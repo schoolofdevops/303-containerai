@@ -110,6 +110,7 @@ When you run `ollama pull qwen2.5:1.5b`, Ollama fetches a GGUF file at roughly `
 | **Qwen3** 4B–8B | 2–5 GB | Latest reasoning series, strong tool use | Recommended beyond labs |
 | **Llama 3.2** 3B | ~2 GB | Meta's compact instruction model | Good general tasks |
 | **Mistral 7B** | ~4 GB | Strong instruction following | Popular production baseline |
+| **gpt-oss** 20B | too big for 16 GB | OpenAI's open-weight release; great via Docker Model Runner on bigger machines | Demo only (Section 1) |
 
 Stay with `qwen2.5:1.5b` for all course labs. It keeps iteration fast and the machine responsive. The model-selection decision becomes interesting in M3, when you learn to serve a model with vLLM and actually need to reason about throughput vs size trade-offs.
 
