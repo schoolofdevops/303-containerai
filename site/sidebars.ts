@@ -44,6 +44,15 @@ const sidebars: SidebarsConfig = {
         'm4-packaging/quiz',
       ],
     },
+    {
+      type: 'category',
+      label: 'M5 · Docs Assistant — Naive RAG',
+      items: [
+        'm5-naive-rag/lesson',
+        'm5-naive-rag/lab',
+        'm5-naive-rag/quiz',
+      ],
+    },
   ],
 };
 
