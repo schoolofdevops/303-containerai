@@ -1,0 +1,71 @@
+# M3 · vLLM on CPU — serves SmolLM2 behind the same OpenAI /v1 contract as M2.
+#
+# Build the patched image (see Dockerfile), then:  docker compose up -d
+# Health:  curl http://localhost:8009/health
+services:
+  vllm-cpu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: vllm-cpu-optimized:latest
+    container_name: vllm-smollm2
+
+    # Args passed to the vLLM OpenAI server entrypoint.
+    command:
+      - --model
+      - ${MODEL_NAME:-HuggingFaceTB/SmolLM2-360M-Instruct}
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "8000"
+      - --dtype
+      - ${DTYPE:-auto}
+      - --max-model-len
+      - "${MAX_MODEL_LEN:-2048}"
+      - --max-num-seqs
+      - "${MAX_NUM_SEQS:-8}"
+      - --tensor-parallel-size
+      - "1"
+      - --disable-log-requests
+      - --trust-remote-code
+
+    ports:
+      # host:container — host 8009 keeps clear of Ollama on 11434.
+      - "${VLLM_PORT:-8009}:8000"
+
+    environment:
+      - VLLM_TARGET_DEVICE=cpu
+      - VLLM_CPU_KVCACHE_SPACE=${KVCACHE_SPACE:-1}
+      # Thread control — the main CPU tuning knob is OMP_NUM_THREADS.
+      - OMP_NUM_THREADS=${OMP_THREADS:-2}
+      - OPENBLAS_NUM_THREADS=1
+      - MKL_NUM_THREADS=1
+      # Cache downloaded weights inside the mounted volume.
+      - HF_HOME=/workspace/.cache/huggingface
+
+    volumes:
+      # Persist model downloads so restarts don't re-fetch multi-GB weights.
+      - hf-cache:/workspace/.cache/huggingface
+
+    # Keep the container from eating the whole laptop.
+    deploy:
+      resources:
+        limits:
+          cpus: "${CPU_LIMIT:-4.0}"
+          memory: ${MEMORY_LIMIT:-8G}
+        reservations:
+          cpus: "${CPU_RESERVATION:-2.0}"
+          memory: ${MEMORY_RESERVATION:-4G}
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+    restart: unless-stopped
+
+volumes:
+  hf-cache:
+    driver: local
