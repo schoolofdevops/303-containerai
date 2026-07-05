@@ -9,7 +9,22 @@
 **Live site:** https://schoolofdevops.github.io/303-containerai/ (every page 200)
 **Execution mode:** subagent-driven, grouped into waves; controller reviews + live validation
 
-## Course status: DONE
+## Post-completion work (2026-07-05, later)
+
+- ✅ **Phase A — full learner-QA pass (M1→Capstone).** A learner-simulating subagent followed each
+  published `lab.md`; fixed all findings. Notable blockers caught & fixed: M3 (client-container step +
+  `.env` DTYPE=auto→float32), M5 (**app ignored the ChromaDB container** — now uses HttpClient; chunk
+  count 3→2), M6 (`cat` not `head`, stale `thv list`, `thv rm` teardown), M7 (missing teardown), M8
+  (deterministic guardrail eval). Teardown steps added where missing. All pushed & deployed.
+- ✅ **Phase B tasks:** M3B fine-tuning module (LoRA/QLoRA, MLX native + Axolotl NVIDIA) LIVE; extracted
+  `course-authoring` + `docusaurus-scaffold` skills (`.claude/skills/`); bumped CI actions to v5.
+- ⏳ **Task 2 (GHCR real push) — BLOCKED on user:** needs `gh auth refresh -h github.com -s write:packages`
+  (interactive). Then: push ModelKit to `ghcr.io/initcron/acme-docs-model:1.0.0`, keyless cosign
+  sign+verify, make package public, fold real GHCR evidence into M4/M8 labs. Validated locally already.
+- Note: pushing `.github/workflows/*` needs a token with `workflow` scope — initcron lacks it; use
+  `gh auth switch --user gouravjshah` for workflow-file pushes, then switch back.
+
+## Course status: DONE (+ QA-hardened; M3B added)
 
 All 8 modules + Setup + Capstone published and validated live on this machine:
 M1 container-native · M2 serving (OpenAI /v1) · M3 vLLM CPU (5 arm64 fixes) · M4 KitOps packaging ·
