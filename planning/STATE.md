@@ -5,19 +5,35 @@
 > and update it after every task/decision.
 
 **Last updated:** 2026-07-05
-**Active phase:** Phase 1 — building M1 (vertical slice). On branch `build/m1-slice`.
-**Active plan:** `planning/plans/2026-07-05-m1-vertical-slice.md`
-**Execution mode:** subagent-driven, grouped into 3 waves (A=site foundation, B=M1 content+lab validation, C=finalize)
+**Active phase:** M1 vertical slice COMPLETE + PUBLISHED. Ready to start M2. Working on `main`.
+**Active plan:** `planning/plans/2026-07-05-m1-vertical-slice.md` (done)
+**Execution mode:** subagent-driven, grouped into waves; controller reviews + live validation
 
 ## Where we are right now
 
-- ✅ Brainstorm → spec approved & committed (`planning/specs/2026-07-05-...-design.md`).
-- ✅ M1 vertical-slice plan written; continuity system built.
-- ✅ **Phase 0 DONE + verified** — Rancher Desktop (docker 29.5.2), Ollama serving, `qwen2.5:1.5b`,
-  container→host wiring all confirmed. Evidence: `planning/lab-tests/00-environment.md`.
-- 🔄 **Wave A IN PROGRESS** (subagent): scaffold Docusaurus + Mermaid + `<Quiz>` component + M1 stubs.
-- 🔜 **NEXT after Wave A:** Wave B — author M1 lesson (analogies + Mermaid), lab + runnable script,
-  validate lab live on Rancher Desktop, quiz. Then Wave C — ROADMAP + README + full build gate.
+- ✅ Brainstorm → spec; M1 plan; continuity system.
+- ✅ **Phase 0 verified** — Rancher Desktop + Ollama + `qwen2.5:1.5b` + container→host wiring. Evidence `lab-tests/00-environment.md`.
+- ✅ **Wave A** — Docusaurus scaffold + Mermaid + `<Quiz>` component.
+- ✅ **Wave B** — M1 lesson (analogies + 2 Mermaid diagrams), lab + `labs/m1/call-ollama.sh`, quiz.
+  Lab validated live on Rancher Desktop → `lab-tests/m1.md`.
+- ✅ **Wave C** — ROADMAP + README + build gate.
+- ✅ **PUBLISHED LIVE:** https://schoolofdevops.github.io/303-containerai/ — Actions deploy green,
+  all M1 pages return 200. (Fixed a stale package-lock.json that broke CI `npm ci`.)
+- 🔜 **NEXT:** either (a) M2 (Serving Local Models), or (b) polish follow-ups below, or (c) optional
+  final whole-branch review. Ask the user which.
+
+## Publishing (working)
+
+- Remote `schoolofdevops/303-containerai`, public. Pages via `.github/workflows/deploy.yml` from `main`.
+- gh active account: **initcron** (admin on repo). Commits authored as `initcron <bean@initcron.org>`.
+- `old/` + `references.txt` purged from history and gitignored — keep private.
+
+## Polish follow-ups (not blocking)
+
+- ⬜ **Homepage still shows the Docusaurus scaffold** (`<title>Easy to Use</title>`, template banner in
+  `site/src/pages/index.tsx`). Replace with a course-branded landing page.
+- ⬜ Fill the two `setup/` stub pages (prerequisites, gpu-reality) with real content.
+- ⬜ (CI) Actions warns Node 20 actions forced to Node 24 — cosmetic; bump action versions later.
 
 ## Key decisions locked (don't re-litigate)
 

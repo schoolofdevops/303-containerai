@@ -9,9 +9,9 @@ Legend: ✅ done · 🔄 in progress · ⬜ pending
 ## Phase 0 — Environment
 - ✅ Rancher Desktop + Ollama + `qwen2.5:1.5b`; container→host wiring verified (`lab-tests/00-environment.md`)
 
-## Phase 1 — Vertical slice
+## Phase 1 — Vertical slice ✅ COMPLETE + PUBLISHED
 - ✅ Docusaurus scaffold + Mermaid + `<Quiz>` component (Wave A)
-- ✅ GitHub Pages publishing configured (baseUrl `/303-containerai/`, Actions workflow)
+- ✅ GitHub Pages publishing LIVE — https://schoolofdevops.github.io/303-containerai/ (Actions deploy green)
 - ✅ **M1 · Container-Native GenAI** — Lesson ✅ · Lab ✅ (validated `lab-tests/m1.md`) · Quiz ✅
 
 ## Phase 2+ — Remaining modules (per-module loop: clone/adapt reuse asset → lesson → lab → validate → quiz)
