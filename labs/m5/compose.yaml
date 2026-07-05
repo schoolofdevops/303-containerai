@@ -1,0 +1,51 @@
+# M5 · Docs Assistant (naive RAG) — the growing compose.yaml, Day 2 edition.
+#
+# Apple-Silicon pattern: the MODEL SERVER runs NATIVELY (Ollama, Metal) on the host;
+# only the vector DB and the app are containerized and reach Ollama via
+# host.docker.internal. On Linux/NVIDIA you could add an `ollama` service instead.
+#
+# Prereqs on the host:  ollama pull qwen2.5:1.5b  &&  ollama pull nomic-embed-text
+services:
+  # Vector database — pinned to 0.5.x to match the langchain-chroma client version.
+  chromadb:
+    image: chromadb/chroma:0.5.20
+    container_name: chromadb
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+    restart: unless-stopped
+
+  # The Docs Assistant — Streamlit RAG app. Embeds + generates via NATIVE Ollama.
+  genai-app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: genai-app
+    ports:
+      - "8501:8501"
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+      - LLM_MODEL=qwen2.5:1.5b
+      - EMBEDDING_MODEL=nomic-embed-text
+    volumes:
+      - ./docs:/app/seed-docs:ro
+    depends_on:
+      - chromadb
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    restart: unless-stopped
+
+volumes:
+  chroma_data:
