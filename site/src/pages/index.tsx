@@ -17,11 +17,14 @@ function HomepageHeader() {
           {siteConfig.title}
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
+        <p className={styles.heroSubtitle}>
+          Serve, package, and ship local LLMs and agentic systems — on any OCI runtime, no paid Docker Desktop.
+        </p>
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
             to="/docs/intro">
-            Docusaurus Tutorial - 5min ⏱️
+            Start the Course →
           </Link>
         </div>
       </div>
@@ -33,8 +36,8 @@ export default function Home(): ReactNode {
   const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+      title={siteConfig.title}
+      description="A hands-on course: serve, package, and ship local LLMs and agentic systems on any OCI runtime — Colima, OrbStack, Rancher Desktop, or Podman.">
       <HomepageHeader />
       <main>
         <HomepageFeatures />

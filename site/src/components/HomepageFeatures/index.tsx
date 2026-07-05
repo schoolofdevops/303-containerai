@@ -5,48 +5,53 @@ import styles from './styles.module.css';
 
 type FeatureItem = {
   title: string;
-  Svg: React.ComponentType<React.ComponentProps<'svg'>>;
+  icon: string;
   description: ReactNode;
 };
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: 'Container-native, not Docker-native',
+    icon: '📦',
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        One <code>compose.yaml</code> runs identically on Colima, OrbStack,
+        Rancher Desktop, or Podman. Built on the OCI standard and the Compose
+        Spec — free of paid Docker Desktop.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    title: 'One real use case, built step by step',
+    icon: '🪜',
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Go from a served model to naive RAG → Agentic RAG → a multi-agent crew,
+        hand-authoring the stack service by service. Every module adds one
+        deliberate step.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    title: 'Runs on a 16 GB laptop',
+    icon: '💻',
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Small quantized models and the native-server / containerized-app pattern
+        keep every lab to ~4–6 GB. No cloud GPU required; Apple Silicon M1 or
+        Windows 11 + WSL2 both work.
       </>
     ),
   },
 ];
 
-function Feature({title, Svg, description}: FeatureItem) {
+function Feature({title, icon, description}: FeatureItem) {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
+        <span className={styles.featureIcon} role="img" aria-hidden="true">
+          {icon}
+        </span>
       </div>
       <div className="text--center padding-horiz--md">
         <Heading as="h3">{title}</Heading>

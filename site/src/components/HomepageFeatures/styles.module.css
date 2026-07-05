@@ -5,7 +5,9 @@
   width: 100%;
 }
 
-.featureSvg {
-  height: 200px;
-  width: 200px;
+.featureIcon {
+  font-size: 4rem;
+  line-height: 1;
+  display: block;
+  margin-bottom: 0.5rem;
 }
