@@ -21,7 +21,7 @@ Legend: ✅ done · 🔄 in progress · ⬜ pending
 | M2 · Serving Local Models (Ollama/OpenAI-compat) | ✅ | ✅ | ✅ | ✅ | — |
 | M3 · Production Serving with vLLM (CPU+GPU) | ✅ | ✅ | ✅ | ✅ | `vllm-cpu-example` |
 | M3B · LoRA/QLoRA *(optional, GPU-gated)* | ⬜ | ⬜ | ⬜ | ⬜ | — |
-| M4 · Packaging Models as OCI Artifacts (KitOps) | ⬜ | ⬜ | ⬜ | ⬜ | — |
+| M4 · Packaging Models as OCI Artifacts (KitOps) | ✅ | ✅ | ✅ | ✅ | — |
 | M5 · Docs Assistant — Naive RAG | ⬜ | ⬜ | ⬜ | ⬜ | `lightweight-genai-stack` |
 | M6 · Declarative Agent (Agentic RAG + MCP) | ⬜ | ⬜ | ⬜ | ⬜ | — |
 | M7 · Multi-Agent Crew (CrewAI + LangGraph) | ⬜ | ⬜ | ⬜ | ⬜ | `compose-for-agents/crew-ai` |

@@ -51,11 +51,20 @@
   & fixed **5 arm64/Rancher incompatibilities** vs the Docker-Desktop reuse repo (CPU cap, swap-space,
   numa/SYS_NICE+seccomp, bf16→float32, 360M→135M). **Requires runtime VM at 4 CPU / 6 GB.**
 
-## Next: M4 · Packaging Models as OCI Artifacts (KitOps)
+- ✅ **M4 · Packaging (KitOps)** — lesson/lab/quiz + `labs/m4` Kitfile assets. Packaging validated live
+  (pack→push→pull→unpack of a 100 MB ModelKit against local `registry:2`) → `lab-tests/m4.md`.
+  `kit` v1.15.0 installed at `/opt/homebrew/bin/kit`. **GHCR push needs a `write:packages` token**
+  (gh token lacks it — user can `gh auth refresh -s write:packages` to enable a real GHCR push).
 
-No reuse repo. Package a model (+ config/prompts) as a ModelKit with KitOps/ORAS, push to GHCR, pull &
-run on a clean env to prove portability. Follow the proven pattern; validate live (kit CLI + a registry).
-Lighter than M3 (no heavy container serving).
+## Next: M5 · Docs Assistant — Naive RAG
+
+Reuse `reference-repos/lightweight-genai-stack` (Ollama + ChromaDB + Streamlit). ADAPT to the course
+pattern: **native Ollama** (host) + containerized ChromaDB + app (not the repo's containerized Ollama).
+Models: `qwen2.5:1.5b` + `nomic-embed-text` (both pulled). Begins the RAG pipeline (ingest→embed→
+retrieve→generate). Validate live on Rancher Desktop. This starts Use Case A (the Docs Assistant).
+
+## Tooling installed (this machine)
+- Rancher Desktop (VM 4 CPU/6 GB), Ollama (qwen2.5:1.5b, nomic-embed-text), `kit` v1.15.0.
 
 ## Key decisions locked (don't re-litigate)
 
