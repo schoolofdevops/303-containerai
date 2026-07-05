@@ -266,6 +266,10 @@ OPENAI_BASE_URL=http://host.docker.internal:8080/v1 \
   docker compose -f labs/m2/compose.yaml run --rm client
 ```
 
+:::note Illustration only — don't run this now
+There is no engine listening on `:8080` in this lab, so the command above is a *demonstration of the seam*, not a step to execute. If you did run it with nothing at that address, you'd get a `Connection error` from the SDK — proof that the only thing that changed was the target URL, not a single line of code. You perform this swap for real against a live engine in M3.
+:::
+
 Or in a `compose.override.yaml`:
 
 ```yaml
@@ -351,7 +355,7 @@ layer cache and finish in seconds.
 You have a containerized Python client that speaks the OpenAI `/v1` contract and reaches Ollama
 natively via `host.docker.internal`. Key results:
 
-- `labs/m2/client.py` — a 6-line Python script that works against any OpenAI-compatible engine
+- `labs/m2/client.py` — a tiny Python script that works against any OpenAI-compatible engine
 - `labs/m2/Dockerfile` — packages it as a portable, minimal image
 - `labs/m2/compose.yaml` — the first entry in the growing multi-module Compose file
 
