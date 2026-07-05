@@ -178,7 +178,7 @@ docker compose run --rm crew "The Kafka event streaming cluster has stopped proc
 INCIDENT: The Kafka event streaming cluster has stopped processing messages.
 ======================================================================
 
-[TRIAGE]      Kafka | SEV3 | ...
+[TRIAGE]      AREA: Kafka | SEV: 3 | Event streaming cluster stalled.
 
 [INVESTIGATOR] NO RUNBOOK FOUND — the knowledge base has no runbook for this incident. Escalate.
 
@@ -198,7 +198,7 @@ Without the gate, the crew would have proposed the payments runbook for a Kafka 
 
 ## Step 6 — Containerised run
 
-The compose service builds the crew as a single image: four profiles + `crew.py`, ~50 MB. The `Dockerfile` is three lines:
+The compose service builds the crew as a single image: four profiles + `crew.py`, ~50 MB. The `Dockerfile` is just a handful of lines (`FROM`, `WORKDIR`, two `COPY`s, `ENTRYPOINT`):
 
 ```dockerfile
 FROM python:3.12-slim
@@ -287,6 +287,27 @@ If the 1.5B model produces garbled output for a particular incident, bump to `qw
 The gate prompt — "Does this passage directly address THIS incident? Answer ONLY YES or NO." — is calibrated for `qwen2.5:1.5b`. If you switch models and find the gate is too strict (rejecting valid runbooks) or too loose (passing irrelevant ones), adjust the prompt to be more specific about what "directly addresses" means for your knowledge base.
 
 :::
+
+---
+
+## Step 7 — Tear down
+
+The crew ran with `--rm`, but `chromadb` is still up (it has `restart: unless-stopped`). Stop it and
+remove the network from `labs/m7/`:
+
+```bash
+docker compose down
+```
+
+**Expected output:**
+```
+[+] Running 2/2
+ ✔ Container chromadb   Removed
+ ✔ Network m7_default   Removed
+```
+
+Your native Ollama keeps running — it's shared by every module. This keeps your 16 GB laptop's
+footprint flat.
 
 ---
 
