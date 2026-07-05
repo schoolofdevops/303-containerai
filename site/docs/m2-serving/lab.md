@@ -271,7 +271,8 @@ Containers are lightweight virtualizations that allow applications to run isolat
 model's reply, and removes the container. No ports are mapped, no long-running daemon — the
 client is ephemeral by design.
 
-:::info The model stays native and shared
+:::info[The model stays native and shared]
+
 Ollama is not in this `compose.yaml`. It lives natively on your Mac and serves Metal-accelerated
 inference. The `compose.yaml` only contains the *consumer* of the model API, not the model itself.
 This is Pattern A from the lesson: native model, containerized everything else.
@@ -295,7 +296,8 @@ OPENAI_BASE_URL=http://host.docker.internal:8080/v1 \
   docker compose -f labs/m2/compose.yaml run --rm client
 ```
 
-:::note Illustration only — don't run this now
+:::note[Illustration only — don't run this now]
+
 There is no engine listening on `:8080` in this lab, so the command above is a *demonstration of the seam*, not a step to execute. If you did run it with nothing at that address, you'd get a `Connection error` from the SDK — proof that the only thing that changed was the target URL, not a single line of code. You perform this swap for real against a live engine in M3.
 :::
 
@@ -321,7 +323,7 @@ The `client.py` from this lab is the code that works on both sides of that swap 
 
 ## Troubleshooting
 
-:::warning `Connection refused` on port 11434
+:::warning[`Connection refused` on port 11434]
 
 Ollama is either not running or is bound only to `localhost`, which is not reachable from inside
 a container.
@@ -340,7 +342,7 @@ On macOS with Ollama installed via the app, you can set this in the app's enviro
 reachable from containers.
 :::
 
-:::warning `Could not resolve host: host.docker.internal` (plain Linux)
+:::warning[`Could not resolve host: host.docker.internal` (plain Linux)]
 
 On a plain Linux host (no Docker Desktop, no Rancher Desktop), the `host.docker.internal` hostname
 is not automatically injected. Uncomment the `extra_hosts` line in `compose.yaml`:
@@ -360,7 +362,7 @@ host machine. This is not needed on Rancher Desktop or Docker Desktop, where the
 injected automatically.
 :::
 
-:::warning `AuthenticationError` or API key validation error
+:::warning[`AuthenticationError` or API key validation error]
 
 The `openai` SDK requires `api_key` to be set to a non-empty string. Ollama does not actually
 validate the key — it ignores it — but the SDK enforces the field client-side.
@@ -370,7 +372,7 @@ validate the key — it ignores it — but the SDK enforces the field client-sid
 in your environment.
 :::
 
-:::warning First build is slow
+:::warning[First build is slow]
 
 The first `docker compose run` (or `docker build`) pulls `python:3.12-slim` from Docker Hub and
 installs the `openai` package. Expect ~1–2 minutes on a fresh machine. Subsequent builds hit the
