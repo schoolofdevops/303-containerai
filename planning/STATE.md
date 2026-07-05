@@ -5,9 +5,18 @@
 > and update it after every task/decision.
 
 **Last updated:** 2026-07-05
-**Active phase:** M1 vertical slice COMPLETE + PUBLISHED. Ready to start M2. Working on `main`.
-**Active plan:** `planning/plans/2026-07-05-m1-vertical-slice.md` (done)
+**Active phase:** ✅ **COURSE COMPLETE** — M1–M8 + Capstone all live + lab-validated. Working on `main`.
+**Live site:** https://schoolofdevops.github.io/303-containerai/ (every page 200)
 **Execution mode:** subagent-driven, grouped into waves; controller reviews + live validation
+
+## Course status: DONE
+
+All 8 modules + Setup + Capstone published and validated live on this machine:
+M1 container-native · M2 serving (OpenAI /v1) · M3 vLLM CPU (5 arm64 fixes) · M4 KitOps packaging ·
+M5 naive RAG · M6 declarative agentic-RAG agent + ToolHive · M7 Incident Crew · M8 SBOM/scan/sign/sandbox
+· Capstone platform-check. Evidence in `planning/lab-tests/*.md`. Site-wide sweep clean (quiz schema,
+admonitions, mermaid). Possible next work: M3B (LoRA/QLoRA, GPU-gated), extract authoring skills,
+enable GHCR `write:packages` for a real ModelKit/cosign push, deeper per-module review.
 
 ## Where we are right now
 
