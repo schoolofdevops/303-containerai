@@ -1,0 +1,139 @@
+---
+sidebar_position: 3
+title: 'Quiz: Module 3'
+---
+
+import Quiz from '@site/src/components/Quiz';
+
+# Module 3 Quiz
+
+Test your understanding of vLLM, PagedAttention, continuous batching, the CPU track and its NUMA patch, and quantization from the lesson and lab.
+
+<Quiz questions={[
+  {
+    prompt: 'Which mechanisms let vLLM achieve roughly 3× the throughput of a naive server under load? (Select all that apply)',
+    multiSelect: true,
+    options: [
+      {
+        text: 'Continuous batching — refilling a finished sequence slot mid-flight instead of waiting for the whole batch to complete.',
+        correct: true,
+        explanation: 'Correct. Token-level scheduling means a finished sequence leaves and a waiting request takes its place immediately, so no slot sits idle — the "never idle group head" from the espresso-café analogy.',
+      },
+      {
+        text: 'PagedAttention — allocating the KV cache in small on-demand pages instead of one big contiguous reservation.',
+        correct: true,
+        explanation: 'Correct. Paging the KV cache like an OS pages RAM cuts memory waste from ~60–80% to under 4%, so far more sequences fit at once — which is what feeds continuous batching enough concurrent work to stay busy.',
+      },
+      {
+        text: 'Running the model at a higher clock speed than other engines.',
+        correct: false,
+        explanation: 'Engines do not change hardware clock speed. Each individual request takes the same time; vLLM wins by keeping the hardware busy across many requests, not by making one request faster.',
+      },
+      {
+        text: 'Silently dropping requests when the queue gets long.',
+        correct: false,
+        explanation: 'vLLM does not drop requests to look fast. Its throughput gain comes from eliminating idle memory and idle compute slots, not from discarding work.',
+      },
+    ],
+  },
+  {
+    prompt: 'The lesson compares PagedAttention to a familiar operating-system technique. Which one, and why?',
+    options: [
+      {
+        text: 'CPU branch prediction — it guesses the next token before it is computed.',
+        correct: false,
+        explanation: 'PagedAttention is about memory allocation, not speculative execution. It does not guess tokens.',
+      },
+      {
+        text: 'Virtual memory paging — the KV cache is handed out in small fixed-size pages mapped on demand, so memory never fragments into unusable reserved-but-empty gaps.',
+        correct: true,
+        explanation: 'Correct. Just as an OS avoids demanding one contiguous block per program by paging memory, PagedAttention pages the KV cache — dropping waste from ~60–80% to under 4% and letting many more sequences fit in the same VRAM.',
+      },
+      {
+        text: 'Disk defragmentation — it periodically rearranges the KV cache into one contiguous block.',
+        correct: false,
+        explanation: 'It is the opposite: PagedAttention avoids needing contiguous memory at all by using pages plus a lookup table. It does not defragment into a contiguous block.',
+      },
+      {
+        text: 'Swap files — it moves the KV cache to disk when VRAM runs out.',
+        correct: false,
+        explanation: 'PagedAttention is about fine-grained in-memory allocation, not spilling to disk. The paging analogy refers to fixed-size pages, not swapping to storage.',
+      },
+    ],
+  },
+  {
+    prompt: 'You built a client against Ollama in M2. Now you want it to talk to the vLLM server from this lab instead. What has to change?',
+    options: [
+      {
+        text: 'Only OPENAI_BASE_URL — point it from the Ollama address to http://host.docker.internal:8009/v1. No code, SDK, or image change.',
+        correct: true,
+        explanation: 'Correct. vLLM exposes the identical OpenAI-compatible /v1 contract as Ollama. This is the wall-socket principle: the client speaks to the contract, and swapping the engine behind it is a one-variable deployment change.',
+      },
+      {
+        text: 'Rewrite client.py to use a vLLM-specific SDK and response parser.',
+        correct: false,
+        explanation: 'There is no vLLM-specific SDK needed. The same openai SDK and the same choices[0].message.content parsing work, because the response shape is identical.',
+      },
+      {
+        text: 'Rebuild the client image with CUDA libraries so it can talk to a GPU engine.',
+        correct: false,
+        explanation: 'The client never touches the GPU — it makes an HTTP call to a /v1 endpoint. The engine\'s hardware is irrelevant to the client. In this lab vLLM even runs on CPU.',
+      },
+      {
+        text: 'Nothing — Ollama and vLLM share a process, so the client reaches both automatically.',
+        correct: false,
+        explanation: 'They are separate servers on separate ports. You do change one thing: the base URL. Everything else stays the same.',
+      },
+    ],
+  },
+  {
+    prompt: 'The CPU Dockerfile patches cpu_worker.py with a one-line sed. What problem does that patch fix?',
+    options: [
+      {
+        text: 'It disables GPU detection so vLLM does not try to use a GPU that is not there.',
+        correct: false,
+        explanation: 'The patch has nothing to do with GPU detection. The image is a CPU build; the crash is in NUMA-node handling.',
+      },
+      {
+        text: 'Inside a container the kernel reports 0 NUMA nodes, so vLLM\'s cpu_count // numa_size becomes a division by zero and the worker crashes on startup. The patch guards that division.',
+        correct: true,
+        explanation: 'Correct. A container is like a furnished apartment that cannot see the building\'s floor plan, so numa_size is 0. The patch adds "if numa_size > 0 else cpu_count" so the worker uses the full CPU count instead of dividing by zero.',
+      },
+      {
+        text: 'It increases the KV cache size so longer prompts do not overflow memory.',
+        correct: false,
+        explanation: 'KV cache size is controlled by VLLM_CPU_KVCACHE_SPACE and --max-model-len, not by this patch. The patch is purely a division-by-zero guard for NUMA handling.',
+      },
+      {
+        text: 'It converts the model weights to a quantized format at build time.',
+        correct: false,
+        explanation: 'The patch does not touch model weights. Quantization is a property of the model checkpoint you load, done ahead of time, not something the sed line performs.',
+      },
+    ],
+  },
+  {
+    prompt: 'A colleague wants to fit a 7B model onto a smaller GPU and asks about quantization trade-offs. Which statement is accurate?',
+    options: [
+      {
+        text: 'Quantization increases model quality, which is why production always uses it.',
+        correct: false,
+        explanation: 'Quantization trades a small amount of accuracy for much smaller memory and faster loading — it does not increase quality. It is used because the trade-off is usually worth it, not because it improves outputs.',
+      },
+      {
+        text: '4-bit AWQ roughly quarters VRAM versus FP16 for a small accuracy cost, often making a 7B model fit a consumer 8 GB card; FP8 is near-lossless but needs newer GPU hardware.',
+        correct: true,
+        explanation: 'Correct. AWQ and GPTQ are common 4-bit formats (AWQ is activation-aware and retains accuracy well); FP8 is an 8-bit float format that is near-lossless but requires Hopper/Ada-class hardware. You pass a pre-quantized checkpoint and vLLM detects the method.',
+      },
+      {
+        text: 'FP8 uses fewer bits than 4-bit AWQ, so it always saves the most memory.',
+        correct: false,
+        explanation: 'FP8 is 8-bit, which is more bits than 4-bit AWQ — so AWQ saves more memory. FP8\'s advantage is near-lossless quality on capable hardware, not maximum compression.',
+      },
+      {
+        text: 'Quantization only works on CPU, so it is irrelevant to the GPU track.',
+        correct: false,
+        explanation: 'Quantization is most impactful on the GPU track, where it lets a large model fit limited VRAM. It is not CPU-only.',
+      },
+    ],
+  },
+]} />
