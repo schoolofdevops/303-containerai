@@ -26,6 +26,15 @@ const sidebars: SidebarsConfig = {
         'm2-serving/quiz',
       ],
     },
+    {
+      type: 'category',
+      label: 'M3 · Production Serving with vLLM',
+      items: [
+        'm3-vllm/lesson',
+        'm3-vllm/lab',
+        'm3-vllm/quiz',
+      ],
+    },
   ],
 };
 
