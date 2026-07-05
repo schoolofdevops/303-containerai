@@ -1,0 +1,60 @@
+---
+sidebar_position: 2
+title: 'Quiz: Capstone'
+---
+
+import Quiz from '@site/src/components/Quiz';
+
+# Quiz: Capstone
+
+Test your understanding of the end-to-end Acme AI Support Platform — the architecture, the portability principle, and which module is responsible for each layer.
+
+<Quiz questions={[
+  {
+    prompt: 'In the Acme AI Support Platform, which component runs NATIVE on the host — outside any container?',
+    options: [
+      { text: 'Ollama model server (qwen2.5:1.5b + nomic-embed-text)', correct: true, explanation: 'Ollama runs natively on the host, using Metal on Apple Silicon or the CPU elsewhere. All containers reach it at host.docker.internal:11434 — the model never moves into a container.' },
+      { text: 'ChromaDB vector store', correct: false, explanation: 'ChromaDB is containerised — it runs as a service in the compose.yaml alongside the Docs Assistant and Support Agent.' },
+      { text: 'ToolHive MCP gateway', correct: false, explanation: 'ToolHive (thv) runs as a container process that brokers MCP tool calls for the Support Agent and Incident Crew.' },
+      { text: 'Streamlit Docs Assistant', correct: false, explanation: 'The Streamlit app is a container. It reaches ChromaDB and Ollama through the compose network and host.docker.internal respectively.' },
+    ],
+  },
+  {
+    prompt: 'Which of the following reasons explain why the same compose.yaml runs unchanged on Colima, Rancher Desktop, OrbStack, and Podman? Select all that apply.',
+    multiSelect: true,
+    options: [
+      { text: 'The OCI image format is a cross-runtime open standard', correct: true, explanation: 'Any OCI-compliant runtime can pull and run any OCI image — the spec defines the contract, not the vendor. This is the M1 container-native principle.' },
+      { text: 'The Compose Spec is an open standard independent of Docker Desktop', correct: true, explanation: 'compose.yaml follows the Compose Spec, which Podman Compose, Rancher Desktop, OrbStack, and Colima all implement. It is not a Docker Desktop proprietary format.' },
+      { text: 'host.docker.internal resolves to the host on all four runtimes', correct: true, explanation: 'Every OCI runtime on macOS (and most Linux setups) resolves host.docker.internal to the host IP, so containers always find the native Ollama server at the same address.' },
+      { text: 'All four runtimes share the same proprietary Docker API layer', correct: false, explanation: 'They do not share a proprietary API layer — portability comes from the open OCI and Compose Spec standards, not from a common vendor implementation.' },
+    ],
+  },
+  {
+    prompt: 'The platform-check.sh script tests four things: runtime, model serving, container→host wiring, and supply chain tooling. Which module introduced the host.docker.internal wiring pattern that all later modules depend on?',
+    options: [
+      { text: 'M1 — Container-Native GenAI', correct: true, explanation: 'M1 establishes the container-native pattern and proves the host.docker.internal wiring on Apple Silicon. Every subsequent module inherits this address without modification.' },
+      { text: 'M2 — Serving Local Models', correct: false, explanation: 'M2 introduced the OpenAI-compatible /v1 API contract, but the host.docker.internal wiring that lets containers reach the native server was the M1 lesson and lab.' },
+      { text: 'M5 — Docs Assistant (Naive RAG)', correct: false, explanation: 'M5 used the wiring to connect the Streamlit app and ChromaDB to Ollama, but it did not introduce it — that was M1.' },
+      { text: 'M6 — Declarative Agent', correct: false, explanation: 'M6 added agentic routing and ToolHive, but relied on the same host.docker.internal pattern established in M1.' },
+    ],
+  },
+  {
+    prompt: 'The Incident Crew (M7) runs four specialised agents — Triage, Investigator, Fixer, Reviewer — in sequence on one shared native model. What is the PRIMARY architectural reason for splitting the work across four agents rather than one?',
+    options: [
+      { text: 'Specialisation keeps each agent\'s context small and auditable; the Reviewer can catch errors the other agents make without seeing their full working', correct: true, explanation: 'Each agent has exactly one job and a tight context. The Reviewer is the explicit approval gate — it checks the Fixer\'s proposed command against the runbook and can reject it. A single all-purpose agent cannot audit its own output.' },
+      { text: 'Four agents run four times faster because they execute in parallel', correct: false, explanation: 'The Incident Crew runs in sequence (Triage → Investigator → Fixer → Reviewer), not in parallel. Each agent\'s output feeds the next. The benefit is specialisation and auditability, not throughput.' },
+      { text: 'A 1.5B model cannot answer any question in a single prompt', correct: false, explanation: 'The 1.5B model handles each specialised agent\'s narrow task reliably. The crew design is about separation of concerns and auditability, not raw model capability.' },
+      { text: 'Using more agents always produces better results for any task', correct: false, explanation: 'Multi-agent adds coordination overhead. A single well-prompted agent is sufficient for simple Q&A (M6). The crew pattern makes sense for multi-step tasks with approval gates, not as a universal rule.' },
+    ],
+  },
+  {
+    prompt: 'Which tools form the M8 container supply chain pipeline? Select all that apply.',
+    multiSelect: true,
+    options: [
+      { text: 'Syft — generates the Software Bill of Materials (SBOM)', correct: true, explanation: 'Syft produces a complete SBOM listing every package inside the container image — the ingredients label for the container.' },
+      { text: 'Trivy and Grype — scan the image for known vulnerabilities', correct: true, explanation: 'Both scanners check the image (and its SBOM) against CVE databases. A result above the severity threshold blocks the image from reaching the registry.' },
+      { text: 'Cosign — signs the image and stores the attestation in the registry', correct: true, explanation: 'Cosign applies a cryptographic signature stored as an OCI referrer alongside the image. Any downstream consumer can verify the signature without trusting the sender.' },
+      { text: 'KitOps — scans the model weights for adversarial content', correct: false, explanation: 'KitOps (kit) is the M4 packaging tool — it bundles model weights + config + prompts into a signed OCI artifact. It does not perform vulnerability scanning; that is Trivy and Grype\'s job.' },
+    ],
+  },
+]} />
