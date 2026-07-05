@@ -56,15 +56,22 @@
   `kit` v1.15.0 installed at `/opt/homebrew/bin/kit`. **GHCR push needs a `write:packages` token**
   (gh token lacks it — user can `gh auth refresh -s write:packages` to enable a real GHCR push).
 
-## Next: M5 · Docs Assistant — Naive RAG
+- ✅ **M5 · Docs Assistant (Naive RAG)** — lesson/lab/quiz + `labs/m5` (native Ollama + ChromaDB 0.5.20 +
+  Streamlit). Full RAG round-trip + app health validated live → `lab-tests/m5.md`. Use Case A started.
 
-Reuse `reference-repos/lightweight-genai-stack` (Ollama + ChromaDB + Streamlit). ADAPT to the course
-pattern: **native Ollama** (host) + containerized ChromaDB + app (not the repo's containerized Ollama).
-Models: `qwen2.5:1.5b` + `nomic-embed-text` (both pulled). Begins the RAG pipeline (ingest→embed→
-retrieve→generate). Validate live on Rancher Desktop. This starts Use Case A (the Docs Assistant).
+## Next: M6 · Declarative Agent (Agentic RAG + MCP tools via ToolHive)
+
+**De-risked:** `thv` v0.33.0 installed; ran the `fetch` MCP server as an isolated container (server +
+ingress/egress proxies + DNS) — evidence in `/tmp/toolhive-evidence.txt` (fold into lab-tests/m6.md).
+Still to design: the declarative agent runtime (AGENTS.md/SOUL.md + skills + MCP + guardrails) — pick a
+concrete runnable approach (likely a small Python agent over native Ollama that reads AGENTS.md/SOUL.md
+and calls ToolHive MCP tools + the M5 Docs Assistant as a retrieval tool). Agentic RAG = agent decides
+whether/what to retrieve. Starts Use Case B.
 
 ## Tooling installed (this machine)
-- Rancher Desktop (VM 4 CPU/6 GB), Ollama (qwen2.5:1.5b, nomic-embed-text), `kit` v1.15.0.
+- Rancher Desktop (VM 4 CPU/6 GB), Ollama (qwen2.5:1.5b, nomic-embed-text), vLLM CPU image, `kit` v1.15.0,
+  `thv` v0.33.0 (ToolHive), trivy/syft/grype/cosign (for M8). `kit` + `thv` at `/opt/homebrew/bin`.
+- ToolHive needs `DOCKER_HOST=unix://$HOME/.rd/docker.sock` set for automated `thv` calls.
 
 ## Key decisions locked (don't re-litigate)
 
