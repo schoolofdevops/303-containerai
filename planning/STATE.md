@@ -37,13 +37,20 @@
 - Note: GitHub Pages "Deploy" step can intermittently fail with "try again later" (transient) — just
   `gh run rerun <id> --failed`.
 
-## Next: M2 · Serving Local Models the Universal Way
+## Modules complete
 
-Follow the proven M1 pattern (lesson w/ analogies+Mermaid → lab → live validation → quiz). M2 scope:
-DMR demo → open engines (Ollama/llama.cpp/LocalAI) → **OpenAI-compatible endpoint as the universal
-contract** (`/v1/...`) → GGUF + laptop model selection → two wiring patterns. Lab: containerize a small
-Python client hitting the OpenAI-compatible API at `host.docker.internal:11434/v1`; this begins the
-hand-authored `compose.yaml`.
+- ✅ **M1 · Container-Native GenAI** — live, lab-validated.
+- ✅ **M2 · Serving Local Models** — lesson (analogies + 2 Mermaid), lab (OpenAI-compatible `/v1`
+  client, containerized, first hand-authored `labs/m2/compose.yaml`), quiz. Lab validated live →
+  `lab-tests/m2.md`. Admonitions in bracket form.
+- Fixed a site-wide bug: Docusaurus admonition titles need bracket form `:::type[Title]` (space form
+  renders literally). Convention now in CLAUDE.md.
+
+## Next: M3 · Production Serving with vLLM (CPU + GPU)
+
+Reuse anchor cloned at `reference-repos/vllm-cpu-example` (SmolLM2, resource presets, NUMA/thread
+tuning). CPU track is universal (runs in a container on this Mac); GPU track documented. Follow the
+proven pattern; validate the CPU vLLM lab live on Rancher Desktop.
 
 ## Key decisions locked (don't re-litigate)
 

@@ -18,7 +18,7 @@ Legend: ✅ done · 🔄 in progress · ⬜ pending
 
 | Module | Lesson | Lab | Lab validated | Quiz | Reuse asset |
 | --- | --- | --- | --- | --- | --- |
-| M2 · Serving Local Models (Ollama/OpenAI-compat) | ⬜ | ⬜ | ⬜ | ⬜ | — |
+| M2 · Serving Local Models (Ollama/OpenAI-compat) | ✅ | ✅ | ✅ | ✅ | — |
 | M3 · Production Serving with vLLM (CPU+GPU) | ⬜ | ⬜ | ⬜ | ⬜ | `vllm-cpu-example` |
 | M3B · LoRA/QLoRA *(optional, GPU-gated)* | ⬜ | ⬜ | ⬜ | ⬜ | — |
 | M4 · Packaging Models as OCI Artifacts (KitOps) | ⬜ | ⬜ | ⬜ | ⬜ | — |
