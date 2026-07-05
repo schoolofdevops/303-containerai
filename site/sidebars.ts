@@ -80,6 +80,14 @@ const sidebars: SidebarsConfig = {
         'm8-security/quiz',
       ],
     },
+    {
+      type: 'category',
+      label: 'Capstone · Ship the Acme AI Platform',
+      items: [
+        'capstone/index',
+        'capstone/quiz',
+      ],
+    },
   ],
 };
 
