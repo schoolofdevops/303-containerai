@@ -1,0 +1,139 @@
+---
+sidebar_position: 3
+title: 'Quiz: Module M3B'
+---
+
+import Quiz from '@site/src/components/Quiz';
+
+# Module M3B Quiz
+
+Test your understanding of LoRA/QLoRA fine-tuning, when to fine-tune vs. other strategies, the Apple Silicon vs. NVIDIA toolchain split, and the container-as-experiment-record pattern.
+
+<Quiz questions={[
+  {
+    prompt: 'Which situations are strong candidates for fine-tuning over RAG or prompting? (Select all that apply)',
+    multiSelect: true,
+    options: [
+      {
+        text: 'The model needs to consistently output valid JSON in a specific schema, and few-shot prompting still occasionally produces malformed output.',
+        correct: true,
+        explanation: 'Correct. Reliable output structure is one of the clearest wins for fine-tuning — you are teaching a behaviour pattern, not adding knowledge. Few-shot prompting can drift; a fine-tuned adapter locks the format in.',
+      },
+      {
+        text: "The model doesn't know about your company's internal runbooks written last month.",
+        correct: false,
+        explanation: "This is a knowledge gap, not a behaviour gap — RAG (M5/M6) is the right tool. Fine-tuning a model on private documents gives it style familiarity but doesn't reliably inject facts; RAG retrieves the actual content at inference time.",
+      },
+      {
+        text: 'You need the model to write in a consistent house style using internal product names that do not appear in its training data.',
+        correct: true,
+        explanation: 'Correct. Domain dialect — vocabulary, tone, acronyms — is a behaviour that fine-tuning encodes reliably, especially when you have dozens to hundreds of examples of the target style.',
+      },
+      {
+        text: 'You want to deploy a smaller specialist model to edge hardware instead of calling a large cloud API.',
+        correct: true,
+        explanation: 'Correct. A LoRA-fine-tuned small model can out-perform a larger generalist on a narrow task, and the adapter + base model package is small enough to ship to constrained hardware.',
+      },
+    ],
+  },
+  {
+    prompt: 'The lesson compares LoRA to sticky notes on a textbook. What does each part of the analogy map to?',
+    options: [
+      {
+        text: 'The textbook = the LoRA adapter; the sticky notes = the base model weights.',
+        correct: false,
+        explanation: 'The analogy is reversed. The textbook is the large, expensive thing you cannot rewrite — that is the base model. The sticky notes are the small, targeted additions — that is the LoRA adapter.',
+      },
+      {
+        text: 'The textbook = the frozen base model weights; the sticky notes = the two small trainable LoRA matrices added per layer.',
+        correct: true,
+        explanation: 'Correct. LoRA freezes the base weights (textbook, unchanged) and trains two tiny low-rank matrices per layer (sticky notes). At inference the sticky notes are multiplied and added to the frozen weights — no rewriting, just targeted annotation.',
+      },
+      {
+        text: 'The textbook = the training dataset; the sticky notes = the gradient updates applied during training.',
+        correct: false,
+        explanation: 'The analogy is about the model weights, not the training process. The textbook is the base model; the sticky notes are the trained adapter matrices that are attached alongside it.',
+      },
+      {
+        text: 'The textbook = the Docker image; the sticky notes = the YAML config passed to Axolotl.',
+        correct: false,
+        explanation: "This misses the point of the analogy. The textbook/sticky-note metaphor explains the weight architecture (frozen base + small trained matrices), not the tooling or deployment setup.",
+      },
+    ],
+  },
+  {
+    prompt: 'Why can you not run a GPU-accelerated QLoRA fine-tune inside a Docker container on an Apple Silicon Mac?',
+    options: [
+      {
+        text: 'Docker does not support arm64 images, so the Axolotl image will not pull on a Mac.',
+        correct: false,
+        explanation: 'Docker supports arm64 and many images are multi-arch. The blocker is not image architecture — it is the absence of a CUDA path from container to hardware.',
+      },
+      {
+        text: "bitsandbytes requires CUDA, which does not exist on macOS, and Docker containers on Mac have no path to the Metal GPU or Neural Engine — so the container falls back to CPU and bitsandbytes fails to import.",
+        correct: true,
+        explanation: 'Correct. bitsandbytes is a CUDA library — it will not install on macOS. Even if the image ran, Docker on Mac runs inside a Linux VM with no GPU pass-through to the Apple GPU/Neural Engine. MLX-LM exists precisely to fill this gap natively.',
+      },
+      {
+        text: 'Axolotl only supports x86_64 CPUs and will crash on Apple Silicon.',
+        correct: false,
+        explanation: 'Architecture compatibility is not the issue. Axolotl itself can run on arm64 for CPU workloads; the blocker is CUDA dependency (bitsandbytes) which does not exist on macOS regardless of CPU architecture.',
+      },
+      {
+        text: 'The NVIDIA Container Toolkit is not installed on Macs, but installing it would make GPU containers work.',
+        correct: false,
+        explanation: 'The NVIDIA Container Toolkit works on Linux + NVIDIA GPU. Apple Silicon uses Metal/Neural Engine, not CUDA, and installing the NVIDIA toolkit on a Mac is not possible or meaningful.',
+      },
+    ],
+  },
+  {
+    prompt: 'After a successful Axolotl QLoRA run, what does the output directory contain, and how does it relate to the base model?',
+    options: [
+      {
+        text: 'A full copy of the base model with the fine-tuned weights merged in — you must always ship the complete model.',
+        correct: false,
+        explanation: 'LoRA training does not modify or copy the base model weights. The output is only the adapter. You can merge later if you want a single file, but the default output is adapter-only.',
+      },
+      {
+        text: 'adapter_model.safetensors and adapter_config.json — a small adapter (20–200 MB) that references the base model but does not include its weights.',
+        correct: true,
+        explanation: 'Correct. The base model was frozen (quantized to 4-bit in QLoRA but never updated). Only the two LoRA matrices per targeted layer were trained and saved. The adapter is tiny compared to the base model and can be hot-loaded into Ollama or vLLM alongside the shared base.',
+      },
+      {
+        text: 'A new Docker image containing the fine-tuned model, ready to push to a registry.',
+        correct: false,
+        explanation: 'Axolotl outputs model files, not Docker images. Packaging the adapter into an OCI artifact (ModelKit) is a separate step covered in M4.',
+      },
+      {
+        text: 'A GGUF quantized file compatible with llama.cpp and Ollama, generated automatically.',
+        correct: false,
+        explanation: 'Axolotl produces safetensors format, not GGUF. GGUF conversion is a separate step (llama.cpp convert scripts). The adapter is loaded by compatible frameworks (vLLM, PEFT) directly in safetensors format.',
+      },
+    ],
+  },
+  {
+    prompt: 'The lesson says the frozen container image is the reproducibility unit for a fine-tuning experiment. What does pinning an image tag guarantee that pinning a pip requirements.txt alone does not?',
+    options: [
+      {
+        text: 'Pinning an image tag is unnecessary — pip requirements.txt with exact versions provides identical reproducibility.',
+        correct: false,
+        explanation: 'pip + requirements.txt pins Python packages but not the system libraries, CUDA toolkit version, OS-level shared libraries (libcuda, libnccl), or the Python runtime itself. An image tag freezes the entire userspace stack.',
+      },
+      {
+        text: 'A tagged image freezes the entire userspace — CUDA toolkit, system libraries, bitsandbytes, PEFT, Python runtime — so the exact same binary environment runs six months later, regardless of upstream package updates.',
+        correct: true,
+        explanation: 'Correct. pip requirements.txt pins Python packages but the image goes further: it pins the OS base, the CUDA runtime, system .so libraries, and the Python interpreter version — everything that can shift between runs. Image tag + YAML config = immutable experiment record.',
+      },
+      {
+        text: 'A tagged image prevents the model from being updated by Hugging Face, ensuring the base weights stay the same.',
+        correct: false,
+        explanation: 'The image does not control the Hugging Face model weights — those are downloaded separately. To pin the base model, store it in your own registry or use a specific commit hash from the Hub. The image pins the training environment, not the model weights.',
+      },
+      {
+        text: 'A tagged image automatically encrypts the LoRA adapter output to prevent unauthorised fine-tune reuse.',
+        correct: false,
+        explanation: 'Image tagging has nothing to do with encryption or access control. It is purely a reproducibility and environment-pinning mechanism.',
+      },
+    ],
+  },
+]} />
