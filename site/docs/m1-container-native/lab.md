@@ -115,7 +115,9 @@ You should see a `"response"` field with a short reply. The exact wording varies
 
 ## Step 4 — Wrap it in a script
 
-Download and run the convenience script from the `labs/m1/` directory of this repository:
+The `labs/m1/` directory of this repo already includes a convenience script, `call-ollama.sh`, that runs
+the exact command from Step 3. From the **root of the course repo** (where you cloned it), make it
+executable:
 
 ```bash
 chmod +x labs/m1/call-ollama.sh
@@ -127,9 +129,9 @@ Run it with the default prompt:
 ./labs/m1/call-ollama.sh
 ```
 
-**Expected output:**
+**Expected output** (the response wording varies — the model is generative; the JSON *shape* is what matters):
 ```json
-{"model":"qwen2.5:1.5b","created_at":"...","response":"A container is a lightweight virtualization technology that allows you to package an application and all its dependencies into a single unit, which can then be easily deployed across different computing environments.","done":true,...}
+{"model":"qwen2.5:1.5b","created_at":"...","response":"A container is a lightweight virtualization technology that packages an application with its dependencies so it runs the same anywhere.","done":true,...}
 ```
 
 Run it with a custom prompt:
@@ -138,9 +140,9 @@ Run it with a custom prompt:
 ./labs/m1/call-ollama.sh "What is a container registry in one sentence?"
 ```
 
-**Expected output:**
+**Expected output** (wording will differ):
 ```json
-{"model":"qwen2.5:1.5b","created_at":"...","response":"A container registry is an online repository for storing and managing Docker images.","done":true,...}
+{"model":"qwen2.5:1.5b","created_at":"...","response":"A container registry is an online repository for storing and managing container images.","done":true,...}
 ```
 
 The script is a thin wrapper around the `docker run` command from Step 3. Open it and read it — there are no surprises:
