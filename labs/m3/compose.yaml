@@ -10,22 +10,42 @@ services:
     image: vllm-cpu-optimized:latest
     container_name: vllm-smollm2
 
+    # vLLM's CPU backend migrates memory pages across NUMA nodes at startup.
+    # That needs the SYS_NICE capability AND the migrate_pages syscall, which
+    # the default seccomp profile blocks — without both you get
+    # "numa_migrate_pages failed. errno: 1" (EPERM).
+    cap_add:
+      - SYS_NICE
+    security_opt:
+      - seccomp:unconfined
+
     # Args passed to the vLLM OpenAI server entrypoint.
     command:
+      # Default to the 135M model: float32 (required on CPU) doubles memory vs the
+      # model's native bf16, so 135M keeps the whole engine comfortably inside a
+      # ~5 GB container. Bump to 360M/1.7B via .env if you gave the VM more RAM.
       - --model
-      - ${MODEL_NAME:-HuggingFaceTB/SmolLM2-360M-Instruct}
+      - ${MODEL_NAME:-HuggingFaceTB/SmolLM2-135M-Instruct}
       - --host
       - "0.0.0.0"
       - --port
       - "8000"
+      # Force float32 on CPU: '--dtype auto' picks the model's native bfloat16,
+      # but CPU kernels (esp. on arm64) lack bf16 support and crash inference with
+      # "rms_norm_impl not implemented for 'BFloat16'". float32 is the safe CPU dtype.
       - --dtype
-      - ${DTYPE:-auto}
+      - ${DTYPE:-float32}
+      # Smaller context + fewer concurrent seqs = smaller KV cache = fits in RAM.
       - --max-model-len
-      - "${MAX_MODEL_LEN:-2048}"
+      - "${MAX_MODEL_LEN:-1024}"
       - --max-num-seqs
-      - "${MAX_NUM_SEQS:-8}"
+      - "${MAX_NUM_SEQS:-4}"
       - --tensor-parallel-size
       - "1"
+      # CPU swap space for KV-cache offload (GiB). vLLM defaults to 4 GiB, which
+      # is larger than this container's RAM — keep it small so startup succeeds.
+      - --swap-space
+      - "${SWAP_SPACE:-1}"
       - --disable-log-requests
       - --trust-remote-code
 
@@ -47,15 +67,15 @@ services:
       # Persist model downloads so restarts don't re-fetch multi-GB weights.
       - hf-cache:/workspace/.cache/huggingface
 
-    # Keep the container from eating the whole laptop.
+    # Keep the container from eating the whole laptop. These are CAPS, not
+    # requirements — each limit must be <= what your runtime VM has allocated.
+    # This lab assumes your container runtime has >= 4 CPUs and >= 6 GB (see the
+    # lab's setup note). Lower these if you allocated less.
     deploy:
       resources:
         limits:
           cpus: "${CPU_LIMIT:-4.0}"
-          memory: ${MEMORY_LIMIT:-8G}
-        reservations:
-          cpus: "${CPU_RESERVATION:-2.0}"
-          memory: ${MEMORY_RESERVATION:-4G}
+          memory: ${MEMORY_LIMIT:-5G}
 
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]

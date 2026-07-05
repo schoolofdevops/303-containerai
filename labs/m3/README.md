@@ -32,9 +32,9 @@ curl http://localhost:8009/v1/models
 
 curl http://localhost:8009/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -d '{"model":"HuggingFaceTB/SmolLM2-360M-Instruct",
-       "messages":[{"role":"user","content":"Explain containers in one sentence."}],
-       "max_tokens":64}'
+  -d '{"model":"HuggingFaceTB/SmolLM2-135M-Instruct",
+       "messages":[{"role":"user","content":"In one sentence, what is a Linux container?"}],
+       "max_tokens":48}'
 
 docker compose down         # stop and free RAM
 ```

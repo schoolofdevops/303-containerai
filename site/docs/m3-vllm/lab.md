@@ -5,10 +5,22 @@ title: 'Lab: Serve SmolLM2 on CPU vLLM'
 
 # Lab: Serve SmolLM2 on CPU vLLM
 
-**Goal:** Build a patched CPU vLLM image, serve `SmolLM2-360M` behind the OpenAI-compatible `/v1` API, prove it's the *same contract* your M2 client speaks by pointing that client at it with a one-line change, then tune the CPU knobs.
+**Goal:** Build a patched CPU vLLM image, serve `SmolLM2-135M` behind the OpenAI-compatible `/v1` API, prove it's the *same contract* your M2 client speaks by pointing that client at it with a one-line change, then tune the CPU knobs.
 
 **Time:** ~30 minutes (plus a one-time multi-GB image pull + model download on first run)
 **Prerequisites:** Rancher Desktop (or Docker Desktop) running; `docker` and `docker compose` on your PATH; the M2 lab's `client.py` handy. Lab assets live in `labs/m3/`.
+
+:::danger[Allocate resources first — vLLM is heavier than Ollama]
+
+Unlike M1/M2 (where the model ran natively), vLLM runs **inside a container**, so it needs real CPU and RAM allocated to your container runtime's VM. **Give your runtime at least 4 CPUs and 6 GB of memory** before this lab:
+
+- **Rancher Desktop:** Preferences → **Virtual Machine** → set **CPUs = 4**, **Memory = 6 GB**, then apply (it restarts the VM).
+- **Colima:** `colima start --cpu 4 --memory 6`
+- **Docker Desktop / OrbStack:** Settings → Resources.
+
+The `compose.yaml` caps the container at `cpus: 4.0` / `memory: 5G`. A cap **must not exceed** what the VM has — if it does, the container refuses to start (see Troubleshooting).
+
+:::
 
 :::warning[First run is slow — this is expected]
 
@@ -65,7 +77,7 @@ docker compose build
 
 ## Step 2 — Serve SmolLM2 on CPU vLLM
 
-Look at `compose.yaml`. The `vllm-cpu` service runs the patched image, passes the model and serving args, caps resources (cpus 4 / mem 8G) so it can't eat the laptop, mounts an `hf-cache` volume so weights survive restarts, and maps host port **8009** to the container's **8000**.
+Look at `compose.yaml`. The `vllm-cpu` service runs the patched image, passes the model and serving args, caps resources (cpus 4 / mem 5G) so it can't eat the laptop, mounts an `hf-cache` volume so weights survive restarts, and maps host port **8009** to the container's **8000**. Four of its settings are exactly what it takes to make CPU vLLM run in a container — each one fixes a real startup/inference failure:
 
 ```bash
 cat compose.yaml
@@ -75,22 +87,34 @@ cat compose.yaml
 ```yaml
 services:
   vllm-cpu:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: {context: ., dockerfile: Dockerfile}
     image: vllm-cpu-optimized:latest
     container_name: vllm-smollm2
+    # (2) SYS_NICE + unconfined seccomp let vLLM migrate NUMA pages; without them
+    #     startup dies with "numa_migrate_pages failed. errno: 1".
+    cap_add: [SYS_NICE]
+    security_opt: ["seccomp:unconfined"]
     command:
       - --model
-      - ${MODEL_NAME:-HuggingFaceTB/SmolLM2-360M-Instruct}
+      - ${MODEL_NAME:-HuggingFaceTB/SmolLM2-135M-Instruct}
       - --host
       - "0.0.0.0"
       - --port
       - "8000"
-      ...
+      - --dtype
+      - ${DTYPE:-float32}      # (3) CPU has no bf16 kernel — float32 or inference 500s
+      - --swap-space
+      - "${SWAP_SPACE:-1}"     # (4) default 4 GiB > container RAM; keep it small
+      - --max-model-len
+      - "${MAX_MODEL_LEN:-1024}"  # smaller context => smaller KV cache => fits RAM
     ports:
       - "8009:8000"
+    deploy:
+      resources:
+        limits: {cpus: "4.0", memory: 5G}   # (1) must be <= your runtime VM's allocation
 ```
+
+Those four numbered settings are the difference between "vLLM CPU works" and a wall of tracebacks. They're covered in Troubleshooting below and in the lesson's CPU-track section.
 
 Start it:
 
@@ -147,11 +171,11 @@ curl -s http://localhost:8009/v1/models | python3 -m json.tool
     "object": "list",
     "data": [
         {
-            "id": "HuggingFaceTB/SmolLM2-360M-Instruct",
+            "id": "HuggingFaceTB/SmolLM2-135M-Instruct",
             "object": "model",
-            "created": 1783245000,
+            "created": 1783253768,
             "owned_by": "vllm",
-            "max_model_len": 2048
+            "max_model_len": 1024
         }
     ]
 }
@@ -165,33 +189,33 @@ Same shape as the M2 `GET /v1/models` you hit against Ollama — only the `id` a
 curl -s http://localhost:8009/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
-    "messages": [{"role": "user", "content": "Explain containers in one sentence."}],
-    "max_tokens": 64
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "messages": [{"role": "user", "content": "In one sentence, what is a Linux container?"}],
+    "max_tokens": 48
   }' | python3 -m json.tool
 ```
 
-**Expected output:**
+**Expected output** (this is a real capture — a 135M model is tiny, so the wording will be rough but the *shape* is a standard OpenAI response):
 ```json
 {
-    "id": "chatcmpl-a1b2c3",
+    "id": "chatcmpl-1c1ec4302bee44089339020eb932ba36",
     "object": "chat.completion",
-    "created": 1783245123,
-    "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+    "created": 1783253771,
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
     "choices": [
         {
             "index": 0,
             "message": {
                 "role": "assistant",
-                "content": "Containers package an application together with everything it needs to run, so it behaves the same on any machine."
+                "content": "Linux containers are virtualized environments that run applications and services without requiring network connections or additional hardware, allowing for efficient application running on minimal infrastructure."
             },
             "finish_reason": "stop"
         }
     ],
     "usage": {
-        "prompt_tokens": 14,
-        "completion_tokens": 24,
-        "total_tokens": 38
+        "prompt_tokens": 40,
+        "completion_tokens": 29,
+        "total_tokens": 69
     }
 }
 ```
@@ -208,14 +232,14 @@ This is the through-line of the whole course. Your M2 `client.py` reads `OPENAI_
 
 ```bash
 OPENAI_BASE_URL=http://host.docker.internal:8009/v1 \
-MODEL=HuggingFaceTB/SmolLM2-360M-Instruct \
-  python3 client.py "Explain containers in one sentence."
+MODEL=HuggingFaceTB/SmolLM2-135M-Instruct \
+  python3 client.py "In one sentence, what is a Linux container?"
 ```
 
-**Expected output:**
+**Expected output** (135M is tiny — expect rough wording; the point is that the *same client* got an answer from a different engine):
 ```
-Containers package an application together with everything it needs to run,
-so it behaves the same on any machine.
+Linux containers are virtualized environments that run applications and services
+without requiring network connections or additional hardware.
 ```
 
 No code changed. No SDK changed. No image rebuilt. One environment variable swapped the engine behind the `/v1` wall socket — exactly the point M2 made, now proven against a real production engine.
@@ -294,6 +318,10 @@ The served endpoint is the *same* `/v1` contract — your M2 client would point 
 
 :::warning[Common failure modes]
 
+- **`range of CPUs is from 0.01 to 2.00, as there are only 2 CPUs available`** (or similar) — your compose `cpus`/`memory` cap is larger than what your runtime VM has. Raise the VM's allocation (4 CPUs / 6 GB — see the setup note at the top), or lower `CPU_LIMIT` / `MEMORY_LIMIT` in `.env` to fit.
+- **`numa_migrate_pages failed. errno: 1`** on startup — the container lacks permission to migrate memory across NUMA nodes. The compose already grants `cap_add: [SYS_NICE]` and `security_opt: ["seccomp:unconfined"]`; if you stripped those, add them back.
+- **`Too large swap space. 4.00 GiB out of the ... total CPU memory`** — vLLM's `--swap-space` defaults to 4 GiB, bigger than this container's RAM. The compose sets `--swap-space 1`; lower it further if needed.
+- **HTTP 500 with `rms_norm_impl not implemented for 'BFloat16'`** — `--dtype auto` picked the model's bf16, which CPU kernels (especially arm64) can't run. The compose forces `--dtype float32`. Don't set it back to `auto` on CPU.
 - **Connection refused on `/health`** — the model is still downloading/loading on first run. Follow `docker compose logs -f vllm-cpu` and wait for `Application startup complete`.
 - **Slow first token** — expected on CPU. The first token is slowest; subsequent tokens stream faster. Not a bug.
 - **Container killed / out of memory** — lower `MAX_MODEL_LEN` (e.g. 1024), lower `MAX_NUM_SEQS`, or switch to `SmolLM2-135M-Instruct` in `.env`, then `docker compose up -d`.
