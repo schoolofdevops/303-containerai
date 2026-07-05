@@ -35,12 +35,14 @@ curl -s http://localhost:11434/v1/models | python3 -m json.tool
         {
             "id": "qwen2.5:1.5b",
             "object": "model",
-            "created": 1720000000,
+            "created": 1783237329,
             "owned_by": "library"
         }
     ]
 }
 ```
+
+> The `created` value is an epoch timestamp set when Ollama loaded the model; it will differ on your machine.
 
 This is the standard OpenAI `GET /v1/models` response shape. Any tool, SDK, or framework that
 expects OpenAI will accept this.
@@ -59,27 +61,30 @@ curl -s http://localhost:11434/v1/chat/completions \
 **Expected output:**
 ```json
 {
-    "id": "chatcmpl-abc123",
+    "id": "chatcmpl-184",
     "object": "chat.completion",
-    "created": 1720000001,
+    "created": 1783249846,
     "model": "qwen2.5:1.5b",
+    "system_fingerprint": "fp_ollama",
     "choices": [
         {
             "index": 0,
             "message": {
                 "role": "assistant",
-                "content": "Containers are lightweight, portable units that package an application and its dependencies together, ensuring consistent execution across different environments."
+                "content": "Containers are lightweight, portable executable packages that include all necessary components (code and dependencies) to run software independently."
             },
             "finish_reason": "stop"
         }
     ],
     "usage": {
-        "prompt_tokens": 15,
-        "completion_tokens": 28,
-        "total_tokens": 43
+        "prompt_tokens": 36,
+        "completion_tokens": 23,
+        "total_tokens": 59
     }
 }
 ```
+
+> The `id` suffix is a counter that increments with each request; `created` is a live epoch timestamp. The `system_fingerprint` field (`"fp_ollama"`) is always present in Ollama's `/v1` responses. The model's reply wording varies — what matters is the shape of the response.
 
 Compare this to M1's `/api/generate` response. The `/api/generate` format is Ollama-specific — a
 flat JSON object with a `"response"` string. The `/v1/chat/completions` format is the OpenAI
@@ -98,7 +103,7 @@ docker run --rm curlimages/curl:latest -s \
 
 **Expected output:**
 ```json
-{"object":"list","data":[{"id":"qwen2.5:1.5b","object":"model","created":1720000000,"owned_by":"library"}]}
+{"object":"list","data":[{"id":"qwen2.5:1.5b","object":"model","created":1783237329,"owned_by":"library"}]}
 ```
 
 ```bash
@@ -110,8 +115,10 @@ docker run --rm curlimages/curl:latest -s \
 
 **Expected output:**
 ```json
-{"id":"chatcmpl-def456","object":"chat.completion","created":1720000002,"model":"qwen2.5:1.5b","choices":[{"index":0,"message":{"role":"assistant","content":"Hello there, how are you?"},"finish_reason":"stop"}],"usage":{"prompt_tokens":12,"completion_tokens":6,"total_tokens":18}}
+{"id":"chatcmpl-460","object":"chat.completion","created":1783249856,"model":"qwen2.5:1.5b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"Hello there! Ready to chat now."},"finish_reason":"stop"}],"usage":{"prompt_tokens":36,"completion_tokens":9,"total_tokens":45}}
 ```
+
+> The `id`, `created`, and reply text all vary per request. `system_fingerprint` will always be `"fp_ollama"`.
 
 The routing is identical to M1's `/api/generate` call, but the shape is now the universal
 OpenAI-compatible contract. That's the only difference — and it is the difference that lets you
@@ -165,19 +172,39 @@ docker build -t m2-client labs/m2/
 
 **Expected output:**
 ```
-[+] Building 45.2s (7/7) FINISHED
- => [internal] load build definition from Dockerfile
- => [internal] load metadata for docker.io/library/python:3.12-slim
- => [1/3] FROM docker.io/library/python:3.12-slim
- => [2/3] RUN pip install --no-cache-dir openai
- => [3/3] COPY client.py .
- => exporting to image
- => => writing image sha256:a1b2c3d4...
- => => naming to docker.io/library/m2-client
+#0 building with "rancher-desktop" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim
+#2 DONE 2.7s
+
+#5 [1/4] FROM docker.io/library/python:3.12-slim@sha256:423ed6ab...
+#5 DONE 10.3s
+
+#6 [2/4] RUN pip install --no-cache-dir openai
+#6 0.780 Collecting openai
+#6 0.851   Downloading openai-2.44.0-py3-none-any.whl.metadata (34 kB)
+#6 ...
+#6 3.757 Successfully installed ... openai-2.44.0 ...
+#6 DONE 4.0s
+
+#7 [3/4] WORKDIR /app
+#7 DONE 0.0s
+
+#8 [4/4] COPY client.py .
+#8 DONE 0.0s
+
+#9 exporting to image
+#9 naming to docker.io/library/m2-client:latest done
+#9 DONE 0.9s
 ```
 
-The first build pulls `python:3.12-slim` (~150 MB) and installs the `openai` package (a few
-hundred MB total on first pull). Subsequent builds are fast — Docker caches each layer.
+> Docker uses BuildKit's `#N` step notation. The build has **4 steps** (FROM, RUN, WORKDIR, COPY).
+> The first build pulls `python:3.12-slim` (~50 MB compressed) and installs `openai` (~2 MB) plus
+> its dependencies. Expect ~10–30 seconds on a typical connection. Subsequent builds use the layer
+> cache and finish in under a second.
 
 Run it directly to verify the wiring before we add Compose:
 
@@ -187,7 +214,7 @@ docker run --rm m2-client
 
 **Expected output:**
 ```
-Containers are lightweight, isolated environments that package an application with all its dependencies, ensuring it runs consistently across different systems.
+Containers are lightweight, portable executable packages that include everything needed to run software independently.
 ```
 
 The model's exact wording will vary — what matters is that a sentence comes back, not an error.
@@ -235,8 +262,10 @@ docker compose -f labs/m2/compose.yaml run --rm client
 
 **Expected output:**
 ```
-Containers are lightweight, portable environments that package an application and its dependencies so it can run consistently across any infrastructure.
+Containers are lightweight virtualizations that allow applications to run isolated from each other on a single machine.
 ```
+
+> On first run you will also see two lines like `Network m2_default Created` before the model reply — Compose creates the default network. These disappear on subsequent runs.
 
 `docker compose run --rm client` builds the image if needed, starts the container, prints the
 model's reply, and removes the container. No ports are mapped, no long-running daemon — the
