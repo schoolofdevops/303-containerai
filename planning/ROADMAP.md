@@ -25,7 +25,7 @@ Legend: ✅ done · 🔄 in progress · ⬜ pending
 | M5 · Docs Assistant — Naive RAG | ✅ | ✅ | ✅ | ✅ | `lightweight-genai-stack` |
 | M6 · Declarative Agent (Agentic RAG + MCP) | ✅ | ✅ | ✅ | ✅ | — |
 | M7 · Multi-Agent Crew (CrewAI + LangGraph) | ✅ | ✅ | ✅ | ✅ | `compose-for-agents/crew-ai` |
-| M8 · Securing & Governing AI Workloads | ⬜ | ⬜ | ⬜ | ⬜ | — |
+| M8 · Securing & Governing AI Workloads | ✅ | ✅ | ✅ | ✅ | — |
 | Capstone · Ship the Acme AI Platform | ⬜ | ⬜ | ⬜ | ⬜ | — |
 | Setup pages (prerequisites, gpu-reality) | ⬜ full | — | — | — | (stubs exist) |
 
