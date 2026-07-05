@@ -51,7 +51,7 @@ If you're starting from scratch on macOS, these three commands get you to a work
 ### 1. Install Rancher Desktop (the container runtime)
 
 ```bash
-brew install --cask rancher-desktop
+brew install --cask rancher
 ```
 
 Launch Rancher Desktop from Applications, wait for it to finish initializing (the tray icon turns green), then verify:
