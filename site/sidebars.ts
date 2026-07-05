@@ -71,6 +71,15 @@ const sidebars: SidebarsConfig = {
         'm7-multi-agent/quiz',
       ],
     },
+    {
+      type: 'category',
+      label: 'M8 · Securing & Governing AI Workloads',
+      items: [
+        'm8-security/lesson',
+        'm8-security/lab',
+        'm8-security/quiz',
+      ],
+    },
   ],
 };
 
