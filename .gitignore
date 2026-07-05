@@ -3,3 +3,4 @@ reference-repos/
 .DS_Store
 site/build/
 site/.docusaurus/
+.superpowers/

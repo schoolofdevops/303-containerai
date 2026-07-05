@@ -10,7 +10,8 @@
 
 ## Global Constraints
 
-- Runtime-agnostic content: Rancher Desktop is the **validation** runtime; content must note Colima/OrbStack/Podman equivalence. Commands use `docker` CLI (Rancher Desktop provides it) with `nerdctl` noted where relevant.
+- **ENV FACT (verified 2026-07-05):** `docker` is NOT on the default shell PATH. Rancher Desktop's docker CLI lives at `~/.rd/bin/docker` (server 29.5.2, dockerd/moby). Shell exports do NOT persist between separate Bash tool calls, so every command that uses docker MUST prefix `PATH="$HOME/.rd/bin:$PATH"` (e.g. `PATH="$HOME/.rd/bin:$PATH" docker run ...`). `nerdctl` is also under `~/.rd/bin/`. Rancher Desktop, Ollama (v0.17.4, serving on :11434), and `qwen2.5:1.5b` (986 MB) are all installed and running — Phase 0 installs are DONE; only verification + evidence remain.
+- Runtime-agnostic content: Rancher Desktop is the **validation** runtime; content must note Colima/OrbStack/Podman equivalence. Commands use `docker` CLI (Rancher Desktop provides it) with `nerdctl` noted where relevant. In authored lab prose, use plain `docker` (learners will have it on PATH); the `~/.rd/bin` prefix is only a constraint for *our automated validation* on this machine.
 - Target laptop: **arm64, 16 GB RAM**. Nothing in a lab may exceed ~4–6 GB peak.
 - Model server runs **natively** on Mac (Ollama, Metal); containers reach it at `http://host.docker.internal:11434`. This is the M1 teaching point — do not containerize the model on Mac.
 - Standard dev model: **`qwen2.5:1.5b`** (small, fast on 16 GB).
@@ -166,9 +167,13 @@ git commit -m "feat: scaffold Docusaurus site (classic, TypeScript)"
 - Consumes: scaffold from Task 1.
 - Produces: a sidebar with `intro`, a `Setup` category, then each module (M1–M8, Capstone) as its own **top-level category** (no Day grouping) containing lesson/lab/quiz; `blog` disabled.
 
-- [ ] **Step 1: Update site metadata + disable blog**
+- [ ] **Step 1: Update site metadata + disable blog + enable Mermaid**
 
-In `site/docusaurus.config.ts`: set `title: 'Containers for GenAI & Agentic AI'`, `tagline: 'The Open-Source Way'`, `url`/`baseUrl` placeholders, `organizationName: 'schoolofdevops'`, `projectName: 'containerai'`. In the classic preset options set `blog: false`. In `themeConfig.navbar` set `title: 'Containers for GenAI & Agentic AI'`, keep a single "Course" doc link (`sidebarId: 'courseSidebar'`), remove the blog navbar item. Set `footer` to a minimal School of DevOps & AI credit.
+Install the Mermaid theme:
+```bash
+npm --prefix site install @docusaurus/theme-mermaid
+```
+In `site/docusaurus.config.ts`: set `title: 'Containers for GenAI & Agentic AI'`, `tagline: 'The Open-Source Way'`, `url`/`baseUrl` placeholders, `organizationName: 'schoolofdevops'`, `projectName: 'containerai'`. In the classic preset options set `blog: false`. **Enable Mermaid:** add top-level `markdown: {mermaid: true}` and `themes: ['@docusaurus/theme-mermaid']`. In `themeConfig.navbar` set `title: 'Containers for GenAI & Agentic AI'`, keep a single "Course" doc link (`sidebarId: 'courseSidebar'`), remove the blog navbar item. Set `footer` to a minimal School of DevOps & AI credit. (Mermaid diagrams are then authored as ` ```mermaid ` fenced code blocks in any lesson.)
 
 - [ ] **Step 2: Author the sidebar**
 
@@ -403,6 +408,8 @@ git commit -m "feat: add reusable <Quiz> MDX component with scoring + explanatio
 - Consumes: sidebar entry `m1-container-native/lesson` from Task 2's sidebar (add the M1 category to `sidebars.ts` if not already present).
 
 - [ ] **Step 1: Write the lesson**
+
+**Authoring conventions (per CLAUDE.md — REQUIRED):** open each major concept with a **relatable analogy** before the technical definition (e.g. OCI image = shipping container; OpenAI-compatible endpoint = wall socket you can swap the power station behind). Include **at least two Mermaid diagrams** as ` ```mermaid ` fenced blocks — mandatory: (a) the same `compose.yaml` runs on any OCI runtime, and (b) the Apple-Silicon native-model-server vs containerized-app wiring showing the `host.docker.internal:11434` boundary. Label the container boundary explicitly. An Excalidraw-style black-and-white illustration of the wiring is optional polish (do not block on it).
 
 Create `lesson.md` with frontmatter (`sidebar_position: 1`, `title: 'Lesson: Container-Native GenAI'`) covering, as sections:
 1. **Why "container-native", not "Docker-native"** — OCI + Compose Spec run identically on Colima/OrbStack/Rancher Desktop/Podman; Docker Desktop is now paid for larger orgs; the open standard is the through-line.
