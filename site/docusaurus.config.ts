@@ -52,6 +52,13 @@ const config: Config = {
   ],
 
   themeConfig: {
+    announcementBar: {
+      id: 'star_repo',
+      content: '⭐ If this course helps you, <a href="https://github.com/schoolofdevops/303-containerai" target="_blank" rel="noopener noreferrer">star it on GitHub</a> — it helps others find it!',
+      backgroundColor: '#fafbfc',
+      textColor: '#091E42',
+      isCloseable: true,
+    },
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
     colorMode: {

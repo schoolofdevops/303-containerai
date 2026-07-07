@@ -26,6 +26,14 @@ function HomepageHeader() {
             to="/docs/intro">
             Start the Course →
           </Link>
+          <Link
+            className="button button--outline button--secondary button--lg"
+            href="https://github.com/schoolofdevops/303-containerai"
+            target="_blank"
+            rel="noopener noreferrer"
+            >
+            ⭐ Star on GitHub
+          </Link>
         </div>
       </div>
     </header>
