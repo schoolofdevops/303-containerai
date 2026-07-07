@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Containers for GenAI &amp; Agentic AI — Serving Local Models</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/white.min.css" id="theme">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap">
+
+<style>
+  :root{
+    --ink:#1e1e1e;
+    --gray:#757575;
+    --paper:#ffffff;
+  }
+  .reveal{ font-family:'Patrick Hand', cursive; color:var(--ink); }
+  .reveal .slides{ text-align:center; }
+  .reveal .slides section{ position:absolute; inset:0; box-sizing:border-box; flex-direction:column; justify-content:center; padding:20px 48px 42px; overflow:hidden; }
+  .reveal .slides > section.present{ display:flex; }
+
+  .reveal h1,.reveal h2,.reveal h3{
+    font-family:'Patrick Hand', cursive;
+    color:var(--ink);
+    text-transform:none;
+    font-weight:700;
+    letter-spacing:0;
+    margin:0 0 6px 0;
+    line-height:1.15;
+  }
+  .reveal h2.t{ font-size:1.75em; }
+  .reveal p.s{ font-size:0.95em; color:var(--gray); margin:0 0 8px 0; }
+  .reveal p.takeaway{
+    font-size:0.92em; color:var(--gray);
+    margin:10px auto 0; max-width:1050px;
+  }
+  .reveal p.takeaway::before{ content:"\2192  "; color:var(--ink); font-weight:700; }
+  .reveal svg{ width:100%; flex:1 1 0; min-height:0; max-height:58%; display:block; margin:8px auto 0; }
+  .reveal .kicker{ font-size:.8em; color:var(--gray); letter-spacing:2px; }
+  .reveal .credit{ font-size:.85em; color:var(--gray); margin-top:16px; }
+  .reveal .credit b{ color:var(--ink); font-weight:700; }
+  .reveal .pageno{ position:absolute; bottom:14px; right:22px; font-size:.6em; color:#bdbdbd; }
+  .reveal .slide-number{ font-family:'Patrick Hand',cursive; }
+
+  /* SVG typographic helpers */
+  text{ font-family:'Patrick Hand', cursive; }
+  .lbl{ fill:var(--ink); font-size:21px; }
+  .lbl-sm{ fill:var(--ink); font-size:17px; }
+  .lbl-g{ fill:var(--gray); font-size:17px; }
+  .lbl-b{ fill:var(--ink); font-size:23px; font-weight:700; }
+  .num{ fill:var(--ink); font-size:24px; font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- shared SVG defs: hand-drawn wobble filter + arrowhead -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="ah" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="ahg" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="reveal"><div class="slides">
+
+<!-- ============ SLIDE 1 — TITLE ============ -->
+<section data-auto-animate>
+  <p class="kicker">MODULE 2 &nbsp;·&nbsp; DAY 1</p>
+  <h2 class="t" style="font-size:2.3em">Serving Local Models</h2>
+  <p class="s" style="font-size:1.2em">Open engines behind one universal endpoint</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Three swappable serving engines feed one shared socket that an app plugs into">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="80" y="90"  width="200" height="52" rx="8"/>
+      <rect x="80" y="164" width="200" height="52" rx="8"/>
+      <rect x="80" y="238" width="200" height="52" rx="8"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="180" y="124">Ollama</text>
+      <text x="180" y="198">llama.cpp</text>
+      <text x="180" y="272">LocalAI</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M285,116 L470,180" marker-end="url(#ahg)"/>
+      <path d="M285,190 L470,190" marker-end="url(#ahg)"/>
+      <path d="M285,264 L470,200" marker-end="url(#ahg)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="480" y="130" width="170" height="120" rx="14"/>
+      <circle cx="535" cy="172" r="10"/>
+      <circle cx="595" cy="172" r="10"/>
+      <line x1="565" y1="200" x2="565" y2="228"/>
+    </g>
+    <text x="565" y="118" text-anchor="middle" class="lbl-g">/v1 endpoint</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M655,190 L770,190" marker-end="url(#ah)"/>
+      <rect x="790" y="150" width="230" height="80" rx="12"/>
+    </g>
+    <text x="905" y="197" text-anchor="middle" class="lbl-b">Your app</text>
+  </svg>
+  <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI &nbsp;·&nbsp; Hands-on</p>
+  <div class="pageno">M2·01</div>
+</section>
+
+<!-- ============ SLIDE 2 — WHAT YOU'LL LEARN ============ -->
+<section>
+  <h2 class="t">What you'll learn</h2>
+  <p class="s">Five ideas that make model serving portable and boring — in the best way.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Five learning objectives listed as numbered rows">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <circle cx="120" cy="70"  r="24"/>
+      <circle cx="120" cy="140" r="24"/>
+      <circle cx="120" cy="210" r="24"/>
+      <circle cx="120" cy="280" r="24"/>
+      <circle cx="120" cy="350" r="24"/>
+    </g>
+    <g class="num" text-anchor="middle">
+      <text x="120" y="78">1</text><text x="120" y="148">2</text>
+      <text x="120" y="218">3</text><text x="120" y="288">4</text>
+      <text x="120" y="358">5</text>
+    </g>
+    <g class="lbl" text-anchor="start">
+      <text x="170" y="78">See Docker Model Runner — then choose runtime-agnostic open engines</text>
+      <text x="170" y="148">Know when Ollama, llama.cpp, or LocalAI is the right engine</text>
+      <text x="170" y="218">Treat the OpenAI-compatible /v1 API as the universal contract</text>
+      <text x="170" y="288">Read GGUF + quantization; size a model to a 16 GB laptop</text>
+      <text x="170" y="358">Wire model-native (Mac) vs model-in-container (GPU host)</text>
+    </g>
+  </svg>
+  <p class="takeaway">One app, many backends — the serving engine becomes a deployment choice, never a code change.</p>
+  <div class="pageno">M2·02</div>
+</section>
+
+<!-- ============ SLIDE 3 — THE PROBLEM ============ -->
+<section>
+  <h2 class="t">The problem: every engine speaks differently?</h2>
+  <p class="s">If each serving engine had its own API, swapping one would mean rewriting the app. It doesn't have to.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Without a shared contract each engine forces its own client wiring, a tangle of custom code">
+    <!-- app -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="60" y="160" width="220" height="90" rx="12"/>
+    </g>
+    <text x="170" y="200" text-anchor="middle" class="lbl-b">Your app</text>
+    <text x="170" y="230" text-anchor="middle" class="lbl-g">has to know each one?</text>
+
+    <!-- tangled dashed lines to three different engines -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="9 7" stroke-linecap="round">
+      <path d="M285,180 L640,90"/>
+      <path d="M285,205 L640,205"/>
+      <path d="M285,230 L640,320"/>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="650" y="55"  width="360" height="72" rx="10"/>
+      <rect x="650" y="170" width="360" height="72" rx="10"/>
+      <rect x="650" y="285" width="360" height="72" rx="10"/>
+    </g>
+    <g class="lbl" text-anchor="start">
+      <text x="675" y="88">Engine A</text>
+      <text x="675" y="203">Engine B</text>
+      <text x="675" y="318">Engine C</text>
+    </g>
+    <g class="lbl-g" text-anchor="start">
+      <text x="675" y="112">custom SDK, custom URL</text>
+      <text x="675" y="227">another SDK, another URL</text>
+      <text x="675" y="342">yet another SDK...</text>
+    </g>
+    <text x="465" y="150" text-anchor="middle" class="lbl-g">custom glue</text>
+    <text x="465" y="290" text-anchor="middle" class="lbl-g">for each</text>
+  </svg>
+  <p class="takeaway">Three custom integrations is three ways to break. The fix is one shared contract — the rest of this module.</p>
+  <div class="pageno">M2·03</div>
+</section>
+
+<!-- ============ SLIDE 4 — DOCKER MODEL RUNNER ============ -->
+<section>
+  <h2 class="t">The quick demo: Docker Model Runner</h2>
+  <p class="s">Docker 4.40+ serves a model in one command — good to know, but tied to Docker's toolchain.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="One docker model run command downloads weights and exposes the standard v1 API">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="70" y="150" width="360" height="80" rx="10"/>
+    </g>
+    <text x="250" y="130" text-anchor="middle" class="lbl-g">one command</text>
+    <text x="250" y="198" text-anchor="middle" class="lbl">docker model run</text>
+    <text x="250" y="222" text-anchor="middle" class="lbl-g">ai/gpt-oss</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M435,190 L560,190" marker-end="url(#ah)"/>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="580" y="90"  width="440" height="60" rx="9"/>
+      <rect x="580" y="165" width="440" height="60" rx="9"/>
+      <rect x="580" y="240" width="440" height="60" rx="9"/>
+    </g>
+    <g class="lbl" text-anchor="start">
+      <text x="605" y="128">Pulls quantized weights</text>
+      <text x="605" y="203">Serves them locally</text>
+      <text x="605" y="278">Exposes the same /v1 API</text>
+    </g>
+  </svg>
+  <p class="takeaway">Slickest on-ramp inside Docker — but this course goes runtime-agnostic, so the patterns run anywhere.</p>
+  <div class="pageno">M2·04</div>
+</section>
+
+<!-- ============ SLIDE 5 — ESPRESSO ANALOGY (open engines) ============ -->
+<section>
+  <h2 class="t">Open engines: different machines, same cup</h2>
+  <p class="s">Espresso machines differ inside — boiler vs thermoblock — but they all pour into one standard cup.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Three different espresso machines all pour into the same standard cup, which is the OpenAI API">
+    <!-- three machines -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="70"  y="70" width="250" height="120" rx="10"/>
+      <rect x="70"  y="70" width="250" height="120" rx="10" transform="translate(30 60)"/>
+      <rect x="70"  y="70" width="250" height="120" rx="10" transform="translate(60 120)"/>
+    </g>
+    <text x="195" y="100" text-anchor="middle" class="lbl-b">Ollama</text>
+    <text x="195" y="128" text-anchor="middle" class="lbl-g">dev standard, Metal</text>
+    <text x="255" y="220" text-anchor="middle" class="lbl-b">llama.cpp</text>
+    <text x="255" y="248" text-anchor="middle" class="lbl-g">the lean core</text>
+    <text x="285" y="340" text-anchor="middle" class="lbl-b">LocalAI</text>
+    <text x="285" y="368" text-anchor="middle" class="lbl-g">multi-backend hub</text>
+
+    <!-- arrows to cup -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M420,130 L720,205" marker-end="url(#ahg)"/>
+      <path d="M480,250 L720,225" marker-end="url(#ahg)"/>
+      <path d="M540,340 L720,245" marker-end="url(#ahg)"/>
+    </g>
+
+    <!-- the cup -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
+      <path d="M740,180 L910,180 L892,290 Q890,310 870,310 L780,310 Q760,310 758,290 Z"/>
+      <path d="M910,200 Q960,205 955,245 Q950,282 905,278"/>
+    </g>
+    <text x="825" y="345" text-anchor="middle" class="lbl-b">OpenAI API</text>
+    <text x="825" y="372" text-anchor="middle" class="lbl-g">the same standard cup</text>
+  </svg>
+  <p class="takeaway">Swap the machine under the counter — no barista, and no app, needs retraining.</p>
+  <div class="pageno">M2·05</div>
+</section>
+
+<!-- ============ SLIDE 6 — ENGINE PICKER ============ -->
+<section>
+  <h2 class="t">Which engine, when</h2>
+  <p class="s">Three open engines, three jobs. You reach for the one that fits the moment.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A table matching Ollama, llama.cpp and LocalAI to their best-fit use">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60" y="60" width="980" height="290" rx="12"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="1.8">
+      <line x1="60"  y1="140" x2="1040" y2="140"/>
+      <line x1="60"  y1="235" x2="1040" y2="235"/>
+      <line x1="330" y1="60"  x2="330"  y2="350"/>
+    </g>
+    <g class="lbl-b" text-anchor="start">
+      <text x="90" y="118">Ollama</text>
+      <text x="90" y="212">llama.cpp</text>
+      <text x="90" y="308">LocalAI</text>
+    </g>
+    <g class="lbl" text-anchor="start">
+      <text x="360" y="106">The de-facto dev standard — one-command setup</text>
+      <text x="360" y="132" class="lbl-g" style="fill:var(--gray)">Metal-accelerated natively on Apple Silicon</text>
+      <text x="360" y="200">The inference core inside Ollama — minimal footprint</text>
+      <text x="360" y="226" class="lbl-g" style="fill:var(--gray)">Run it directly when you want maximum control</text>
+      <text x="360" y="295">One container that looks like OpenAI to every caller</text>
+      <text x="360" y="321" class="lbl-g" style="fill:var(--gray)">Routes to many backends — popular on mixed-HW Linux</text>
+    </g>
+  </svg>
+  <p class="takeaway">For development, Ollama is the standard. M3 adds vLLM for high-throughput batched serving on a GPU.</p>
+  <div class="pageno">M2·06</div>
+</section>
+
+<!-- ============ SLIDE 7 — WALL SOCKET (the contract) ============ -->
+<section>
+  <h2 class="t">The universal contract: the /v1 endpoint</h2>
+  <p class="s">A wall socket — swap the power station behind it and your appliance never notices.</p>
+  <svg viewBox="0 0 1100 360" role="img" aria-label="Swappable serving engines behind one OpenAI-compatible socket that the app plugs into">
+    <!-- engines -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="70" y="70"  width="200" height="60" rx="8"/>
+      <rect x="70" y="150" width="200" height="60" rx="8"/>
+      <rect x="70" y="230" width="200" height="60" rx="8"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="170" y="108">Ollama</text>
+      <text x="170" y="188">vLLM</text>
+      <text x="170" y="268">LocalAI</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M275,100 L470,175" marker-end="url(#ahg)"/>
+      <path d="M275,180 L470,180" marker-end="url(#ahg)"/>
+      <path d="M275,260 L470,185" marker-end="url(#ahg)"/>
+    </g>
+
+    <!-- the socket -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="480" y="120" width="180" height="130" rx="14"/>
+      <circle cx="540" cy="165" r="10"/>
+      <circle cx="600" cy="165" r="10"/>
+      <line x1="570" y1="195" x2="570" y2="225"/>
+    </g>
+    <text x="570" y="105" text-anchor="middle" class="lbl-g">/v1 (OpenAI API)</text>
+
+    <!-- app plug -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M665,185 L780,185" marker-end="url(#ah)"/>
+      <rect x="800" y="140" width="230" height="90" rx="12"/>
+    </g>
+    <text x="915" y="180" text-anchor="middle" class="lbl-b">Your app / agent</text>
+    <text x="915" y="210" text-anchor="middle" class="lbl-g">code never changes</text>
+  </svg>
+  <p class="takeaway">Two endpoints — chat/completions and models. The app talks to the contract, not the engine.</p>
+  <div class="pageno">M2·07</div>
+</section>
+
+<!-- ============ SLIDE 8 — ONE VARIABLE, NOT CODE ============ -->
+<section>
+  <h2 class="t">Swap engines by changing one variable</h2>
+  <p class="s">The endpoint is an environment variable. Dev, staging, production differ by one line — not code.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="One OPENAI_BASE_URL variable points at Ollama in dev, LocalAI in staging, vLLM in production">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="380" y="40" width="340" height="80" rx="12"/>
+    </g>
+    <text x="550" y="78" text-anchor="middle" class="lbl-b">OPENAI_BASE_URL</text>
+    <text x="550" y="106" text-anchor="middle" class="lbl-g">one variable your app reads</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-linecap="round">
+      <path d="M430,124 L230,190" marker-end="url(#ahg)"/>
+      <path d="M550,124 L550,190" marker-end="url(#ahg)"/>
+      <path d="M670,124 L880,190" marker-end="url(#ahg)"/>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="70"  y="200" width="300" height="150" rx="10"/>
+      <rect x="400" y="200" width="300" height="150" rx="10"/>
+      <rect x="730" y="200" width="300" height="150" rx="10"/>
+    </g>
+    <g class="lbl-b" text-anchor="middle">
+      <text x="220" y="240">DEV</text>
+      <text x="550" y="240">STAGING</text>
+      <text x="880" y="240">PRODUCTION</text>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="220" y="285">Ollama, native Mac</text>
+      <text x="550" y="285">LocalAI, Compose</text>
+      <text x="880" y="285">vLLM, GPU VM</text>
+    </g>
+    <g class="lbl-g" text-anchor="middle">
+      <text x="220" y="322">host.docker.internal</text>
+      <text x="550" y="322">localai:8080</text>
+      <text x="880" y="322">vllm-service:8000</text>
+    </g>
+  </svg>
+  <p class="takeaway">Move a 1.5B dev model to a 13B production model — the application does not notice.</p>
+  <div class="pageno">M2·08</div>
+</section>
+
+<!-- ============ SLIDE 9 — GGUF / QUANTIZATION ANALOGY ============ -->
+<section>
+  <h2 class="t">GGUF: the JPEG of model weights</h2>
+  <p class="s">RAW is huge and perfect. JPEG at 80% is a fraction of the size and looks the same. GGUF is the JPEG for LLMs.</p>
+  <svg viewBox="0 0 1100 360" role="img" aria-label="A large RAW float16 file compresses down to a small quantized GGUF file that fits laptop RAM">
+    <!-- RAW big file -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="80" y="70" width="260" height="230" rx="10"/>
+    </g>
+    <text x="210" y="115" text-anchor="middle" class="lbl-b">float16 RAW</text>
+    <text x="210" y="150" text-anchor="middle" class="lbl-g">mathematically</text>
+    <text x="210" y="176" text-anchor="middle" class="lbl-g">perfect</text>
+    <text x="210" y="220" text-anchor="middle" class="lbl">huge — won't</text>
+    <text x="210" y="248" text-anchor="middle" class="lbl">fit the laptop</text>
+
+    <!-- compress arrow -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <path d="M355,185 L560,185" marker-end="url(#ah)"/>
+    </g>
+    <text x="457" y="165" text-anchor="middle" class="lbl-g">quantize</text>
+    <text x="457" y="215" text-anchor="middle" class="lbl-g">Q4_K_M</text>
+
+    <!-- small GGUF -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="585" y="130" width="160" height="120" rx="10"/>
+    </g>
+    <text x="665" y="180" text-anchor="middle" class="lbl-b">GGUF</text>
+    <text x="665" y="210" text-anchor="middle" class="lbl-g">compact + fast</text>
+
+    <!-- rule box -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="800" y="110" width="240" height="160" rx="10"/>
+    </g>
+    <rect x="802" y="112" width="236" height="46" fill="#f5f5f5"/>
+    <text x="920" y="142" text-anchor="middle" class="lbl-b">sizing rule</text>
+    <text x="920" y="190" text-anchor="middle" class="lbl">params × 0.6</text>
+    <text x="920" y="220" text-anchor="middle" class="lbl">≈ GB of RAM</text>
+    <text x="920" y="252" text-anchor="middle" class="lbl-g">7B ≈ 4 GB at Q4</text>
+  </svg>
+  <p class="takeaway">Ollama pulls GGUF, not float16 — so laptop CPU and Metal run it without CUDA.</p>
+  <div class="pageno">M2·09</div>
+</section>
+
+<!-- ============ SLIDE 10 — MODEL SELECTION ============ -->
+<section>
+  <h2 class="t">Picking a model for a 16 GB laptop</h2>
+  <p class="s">Discussed big, required small. Labs stay tiny; heavier models are there when you outgrow them.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A table of laptop-friendly models with approximate Q4 sizes and their role in the course">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60" y="55" width="980" height="300" rx="12"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="1.6">
+      <line x1="60" y1="105" x2="1040" y2="105"/>
+      <line x1="60" y1="155" x2="1040" y2="155"/>
+      <line x1="60" y1="205" x2="1040" y2="205"/>
+      <line x1="60" y1="255" x2="1040" y2="255"/>
+      <line x1="60" y1="305" x2="1040" y2="305"/>
+      <line x1="520" y1="55" x2="520" y2="355"/>
+      <line x1="740" y1="55" x2="740" y2="355"/>
+    </g>
+    <g class="lbl-g" text-anchor="start" style="font-size:16px">
+      <text x="80" y="87">MODEL</text>
+      <text x="540" y="87">SIZE (Q4)</text>
+      <text x="760" y="87">COURSE USE</text>
+    </g>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="80" y="137">qwen2.5:1.5b</text>   <text x="540" y="137">~1 GB</text>  <text x="760" y="137">Labs (default)</text>
+      <text x="80" y="187">qwen2.5:3b</text>     <text x="540" y="187">~2 GB</text>  <text x="760" y="187">Optional upgrade</text>
+      <text x="80" y="237">Qwen3 4B–8B</text>    <text x="540" y="237">2–5 GB</text> <text x="760" y="237">Beyond labs</text>
+      <text x="80" y="287">Llama 3.2 3B</text>   <text x="540" y="287">~2 GB</text>  <text x="760" y="287">General tasks</text>
+      <text x="80" y="337">Mistral 7B</text>     <text x="540" y="337">~4 GB</text>  <text x="760" y="337">Prod baseline</text>
+    </g>
+  </svg>
+  <p class="takeaway">Stay on qwen2.5:1.5b for every lab — fast iteration keeps the machine responsive. gpt-oss 20B is demo-only.</p>
+  <div class="pageno">M2·10</div>
+</section>
+
+<!-- ============ SLIDE 11 — TWO WIRING PATTERNS ============ -->
+<section>
+  <h2 class="t">Two wiring patterns, one app</h2>
+  <p class="s">The app code is identical. Only <code>OPENAI_BASE_URL</code> changes — native model vs model-in-container.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Pattern A on Mac reaches a native Ollama over host.docker.internal, Pattern B on a GPU host reaches an Ollama container over the Compose network">
+    <!-- Pattern A -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="4 6">
+      <rect x="50" y="70" width="470" height="290" rx="14"/>
+    </g>
+    <text x="285" y="100" text-anchor="middle" class="lbl-b">Pattern A · Mac</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="80" y="130" width="180" height="90" rx="10"/>
+      <rect x="310" y="130" width="180" height="90" rx="10"/>
+    </g>
+    <text x="170" y="170" text-anchor="middle" class="lbl">App</text>
+    <text x="170" y="196" text-anchor="middle" class="lbl-g">container</text>
+    <text x="400" y="163" text-anchor="middle" class="lbl">Ollama</text>
+    <text x="400" y="189" text-anchor="middle" class="lbl-g">NATIVE</text>
+    <text x="400" y="212" text-anchor="middle" class="lbl-g">Metal GPU</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+      <path d="M263,175 L305,175" marker-end="url(#ah)"/>
+    </g>
+    <text x="285" y="255" text-anchor="middle" class="lbl-g">host.docker.internal</text>
+    <text x="285" y="281" text-anchor="middle" class="lbl-g">:11434</text>
+
+    <!-- Pattern B -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="4 6">
+      <rect x="580" y="70" width="470" height="290" rx="14"/>
+    </g>
+    <text x="815" y="100" text-anchor="middle" class="lbl-b">Pattern B · GPU host</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="610" y="130" width="180" height="90" rx="10"/>
+      <rect x="840" y="130" width="180" height="90" rx="10"/>
+    </g>
+    <text x="700" y="170" text-anchor="middle" class="lbl">App</text>
+    <text x="700" y="196" text-anchor="middle" class="lbl-g">container</text>
+    <text x="930" y="163" text-anchor="middle" class="lbl">Ollama</text>
+    <text x="930" y="189" text-anchor="middle" class="lbl-g">CONTAINER</text>
+    <text x="930" y="212" text-anchor="middle" class="lbl-g">NVIDIA GPU</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+      <path d="M793,175 L835,175" marker-end="url(#ah)"/>
+    </g>
+    <text x="815" y="255" text-anchor="middle" class="lbl-g">ollama:11434</text>
+    <text x="815" y="281" text-anchor="middle" class="lbl-g">Compose network</text>
+  </svg>
+  <p class="takeaway">Build once on your laptop; the same image drops onto a Linux GPU VM with one config change.</p>
+  <div class="pageno">M2·11</div>
+</section>
+
+<!-- ============ SLIDE 12 — CLOSING ============ -->
+<section>
+  <p class="kicker">BIG IDEA</p>
+  <h2 class="t" style="font-size:2.3em">The engine is a deployment choice, not a code choice</h2>
+  <svg viewBox="0 0 1100 320" role="img" aria-label="Any engine plugs into the shared v1 socket, and the app plugs in once and stays untouched">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="60" y="120" width="150" height="55" rx="8"/>
+      <rect x="60" y="190" width="150" height="55" rx="8"/>
+    </g>
+    <text x="135" y="155" text-anchor="middle" class="lbl">any engine</text>
+    <text x="135" y="225" text-anchor="middle" class="lbl-g">any hardware</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M215,150 L370,175" marker-end="url(#ahg)"/>
+      <path d="M215,215 L370,190" marker-end="url(#ahg)"/>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="380" y="120" width="180" height="120" rx="14"/>
+      <circle cx="435" cy="162" r="10"/>
+      <circle cx="505" cy="162" r="10"/>
+      <line x1="470" y1="190" x2="470" y2="218"/>
+    </g>
+    <text x="470" y="108" text-anchor="middle" class="lbl-g">/v1 contract</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <path d="M565,180 L720,180" marker-end="url(#ah)"/>
+      <rect x="740" y="135" width="300" height="90" rx="12"/>
+    </g>
+    <text x="890" y="178" text-anchor="middle" class="lbl-b">Your app — plugged in once</text>
+    <text x="890" y="208" text-anchor="middle" class="lbl-g">never rewired</text>
+  </svg>
+  <p class="s" style="font-size:1.15em">Next: in the lab you'll containerize a client that speaks this contract.</p>
+  <p class="credit">Continue to the <b>Serving lab</b>. &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
+  <div class="pageno">M2·12</div>
+</section>
+
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280,
+    height: 720,
+    margin: 0.04,
+    minScale: 0.2,
+    maxScale: 2.0,
+    hash: true,
+    center: false,
+    slideNumber: false,
+    transition: 'slide',
+    controlsTutorial: true
+  });
+</script>
+</body>
+</html>

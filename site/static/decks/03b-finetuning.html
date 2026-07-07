@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Containers for GenAI &amp; Agentic AI — Fine-Tuning with LoRA/QLoRA</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/white.min.css" id="theme">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap">
+
+<style>
+  :root{
+    --ink:#1e1e1e;
+    --gray:#757575;
+    --paper:#ffffff;
+  }
+  .reveal{ font-family:'Patrick Hand', cursive; color:var(--ink); }
+  .reveal .slides{ text-align:center; }
+  .reveal .slides section{ position:absolute; inset:0; box-sizing:border-box; flex-direction:column; justify-content:center; padding:20px 48px 42px; overflow:hidden; }
+  .reveal .slides > section.present{ display:flex; }
+
+  .reveal h1,.reveal h2,.reveal h3{
+    font-family:'Patrick Hand', cursive;
+    color:var(--ink);
+    text-transform:none;
+    font-weight:700;
+    letter-spacing:0;
+    margin:0 0 6px 0;
+    line-height:1.15;
+  }
+  .reveal h2.t{ font-size:1.75em; }
+  .reveal p.s{ font-size:0.95em; color:var(--gray); margin:0 0 8px 0; }
+  .reveal p.takeaway{
+    font-size:0.92em; color:var(--gray);
+    margin:10px auto 0; max-width:1050px;
+  }
+  .reveal p.takeaway::before{ content:"\2192  "; color:var(--ink); font-weight:700; }
+  .reveal svg{ width:100%; flex:1 1 0; min-height:0; max-height:58%; display:block; margin:8px auto 0; }
+  .reveal .kicker{ font-size:.8em; color:var(--gray); letter-spacing:2px; }
+  .reveal .credit{ font-size:.85em; color:var(--gray); margin-top:16px; }
+  .reveal .credit b{ color:var(--ink); font-weight:700; }
+  .reveal .pageno{ position:absolute; bottom:14px; right:22px; font-size:.6em; color:#bdbdbd; }
+  .reveal .slide-number{ font-family:'Patrick Hand',cursive; }
+
+  /* SVG typographic helpers */
+  text{ font-family:'Patrick Hand', cursive; }
+  .lbl{ fill:var(--ink); font-size:21px; }
+  .lbl-sm{ fill:var(--ink); font-size:17px; }
+  .lbl-g{ fill:var(--gray); font-size:17px; }
+  .lbl-b{ fill:var(--ink); font-size:23px; font-weight:700; }
+  .num{ fill:var(--ink); font-size:24px; font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- shared SVG defs: hand-drawn wobble filter + arrowhead -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="ah" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="ahg" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="reveal"><div class="slides">
+
+<!-- ============ SLIDE 1 — TITLE ============ -->
+<section data-auto-animate>
+  <p class="kicker">MODULE 3B &nbsp;·&nbsp; OPTIONAL &nbsp;·&nbsp; DAY 1</p>
+  <h2 class="t" style="font-size:2.3em">Customizing Models with LoRA / QLoRA</h2>
+  <p class="s" style="font-size:1.2em">Make the model <em>yours</em> — reproducibly, in a container</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A base model with a small clip-on adapter, produced by a training container">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
+      <!-- base model box -->
+      <rect x="360" y="120" width="260" height="180" rx="12"/>
+      <!-- clip-on adapter -->
+      <rect x="640" y="165" width="120" height="90" rx="10"/>
+      <!-- connector nub -->
+      <line x1="620" y1="210" x2="640" y2="210"/>
+    </g>
+    <text x="490" y="200" text-anchor="middle" class="lbl-b">Base model</text>
+    <text x="490" y="232" text-anchor="middle" class="lbl-g">frozen weights</text>
+    <text x="700" y="205" text-anchor="middle" class="lbl-sm">LoRA</text>
+    <text x="700" y="230" text-anchor="middle" class="lbl-sm">adapter</text>
+    <text x="560" y="345" text-anchor="middle" class="lbl-g">a tiny trained layer that clips onto a big model</text>
+  </svg>
+  <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI &nbsp;·&nbsp; GPU-gated · Hands-on</p>
+  <div class="pageno">M3B·01</div>
+</section>
+
+<!-- ============ SLIDE 2 — WHAT YOU'LL LEARN ============ -->
+<section>
+  <h2 class="t">What you'll learn</h2>
+  <p class="s">Four ideas — when to fine-tune, what LoRA does, which tool, and why the container matters.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Four learning objectives listed as numbered rows">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <circle cx="120" cy="70"  r="24"/>
+      <circle cx="120" cy="150" r="24"/>
+      <circle cx="120" cy="230" r="24"/>
+      <circle cx="120" cy="310" r="24"/>
+    </g>
+    <g class="num" text-anchor="middle">
+      <text x="120" y="78">1</text><text x="120" y="158">2</text>
+      <text x="120" y="238">3</text><text x="120" y="318">4</text>
+    </g>
+    <g class="lbl" text-anchor="start">
+      <text x="170" y="78">When fine-tuning beats prompting or RAG — and when it doesn't</text>
+      <text x="170" y="158">What LoRA and QLoRA actually do to a model's weights</text>
+      <text x="170" y="238">Which toolchain: Axolotl on NVIDIA, MLX-LM on Apple Silicon</text>
+      <text x="170" y="318">Why a frozen training container is the reproducibility unit</text>
+    </g>
+  </svg>
+  <p class="takeaway">The output is a small LoRA adapter that plugs straight into serving (M2/M3) and packaging (M4).</p>
+  <div class="pageno">M3B·02</div>
+</section>
+
+<!-- ============ SLIDE 3 — THE MOTIVATING PROBLEM ============ -->
+<section>
+  <h2 class="t">The problem: a behaviour gap</h2>
+  <p class="s">Sometimes no prompt reliably makes the model behave the way you need. That's not a knowledge gap.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A generalist model that occasionally breaks format, versus a specialist that always emits valid JSON">
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.6" stroke-dasharray="9 7" stroke-linecap="round">
+      <rect x="60" y="90" width="410" height="200" rx="12"/>
+    </g>
+    <text x="265" y="130" text-anchor="middle" class="lbl-g">Generalist + prompt</text>
+    <text x="265" y="180" text-anchor="middle" class="lbl">"usually" valid JSON</text>
+    <text x="265" y="222" text-anchor="middle" class="lbl-g">occasionally breaks format</text>
+    <text x="265" y="262" text-anchor="middle" class="lbl-g">wrong style · wrong dialect</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+      <path d="M485,190 L625,190" marker-end="url(#ah)"/>
+    </g>
+    <text x="555" y="175" text-anchor="middle" class="lbl-g">fine-tune</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8" stroke-linecap="round">
+      <rect x="640" y="90" width="400" height="200" rx="12"/>
+    </g>
+    <text x="840" y="130" text-anchor="middle" class="lbl-b">Specialist</text>
+    <text x="840" y="180" text-anchor="middle" class="lbl">always valid JSON</text>
+    <text x="840" y="222" text-anchor="middle" class="lbl-g">consistent format &amp; style</text>
+    <text x="840" y="262" text-anchor="middle" class="lbl-g">learned from 50–5000 examples</text>
+  </svg>
+  <p class="takeaway">Fine-tuning teaches new <em>behaviour</em> — style, dialect, reliable output structure — not new facts.</p>
+  <div class="pageno">M3B·03</div>
+</section>
+
+<!-- ============ SLIDE 4 — THE THREE-WAY DECISION ============ -->
+<section>
+  <h2 class="t">Prompt vs RAG vs fine-tune</h2>
+  <p class="s">Three tools, three different gaps. Reach for the cheapest one that closes your gap.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Three columns: prompting for instruction gaps, RAG for knowledge gaps, fine-tuning for behaviour gaps">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="50"  y="70" width="320" height="250" rx="12"/>
+      <rect x="390" y="70" width="320" height="250" rx="12"/>
+      <rect x="730" y="70" width="320" height="250" rx="12"/>
+    </g>
+    <text x="210" y="112" text-anchor="middle" class="lbl-b">Prompting</text>
+    <text x="210" y="165" text-anchor="middle" class="lbl-g">the gap:</text>
+    <text x="210" y="198" text-anchor="middle" class="lbl">instruction</text>
+    <text x="210" y="252" text-anchor="middle" class="lbl-g">a better system</text>
+    <text x="210" y="280" text-anchor="middle" class="lbl-g">prompt fixes it</text>
+
+    <text x="550" y="112" text-anchor="middle" class="lbl-b">RAG</text>
+    <text x="550" y="165" text-anchor="middle" class="lbl-g">the gap:</text>
+    <text x="550" y="198" text-anchor="middle" class="lbl">knowledge</text>
+    <text x="550" y="252" text-anchor="middle" class="lbl-g">reason over your</text>
+    <text x="550" y="280" text-anchor="middle" class="lbl-g">private docs (M5/M6)</text>
+
+    <text x="890" y="112" text-anchor="middle" class="lbl-b">Fine-tune</text>
+    <text x="890" y="165" text-anchor="middle" class="lbl-g">the gap:</text>
+    <text x="890" y="198" text-anchor="middle" class="lbl">behaviour</text>
+    <text x="890" y="252" text-anchor="middle" class="lbl-g">new style, dialect,</text>
+    <text x="890" y="280" text-anchor="middle" class="lbl-g">reliable structure</text>
+  </svg>
+  <p class="takeaway">Knowledge problem → RAG. Reasoning problem → better prompt or bigger base. Behaviour problem → fine-tune.</p>
+  <div class="pageno">M3B·04</div>
+</section>
+
+<!-- ============ SLIDE 5 — LORA: STICKY NOTES ============ -->
+<section>
+  <h2 class="t">LoRA — sticky notes on a textbook</h2>
+  <p class="s">You can't rewrite the expensive textbook. So you add Post-it notes in the margins instead.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Frozen base weight matrix with two small trainable low-rank matrices added on top">
+    <!-- textbook / base weights -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="80" y="90" width="220" height="220" rx="10"/>
+    </g>
+    <text x="190" y="80" text-anchor="middle" class="lbl-g">base weights (frozen)</text>
+    <text x="190" y="200" text-anchor="middle" class="lbl-b">W</text>
+    <text x="190" y="235" text-anchor="middle" class="lbl-g">billions of params</text>
+
+    <!-- plus -->
+    <text x="345" y="210" text-anchor="middle" class="lbl-b">+</text>
+
+    <!-- sticky notes A x B -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="400" y="130" width="120" height="120" rx="8"/>
+      <rect x="560" y="130" width="120" height="120" rx="8"/>
+    </g>
+    <rect x="402" y="132" width="116" height="116" fill="#f5f5f5"/>
+    <rect x="562" y="132" width="116" height="116" fill="#f5f5f5"/>
+    <text x="460" y="195" text-anchor="middle" class="lbl-b">A</text>
+    <text x="620" y="195" text-anchor="middle" class="lbl-b">B</text>
+    <text x="540" y="285" text-anchor="middle" class="lbl-g">two small low-rank matrices (trained)</text>
+
+    <!-- arrow to effective weight -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+      <path d="M700,190 L800,190" marker-end="url(#ah)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="815" y="120" width="225" height="140" rx="10"/>
+    </g>
+    <text x="927" y="185" text-anchor="middle" class="lbl">W + A×B</text>
+    <text x="927" y="220" text-anchor="middle" class="lbl-g">at inference</text>
+  </svg>
+  <p class="takeaway">Freeze the base, train two tiny matrices, add them at inference. The adapter is ~1–3% of the model.</p>
+  <div class="pageno">M3B·05</div>
+</section>
+
+<!-- ============ SLIDE 6 — QLORA: 4-BIT BASE ============ -->
+<section>
+  <h2 class="t">QLoRA — squeeze the base to 4-bit</h2>
+  <p class="s">LoRA's frozen base still hogs memory. Quantize it to 4-bit and a 7B fits one consumer GPU.</p>
+  <svg viewBox="0 0 1100 360" role="img" aria-label="A large 16-bit base model shrinking to a compact 4-bit base while the adapter stays high precision">
+    <!-- big base -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.6">
+      <rect x="70" y="70" width="300" height="230" rx="10"/>
+    </g>
+    <text x="220" y="60" text-anchor="middle" class="lbl-g">base in 16-bit</text>
+    <text x="220" y="195" text-anchor="middle" class="lbl">too big for</text>
+    <text x="220" y="225" text-anchor="middle" class="lbl">one GPU</text>
+
+    <!-- quantize arrow -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M385,185 L510,185" marker-end="url(#ah)"/>
+    </g>
+    <text x="447" y="168" text-anchor="middle" class="lbl-g">quantize</text>
+    <text x="447" y="212" text-anchor="middle" class="lbl-g">to 4-bit</text>
+
+    <!-- small 4-bit base + hi-precision adapter -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="540" y="130" width="170" height="130" rx="10"/>
+      <rect x="760" y="150" width="120" height="90" rx="8"/>
+    </g>
+    <rect x="542" y="132" width="166" height="126" fill="#f5f5f5"/>
+    <text x="625" y="185" text-anchor="middle" class="lbl-b">4-bit</text>
+    <text x="625" y="218" text-anchor="middle" class="lbl-g">base (frozen)</text>
+    <text x="820" y="190" text-anchor="middle" class="lbl-sm">adapter</text>
+    <text x="820" y="215" text-anchor="middle" class="lbl-g">hi-precision</text>
+
+    <text x="960" y="185" text-anchor="middle" class="lbl">7B fits</text>
+    <text x="960" y="215" text-anchor="middle" class="lbl">~24 GB</text>
+  </svg>
+  <p class="takeaway">QLoRA = LoRA + a 4-bit frozen base — half the memory again, with the adapter kept high-precision.</p>
+  <div class="pageno">M3B·06</div>
+</section>
+
+<!-- ============ SLIDE 7 — THE TOOLCHAIN ============ -->
+<section>
+  <h2 class="t">The open-source toolchain</h2>
+  <p class="s">A handful of mature stacks cover almost every fine-tuning job — pick by your hardware.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A table of fine-tuning tools grouped by NVIDIA and Apple Silicon, all built on TRL and PEFT">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60"  y="60" width="480" height="230" rx="10"/>
+      <rect x="560" y="60" width="480" height="230" rx="10"/>
+    </g>
+    <text x="300" y="98" text-anchor="middle" class="lbl-b">NVIDIA (containerized)</text>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="85" y="140">Axolotl — YAML-driven, ships a Docker image</text>
+      <text x="85" y="180">Unsloth — 2x faster, ~60% less VRAM</text>
+      <text x="85" y="220">LLaMA-Factory — broad model coverage</text>
+      <text x="85" y="262" class="lbl-g" style="font-size:16px">all wrap Hugging Face TRL / PEFT</text>
+    </g>
+
+    <text x="800" y="98" text-anchor="middle" class="lbl-b">Apple Silicon (native)</text>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="585" y="140">MLX-LM — runs on Metal + Neural Engine</text>
+      <text x="585" y="180">unified memory: no copy CPU↔GPU</text>
+      <text x="585" y="220">fine-tune 3B–7B on 16–32 GB RAM</text>
+      <text x="585" y="262" class="lbl-g" style="font-size:16px">no CUDA · no bitsandbytes needed</text>
+    </g>
+    <line x1="60" y1="235" x2="540" y2="235" filter="url(#rough)" stroke="#757575" stroke-width="1.6"/>
+    <line x1="560" y1="235" x2="1040" y2="235" filter="url(#rough)" stroke="#757575" stroke-width="1.6"/>
+  </svg>
+  <p class="takeaway">Axolotl's YAML config is the interface; the pinned Docker image is what makes the run reproducible.</p>
+  <div class="pageno">M3B·07</div>
+</section>
+
+<!-- ============ SLIDE 8 — THE GPU REALITY ============ -->
+<section>
+  <h2 class="t">The same GPU reality — again</h2>
+  <p class="s">On Apple Silicon you fine-tune <em>natively</em>. On NVIDIA you fine-tune <em>in a container</em>. Never the reverse.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="On Mac MLX runs native and containers can't accelerate; on NVIDIA the Axolotl container uses the GPU">
+    <!-- MAC side -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="4 6">
+      <rect x="40" y="60" width="480" height="300" rx="14"/>
+    </g>
+    <text x="70" y="90" class="lbl-g" text-anchor="start">Apple Silicon Mac</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="80" y="120" width="400" height="90" rx="12"/>
+    </g>
+    <text x="280" y="155" text-anchor="middle" class="lbl-b">MLX-LM — NATIVE</text>
+    <text x="280" y="188" text-anchor="middle" class="lbl-g">Metal · Neural Engine · unified memory</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="10 6">
+      <rect x="80" y="240" width="400" height="90" rx="12"/>
+    </g>
+    <text x="280" y="278" text-anchor="middle" class="lbl-g">container = CPU only</text>
+    <text x="280" y="308" text-anchor="middle" class="lbl-g">bitsandbytes / CUDA won't install</text>
+
+    <!-- NVIDIA side -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="580" y="60" width="480" height="300" rx="14"/>
+    </g>
+    <text x="610" y="90" class="lbl-g" text-anchor="start">NVIDIA (WSL2 / cloud VM)</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-dasharray="10 6">
+      <rect x="620" y="120" width="400" height="90" rx="12"/>
+    </g>
+    <text x="820" y="155" text-anchor="middle" class="lbl-b">Axolotl — CONTAINER</text>
+    <text x="820" y="188" text-anchor="middle" class="lbl-g">QLoRA · CUDA · bitsandbytes</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="620" y="240" width="400" height="90" rx="12"/>
+    </g>
+    <text x="820" y="290" text-anchor="middle" class="lbl">NVIDIA GPU</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+      <path d="M820,213 L820,237" marker-end="url(#ah)"/>
+    </g>
+    <text x="930" y="230" text-anchor="middle" class="lbl-g">--gpus all</text>
+  </svg>
+  <p class="takeaway">A 7B QLoRA fits ~24 GB. On Mac, MLX is the accelerated path — CUDA tools simply don't run in a Mac container.</p>
+  <div class="pageno">M3B·08</div>
+</section>
+
+<!-- ============ SLIDE 9 — REPRODUCIBILITY ============ -->
+<section>
+  <h2 class="t">The frozen container is the experiment</h2>
+  <p class="s">Scripts rot — Python, PEFT, and bitsandbytes all drift. An OCI image does not.</p>
+  <svg viewBox="0 0 1100 360" role="img" aria-label="A loose script drifting over time versus a pinned image plus YAML that reproduces the exact run">
+    <!-- rotting script -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4" stroke-dasharray="9 7">
+      <rect x="70" y="80" width="360" height="200" rx="12"/>
+    </g>
+    <text x="250" y="120" text-anchor="middle" class="lbl-g">a bare script</text>
+    <text x="250" y="170" text-anchor="middle" class="lbl">deps drift over time</text>
+    <text x="250" y="212" text-anchor="middle" class="lbl-g">defaults change silently</text>
+    <text x="250" y="250" text-anchor="middle" class="lbl-g">"works on my machine"</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+      <path d="M445,180 L620,180" marker-end="url(#ah)"/>
+    </g>
+    <text x="532" y="165" text-anchor="middle" class="lbl-g">freeze it</text>
+
+    <!-- pinned image + yaml -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="640" y="80" width="400" height="200" rx="12"/>
+    </g>
+    <text x="840" y="120" text-anchor="middle" class="lbl-b">pinned image + YAML</text>
+    <text x="840" y="168" text-anchor="middle" class="lbl">every dep version locked</text>
+    <text x="840" y="210" text-anchor="middle" class="lbl-g">config in git · tag in GHCR</text>
+    <text x="840" y="250" text-anchor="middle" class="lbl-g">reproduce it 6 months later</text>
+  </svg>
+  <p class="takeaway">YAML in git + image tag in your registry = an immutable, repeatable experiment record.</p>
+  <div class="pageno">M3B·09</div>
+</section>
+
+<!-- ============ SLIDE 10 — WHAT YOU PRODUCE ============ -->
+<section>
+  <h2 class="t">What you produce: a tiny adapter</h2>
+  <p class="s">The run emits a 50–200 MB adapter directory — two small files, ready to serve.</p>
+  <svg viewBox="0 0 1100 360" role="img" aria-label="A small adapter directory with two files, which can be merged, hot-loaded, or packaged">
+    <!-- adapter dir -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="80" y="110" width="300" height="150" rx="12"/>
+      <rect x="110" y="140" width="240" height="42" rx="6"/>
+      <rect x="110" y="192" width="240" height="42" rx="6"/>
+    </g>
+    <text x="230" y="95" text-anchor="middle" class="lbl-g">LoRA adapter (~50–200 MB)</text>
+    <text x="130" y="168" text-anchor="start" class="lbl-sm">adapter_model.safetensors</text>
+    <text x="130" y="220" text-anchor="start" class="lbl-sm">adapter_config.json</text>
+
+    <!-- three destinations -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M385,140 L560,90"  marker-end="url(#ahg)"/>
+      <path d="M385,185 L560,185" marker-end="url(#ahg)"/>
+      <path d="M385,230 L560,280" marker-end="url(#ahg)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="580" y="55" width="460" height="70" rx="10"/>
+      <rect x="580" y="150" width="460" height="70" rx="10"/>
+      <rect x="580" y="245" width="460" height="70" rx="10"/>
+    </g>
+    <g class="lbl" text-anchor="start">
+      <text x="605" y="88">Merge → one portable file</text>
+      <text x="605" y="183">Hot-load → Ollama · vLLM adapter</text>
+      <text x="605" y="288">Package → ModelKit artifact (M4)</text>
+    </g>
+    <g class="lbl-g" text-anchor="start" font-size="15px">
+      <text x="605" y="108">mlx_lm.fuse · peft merge</text>
+      <text x="605" y="203">base shared, adapter swapped per request</text>
+      <text x="605" y="308">base ref + adapter shipped together</text>
+    </g>
+  </svg>
+  <p class="takeaway">One adapter, three exits — merge for portability, hot-load for flexibility, package to ship.</p>
+  <div class="pageno">M3B·10</div>
+</section>
+
+<!-- ============ SLIDE 11 — THE PIPELINE ============ -->
+<section>
+  <h2 class="t">The pipeline, end to end</h2>
+  <p class="s">Fine-tuning is one rung — it feeds serving and packaging you already know.</p>
+  <svg viewBox="0 0 1100 320" role="img" aria-label="A left to right flow: fine-tune to adapter to serve to package to ship">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="30"  y="120" width="180" height="90" rx="10"/>
+      <rect x="250" y="120" width="180" height="90" rx="10"/>
+      <rect x="470" y="120" width="180" height="90" rx="10"/>
+      <rect x="690" y="120" width="180" height="90" rx="10"/>
+      <rect x="910" y="120" width="160" height="90" rx="10"/>
+      <path d="M215,165 L245,165" marker-end="url(#ah)"/>
+      <path d="M435,165 L465,165" marker-end="url(#ah)"/>
+      <path d="M655,165 L685,165" marker-end="url(#ah)"/>
+      <path d="M875,165 L905,165" marker-end="url(#ah)"/>
+    </g>
+    <text x="120" y="160" text-anchor="middle" class="lbl">fine-tune</text>
+    <text x="120" y="188" text-anchor="middle" class="lbl-g">M3B</text>
+    <text x="340" y="160" text-anchor="middle" class="lbl">adapter</text>
+    <text x="340" y="188" text-anchor="middle" class="lbl-g">tiny</text>
+    <text x="560" y="160" text-anchor="middle" class="lbl">serve</text>
+    <text x="560" y="188" text-anchor="middle" class="lbl-g">M2 / M3</text>
+    <text x="780" y="160" text-anchor="middle" class="lbl">package</text>
+    <text x="780" y="188" text-anchor="middle" class="lbl-g">M4</text>
+    <text x="990" y="160" text-anchor="middle" class="lbl">ship</text>
+    <text x="990" y="188" text-anchor="middle" class="lbl-g">GHCR</text>
+    <text x="550" y="255" text-anchor="middle" class="lbl-g">the adapter flows into the same system you've been building</text>
+  </svg>
+  <p class="takeaway">Nothing new downstream — a fine-tune just adds a custom-behaviour adapter to the pipeline you own.</p>
+  <div class="pageno">M3B·11</div>
+</section>
+
+<!-- ============ SLIDE 12 — CLOSING + LAB LEAD-IN ============ -->
+<section>
+  <p class="kicker">TO THE LAB</p>
+  <h2 class="t" style="font-size:2.3em">Two tracks, one destination: a working adapter</h2>
+  <svg viewBox="0 0 1100 320" role="img" aria-label="Track A MLX on Mac and Track B Axolotl on NVIDIA both converge on one LoRA adapter">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8" stroke-linecap="round">
+      <rect x="60" y="60" width="360" height="90" rx="12"/>
+      <rect x="60" y="185" width="360" height="90" rx="12"/>
+      <rect x="760" y="120" width="280" height="95" rx="12"/>
+      <path d="M425,105 L755,155" marker-end="url(#ah)"/>
+      <path d="M425,230 L755,180" marker-end="url(#ah)"/>
+    </g>
+    <text x="240" y="100" text-anchor="middle" class="lbl-b">Track A</text>
+    <text x="240" y="130" text-anchor="middle" class="lbl-g">MLX-LM native · Apple Silicon</text>
+    <text x="240" y="225" text-anchor="middle" class="lbl-b">Track B</text>
+    <text x="240" y="255" text-anchor="middle" class="lbl-g">Axolotl container · NVIDIA</text>
+    <text x="900" y="165" text-anchor="middle" class="lbl-b">LoRA adapter</text>
+    <text x="900" y="195" text-anchor="middle" class="lbl-g">measurable behaviour change</text>
+  </svg>
+  <p class="s" style="font-size:1.1em">Fine-tune the behaviour · keep the base · ship the tiny adapter.</p>
+  <p class="credit">Optional module — do it if your cohort needs model customization. &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
+  <div class="pageno">M3B·12</div>
+</section>
+
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280,
+    height: 720,
+    margin: 0.04,
+    minScale: 0.2,
+    maxScale: 2.0,
+    hash: true,
+    center: false,
+    slideNumber: false,
+    transition: 'slide',
+    controlsTutorial: true
+  });
+</script>
+</body>
+</html>

@@ -3,11 +3,19 @@ sidebar_position: 1
 title: 'Lesson: Docs Assistant — Naive RAG'
 ---
 
+import Slides from '@site/src/components/Slides';
+
 # Lesson: Docs Assistant — Naive RAG
 
 > **Module goal:** Build a real GenAI application — a Docs Assistant that answers questions grounded in Acme's runbooks — by wiring an LLM endpoint, an embedding model, a vector database, and a Streamlit UI together into a naive-RAG pipeline. Understand where naive RAG breaks so Module 6's agentic approach makes sense.
 
 ---
+
+## Module slides
+
+Walk this short whiteboard deck for the big picture before the hands-on lab — or open it fullscreen.
+
+<Slides src="decks/05-naive-rag.html" title="Module 5 — Docs Assistant, Naive RAG" />
 
 ## 1. The problem: ungrounded answers
 

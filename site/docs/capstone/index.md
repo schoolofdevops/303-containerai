@@ -3,11 +3,19 @@ sidebar_position: 1
 title: 'Capstone: Ship the Acme AI Platform'
 ---
 
+import Slides from '@site/src/components/Slides';
+
 # Capstone: Ship the Acme AI Support Platform
 
 > You have run eight modules, each a self-contained building block. This capstone snaps them together into one deployable product — the **Acme AI Support Platform** — and proves it ships unchanged on any OCI runtime.
 
 ---
+
+## Module slides
+
+Walk this short whiteboard deck for the big picture before the hands-on lab — or open it fullscreen.
+
+<Slides src="decks/09-capstone.html" title="Capstone — Ship the Platform" />
 
 ## 1. The Platform at a Glance
 

@@ -3,6 +3,8 @@ sidebar_position: 1
 title: 'Lesson: Customizing Models with LoRA/QLoRA'
 ---
 
+import Slides from '@site/src/components/Slides';
+
 # Lesson: Customizing Models with LoRA/QLoRA in Containers
 
 > **Module goal:** Understand when fine-tuning beats prompting or RAG, what LoRA and QLoRA actually do to a model's weights, which toolchain to reach for (Axolotl on NVIDIA, MLX-LM on Apple Silicon), and why the container is the reproducibility unit — not the script.
@@ -14,6 +16,12 @@ This module is **optional** and intended for learners who need to produce custom
 :::
 
 ---
+
+## Module slides
+
+Walk this short whiteboard deck for the big picture before the hands-on lab — or open it fullscreen.
+
+<Slides src="decks/03b-finetuning.html" title="Module 3B — LoRA / QLoRA Fine-tuning" />
 
 ## 1. When to fine-tune — and when not to
 

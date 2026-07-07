@@ -3,11 +3,19 @@ sidebar_position: 1
 title: 'Lesson: Multi-Agent Incident Crew'
 ---
 
+import Slides from '@site/src/components/Slides';
+
 # Lesson: Multi-Agent Incident Crew
 
 > **Module goal:** Grow the single declarative agent from M6 into a crew of four specialised agents — Triage, Investigator, Fixer, Reviewer — all sharing one native model endpoint. Understand *why* multi-agent, *when* a single agent is enough, and the two paths to go multi-agent: declarative (what you build) and framework (CrewAI / LangGraph).
 
 ---
+
+## Module slides
+
+Walk this short whiteboard deck for the big picture before the hands-on lab — or open it fullscreen.
+
+<Slides src="decks/07-multi-agent.html" title="Module 7 — Multi-Agent Incident Crew" />
 
 ## 1. The analogy: a hospital, not a superhero
 

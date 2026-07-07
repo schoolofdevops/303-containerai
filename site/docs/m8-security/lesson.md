@@ -3,11 +3,19 @@ sidebar_position: 1
 title: 'Lesson: Securing & Governing AI Workloads'
 ---
 
+import Slides from '@site/src/components/Slides';
+
 # Lesson: Securing & Governing AI Workloads
 
 > **Module goal:** Harden and ship the M7 crew with open tools: a software bill of materials, vulnerability scanning, image signing, sandboxed code execution, input/output guardrails, lightweight evaluation, and a GitHub Actions pipeline that gates on security before signing.
 
 ---
+
+## Module slides
+
+Walk this short whiteboard deck for the big picture before the hands-on lab — or open it fullscreen.
+
+<Slides src="decks/08-security.html" title="Module 8 — Securing & Governing AI" />
 
 ## 1. The analogy: ingredients label, health inspection, tamper seal
 

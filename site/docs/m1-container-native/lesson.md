@@ -3,11 +3,19 @@ sidebar_position: 1
 title: 'Lesson: Container-Native GenAI'
 ---
 
+import Slides from '@site/src/components/Slides';
+
 # Lesson: Container-Native GenAI
 
 > **Module goal:** Understand *why* the container-native pattern exists, what it gives your AI stack, and how to wire a natively-served model to containerized apps on Apple Silicon. By the end of the lab you will have proved this wiring yourself.
 
 ---
+
+## Module slides
+
+Walk this short whiteboard deck for the big picture before the hands-on lab — or open it fullscreen.
+
+<Slides src="decks/01-container-native.html" title="Module 1 — Container-Native GenAI" />
 
 ## 1. Container-Native, Not Docker-Native
 

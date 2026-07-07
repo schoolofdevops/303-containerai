@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Containers for GenAI &amp; Agentic AI — Module 3 · vLLM</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/white.min.css" id="theme">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap">
+
+<style>
+  :root{
+    --ink:#1e1e1e;
+    --gray:#757575;
+    --paper:#ffffff;
+  }
+  .reveal{ font-family:'Patrick Hand', cursive; color:var(--ink); }
+  .reveal .slides{ text-align:center; }
+  .reveal .slides section{ position:absolute; inset:0; box-sizing:border-box; flex-direction:column; justify-content:center; padding:20px 48px 42px; overflow:hidden; }
+  .reveal .slides > section.present{ display:flex; }
+
+  .reveal h1,.reveal h2,.reveal h3{
+    font-family:'Patrick Hand', cursive;
+    color:var(--ink);
+    text-transform:none;
+    font-weight:700;
+    letter-spacing:0;
+    margin:0 0 6px 0;
+    line-height:1.15;
+  }
+  .reveal h2.t{ font-size:1.75em; }
+  .reveal p.s{ font-size:0.95em; color:var(--gray); margin:0 0 8px 0; }
+  .reveal p.takeaway{
+    font-size:0.92em; color:var(--gray);
+    margin:10px auto 0; max-width:1050px;
+  }
+  .reveal p.takeaway::before{ content:"\2192  "; color:var(--ink); font-weight:700; }
+  .reveal svg{ width:100%; flex:1 1 0; min-height:0; max-height:58%; display:block; margin:8px auto 0; }
+  .reveal .kicker{ font-size:.8em; color:var(--gray); letter-spacing:2px; }
+  .reveal .credit{ font-size:.85em; color:var(--gray); margin-top:16px; }
+  .reveal .credit b{ color:var(--ink); font-weight:700; }
+  .reveal .pageno{ position:absolute; bottom:14px; right:22px; font-size:.6em; color:#bdbdbd; }
+  .reveal .slide-number{ font-family:'Patrick Hand',cursive; }
+
+  /* SVG typographic helpers */
+  text{ font-family:'Patrick Hand', cursive; }
+  .lbl{ fill:var(--ink); font-size:21px; }
+  .lbl-sm{ fill:var(--ink); font-size:17px; }
+  .lbl-g{ fill:var(--gray); font-size:17px; }
+  .lbl-b{ fill:var(--ink); font-size:23px; font-weight:700; }
+  .num{ fill:var(--ink); font-size:24px; font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- shared SVG defs: hand-drawn wobble filter + arrowhead -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="ah" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="ahg" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="reveal"><div class="slides">
+
+<!-- ============ SLIDE 1 — TITLE ============ -->
+<section data-auto-animate>
+  <p class="kicker">MODULE 3 &nbsp;·&nbsp; DAY 1</p>
+  <h2 class="t" style="font-size:2.3em">Production Serving with vLLM</h2>
+  <p class="s" style="font-size:1.2em">Continuous batching, PagedAttention, and the same <code>/v1</code> contract</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A busy commercial coffee machine serving many cups at once, versus a single home machine">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
+      <!-- commercial machine body -->
+      <rect x="330" y="120" width="440" height="150" rx="12"/>
+      <!-- group heads -->
+      <line x1="410" y1="270" x2="410" y2="300"/>
+      <line x1="510" y1="270" x2="510" y2="300"/>
+      <line x1="610" y1="270" x2="610" y2="300"/>
+      <line x1="690" y1="270" x2="690" y2="300"/>
+      <!-- cups -->
+      <rect x="392" y="300" width="36" height="26" rx="5"/>
+      <rect x="492" y="300" width="36" height="26" rx="5"/>
+      <rect x="592" y="300" width="36" height="26" rx="5"/>
+      <rect x="672" y="300" width="36" height="26" rx="5"/>
+      <!-- ground -->
+      <line x1="250" y1="335" x2="850" y2="335"/>
+    </g>
+    <text x="550" y="175" text-anchor="middle" class="lbl-b">vLLM</text>
+    <text x="550" y="215" text-anchor="middle" class="lbl-g">many shots at once — heads never idle</text>
+  </svg>
+  <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI &nbsp;·&nbsp; Containers for GenAI &amp; Agentic AI</p>
+  <div class="pageno">M3·01</div>
+</section>
+
+<!-- ============ SLIDE 2 — WHAT YOU'LL LEARN ============ -->
+<section>
+  <h2 class="t">What you'll learn</h2>
+  <p class="s">Why vLLM is the production workhorse — and how to run it on any laptop.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Four learning objectives listed as numbered rows">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <circle cx="120" cy="70"  r="24"/>
+      <circle cx="120" cy="160" r="24"/>
+      <circle cx="120" cy="250" r="24"/>
+      <circle cx="120" cy="340" r="24"/>
+    </g>
+    <g class="num" text-anchor="middle">
+      <text x="120" y="78">1</text><text x="120" y="168">2</text>
+      <text x="120" y="258">3</text><text x="120" y="348">4</text>
+    </g>
+    <g class="lbl" text-anchor="start">
+      <text x="170" y="78">Why continuous batching + PagedAttention win ~3x throughput</text>
+      <text x="170" y="168">Serve vLLM behind the same OpenAI-compatible /v1 as Ollama</text>
+      <text x="170" y="258">Run the CPU track on any laptop — NUMA patch, thread tuning</text>
+      <text x="170" y="348">The GPU track + quantization: AWQ · GPTQ · FP8 trade-offs</text>
+    </g>
+  </svg>
+  <p class="takeaway">Same client, bigger engine — you swap the backend, your application code never notices.</p>
+  <div class="pageno">M3·02</div>
+</section>
+
+<!-- ============ SLIDE 3 — THE MOTIVATING PROBLEM ============ -->
+<section>
+  <h2 class="t">Ollama is great — until the crowd arrives</h2>
+  <p class="s">A home espresso machine pulls one perfect shot. Ask for a second mid-brew and you wait your turn.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="One request served while a queue of waiting requests backs up behind a single-slot server">
+    <!-- queue of requests -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2">
+      <rect x="60"  y="150" width="70" height="70" rx="10"/>
+      <rect x="150" y="150" width="70" height="70" rx="10"/>
+      <rect x="240" y="150" width="70" height="70" rx="10"/>
+      <rect x="330" y="150" width="70" height="70" rx="10"/>
+    </g>
+    <text x="230" y="120" text-anchor="middle" class="lbl-g">requests waiting in line</text>
+    <g class="lbl-sm" text-anchor="middle" fill="#757575">
+      <text x="95" y="192">R4</text><text x="185" y="192">R3</text>
+      <text x="275" y="192">R2</text><text x="365" y="192">R1</text>
+    </g>
+    <!-- arrow into server -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-linecap="round">
+      <path d="M410,185 L560,185" marker-end="url(#ahg)"/>
+    </g>
+    <!-- single-slot server -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="575" y="130" width="230" height="120" rx="12"/>
+    </g>
+    <text x="690" y="180" text-anchor="middle" class="lbl-b">Ollama</text>
+    <text x="690" y="215" text-anchor="middle" class="lbl-g">one shot at a time</text>
+    <!-- clock -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <circle cx="940" cy="190" r="55"/>
+      <path d="M940,190 L940,155"/>
+      <path d="M940,190 L968,205"/>
+    </g>
+    <text x="940" y="290" text-anchor="middle" class="lbl-g">throughput stalls</text>
+  </svg>
+  <p class="takeaway">Perfect for a developer at a laptop. Under concurrent load, finished slots sit idle and the queue backs up.</p>
+  <div class="pageno">M3·03</div>
+</section>
+
+<!-- ============ SLIDE 4 — CONTINUOUS BATCHING ============ -->
+<section>
+  <h2 class="t">Continuous batching — never let a head sit idle</h2>
+  <p class="s">The moment one shot finishes, the next order slides in — no waiting for the whole batch.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Static batching wastes idle slots while continuous batching refills a finished slot mid-flight">
+    <!-- static batching -->
+    <text x="270" y="55" text-anchor="middle" class="lbl-b">Static batch</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2">
+      <rect x="60"  y="80" width="420" height="46" rx="8"/>
+      <rect x="60"  y="136" width="200" height="46" rx="8"/>
+      <rect x="60"  y="192" width="420" height="46" rx="8"/>
+    </g>
+    <rect x="262" y="138" width="216" height="42" fill="#f5f5f5"/>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="80" y="110">seq A — running</text>
+      <text x="80" y="166">seq B — done</text>
+      <text x="80" y="222">seq C — running</text>
+    </g>
+    <text x="370" y="166" text-anchor="middle" class="lbl-g">idle · wasted</text>
+    <text x="270" y="278" text-anchor="middle" class="lbl-g">whole batch waits for the laggard</text>
+
+    <!-- arrow -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M500,180 L610,180" marker-end="url(#ah)"/>
+    </g>
+
+    <!-- continuous batching -->
+    <text x="850" y="55" text-anchor="middle" class="lbl-b">Continuous batch</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="640" y="80"  width="420" height="46" rx="8"/>
+      <rect x="640" y="136" width="420" height="46" rx="8"/>
+      <rect x="640" y="192" width="420" height="46" rx="8"/>
+    </g>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="660" y="110">seq A — running</text>
+      <text x="660" y="166">seq D — slots in mid-flight</text>
+      <text x="660" y="222">seq C — running</text>
+    </g>
+    <text x="850" y="278" text-anchor="middle" class="lbl-g">token-level scheduling · no idle slots</text>
+  </svg>
+  <p class="takeaway">As soon as a sequence emits its final token and leaves, a waiting request takes its place — the single biggest reason vLLM wins under load.</p>
+  <div class="pageno">M3·04</div>
+</section>
+
+<!-- ============ SLIDE 5 — PAGEDATTENTION ============ -->
+<section>
+  <h2 class="t">PagedAttention — virtual memory for the KV cache</h2>
+  <p class="s">Your OS never demands one giant contiguous block per program. It hands out small pages and maps them anywhere.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Naive serving reserves a huge contiguous slab and wastes most of it, while PagedAttention allocates small pages on demand">
+    <!-- naive -->
+    <text x="270" y="55" text-anchor="middle" class="lbl-b">Naive · reserved slab</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2">
+      <rect x="60" y="80" width="420" height="80" rx="8"/>
+      <rect x="60" y="180" width="420" height="80" rx="8"/>
+    </g>
+    <rect x="62" y="82" width="70" height="76" fill="#f5f5f5"/>
+    <rect x="62" y="182" width="110" height="76" fill="#f5f5f5"/>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="80" y="128">A: used</text>
+      <text x="270" y="128" fill="#757575">reserved · empty</text>
+      <text x="80" y="228">B: used</text>
+      <text x="300" y="228" fill="#757575">reserved · empty</text>
+    </g>
+    <text x="270" y="300" text-anchor="middle" class="lbl-g">60–80% of VRAM reserved-but-empty</text>
+
+    <!-- arrow -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M500,170 L610,170" marker-end="url(#ah)"/>
+    </g>
+
+    <!-- paged -->
+    <text x="850" y="55" text-anchor="middle" class="lbl-b">Paged · pages on demand</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="640" y="80"  width="90" height="60" rx="8"/>
+      <rect x="745" y="80"  width="90" height="60" rx="8"/>
+      <rect x="850" y="80"  width="90" height="60" rx="8"/>
+      <rect x="955" y="80"  width="90" height="60" rx="8"/>
+      <rect x="640" y="155" width="90" height="60" rx="8"/>
+      <rect x="745" y="155" width="90" height="60" rx="8"/>
+      <rect x="850" y="155" width="90" height="60" rx="8"/>
+      <rect x="955" y="155" width="90" height="60" rx="8"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="685" y="117">A·1</text><text x="790" y="117">B·1</text>
+      <text x="895" y="117">A·2</text><text x="1000" y="117">B·2</text>
+      <text x="685" y="192">A·3</text><text x="790" y="192">free</text>
+      <text x="895" y="192">free</text><text x="1000" y="192">free</text>
+    </g>
+    <text x="850" y="255" text-anchor="middle" class="lbl-g">lookup table maps pages anywhere</text>
+    <text x="850" y="300" text-anchor="middle" class="lbl-g">waste &lt; 4% — many more sequences fit</text>
+  </svg>
+  <p class="takeaway">Near-zero memory waste means far more concurrent sequences fit — which is exactly what feeds continuous batching enough work to stay busy.</p>
+  <div class="pageno">M3·05</div>
+</section>
+
+<!-- ============ SLIDE 6 — 3X THROUGHPUT ============ -->
+<section>
+  <h2 class="t">The payoff: ~3x throughput under load</h2>
+  <p class="s">Same GPU, same per-shot time — but the heads never go idle, so far more coffees per hour.</p>
+  <svg viewBox="0 0 1100 360" role="img" aria-label="A bar chart comparing naive server throughput to vLLM at roughly three times">
+    <!-- axis -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+      <path d="M180,300 L980,300"/>
+      <path d="M180,300 L180,70"/>
+    </g>
+    <!-- naive bar -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4">
+      <rect x="290" y="230" width="150" height="70" rx="8"/>
+    </g>
+    <text x="365" y="272" text-anchor="middle" class="lbl-g">1x</text>
+    <text x="365" y="330" text-anchor="middle" class="lbl-g">naive server</text>
+    <!-- vLLM bar -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="640" y="90" width="150" height="210" rx="8"/>
+    </g>
+    <rect x="642" y="92" width="146" height="206" fill="#f5f5f5"/>
+    <text x="715" y="200" text-anchor="middle" class="lbl-b">~3x</text>
+    <text x="715" y="330" text-anchor="middle" class="lbl">vLLM</text>
+    <text x="120" y="185" text-anchor="middle" class="lbl-g" transform="rotate(-90 120 185)">throughput</text>
+  </svg>
+  <p class="takeaway">Continuous batching + PagedAttention together give roughly 3x the throughput of a naive server on the same hardware.</p>
+  <div class="pageno">M3·06</div>
+</section>
+
+<!-- ============ SLIDE 7 — SAME CONTRACT ============ -->
+<section>
+  <h2 class="t">Same contract, bigger engine</h2>
+  <p class="s">The wall socket from M2, again — the client speaks to the contract, not the engine behind it.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="One client speaks to the v1 contract, which routes to either Ollama or vLLM with only an env var change">
+    <!-- client -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="60" y="150" width="230" height="90" rx="12"/>
+    </g>
+    <text x="175" y="190" text-anchor="middle" class="lbl-b">Your M2 client</text>
+    <text x="175" y="220" text-anchor="middle" class="lbl-g">openai SDK · curl</text>
+    <!-- arrow to contract -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M295,195 L410,195" marker-end="url(#ah)"/>
+    </g>
+    <!-- contract socket -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="420" y="140" width="200" height="110" rx="14"/>
+      <circle cx="480" cy="185" r="9"/>
+      <circle cx="560" cy="185" r="9"/>
+      <line x1="520" y1="210" x2="520" y2="235"/>
+    </g>
+    <text x="520" y="125" text-anchor="middle" class="lbl-g">/v1 contract (OpenAI API)</text>
+    <!-- branches to engines -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-linecap="round">
+      <path d="M625,175 L760,110" marker-end="url(#ahg)"/>
+      <path d="M625,215 L760,280" marker-end="url(#ahg)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="770" y="75"  width="270" height="80" rx="10"/>
+      <rect x="770" y="250" width="270" height="80" rx="10"/>
+    </g>
+    <text x="905" y="110" text-anchor="middle" class="lbl">Ollama · :11434</text>
+    <text x="905" y="138" text-anchor="middle" class="lbl-g">dev laptop</text>
+    <text x="905" y="285" text-anchor="middle" class="lbl">vLLM · :8009</text>
+    <text x="905" y="313" text-anchor="middle" class="lbl-g">production throughput</text>
+  </svg>
+  <p class="takeaway">Swapping Ollama for vLLM is a one-line change — point OPENAI_BASE_URL at the new address. No code, no SDK, no image change.</p>
+  <div class="pageno">M3·07</div>
+</section>
+
+<!-- ============ SLIDE 8 — CPU TRACK ============ -->
+<section>
+  <h2 class="t">The CPU track — learn the machinery anywhere</h2>
+  <p class="s">Apple Silicon exposes no GPU to containers, so containerized vLLM runs on CPU. Slow on purpose.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A container running the CPU vLLM image serving SmolLM2 behind the v1 API on any laptop">
+    <!-- container boundary -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-dasharray="10 6">
+      <rect x="80" y="70" width="600" height="260" rx="14"/>
+    </g>
+    <text x="120" y="100" class="lbl-g" text-anchor="start">Container · any laptop CPU</text>
+    <!-- image -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="120" y="130" width="520" height="70" rx="10"/>
+      <rect x="120" y="220" width="240" height="80" rx="10"/>
+      <rect x="400" y="220" width="240" height="80" rx="10"/>
+    </g>
+    <text x="380" y="163" text-anchor="middle" class="lbl">openeuler/vllm-cpu:0.9.1</text>
+    <text x="380" y="188" text-anchor="middle" class="lbl-g">multi-arch · runs native on arm64</text>
+    <text x="240" y="255" text-anchor="middle" class="lbl">SmolLM2</text>
+    <text x="240" y="283" text-anchor="middle" class="lbl-g">135M / 360M / 1.7B</text>
+    <text x="520" y="255" text-anchor="middle" class="lbl">/v1 server</text>
+    <text x="520" y="283" text-anchor="middle" class="lbl-g">same OpenAI API</text>
+    <!-- arrow out -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M685,200 L800,200" marker-end="url(#ah)"/>
+    </g>
+    <text x="945" y="180" text-anchor="middle" class="lbl-b">Study the engine</text>
+    <text x="945" y="215" text-anchor="middle" class="lbl-g">batcher · quantization</text>
+    <text x="945" y="245" text-anchor="middle" class="lbl-g">at a walking pace</text>
+  </svg>
+  <p class="takeaway">Throughput isn't the lesson on CPU — understanding the OpenAI server, the batcher, and quantization mechanics is.</p>
+  <div class="pageno">M3·08</div>
+</section>
+
+<!-- ============ SLIDE 9 — NUMA PATCH ============ -->
+<section>
+  <h2 class="t">Why containers report 0 NUMA nodes</h2>
+  <p class="s">NUMA is the building's floor plan. A container is a furnished apartment inside it — the floor plan is abstracted away.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A container sees zero NUMA nodes causing a division by zero, fixed by a one-line guard patch">
+    <!-- host building -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="4 6">
+      <rect x="60" y="70" width="330" height="250" rx="14"/>
+    </g>
+    <text x="225" y="100" text-anchor="middle" class="lbl-g">Host (building)</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2">
+      <rect x="90" y="130" width="130" height="70" rx="8"/>
+      <rect x="235" y="130" width="130" height="70" rx="8"/>
+      <rect x="90" y="220" width="130" height="70" rx="8"/>
+      <rect x="235" y="220" width="130" height="70" rx="8"/>
+    </g>
+    <g class="lbl-g" text-anchor="middle">
+      <text x="155" y="172">NUMA 0</text><text x="300" y="172">NUMA 1</text>
+      <text x="155" y="262">NUMA 2</text><text x="300" y="262">NUMA 3</text>
+    </g>
+    <!-- container apartment -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-dasharray="10 6">
+      <rect x="470" y="120" width="230" height="150" rx="12"/>
+    </g>
+    <text x="585" y="160" text-anchor="middle" class="lbl-b">Container</text>
+    <text x="585" y="200" text-anchor="middle" class="lbl-g">sees numa_size = 0</text>
+    <text x="585" y="240" text-anchor="middle" class="lbl">cpu_count // 0 crashes</text>
+    <!-- arrow to fix -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M705,195 L810,195" marker-end="url(#ah)"/>
+    </g>
+    <!-- fix -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="825" y="140" width="240" height="110" rx="10"/>
+    </g>
+    <text x="945" y="180" text-anchor="middle" class="lbl">one-line patch</text>
+    <text x="945" y="212" text-anchor="middle" class="lbl-g">if numa_size &gt; 0</text>
+    <text x="945" y="240" text-anchor="middle" class="lbl-g">else cpu_count</text>
+  </svg>
+  <p class="takeaway">The signature teaching point: a surgical sed patch guards the division so an upstream image behaves in a containerized world.</p>
+  <div class="pageno">M3·09</div>
+</section>
+
+<!-- ============ SLIDE 10 — THREAD TUNING ============ -->
+<section>
+  <h2 class="t">CPU tuning knobs that keep the laptop usable</h2>
+  <p class="s">A few environment dials do most of the work — set threads to part of your cores, not all.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Four environment variables that tune CPU threads and KV cache size">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60"  y="70" width="480" height="130" rx="10"/>
+      <rect x="560" y="70" width="480" height="130" rx="10"/>
+      <rect x="60"  y="220" width="480" height="130" rx="10"/>
+      <rect x="560" y="220" width="480" height="130" rx="10"/>
+    </g>
+    <g text-anchor="start">
+      <text x="85" y="110" class="lbl-b">OMP_NUM_THREADS</text>
+      <text x="85" y="145" class="lbl-g">the main dial · caps OpenMP threads</text>
+      <text x="85" y="178" class="lbl-g">set 2–4 (~50–75% of perf cores)</text>
+
+      <text x="585" y="110" class="lbl-b">VLLM_CPU_KVCACHE_SPACE</text>
+      <text x="585" y="145" class="lbl-g">GB reserved for the KV cache</text>
+      <text x="585" y="178" class="lbl-g">small (1 GB) keeps memory tight</text>
+
+      <text x="85" y="260" class="lbl-b">OPENBLAS / MKL = 1</text>
+      <text x="85" y="295" class="lbl-g">keep BLAS single-threaded</text>
+      <text x="85" y="328" class="lbl-g">don't let it fight OpenMP for cores</text>
+
+      <text x="585" y="260" class="lbl-b">Why leave cores free?</text>
+      <text x="585" y="295" class="lbl-g">the OS &amp; your apps stay responsive</text>
+      <text x="585" y="328" class="lbl-g">the machine won't thermally throttle</text>
+    </g>
+  </svg>
+  <p class="takeaway">Multi-threaded BLAS and multi-threaded OpenMP thrash the cache and slow everything down — keep BLAS at one thread.</p>
+  <div class="pageno">M3·10</div>
+</section>
+
+<!-- ============ SLIDE 11 — CPU VS GPU TRACK ============ -->
+<section>
+  <h2 class="t">CPU track vs GPU track</h2>
+  <p class="s">Learn the engine on any laptop; reach for the throughput payoff on an NVIDIA box.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="A comparison table of the CPU track versus the GPU track across image, hardware, GPU enablement, shared memory and goal">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60" y="55" width="480" height="315" rx="10"/>
+      <rect x="560" y="55" width="480" height="315" rx="10"/>
+    </g>
+    <text x="300" y="95" text-anchor="middle" class="lbl-b">CPU track (this module)</text>
+    <text x="800" y="95" text-anchor="middle" class="lbl-b">GPU track (production)</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="1.6">
+      <line x1="80" y1="115" x2="520" y2="115"/>
+      <line x1="580" y1="115" x2="1020" y2="115"/>
+      <line x1="80" y1="180" x2="520" y2="180"/>
+      <line x1="580" y1="180" x2="1020" y2="180"/>
+      <line x1="80" y1="245" x2="520" y2="245"/>
+      <line x1="580" y1="245" x2="1020" y2="245"/>
+      <line x1="80" y1="310" x2="520" y2="310"/>
+      <line x1="580" y1="310" x2="1020" y2="310"/>
+    </g>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="85" y="152">openeuler/vllm-cpu</text>
+      <text x="85" y="217">any laptop CPU</text>
+      <text x="85" y="282">no GPU flags</text>
+      <text x="85" y="347">goal: learn the engine</text>
+
+      <text x="585" y="152">vllm/vllm-openai · TGI alt</text>
+      <text x="585" y="217">NVIDIA GPU · safetensors</text>
+      <text x="585" y="282">Container Toolkit + --gpus all</text>
+      <text x="585" y="347">--ipc=host · ~3x throughput</text>
+    </g>
+  </svg>
+  <p class="takeaway">Both speak the identical /v1 contract — your M2 client wouldn't change moving from CPU to GPU.</p>
+  <div class="pageno">M3·11</div>
+</section>
+
+<!-- ============ SLIDE 12 — GPU GOTCHAS ============ -->
+<section>
+  <h2 class="t">GPU operational gotchas</h2>
+  <p class="s">Two flags and one sizing rule separate a working GPU server from cryptic crashes.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="NVIDIA Container Toolkit exposes the GPU, ipc host shares shared memory, and VRAM sizing needs headroom">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60"  y="70" width="310" height="240" rx="12"/>
+      <rect x="395" y="70" width="310" height="240" rx="12"/>
+      <rect x="730" y="70" width="310" height="240" rx="12"/>
+    </g>
+    <text x="215" y="110" text-anchor="middle" class="lbl-b">--gpus all</text>
+    <text x="215" y="150" text-anchor="middle" class="lbl-g">needs NVIDIA</text>
+    <text x="215" y="180" text-anchor="middle" class="lbl-g">Container Toolkit</text>
+    <text x="215" y="225" text-anchor="middle" class="lbl-sm">exposes host GPU</text>
+    <text x="215" y="255" text-anchor="middle" class="lbl-sm">+ drivers to container</text>
+    <text x="215" y="290" text-anchor="middle" class="lbl-g">else falls back to CPU</text>
+
+    <text x="550" y="110" text-anchor="middle" class="lbl-b">--ipc=host</text>
+    <text x="550" y="150" text-anchor="middle" class="lbl-g">shares /dev/shm</text>
+    <text x="550" y="195" text-anchor="middle" class="lbl-sm">multi-process</text>
+    <text x="550" y="222" text-anchor="middle" class="lbl-sm">attention needs it</text>
+    <text x="550" y="290" text-anchor="middle" class="lbl-g">omit → crashes under load</text>
+
+    <text x="885" y="110" text-anchor="middle" class="lbl-b">VRAM sizing</text>
+    <text x="885" y="150" text-anchor="middle" class="lbl-g">7B @ 16-bit</text>
+    <text x="885" y="195" text-anchor="middle" class="lbl-sm">≈ 14 GB weights</text>
+    <text x="885" y="222" text-anchor="middle" class="lbl-sm">+ KV-cache headroom</text>
+    <text x="885" y="290" text-anchor="middle" class="lbl-g">24 GB card, or quantize</text>
+  </svg>
+  <p class="takeaway">--max-model-len and --max-num-seqs cap KV-cache size and concurrency — the usual dials to fit memory.</p>
+  <div class="pageno">M3·12</div>
+</section>
+
+<!-- ============ SLIDE 13 — QUANTIZATION ============ -->
+<section>
+  <h2 class="t">Quantization — trade a little precision for a lot of room</h2>
+  <p class="s">Like a JPEG: compress weights from 16-bit floats to 4- or 8-bit ints. A little accuracy lost, the file shrinks dramatically.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="AWQ, GPTQ and FP8 quantization formats compared by bits, best use, and trade-off">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60"  y="70" width="310" height="250" rx="12"/>
+      <rect x="395" y="70" width="310" height="250" rx="12"/>
+      <rect x="730" y="70" width="310" height="250" rx="12"/>
+    </g>
+    <text x="215" y="112" text-anchor="middle" class="lbl-b">AWQ · 4-bit</text>
+    <text x="550" y="112" text-anchor="middle" class="lbl-b">GPTQ · 4-bit</text>
+    <text x="885" y="112" text-anchor="middle" class="lbl-b">FP8 · 8-bit</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="1.6">
+      <line x1="80" y1="130" x2="350" y2="130"/>
+      <line x1="415" y1="130" x2="685" y2="130"/>
+      <line x1="750" y1="130" x2="1020" y2="130"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="215" y="170">activation-aware</text>
+      <text x="215" y="205">best accuracy at 4-bit</text>
+      <text x="215" y="255">≈ ¼ the VRAM of FP16</text>
+      <text x="215" y="290" fill="#757575">strong quality retention</text>
+
+      <text x="550" y="170">mature ecosystem</text>
+      <text x="550" y="205">many checkpoints on Hub</text>
+      <text x="550" y="255">3 / 8-bit variants too</text>
+      <text x="550" y="290" fill="#757575">slightly more loss than AWQ</text>
+
+      <text x="885" y="170">near-lossless</text>
+      <text x="885" y="205">newer GPUs (Hopper/Ada)</text>
+      <text x="885" y="255">needs HW FP8 support</text>
+      <text x="885" y="290" fill="#757575">chosen for large deployments</text>
+    </g>
+  </svg>
+  <p class="takeaway">Rule of thumb: 4-bit AWQ roughly quarters VRAM vs FP16 for a small accuracy cost — often how a 7B model fits a consumer 8 GB card.</p>
+  <div class="pageno">M3·13</div>
+</section>
+
+<!-- ============ SLIDE 14 — CLOSING / LAB LEAD-IN ============ -->
+<section>
+  <p class="kicker">TO THE LAB</p>
+  <h2 class="t" style="font-size:2.3em">Same socket. Bigger engine.</h2>
+  <svg viewBox="0 0 1100 320" role="img" aria-label="Build the patched CPU vLLM image, serve SmolLM2, and point the M2 client at it with one line">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="60"  y="110" width="250" height="100" rx="12"/>
+      <rect x="420" y="110" width="250" height="100" rx="12"/>
+      <rect x="790" y="110" width="250" height="100" rx="12"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M315,160 L415,160" marker-end="url(#ah)"/>
+      <path d="M675,160 L785,160" marker-end="url(#ah)"/>
+    </g>
+    <text x="185" y="150" text-anchor="middle" class="lbl-b">Build</text>
+    <text x="185" y="185" text-anchor="middle" class="lbl-g">patched CPU image</text>
+    <text x="545" y="150" text-anchor="middle" class="lbl-b">Serve</text>
+    <text x="545" y="185" text-anchor="middle" class="lbl-g">SmolLM2 on /v1</text>
+    <text x="915" y="150" text-anchor="middle" class="lbl-b">Point client</text>
+    <text x="915" y="185" text-anchor="middle" class="lbl-g">one-line env swap</text>
+    <text x="550" y="270" text-anchor="middle" class="lbl-g">the M2 client, unchanged, talks to the vLLM server you build</text>
+  </svg>
+  <p class="s" style="font-size:1.1em">Serve SmolLM2 on CPU vLLM and hit the same <code>/v1</code> your M2 client already speaks.</p>
+  <p class="credit">Next: <b>Lab — Serve SmolLM2 on CPU vLLM</b> &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
+  <div class="pageno">M3·14</div>
+</section>
+
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280,
+    height: 720,
+    margin: 0.04,
+    minScale: 0.2,
+    maxScale: 2.0,
+    hash: true,
+    center: false,
+    slideNumber: false,
+    transition: 'slide',
+    controlsTutorial: true
+  });
+</script>
+</body>
+</html>

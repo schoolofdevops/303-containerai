@@ -3,11 +3,19 @@ sidebar_position: 1
 title: 'Lesson: Serving Local Models'
 ---
 
+import Slides from '@site/src/components/Slides';
+
 # Lesson: Serving Local Models
 
 > **Module goal:** Understand the landscape of open model-serving engines, the OpenAI-compatible API contract that ties them all together, and the two wiring patterns that connect your containerized app to a local model — whether the model runs natively on the host or inside a container.
 
 ---
+
+## Module slides
+
+Walk this short whiteboard deck for the big picture before the hands-on lab — or open it fullscreen.
+
+<Slides src="decks/02-serving.html" title="Module 2 — Serving Local Models" />
 
 ## 1. Demo First: Docker Model Runner
 

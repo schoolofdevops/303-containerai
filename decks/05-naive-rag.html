@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Containers for GenAI &amp; Agentic AI — Introduction</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/white.min.css" id="theme">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap">
+
+<style>
+  :root{
+    --ink:#1e1e1e;
+    --gray:#757575;
+    --paper:#ffffff;
+  }
+  .reveal{ font-family:'Patrick Hand', cursive; color:var(--ink); }
+  .reveal .slides{ text-align:center; }
+  .reveal .slides section{ position:absolute; inset:0; box-sizing:border-box; flex-direction:column; justify-content:center; padding:20px 48px 42px; overflow:hidden; }
+  .reveal .slides > section.present{ display:flex; }
+
+  .reveal h1,.reveal h2,.reveal h3{
+    font-family:'Patrick Hand', cursive;
+    color:var(--ink);
+    text-transform:none;
+    font-weight:700;
+    letter-spacing:0;
+    margin:0 0 6px 0;
+    line-height:1.15;
+  }
+  .reveal h2.t{ font-size:1.75em; }
+  .reveal p.s{ font-size:0.95em; color:var(--gray); margin:0 0 8px 0; }
+  .reveal p.takeaway{
+    font-size:0.92em; color:var(--gray);
+    margin:10px auto 0; max-width:1050px;
+  }
+  .reveal p.takeaway::before{ content:"\2192  "; color:var(--ink); font-weight:700; }
+  .reveal svg{ width:100%; flex:1 1 0; min-height:0; max-height:58%; display:block; margin:8px auto 0; }
+  .reveal .kicker{ font-size:.8em; color:var(--gray); letter-spacing:2px; }
+  .reveal .credit{ font-size:.85em; color:var(--gray); margin-top:16px; }
+  .reveal .credit b{ color:var(--ink); font-weight:700; }
+  .reveal .pageno{ position:absolute; bottom:14px; right:22px; font-size:.6em; color:#bdbdbd; }
+  .reveal .slide-number{ font-family:'Patrick Hand',cursive; }
+
+  /* SVG typographic helpers */
+  text{ font-family:'Patrick Hand', cursive; }
+  .lbl{ fill:var(--ink); font-size:21px; }
+  .lbl-sm{ fill:var(--ink); font-size:17px; }
+  .lbl-g{ fill:var(--gray); font-size:17px; }
+  .lbl-b{ fill:var(--ink); font-size:23px; font-weight:700; }
+  .num{ fill:var(--ink); font-size:24px; font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- shared SVG defs: hand-drawn wobble filter + arrowhead -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="ah" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="ahg" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="reveal"><div class="slides">
+
+<!-- ============ SLIDE 1 — TITLE ============ -->
+<section data-auto-animate>
+  <p class="kicker">MODULE 5 &nbsp;·&nbsp; DAY 2</p>
+  <h2 class="t" style="font-size:2.3em">Docs Assistant — Naive RAG</h2>
+  <p class="s" style="font-size:1.2em">Grounding an LLM in your own documents</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A user question flows through retrieved document context into a grounded answer">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
+      <rect x="60" y="150" width="200" height="90" rx="12"/>
+      <rect x="450" y="150" width="200" height="90" rx="12"/>
+      <rect x="840" y="150" width="200" height="90" rx="12"/>
+      <path d="M265,195 L445,195" marker-end="url(#ah)"/>
+      <path d="M655,195 L835,195" marker-end="url(#ah)"/>
+    </g>
+    <text x="160" y="188" text-anchor="middle" class="lbl">Question</text>
+    <text x="160" y="216" text-anchor="middle" class="lbl-g">about YOUR docs</text>
+    <text x="550" y="188" text-anchor="middle" class="lbl">Retrieved</text>
+    <text x="550" y="216" text-anchor="middle" class="lbl">context</text>
+    <text x="940" y="188" text-anchor="middle" class="lbl-b">Grounded</text>
+    <text x="940" y="216" text-anchor="middle" class="lbl">answer</text>
+    <text x="355" y="130" text-anchor="middle" class="lbl-g">find</text>
+    <text x="745" y="130" text-anchor="middle" class="lbl-g">generate</text>
+    <text x="550" y="290" text-anchor="middle" class="lbl-g">Retrieval-Augmented Generation — no fine-tuning, just wiring</text>
+  </svg>
+  <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI &nbsp;·&nbsp; Hands-on</p>
+  <div class="pageno">M5·01</div>
+</section>
+
+<!-- ============ SLIDE 2 — WHAT YOU'LL LEARN ============ -->
+<section>
+  <h2 class="t">What you'll learn</h2>
+  <p class="s">The anatomy of a real GenAI app — and how to wire it in containers.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Five learning objectives listed as numbered rows">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <circle cx="120" cy="70"  r="24"/>
+      <circle cx="120" cy="140" r="24"/>
+      <circle cx="120" cy="210" r="24"/>
+      <circle cx="120" cy="280" r="24"/>
+      <circle cx="120" cy="350" r="24"/>
+    </g>
+    <g class="num" text-anchor="middle">
+      <text x="120" y="78">1</text><text x="120" y="148">2</text>
+      <text x="120" y="218">3</text><text x="120" y="288">4</text>
+      <text x="120" y="358">5</text>
+    </g>
+    <g class="lbl" text-anchor="start">
+      <text x="170" y="78">Name the four parts of every GenAI application</text>
+      <text x="170" y="148">Understand a vector DB as search by meaning, not by title</text>
+      <text x="170" y="218">Walk the naive-RAG pipeline: ingest → chunk → embed → retrieve → generate</text>
+      <text x="170" y="288">Wire it in Compose — ChromaDB + app talking to native Ollama</text>
+      <text x="170" y="358">See where naive RAG breaks — setting up Module 6</text>
+    </g>
+  </svg>
+  <p class="takeaway">By the end you have a containerised Docs Assistant that answers grounded questions about Acme's runbooks.</p>
+  <div class="pageno">M5·02</div>
+</section>
+
+<!-- ============ SLIDE 3 — THE PROBLEM ============ -->
+<section>
+  <h2 class="t">A model alone can't answer about YOUR docs</h2>
+  <p class="s">It answers confidently from training data that predates your runbooks — and gets it wrong.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="A raw model gives a plausible but wrong command while a RAG-grounded model gives the correct one">
+    <!-- left: raw model, wrong -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4" stroke-dasharray="9 7">
+      <rect x="60" y="70" width="440" height="270" rx="12"/>
+    </g>
+    <text x="280" y="105" text-anchor="middle" class="lbl-g" style="font-size:19px">Raw LLM — ungrounded</text>
+    <text x="280" y="160" text-anchor="middle" class="lbl">"How do I restart</text>
+    <text x="280" y="188" text-anchor="middle" class="lbl">the payments service?"</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2">
+      <rect x="95" y="220" width="370" height="90" rx="8"/>
+    </g>
+    <text x="280" y="255" text-anchor="middle" class="lbl-g">plausible-sounding</text>
+    <text x="280" y="283" text-anchor="middle" class="lbl-g">but WRONG command</text>
+
+    <!-- right: RAG, correct -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="600" y="70" width="440" height="270" rx="12"/>
+    </g>
+    <text x="820" y="105" text-anchor="middle" class="lbl-b" style="font-size:19px">RAG — grounded</text>
+    <text x="820" y="160" text-anchor="middle" class="lbl">same question +</text>
+    <text x="820" y="188" text-anchor="middle" class="lbl">the actual runbook</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2">
+      <rect x="635" y="220" width="370" height="90" rx="8"/>
+    </g>
+    <text x="820" y="255" text-anchor="middle" class="lbl">kubectl rollout restart</text>
+    <text x="820" y="283" text-anchor="middle" class="lbl">deploy/payments — correct</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M505,205 L595,205" marker-end="url(#ah)"/>
+    </g>
+    <text x="550" y="190" text-anchor="middle" class="lbl-g">add</text>
+    <text x="550" y="235" text-anchor="middle" class="lbl-g">docs</text>
+  </svg>
+  <p class="takeaway">RAG gives the model a cheat sheet at query time — it generates from context, not from stale weights.</p>
+  <div class="pageno">M5·03</div>
+</section>
+
+<!-- ============ SLIDE 4 — ANATOMY OF A GENAI APP ============ -->
+<section>
+  <h2 class="t">Anatomy of a GenAI application</h2>
+  <p class="s">Four parts, wired together. You already built the first two in M2 and M3.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Four components of a GenAI app arranged around a central application core">
+    <!-- central app -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="420" y="160" width="260" height="90" rx="14"/>
+    </g>
+    <text x="550" y="200" text-anchor="middle" class="lbl-b">Application</text>
+    <text x="550" y="228" text-anchor="middle" class="lbl-g">Streamlit UI · orchestrate</text>
+
+    <!-- four surrounding -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="120" y="40"  width="300" height="90" rx="10"/>
+      <rect x="680" y="40"  width="300" height="90" rx="10"/>
+      <rect x="120" y="280" width="300" height="90" rx="10"/>
+      <rect x="680" y="280" width="300" height="90" rx="10"/>
+    </g>
+    <text x="270" y="78"  text-anchor="middle" class="lbl-b">LLM endpoint</text>
+    <text x="270" y="108" text-anchor="middle" class="lbl-g">qwen2.5:1.5b · Ollama</text>
+    <text x="830" y="78"  text-anchor="middle" class="lbl-b">Embedding model</text>
+    <text x="830" y="108" text-anchor="middle" class="lbl-g">nomic-embed-text · 768-dim</text>
+    <text x="270" y="318" text-anchor="middle" class="lbl-b">Vector database</text>
+    <text x="270" y="348" text-anchor="middle" class="lbl-g">ChromaDB · search by meaning</text>
+    <text x="830" y="318" text-anchor="middle" class="lbl-g" style="font-size:16px">already have it (M2/M3)</text>
+    <text x="830" y="348" text-anchor="middle" class="lbl-g" style="font-size:16px">compose grows by 2 services</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M420,180 L425,135" marker-end="url(#ahg)"/>
+      <path d="M680,180 L675,135" marker-end="url(#ahg)"/>
+      <path d="M420,230 L425,275" marker-end="url(#ahg)"/>
+    </g>
+  </svg>
+  <p class="takeaway">LLM endpoint + embedding model + vector DB + application — M5 adds the vector DB and the app layer.</p>
+  <div class="pageno">M5·04</div>
+</section>
+
+<!-- ============ SLIDE 5 — THE LIBRARIAN ANALOGY ============ -->
+<section>
+  <h2 class="t">A vector DB shelves by meaning, not title</h2>
+  <p class="s">A filing cabinet needs the exact name. A librarian understands what you mean.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="A filing cabinet keyed by exact title fails while a librarian shelving by meaning finds the right book">
+    <!-- left: filing cabinet -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4" stroke-dasharray="9 7">
+      <rect x="60" y="60" width="440" height="290" rx="12"/>
+    </g>
+    <text x="280" y="95" text-anchor="middle" class="lbl-g" style="font-size:19px">Filing cabinet (by title)</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2">
+      <rect x="150" y="120" width="260" height="45" rx="6"/>
+      <rect x="150" y="180" width="260" height="45" rx="6"/>
+      <rect x="150" y="240" width="260" height="45" rx="6"/>
+    </g>
+    <text x="280" y="150" text-anchor="middle" class="lbl-g">"Payments Runbook"</text>
+    <text x="280" y="210" text-anchor="middle" class="lbl-g">"SRE ops, tier 1"</text>
+    <text x="280" y="270" text-anchor="middle" class="lbl-g">"Deploy notes"</text>
+    <text x="280" y="325" text-anchor="middle" class="lbl-g">wrong words → nothing found</text>
+
+    <!-- right: meaning-space -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="600" y="60" width="440" height="290" rx="12"/>
+    </g>
+    <text x="820" y="95" text-anchor="middle" class="lbl-b" style="font-size:19px">Librarian (by meaning)</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2">
+      <circle cx="700" cy="170" r="12"/>
+      <circle cx="760" cy="220" r="12"/>
+      <circle cx="740" cy="290" r="12"/>
+      <circle cx="900" cy="150" r="12"/>
+      <circle cx="950" cy="250" r="12"/>
+      <circle cx="820" cy="200" r="18"/>
+    </g>
+    <text x="820" y="205" text-anchor="middle" class="lbl-sm">?</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="1.8" stroke-linecap="round">
+      <path d="M804,208 L775,216" marker-end="url(#ahg)"/>
+    </g>
+    <text x="820" y="330" text-anchor="middle" class="lbl-g">question → coordinates → nearest shelf</text>
+  </svg>
+  <p class="takeaway">Embeddings are coordinates that encode meaning — similar passages land near each other, so similarity search finds them.</p>
+  <div class="pageno">M5·05</div>
+</section>
+
+<!-- ============ SLIDE 6 — EMBEDDINGS ============ -->
+<section>
+  <h2 class="t">Embeddings: text becomes coordinates</h2>
+  <p class="s">An embedding model turns each passage into 768 numbers that place it in meaning-space.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Text passages fed through an embedding model become vectors that cluster by topic in a space">
+    <!-- text in -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="50" y="90"  width="220" height="55" rx="8"/>
+      <rect x="50" y="165" width="220" height="55" rx="8"/>
+      <rect x="50" y="240" width="220" height="55" rx="8"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="160" y="123">"restart payments"</text>
+      <text x="160" y="198">"bounce the service"</text>
+      <text x="160" y="273">"the moon is round"</text>
+    </g>
+
+    <!-- embedding model -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="360" y="150" width="200" height="90" rx="12"/>
+    </g>
+    <text x="460" y="188" text-anchor="middle" class="lbl-b">Embedding</text>
+    <text x="460" y="216" text-anchor="middle" class="lbl">model</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M275,118 L355,178" marker-end="url(#ahg)"/>
+      <path d="M275,193 L355,195" marker-end="url(#ahg)"/>
+      <path d="M275,268 L355,212" marker-end="url(#ahg)"/>
+    </g>
+
+    <!-- vector space -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="660" y="70" width="380" height="250" rx="12"/>
+      <circle cx="780" cy="150" r="12"/>
+      <circle cx="820" cy="180" r="12"/>
+      <circle cx="960" cy="270" r="12"/>
+    </g>
+    <text x="850" y="105" text-anchor="middle" class="lbl-g">768-dim space</text>
+    <text x="740" y="150" text-anchor="middle" class="lbl-g" style="font-size:15px">near</text>
+    <text x="960" y="245" text-anchor="middle" class="lbl-g" style="font-size:15px">far</text>
+    <path d="M792,155 L808,175" fill="none" stroke="#757575" stroke-width="1.8"/>
+  </svg>
+  <p class="takeaway">The same model embeds both your documents and your questions — that shared space is what makes retrieval work.</p>
+  <div class="pageno">M5·06</div>
+</section>
+
+<!-- ============ SLIDE 7 — THE PIPELINE (CENTERPIECE) ============ -->
+<section>
+  <h2 class="t">The naive-RAG pipeline</h2>
+  <p class="s">Ingest once. Then answer every question with the same embedding step.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Ingest flow loads chunks embeds and stores; query flow embeds retrieves augments and generates">
+    <!-- ingest row -->
+    <text x="60" y="70" text-anchor="start" class="lbl-g">INGEST · run once</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <rect x="60"  y="90" width="180" height="70" rx="10"/>
+      <rect x="300" y="90" width="180" height="70" rx="10"/>
+      <rect x="540" y="90" width="180" height="70" rx="10"/>
+      <rect x="780" y="90" width="260" height="70" rx="10"/>
+      <path d="M245,125 L295,125" marker-end="url(#ah)"/>
+      <path d="M485,125 L535,125" marker-end="url(#ah)"/>
+      <path d="M725,125 L775,125" marker-end="url(#ah)"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="150" y="132">Load doc</text>
+      <text x="390" y="132">Chunk</text>
+      <text x="630" y="132">Embed</text>
+      <text x="910" y="132">Store → ChromaDB</text>
+    </g>
+
+    <!-- query row -->
+    <text x="60" y="235" text-anchor="start" class="lbl-g">QUERY · every question</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <rect x="60"  y="255" width="200" height="70" rx="10"/>
+      <rect x="320" y="255" width="200" height="70" rx="10"/>
+      <rect x="580" y="255" width="200" height="70" rx="10"/>
+      <rect x="840" y="255" width="200" height="70" rx="10"/>
+      <path d="M265,290 L315,290" marker-end="url(#ah)"/>
+      <path d="M525,290 L575,290" marker-end="url(#ah)"/>
+      <path d="M785,290 L835,290" marker-end="url(#ah)"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="160" y="297">Embed query</text>
+      <text x="420" y="297">Retrieve top-3</text>
+      <text x="680" y="297">Augment prompt</text>
+      <text x="940" y="297">Generate</text>
+    </g>
+
+    <!-- shared embed link -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-dasharray="6 6">
+      <path d="M630,160 L160,255"/>
+    </g>
+    <text x="380" y="215" text-anchor="middle" class="lbl-g">same embedding model</text>
+  </svg>
+  <p class="takeaway">Load → chunk → embed → store, then embed → retrieve → augment → generate. The embedding step is shared.</p>
+  <div class="pageno">M5·07</div>
+</section>
+
+<!-- ============ SLIDE 8 — CONTAINER BOUNDARY ============ -->
+<section>
+  <h2 class="t">Where the pieces run</h2>
+  <p class="s">Models stay native for Metal; the vector store and app are containers.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Native Ollama runs the LLM and embeddings while ChromaDB and the app run in containers reaching Ollama over host.docker.internal">
+    <!-- native side -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="60" y="80" width="380" height="240" rx="12"/>
+    </g>
+    <text x="250" y="115" text-anchor="middle" class="lbl-g">Native Ollama :11434</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="95" y="150" width="310" height="65" rx="8"/>
+      <rect x="95" y="235" width="310" height="65" rx="8"/>
+    </g>
+    <text x="250" y="190" text-anchor="middle" class="lbl">qwen2.5:1.5b — generate</text>
+    <text x="250" y="275" text-anchor="middle" class="lbl">nomic-embed-text</text>
+
+    <!-- container side -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-dasharray="10 6">
+      <rect x="660" y="80" width="380" height="240" rx="12"/>
+    </g>
+    <text x="850" y="115" text-anchor="middle" class="lbl-g">Docker containers</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="695" y="150" width="310" height="65" rx="8"/>
+      <rect x="695" y="235" width="310" height="65" rx="8"/>
+    </g>
+    <text x="850" y="190" text-anchor="middle" class="lbl">ChromaDB :8000</text>
+    <text x="850" y="275" text-anchor="middle" class="lbl">Streamlit app</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M655,200 L445,200" marker-end="url(#ah)"/>
+    </g>
+    <text x="550" y="185" text-anchor="middle" class="lbl-g">host.docker</text>
+    <text x="550" y="225" text-anchor="middle" class="lbl-g">.internal</text>
+  </svg>
+  <p class="takeaway">The M2 pattern continues: model servers native, everything else containerised over the host bridge.</p>
+  <div class="pageno">M5·08</div>
+</section>
+
+<!-- ============ SLIDE 9 — CHROMADB, LIGHTEST STORE ============ -->
+<section>
+  <h2 class="t">ChromaDB — the lightest vector store</h2>
+  <p class="s">Zero-config and under 2 GB — the right default for a 16 GB laptop. Scale up when you outgrow it.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="ChromaDB as the default choice with Qdrant and pgvector as scale-up options">
+    <!-- default -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="60" y="90" width="380" height="200" rx="14"/>
+    </g>
+    <text x="250" y="140" text-anchor="middle" class="lbl-b">ChromaDB — default</text>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="250" y="180">zero-config · one service</text>
+      <text x="250" y="212">Python-native · &lt;10 lines</text>
+      <text x="250" y="244">persistent · ≤ 2 GB total</text>
+      <text x="250" y="276" class="lbl-g">pinned to 0.5.20</text>
+    </g>
+
+    <!-- scale up -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M450,190 L560,190" marker-end="url(#ah)"/>
+    </g>
+    <text x="505" y="175" text-anchor="middle" class="lbl-g">scale up</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="600" y="90"  width="440" height="90" rx="10"/>
+      <rect x="600" y="200" width="440" height="90" rx="10"/>
+    </g>
+    <text x="820" y="128" text-anchor="middle" class="lbl-b">Qdrant</text>
+    <text x="820" y="158" text-anchor="middle" class="lbl-g">millions of vectors · filtering</text>
+    <text x="820" y="238" text-anchor="middle" class="lbl-b">pgvector</text>
+    <text x="820" y="268" text-anchor="middle" class="lbl-g">already on Postgres? add a column</text>
+  </svg>
+  <p class="takeaway">The API you learn — add_documents, similarity_search — is nearly identical across every alternative.</p>
+  <div class="pageno">M5·09</div>
+</section>
+
+<!-- ============ SLIDE 10 — WRITE THE COMPOSE ============ -->
+<section>
+  <h2 class="t">Wired via environment variables</h2>
+  <p class="s">Hand-author the compose service by service. Endpoints are just env vars — portable across runtimes.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A compose file with model, embeddings, ChromaDB and app services connected by environment variables">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="360" y="30" width="380" height="330" rx="12"/>
+    </g>
+    <text x="550" y="62" text-anchor="middle" class="lbl-g">compose.yaml</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2">
+      <rect x="390" y="82"  width="320" height="60" rx="6"/>
+      <rect x="390" y="152" width="320" height="60" rx="6"/>
+      <rect x="390" y="222" width="320" height="60" rx="6"/>
+      <rect x="390" y="292" width="320" height="60" rx="6"/>
+    </g>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="410" y="108">model → Ollama</text>
+      <text x="410" y="130" class="lbl-g">OLLAMA_URL=host.docker.internal</text>
+      <text x="410" y="178">embeddings</text>
+      <text x="410" y="200" class="lbl-g">EMBED_MODEL=nomic-embed-text</text>
+      <text x="410" y="248">ChromaDB</text>
+      <text x="410" y="270" class="lbl-g">CHROMA_HOST=chromadb:8000</text>
+      <text x="410" y="318">app (Streamlit)</text>
+      <text x="410" y="340" class="lbl-g">reads all of the above</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M300,112 L385,112" marker-end="url(#ahg)"/>
+      <path d="M300,182 L385,182" marker-end="url(#ahg)"/>
+      <path d="M300,252 L385,252" marker-end="url(#ahg)"/>
+      <path d="M300,322 L385,322" marker-end="url(#ahg)"/>
+    </g>
+    <text x="150" y="205" text-anchor="middle" class="lbl-g">one block</text>
+    <text x="150" y="235" text-anchor="middle" class="lbl-g">at a time</text>
+  </svg>
+  <p class="takeaway">Swap the endpoint values and the same stack runs anywhere — the wiring is configuration, not code.</p>
+  <div class="pageno">M5·10</div>
+</section>
+
+<!-- ============ SLIDE 11 — LEARNING MODE ============ -->
+<section>
+  <h2 class="t">Learning Mode — watch the pipeline run</h2>
+  <p class="s">The app surfaces each step live, with timings, so the invisible parts of RAG become visible.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Four Learning Mode panels showing query embedding, similarity search, retrieved context and generation with timings">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="50"  y="70" width="230" height="240" rx="10"/>
+      <rect x="308" y="70" width="230" height="240" rx="10"/>
+      <rect x="566" y="70" width="230" height="240" rx="10"/>
+      <rect x="824" y="70" width="230" height="240" rx="10"/>
+      <path d="M283,190 L305,190" marker-end="url(#ah)"/>
+      <path d="M541,190 L563,190" marker-end="url(#ah)"/>
+      <path d="M799,190 L821,190" marker-end="url(#ah)"/>
+    </g>
+    <g class="num" text-anchor="middle">
+      <text x="165" y="115">1</text><text x="423" y="115">2</text>
+      <text x="681" y="115">3</text><text x="939" y="115">4</text>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="165" y="175">Query</text>
+      <text x="165" y="203">embedding</text>
+      <text x="423" y="175">Similarity</text>
+      <text x="423" y="203">search</text>
+      <text x="681" y="175">Retrieved</text>
+      <text x="681" y="203">context</text>
+      <text x="939" y="175">LLM</text>
+      <text x="939" y="203">generation</text>
+    </g>
+    <g class="lbl-g" text-anchor="middle">
+      <text x="165" y="255">768-dim vector</text>
+      <text x="165" y="282">+ ms taken</text>
+      <text x="423" y="255">searched N,</text>
+      <text x="423" y="282">got top-3</text>
+      <text x="681" y="255">the exact</text>
+      <text x="681" y="282">runbook lines</text>
+      <text x="939" y="255">gen time +</text>
+      <text x="939" y="282">which model</text>
+    </g>
+  </svg>
+  <p class="takeaway">Trace which sentence in which document produced the answer — the single best tool for building RAG intuition.</p>
+  <div class="pageno">M5·11</div>
+</section>
+
+<!-- ============ SLIDE 12 — WHERE NAIVE RAG BREAKS ============ -->
+<section>
+  <h2 class="t">Where naive RAG breaks down</h2>
+  <p class="s">It works when the question matches the wording. It fails in predictable ways.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Five failure modes of naive RAG each pointing toward what agentic RAG in Module 6 fixes">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="50"  y="55"  width="620" height="52" rx="8"/>
+      <rect x="50"  y="117" width="620" height="52" rx="8"/>
+      <rect x="50"  y="179" width="620" height="52" rx="8"/>
+      <rect x="50"  y="241" width="620" height="52" rx="8"/>
+      <rect x="50"  y="303" width="620" height="52" rx="8"/>
+    </g>
+    <g class="lbl" text-anchor="start">
+      <text x="70" y="88">Query mismatch — phrasing differs, misses the chunk</text>
+      <text x="70" y="150">Wrong chunk boundary — a 500-char split cuts a procedure</text>
+      <text x="70" y="212">Single-pass retrieval — one miss, no retry</text>
+      <text x="70" y="274">No query rewriting — jargon and typos hurt scores</text>
+      <text x="70" y="336">Stale index — docs changed, index didn't</text>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <path d="M685,205 L780,205" marker-end="url(#ah)"/>
+      <rect x="800" y="130" width="250" height="150" rx="14"/>
+    </g>
+    <text x="925" y="185" text-anchor="middle" class="lbl-b">Module 6</text>
+    <text x="925" y="222" text-anchor="middle" class="lbl">Agentic RAG</text>
+    <text x="925" y="252" text-anchor="middle" class="lbl-g">fixes every row</text>
+  </svg>
+  <p class="takeaway">An agent can rewrite queries, retry retrieval, and judge sufficiency — understanding these failures motivates M6.</p>
+  <div class="pageno">M5·12</div>
+</section>
+
+<!-- ============ SLIDE 13 — CLOSING ============ -->
+<section>
+  <p class="kicker">TO THE LAB</p>
+  <h2 class="t" style="font-size:2.3em">Retrieve, then generate — grounded.</h2>
+  <svg viewBox="0 0 1100 320" role="img" aria-label="A user question retrieving the right runbook chunk and generating the correct kubectl command">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
+      <rect x="60" y="120" width="240" height="90" rx="12"/>
+      <rect x="430" y="120" width="240" height="90" rx="12"/>
+      <rect x="800" y="120" width="240" height="90" rx="12"/>
+      <path d="M305,165 L425,165" marker-end="url(#ah)"/>
+      <path d="M675,165 L795,165" marker-end="url(#ah)"/>
+    </g>
+    <text x="180" y="158" text-anchor="middle" class="lbl">"restart</text>
+    <text x="180" y="188" text-anchor="middle" class="lbl">payments?"</text>
+    <text x="550" y="158" text-anchor="middle" class="lbl">the exact</text>
+    <text x="550" y="188" text-anchor="middle" class="lbl">runbook chunk</text>
+    <text x="920" y="158" text-anchor="middle" class="lbl-b">kubectl rollout</text>
+    <text x="920" y="188" text-anchor="middle" class="lbl">restart deploy</text>
+    <text x="365" y="105" text-anchor="middle" class="lbl-g">retrieve</text>
+    <text x="735" y="105" text-anchor="middle" class="lbl-g">generate</text>
+  </svg>
+  <p class="s" style="font-size:1.15em">Hand-author the compose, ingest Acme's runbooks, and watch Learning Mode reveal the answer.</p>
+  <p class="credit">Next: <b>Lab — build the Docs Assistant</b>. &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
+  <div class="pageno">M5·13</div>
+</section>
+
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280,
+    height: 720,
+    margin: 0.04,
+    minScale: 0.2,
+    maxScale: 2.0,
+    hash: true,
+    center: false,
+    slideNumber: false,
+    transition: 'slide',
+    controlsTutorial: true
+  });
+</script>
+</body>
+</html>

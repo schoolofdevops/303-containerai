@@ -3,11 +3,19 @@ sidebar_position: 1
 title: 'Lesson: Production Serving with vLLM'
 ---
 
+import Slides from '@site/src/components/Slides';
+
 # Lesson: Production Serving with vLLM
 
 > **Module goal:** Understand why vLLM is the production workhorse for model serving, how PagedAttention and continuous batching win ~3× throughput, and how it drops behind the *same* OpenAI-compatible `/v1` contract you met in M2 — so your client never notices the engine swap. You'll learn the CPU track (what you run this module), the GPU track (documented), and where quantization fits.
 
 ---
+
+## Module slides
+
+Walk this short whiteboard deck for the big picture before the hands-on lab — or open it fullscreen.
+
+<Slides src="decks/03-vllm.html" title="Module 3 — Production Serving with vLLM" />
 
 ## 1. Why vLLM: from one cup at a time to a busy café
 

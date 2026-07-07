@@ -3,11 +3,19 @@ sidebar_position: 1
 title: 'Lesson: Packaging Models as OCI Artifacts'
 ---
 
+import Slides from '@site/src/components/Slides';
+
 # Lesson: Packaging Models as OCI Artifacts
 
 > **Module goal:** Understand why models belong in OCI registries, how KitOps ModelKit bundles weights + config + prompts into a single signed, versioned artifact, and how selective pull lets a serving node grab only the layers it needs — without ever checking in a multi-gigabyte GGUF file.
 
 ---
+
+## Module slides
+
+Walk this short whiteboard deck for the big picture before the hands-on lab — or open it fullscreen.
+
+<Slides src="decks/04-packaging.html" title="Module 4 — Packaging as OCI Artifacts" />
 
 ## 1. The problem with loose model files
 

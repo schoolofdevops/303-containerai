@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Containers for GenAI &amp; Agentic AI — Multi-Agent Incident Crew</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/white.min.css" id="theme">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap">
+
+<style>
+  :root{
+    --ink:#1e1e1e;
+    --gray:#757575;
+    --paper:#ffffff;
+  }
+  .reveal{ font-family:'Patrick Hand', cursive; color:var(--ink); }
+  .reveal .slides{ text-align:center; }
+  .reveal .slides section{ position:absolute; inset:0; box-sizing:border-box; flex-direction:column; justify-content:center; padding:20px 48px 42px; overflow:hidden; }
+  .reveal .slides > section.present{ display:flex; }
+
+  .reveal h1,.reveal h2,.reveal h3{
+    font-family:'Patrick Hand', cursive;
+    color:var(--ink);
+    text-transform:none;
+    font-weight:700;
+    letter-spacing:0;
+    margin:0 0 6px 0;
+    line-height:1.15;
+  }
+  .reveal h2.t{ font-size:1.75em; }
+  .reveal p.s{ font-size:0.95em; color:var(--gray); margin:0 0 8px 0; }
+  .reveal p.takeaway{
+    font-size:0.92em; color:var(--gray);
+    margin:10px auto 0; max-width:1050px;
+  }
+  .reveal p.takeaway::before{ content:"\2192  "; color:var(--ink); font-weight:700; }
+  .reveal svg{ width:100%; flex:1 1 0; min-height:0; max-height:58%; display:block; margin:8px auto 0; }
+  .reveal .kicker{ font-size:.8em; color:var(--gray); letter-spacing:2px; }
+  .reveal .credit{ font-size:.85em; color:var(--gray); margin-top:16px; }
+  .reveal .credit b{ color:var(--ink); font-weight:700; }
+  .reveal .pageno{ position:absolute; bottom:14px; right:22px; font-size:.6em; color:#bdbdbd; }
+  .reveal .slide-number{ font-family:'Patrick Hand',cursive; }
+
+  /* SVG typographic helpers */
+  text{ font-family:'Patrick Hand', cursive; }
+  .lbl{ fill:var(--ink); font-size:21px; }
+  .lbl-sm{ fill:var(--ink); font-size:17px; }
+  .lbl-g{ fill:var(--gray); font-size:17px; }
+  .lbl-b{ fill:var(--ink); font-size:23px; font-weight:700; }
+  .num{ fill:var(--ink); font-size:24px; font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- shared SVG defs: hand-drawn wobble filter + arrowhead -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="ah" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="ahg" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="reveal"><div class="slides">
+
+<!-- ============ SLIDE 1 — TITLE ============ -->
+<section data-auto-animate>
+  <p class="kicker">MODULE 7 &nbsp;·&nbsp; DAY 2</p>
+  <h2 class="t" style="font-size:2.3em">The Multi-Agent Incident Crew</h2>
+  <p class="s" style="font-size:1.2em">One agent grows into a crew of four — sharing one model</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Four specialised agents Triage, Investigator, Fixer, Reviewer in a pipeline">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8" stroke-linecap="round">
+      <rect x="60"  y="150" width="210" height="90" rx="10"/>
+      <rect x="320" y="150" width="210" height="90" rx="10"/>
+      <rect x="580" y="150" width="210" height="90" rx="10"/>
+      <rect x="840" y="150" width="210" height="90" rx="10"/>
+      <path d="M275,195 L315,195" marker-end="url(#ah)"/>
+      <path d="M535,195 L575,195" marker-end="url(#ah)"/>
+      <path d="M795,195 L835,195" marker-end="url(#ah)"/>
+    </g>
+    <text x="165" y="203" text-anchor="middle" class="lbl-b">Triage</text>
+    <text x="425" y="203" text-anchor="middle" class="lbl-b">Investigate</text>
+    <text x="685" y="203" text-anchor="middle" class="lbl-b">Fix</text>
+    <text x="945" y="203" text-anchor="middle" class="lbl-b">Review</text>
+    <text x="555" y="290" text-anchor="middle" class="lbl-g">each role has exactly one job — no single agent decides everything</text>
+  </svg>
+  <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI &nbsp;·&nbsp; Hands-on</p>
+  <div class="pageno">M7·01</div>
+</section>
+
+<!-- ============ SLIDE 2 — WHAT YOU'LL LEARN ============ -->
+<section>
+  <h2 class="t">What you'll learn</h2>
+  <p class="s">Why a crew, when a single agent is enough, and the two ways to build one.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Four learning objectives listed as numbered rows">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <circle cx="120" cy="80"  r="24"/>
+      <circle cx="120" cy="170" r="24"/>
+      <circle cx="120" cy="260" r="24"/>
+      <circle cx="120" cy="350" r="24"/>
+    </g>
+    <g class="num" text-anchor="middle">
+      <text x="120" y="88">1</text><text x="120" y="178">2</text>
+      <text x="120" y="268">3</text><text x="120" y="358">4</text>
+    </g>
+    <g class="lbl" text-anchor="start">
+      <text x="170" y="88">Why go multi-agent — specialisation, separation, review loops</text>
+      <text x="170" y="178">When a single declarative agent is already enough</text>
+      <text x="170" y="268">Two paths: declarative profiles vs an orchestration framework</text>
+      <text x="170" y="358">Wire the Incident Crew as Compose services on one model</text>
+    </g>
+  </svg>
+  <p class="takeaway">The orchestrator changes — the skills, MCP tools, and model stay exactly the same.</p>
+  <div class="pageno">M7·02</div>
+</section>
+
+<!-- ============ SLIDE 3 — THE PROBLEM ============ -->
+<section>
+  <h2 class="t">One agent doing everything gets unfocused</h2>
+  <p class="s">Cram triage, retrieval, fixing and safety into one prompt and the roles blur.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A single overloaded agent juggling four tasks at once versus a clean split">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <circle cx="290" cy="190" r="120"/>
+    </g>
+    <text x="290" y="150" text-anchor="middle" class="lbl-b">One agent</text>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="290" y="185">classify + retrieve +</text>
+      <text x="290" y="212">fix + review, all at once</text>
+    </g>
+    <text x="290" y="335" text-anchor="middle" class="lbl-g">overloaded context · blurred roles · hard to audit</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M430,190 L560,190" marker-end="url(#ah)"/>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="600" y="90"  width="200" height="60" rx="10"/>
+      <rect x="600" y="165" width="200" height="60" rx="10"/>
+      <rect x="600" y="240" width="200" height="60" rx="10"/>
+      <rect x="840" y="165" width="200" height="60" rx="10"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="700" y="127">tight prompt</text>
+      <text x="700" y="202">small context</text>
+      <text x="700" y="277">one clear job</text>
+      <text x="940" y="202">easy to audit</text>
+    </g>
+  </svg>
+  <p class="takeaway">A 1.5B laptop model handles four tight tasks reliably — but not one giant task blindly.</p>
+  <div class="pageno">M7·03</div>
+</section>
+
+<!-- ============ SLIDE 4 — HOSPITAL ANALOGY ============ -->
+<section>
+  <h2 class="t">A hospital, not a superhero</h2>
+  <p class="s">No single doctor greets you, diagnoses, prescribes, and countersigns their own order.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Hospital roles map onto crew roles: triage nurse, doctor, pharmacist, attending physician">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="50"  y="70" width="230" height="120" rx="12"/>
+      <rect x="290" y="70" width="230" height="120" rx="12"/>
+      <rect x="530" y="70" width="230" height="120" rx="12"/>
+      <rect x="770" y="70" width="230" height="120" rx="12"/>
+    </g>
+    <g class="lbl-b" text-anchor="middle">
+      <text x="165" y="120">Triage nurse</text>
+      <text x="405" y="120">Doctor</text>
+      <text x="645" y="120">Pharmacist</text>
+      <text x="885" y="120">Attending</text>
+    </g>
+    <g class="lbl-g" text-anchor="middle">
+      <text x="165" y="160">routes you</text>
+      <text x="405" y="160">investigates</text>
+      <text x="645" y="160">writes remedy</text>
+      <text x="885" y="160">reviews &amp; signs</text>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M165,205 L165,255" marker-end="url(#ahg)"/>
+      <path d="M405,205 L405,255" marker-end="url(#ahg)"/>
+      <path d="M645,205 L645,255" marker-end="url(#ahg)"/>
+      <path d="M885,205 L885,255" marker-end="url(#ahg)"/>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="50"  y="270" width="230" height="90" rx="12"/>
+      <rect x="290" y="270" width="230" height="90" rx="12"/>
+      <rect x="530" y="270" width="230" height="90" rx="12"/>
+      <rect x="770" y="270" width="230" height="90" rx="12"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="165" y="325">Triage</text>
+      <text x="405" y="325">Investigator</text>
+      <text x="645" y="325">Fixer</text>
+      <text x="885" y="325">Reviewer</text>
+    </g>
+  </svg>
+  <p class="takeaway">Four staff share one health record; four agents share one model endpoint.</p>
+  <div class="pageno">M7·04</div>
+</section>
+
+<!-- ============ SLIDE 5 — WHY MULTI-AGENT ============ -->
+<section>
+  <h2 class="t">Three things a single agent can't replicate</h2>
+  <p class="s">The properties that earn the extra prompts and latency.</p>
+  <svg viewBox="0 0 1100 360" role="img" aria-label="Three pillars: specialisation, separation of concerns, review loops">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="60"  y="70" width="300" height="240" rx="12"/>
+      <rect x="400" y="70" width="300" height="240" rx="12"/>
+      <rect x="740" y="70" width="300" height="240" rx="12"/>
+    </g>
+    <g class="lbl-b" text-anchor="middle">
+      <text x="210" y="120">Specialisation</text>
+      <text x="550" y="120">Separation</text>
+      <text x="890" y="120">Review loop</text>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="210" y="175">one tight prompt</text>
+      <text x="210" y="205">per role, small</text>
+      <text x="210" y="235">context — the small</text>
+      <text x="210" y="265">model stays reliable</text>
+
+      <text x="550" y="175">each agent sees</text>
+      <text x="550" y="205">only what it needs</text>
+      <text x="550" y="235">— less chance to</text>
+      <text x="550" y="265">hallucinate across lanes</text>
+
+      <text x="890" y="175">a dedicated role</text>
+      <text x="890" y="205">checks the fix</text>
+      <text x="890" y="235">before it ships —</text>
+      <text x="890" y="265">the safety net</text>
+    </g>
+  </svg>
+  <p class="takeaway">Specialisation, separation of concerns, and a review loop — especially for consequential actions.</p>
+  <div class="pageno">M7·05</div>
+</section>
+
+<!-- ============ SLIDE 6 — WHEN ONE AGENT IS ENOUGH ============ -->
+<section>
+  <h2 class="t">When is a single agent enough?</h2>
+  <p class="s">Multi-agent adds real overhead. Don't reach for it by default.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Decision: single agent for simple tasks, crew for consequential actions needing review">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="330" y="30" width="440" height="70" rx="12"/>
+    </g>
+    <text x="550" y="74" text-anchor="middle" class="lbl-b">Does the task produce a consequential action?</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M440,105 L230,175" marker-end="url(#ah)"/>
+      <path d="M660,105 L870,175" marker-end="url(#ah)"/>
+    </g>
+    <text x="300" y="150" text-anchor="middle" class="lbl-g">NO</text>
+    <text x="800" y="150" text-anchor="middle" class="lbl-g">YES</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="60"  y="185" width="380" height="160" rx="12"/>
+      <rect x="660" y="185" width="380" height="160" rx="12"/>
+    </g>
+    <text x="250" y="225" text-anchor="middle" class="lbl-b">Single declarative agent</text>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="250" y="262">one use case end-to-end</text>
+      <text x="250" y="292">no separate safety review</text>
+      <text x="250" y="322">no command or deploy to sign</text>
+    </g>
+    <text x="850" y="225" text-anchor="middle" class="lbl-b">Reach for a crew</text>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="850" y="262">a command / deploy / API call</text>
+      <text x="850" y="292">review is a distinct job</text>
+      <text x="850" y="322">specialisation lifts reliability</text>
+    </g>
+  </svg>
+  <p class="takeaway">The M6 single agent is the right tool until an action needs a countersign.</p>
+  <div class="pageno">M7·06</div>
+</section>
+
+<!-- ============ SLIDE 7 — THE PIPELINE ============ -->
+<section>
+  <h2 class="t">The Incident Crew pipeline</h2>
+  <p class="s">A sequential pipeline with a relevance gate that can short-circuit.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Incident flows through Triage, Investigator, a relevance gate, Fixer, Reviewer to APPROVED or ESCALATE">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="40"  y="150" width="150" height="80" rx="10"/>
+      <rect x="230" y="150" width="150" height="80" rx="10"/>
+      <path d="M420 190 L490 150 L560 190 L490 230 Z"/>
+      <rect x="600" y="150" width="150" height="80" rx="10"/>
+      <rect x="790" y="150" width="150" height="80" rx="10"/>
+      <path d="M195,190 L225,190" marker-end="url(#ah)"/>
+      <path d="M385,190 L415,190" marker-end="url(#ah)"/>
+      <path d="M565,190 L595,190" marker-end="url(#ah)"/>
+      <path d="M755,190 L785,190" marker-end="url(#ah)"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="115" y="195">Triage</text>
+      <text x="305" y="195">Investigate</text>
+      <text x="490" y="195">gate?</text>
+      <text x="675" y="195">Fixer</text>
+      <text x="865" y="195">Reviewer</text>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <rect x="960" y="90"  width="120" height="60" rx="10"/>
+      <rect x="960" y="250" width="120" height="60" rx="10"/>
+      <path d="M865,150 L1015,150" marker-end="url(#ah)"/>
+      <path d="M865,230 L1015,250" marker-end="url(#ah)"/>
+      <path d="M490,230 L490,320 L1015,290" marker-end="url(#ah)"/>
+    </g>
+    <text x="1020" y="126" text-anchor="middle" class="lbl">APPROVED</text>
+    <text x="1020" y="285" text-anchor="middle" class="lbl">ESCALATE</text>
+    <text x="600" y="345" text-anchor="middle" class="lbl-g">NO runbook found → escalate</text>
+  </svg>
+  <p class="takeaway">The gate asks one yes/no question so a catastrophically wrong fix never reaches the output.</p>
+  <div class="pageno">M7·07</div>
+</section>
+
+<!-- ============ SLIDE 8 — TWO PATHS ============ -->
+<section>
+  <h2 class="t">Two paths to multi-agent</h2>
+  <p class="s">Declarative profiles by default; a framework when you need more control.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Declarative markdown profiles versus CrewAI and LangGraph frameworks">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="60" y="60" width="440" height="300" rx="12"/>
+    </g>
+    <text x="280" y="100" text-anchor="middle" class="lbl-b">Declarative (default)</text>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="90" y="150">Four SOUL.md profiles + skills</text>
+      <text x="90" y="188">One Python pipeline, stdlib only</text>
+      <text x="90" y="226">Predictable sequential flow</text>
+      <text x="90" y="264">Change behaviour = Markdown edit</text>
+      <text x="90" y="302">The laptop-friendly 1.5B crew</text>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="600" y="60" width="440" height="300" rx="12"/>
+    </g>
+    <text x="820" y="100" text-anchor="middle" class="lbl-b">Framework</text>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="630" y="150">LangGraph — supervisor graph,</text>
+      <text x="630" y="180">checkpointing, audit trails</text>
+      <text x="630" y="218">pause / inspect / resume any node</text>
+      <text x="630" y="262">CrewAI — role-based alternative</text>
+      <text x="630" y="292">agents.yaml + tasks.yaml routing</text>
+      <text x="630" y="330">for dynamic, non-sequential work</text>
+    </g>
+  </svg>
+  <p class="takeaway">Reach for a framework when you need deterministic, auditable control over a complex workflow.</p>
+  <div class="pageno">M7·08</div>
+</section>
+
+<!-- ============ SLIDE 9 — SWAP THE ORCHESTRATOR ============ -->
+<section>
+  <h2 class="t">Swap the orchestrator, not the tools</h2>
+  <p class="s">Skills, MCP tools, and guardrails are the same layer underneath every crew.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Three interchangeable orchestrators sit above one shared layer of skills, MCP tools, and model">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="80"  y="50" width="270" height="70" rx="10"/>
+      <rect x="415" y="50" width="270" height="70" rx="10"/>
+      <rect x="750" y="50" width="270" height="70" rx="10"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="215" y="93">Declarative</text>
+      <text x="550" y="93">LangGraph</text>
+      <text x="885" y="93">CrewAI</text>
+    </g>
+    <text x="550" y="150" text-anchor="middle" class="lbl-g">pick one — the layer below never changes</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M215,125 L400,180" marker-end="url(#ahg)"/>
+      <path d="M550,125 L550,180" marker-end="url(#ahg)"/>
+      <path d="M885,125 L700,180" marker-end="url(#ahg)"/>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="120" y="195" width="860" height="170" rx="14"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="160" y="245" width="240" height="90" rx="10"/>
+      <rect x="430" y="245" width="240" height="90" rx="10"/>
+      <rect x="700" y="245" width="240" height="90" rx="10"/>
+    </g>
+    <text x="550" y="228" text-anchor="middle" class="lbl-g">the shared standards layer</text>
+    <g class="lbl" text-anchor="middle">
+      <text x="280" y="298">Skills</text>
+      <text x="550" y="298">MCP tools</text>
+      <text x="820" y="298">Guardrails</text>
+    </g>
+  </svg>
+  <p class="takeaway">Build against the standard, swap the implementation — the same lesson as the OpenAI-compatible endpoint.</p>
+  <div class="pageno">M7·09</div>
+</section>
+
+<!-- ============ SLIDE 10 — ONE MODEL, FOUR AGENTS ============ -->
+<section>
+  <h2 class="t">One model, four agents</h2>
+  <p class="s">Agents are cheap Python calls. The model is the expensive part — and it's shared.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Four agent spokes all connect to one native Ollama model hub">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <circle cx="550" cy="200" r="95"/>
+    </g>
+    <text x="550" y="185" text-anchor="middle" class="lbl-b">Ollama</text>
+    <text x="550" y="215" text-anchor="middle" class="lbl-sm">qwen2.5:1.5b</text>
+    <text x="550" y="240" text-anchor="middle" class="lbl-g">native · ~1 GB</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="70"  y="60"  width="200" height="70" rx="10"/>
+      <rect x="830" y="60"  width="200" height="70" rx="10"/>
+      <rect x="70"  y="270" width="200" height="70" rx="10"/>
+      <rect x="830" y="270" width="200" height="70" rx="10"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="170" y="102">Triage</text>
+      <text x="930" y="102">Investigator</text>
+      <text x="170" y="312">Fixer</text>
+      <text x="930" y="312">Reviewer</text>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M270,100 L465,165" marker-end="url(#ahg)"/>
+      <path d="M830,100 L635,165" marker-end="url(#ahg)"/>
+      <path d="M270,300 L465,235" marker-end="url(#ahg)"/>
+      <path d="M830,300 L635,235" marker-end="url(#ahg)"/>
+    </g>
+    <text x="550" y="375" text-anchor="middle" class="lbl-g">crew container ~50 MB + ChromaDB ~200 MB  ≈  1.3 GB total</text>
+  </svg>
+  <p class="takeaway">Four separate model instances would cost 4× the memory for zero gain — all four call one endpoint.</p>
+  <div class="pageno">M7·10</div>
+</section>
+
+<!-- ============ SLIDE 11 — COMPOSE WIRING ============ -->
+<section>
+  <h2 class="t">Wire the crew with the Compose Spec</h2>
+  <p class="s">Each agent a lightweight service, all sharing one endpoint, tools, and memory.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Crew, ToolHive and ChromaDB services in a compose file reaching a native model over host.docker.internal">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-dasharray="10 6">
+      <rect x="60" y="60" width="560" height="300" rx="14"/>
+    </g>
+    <text x="340" y="92" text-anchor="middle" class="lbl-g">compose.yaml — containers</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="100" y="120" width="480" height="60" rx="10"/>
+      <rect x="100" y="200" width="230" height="60" rx="10"/>
+      <rect x="350" y="200" width="230" height="60" rx="10"/>
+      <rect x="100" y="280" width="480" height="60" rx="10"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="340" y="157">crew  (Triage · Investigator · Fixer · Reviewer)</text>
+      <text x="215" y="237">ToolHive (MCP)</text>
+      <text x="465" y="237">ChromaDB memory</text>
+      <text x="340" y="317">reuses the Agentic-RAG assistant as a tool</text>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="760" y="150" width="280" height="120" rx="12"/>
+    </g>
+    <text x="900" y="200" text-anchor="middle" class="lbl-b">Model server</text>
+    <text x="900" y="235" text-anchor="middle" class="lbl-sm">Ollama — NATIVE</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+      <path d="M625,210 L755,210" marker-end="url(#ah)"/>
+    </g>
+    <text x="690" y="195" text-anchor="middle" class="lbl-g">:11434</text>
+    <text x="690" y="245" text-anchor="middle" class="lbl-g">host.docker.internal</text>
+  </svg>
+  <p class="takeaway">One growing compose file gains a crew service — reusing the tools and memory you already built.</p>
+  <div class="pageno">M7·11</div>
+</section>
+
+<!-- ============ SLIDE 12 — THE REVIEWER ============ -->
+<section>
+  <h2 class="t">The Reviewer — human-in-the-loop proxy</h2>
+  <p class="s">It doesn't decide whether to fix; it decides whether the fix is safe to show a human.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="The Reviewer approves runbook-backed non-destructive fixes and rejects the rest, then a human decides">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="70" y="140" width="240" height="110" rx="12"/>
+    </g>
+    <text x="190" y="185" text-anchor="middle" class="lbl-b">Reviewer</text>
+    <text x="190" y="220" text-anchor="middle" class="lbl-g">when in doubt, REJECT</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M315,175 L430,110" marker-end="url(#ah)"/>
+      <path d="M315,215 L430,290" marker-end="url(#ah)"/>
+      <rect x="450" y="60"  width="300" height="100" rx="12"/>
+      <rect x="450" y="245" width="300" height="100" rx="12"/>
+    </g>
+    <text x="600" y="100" text-anchor="middle" class="lbl-b">APPROVED</text>
+    <text x="600" y="135" text-anchor="middle" class="lbl-sm">non-destructive + verbatim runbook</text>
+    <text x="600" y="285" text-anchor="middle" class="lbl-b">REJECTED</text>
+    <text x="600" y="320" text-anchor="middle" class="lbl-sm">destructive · secrets · not in runbook</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M755,110 L920,190" marker-end="url(#ah)"/>
+      <path d="M755,295 L920,215" marker-end="url(#ah)"/>
+      <rect x="930" y="150" width="140" height="110" rx="12"/>
+    </g>
+    <text x="1000" y="200" text-anchor="middle" class="lbl-b">Human</text>
+    <text x="1000" y="232" text-anchor="middle" class="lbl-g">decides</text>
+  </svg>
+  <p class="takeaway">The crew produces a vetted recommendation; the human engineer retains final authority.</p>
+  <div class="pageno">M7·12</div>
+</section>
+
+<!-- ============ SLIDE 13 — CLOSING / LAB LEAD-IN ============ -->
+<section>
+  <p class="kicker">TO THE LAB</p>
+  <h2 class="t" style="font-size:2.3em">Swap the orchestrator, keep the crew</h2>
+  <svg viewBox="0 0 1100 320" role="img" aria-label="The four-agent crew runs a 503 incident to APPROVED and a Kafka incident to ESCALATE">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8" stroke-linecap="round">
+      <rect x="80"  y="120" width="150" height="80" rx="10"/>
+      <rect x="270" y="120" width="150" height="80" rx="10"/>
+      <rect x="460" y="120" width="150" height="80" rx="10"/>
+      <rect x="650" y="120" width="150" height="80" rx="10"/>
+      <path d="M235,160 L265,160" marker-end="url(#ah)"/>
+      <path d="M425,160 L455,160" marker-end="url(#ah)"/>
+      <path d="M615,160 L645,160" marker-end="url(#ah)"/>
+      <path d="M805,140 L910,110" marker-end="url(#ah)"/>
+      <path d="M805,180 L910,215" marker-end="url(#ah)"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="155" y="165">Triage</text>
+      <text x="345" y="165">Investigate</text>
+      <text x="535" y="165">Fix</text>
+      <text x="725" y="165">Review</text>
+    </g>
+    <text x="985" y="110" text-anchor="middle" class="lbl">503 → APPROVED</text>
+    <text x="985" y="220" text-anchor="middle" class="lbl">Kafka → ESCALATE</text>
+  </svg>
+  <p class="s" style="font-size:1.1em">Read the four profiles, run both incidents, watch the relevance gate work.</p>
+  <p class="credit">Then Module 8 — <b>harden &amp; ship</b>. &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
+  <div class="pageno">M7·13</div>
+</section>
+
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280,
+    height: 720,
+    margin: 0.04,
+    minScale: 0.2,
+    maxScale: 2.0,
+    hash: true,
+    center: false,
+    slideNumber: false,
+    transition: 'slide',
+    controlsTutorial: true
+  });
+</script>
+</body>
+</html>

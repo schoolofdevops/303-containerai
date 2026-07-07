@@ -3,11 +3,19 @@ sidebar_position: 1
 title: Introduction
 ---
 
+import Slides from '@site/src/components/Slides';
+
 # Containers for GenAI & Agentic AI — The Open-Source Way
 
 **Author/Trainer:** Gourav Shah | **Duration:** 2 Full Days | **Level:** Intermediate to Advanced
 
 This is a hands-on course where you build **one realistic system, one step per module** — from a bare model call to a shipped multi-agent platform. Every lab runs on a standard 16 GB laptop using open-source tools that work identically on any OCI runtime.
+
+## Course overview slides
+
+Prefer to see the whole map first? Click through this short whiteboard deck before you dive in — or open it fullscreen.
+
+<Slides src="decks/00-introduction.html" title="Course Introduction — 15 slides" />
 
 ---
 

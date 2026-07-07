@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Containers for GenAI &amp; Agentic AI — Capstone</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/white.min.css" id="theme">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap">
+
+<style>
+  :root{
+    --ink:#1e1e1e;
+    --gray:#757575;
+    --paper:#ffffff;
+  }
+  .reveal{ font-family:'Patrick Hand', cursive; color:var(--ink); }
+  .reveal .slides{ text-align:center; }
+  .reveal .slides section{ position:absolute; inset:0; box-sizing:border-box; flex-direction:column; justify-content:center; padding:20px 48px 42px; overflow:hidden; }
+  .reveal .slides > section.present{ display:flex; }
+
+  .reveal h1,.reveal h2,.reveal h3{
+    font-family:'Patrick Hand', cursive;
+    color:var(--ink);
+    text-transform:none;
+    font-weight:700;
+    letter-spacing:0;
+    margin:0 0 6px 0;
+    line-height:1.15;
+  }
+  .reveal h2.t{ font-size:1.75em; }
+  .reveal p.s{ font-size:0.95em; color:var(--gray); margin:0 0 8px 0; }
+  .reveal p.takeaway{
+    font-size:0.92em; color:var(--gray);
+    margin:10px auto 0; max-width:1050px;
+  }
+  .reveal p.takeaway::before{ content:"\2192  "; color:var(--ink); font-weight:700; }
+  .reveal svg{ width:100%; flex:1 1 0; min-height:0; max-height:58%; display:block; margin:8px auto 0; }
+  .reveal .kicker{ font-size:.8em; color:var(--gray); letter-spacing:2px; }
+  .reveal .credit{ font-size:.85em; color:var(--gray); margin-top:16px; }
+  .reveal .credit b{ color:var(--ink); font-weight:700; }
+  .reveal .pageno{ position:absolute; bottom:14px; right:22px; font-size:.6em; color:#bdbdbd; }
+  .reveal .slide-number{ font-family:'Patrick Hand',cursive; }
+
+  /* SVG typographic helpers */
+  text{ font-family:'Patrick Hand', cursive; }
+  .lbl{ fill:var(--ink); font-size:21px; }
+  .lbl-sm{ fill:var(--ink); font-size:17px; }
+  .lbl-g{ fill:var(--gray); font-size:17px; }
+  .lbl-b{ fill:var(--ink); font-size:23px; font-weight:700; }
+  .num{ fill:var(--ink); font-size:24px; font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- shared SVG defs: hand-drawn wobble filter + arrowhead -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="ah" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="ahg" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="reveal"><div class="slides">
+
+<!-- ============ SLIDE 1 — TITLE ============ -->
+<section data-auto-animate>
+  <p class="kicker">CAPSTONE &nbsp;·&nbsp; DAY 2</p>
+  <h2 class="t" style="font-size:2.3em">Ship the Acme AI Support Platform</h2>
+  <p class="s" style="font-size:1.2em">Every module snapped together into one deployable product — end-to-end</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Eight module blocks converging into one shipped platform box on wheels">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <rect x="70"  y="70"  width="150" height="46" rx="8"/>
+      <rect x="70"  y="130" width="150" height="46" rx="8"/>
+      <rect x="70"  y="190" width="150" height="46" rx="8"/>
+      <rect x="70"  y="250" width="150" height="46" rx="8"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="145" y="99">M1 · M2</text>
+      <text x="145" y="159">M3 · M4</text>
+      <text x="145" y="219">M5 · M6</text>
+      <text x="145" y="279">M7 · M8</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M225,93  L470,175" marker-end="url(#ahg)"/>
+      <path d="M225,153 L470,180" marker-end="url(#ahg)"/>
+      <path d="M225,213 L470,185" marker-end="url(#ahg)"/>
+      <path d="M225,273 L470,190" marker-end="url(#ahg)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
+      <rect x="500" y="120" width="340" height="150" rx="12"/>
+      <line x1="560" y1="130" x2="560" y2="260"/>
+      <line x1="620" y1="130" x2="620" y2="260"/>
+      <line x1="720" y1="130" x2="720" y2="260"/>
+      <line x1="780" y1="130" x2="780" y2="260"/>
+      <circle cx="580" cy="300" r="20"/>
+      <circle cx="760" cy="300" r="20"/>
+    </g>
+    <text x="670" y="200" text-anchor="middle" class="lbl-b">Acme AI</text>
+    <text x="670" y="345" text-anchor="middle" class="lbl-g">ships on any OCI runtime</text>
+  </svg>
+  <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI &nbsp;·&nbsp; Capstone · Day 2</p>
+  <div class="pageno">CAP·01</div>
+</section>
+
+<!-- ============ SLIDE 2 — THE WHOLE SYSTEM ============ -->
+<section>
+  <h2 class="t">What you'll assemble — the whole platform</h2>
+  <p class="s">One dispatch centre: a native brain, containerized teams, a sealed supply chain.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Native Ollama model on the host serving three containerized teams plus a packaging and supply chain lane">
+    <!-- host boundary -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="4 6">
+      <rect x="40" y="55" width="300" height="300" rx="14"/>
+    </g>
+    <text x="70" y="82" class="lbl-g" text-anchor="start">Host — native</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="70" y="150" width="240" height="120" rx="12"/>
+    </g>
+    <text x="190" y="200" text-anchor="middle" class="lbl-b">Ollama</text>
+    <text x="190" y="232" text-anchor="middle" class="lbl-sm">:11434</text>
+    <text x="190" y="256" text-anchor="middle" class="lbl-g">shared brain</text>
+
+    <!-- containers boundary -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-dasharray="10 6">
+      <rect x="410" y="55" width="380" height="300" rx="14"/>
+    </g>
+    <text x="440" y="82" class="lbl-g" text-anchor="start">Containers</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="435" y="100" width="330" height="46" rx="8"/>
+      <rect x="435" y="158" width="330" height="46" rx="8"/>
+      <rect x="435" y="216" width="330" height="46" rx="8"/>
+      <rect x="435" y="288" width="155" height="44" rx="8"/>
+      <rect x="610" y="288" width="155" height="44" rx="8"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="600" y="129">Docs Assistant  M5</text>
+      <text x="600" y="187">Support Agent  M6</text>
+      <text x="600" y="245">Incident Crew  M7</text>
+      <text x="512" y="316">ChromaDB</text>
+      <text x="687" y="316">ToolHive</text>
+    </g>
+
+    <!-- supply chain lane -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="855" y="55" width="210" height="300" rx="14"/>
+      <rect x="880" y="110" width="160" height="60" rx="8"/>
+      <rect x="880" y="190" width="160" height="60" rx="8"/>
+      <rect x="880" y="270" width="160" height="60" rx="8"/>
+    </g>
+    <text x="960" y="88" text-anchor="middle" class="lbl-g">Supply chain</text>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="960" y="146">ModelKit  M4</text>
+      <text x="960" y="226">SBOM · sign  M8</text>
+      <text x="960" y="306">CI ship  M8</text>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M315,205 L430,150" marker-end="url(#ahg)"/>
+      <path d="M315,215 L430,235" marker-end="url(#ahg)"/>
+      <path d="M770,205 L850,205" marker-end="url(#ahg)"/>
+    </g>
+  </svg>
+  <p class="takeaway">The container boundary is the rule: the model stays native, everything else is a container.</p>
+  <div class="pageno">CAP·02</div>
+</section>
+
+<!-- ============ SLIDE 3 — HOW THE MODULES CONNECT ============ -->
+<section>
+  <h2 class="t">How the modules connect</h2>
+  <p class="s">Each rung you built maps to exactly one capability of the shipped platform.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Eight modules M1 to M8 each mapping to a capstone capability">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="60"  y="50"  width="470" height="42" rx="8"/>
+      <rect x="60"  y="102" width="470" height="42" rx="8"/>
+      <rect x="60"  y="154" width="470" height="42" rx="8"/>
+      <rect x="60"  y="206" width="470" height="42" rx="8"/>
+      <rect x="570" y="50"  width="470" height="42" rx="8"/>
+      <rect x="570" y="102" width="470" height="42" rx="8"/>
+      <rect x="570" y="154" width="470" height="42" rx="8"/>
+      <rect x="570" y="206" width="470" height="42" rx="8"/>
+    </g>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="78" y="77">M1 · container-native + host wiring</text>
+      <text x="78" y="129">M2 · OpenAI-compatible serving</text>
+      <text x="78" y="181">M3 · vLLM CPU serving path</text>
+      <text x="78" y="233">M4 · ModelKit — versioned artifact</text>
+      <text x="588" y="77">M5 · Docs Assistant — naive RAG</text>
+      <text x="588" y="129">M6 · declarative agent + MCP</text>
+      <text x="588" y="181">M7 · Incident Crew — multi-agent</text>
+      <text x="588" y="233">M8 · SBOM · scan · sign · CI</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="330" y="300" width="440" height="60" rx="12"/>
+    </g>
+    <text x="550" y="337" text-anchor="middle" class="lbl-b">Acme AI Support Platform</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="1.8" stroke-linecap="round">
+      <path d="M300,255 L500,298" marker-end="url(#ahg)"/>
+      <path d="M800,255 L600,298" marker-end="url(#ahg)"/>
+    </g>
+  </svg>
+  <p class="takeaway">Nothing was thrown away — the capstone is the sum of eight modules, wired together.</p>
+  <div class="pageno">CAP·03</div>
+</section>
+
+<!-- ============ SLIDE 4 — MOVE 1 · SERVE ============ -->
+<section>
+  <h2 class="t">Move 1 — Serve the model</h2>
+  <p class="s">One brain, two homes: Ollama native on Mac, or vLLM in a container on CPU / GPU.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Ollama native or vLLM in a container both expose the same slash v1 endpoint that every consumer plugs into">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="60" y="80"  width="260" height="90" rx="10"/>
+      <rect x="60" y="220" width="260" height="90" rx="10"/>
+    </g>
+    <text x="190" y="120" text-anchor="middle" class="lbl">Ollama — native</text>
+    <text x="190" y="150" text-anchor="middle" class="lbl-g">Metal · unified memory</text>
+    <text x="190" y="260" text-anchor="middle" class="lbl">vLLM — container</text>
+    <text x="190" y="290" text-anchor="middle" class="lbl-g">CPU (SmolLM2) or GPU</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M325,125 L470,185" marker-end="url(#ahg)"/>
+      <path d="M325,265 L470,205" marker-end="url(#ahg)"/>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="480" y="140" width="200" height="110" rx="14"/>
+      <circle cx="540" cy="180" r="9"/>
+      <circle cx="620" cy="180" r="9"/>
+      <line x1="580" y1="205" x2="580" y2="232"/>
+    </g>
+    <text x="580" y="125" text-anchor="middle" class="lbl-g">/v1 OpenAI API</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M685,195 L800,195" marker-end="url(#ah)"/>
+      <rect x="820" y="150" width="230" height="90" rx="12"/>
+    </g>
+    <text x="935" y="190" text-anchor="middle" class="lbl-b">Every consumer</text>
+    <text x="935" y="220" text-anchor="middle" class="lbl-g">app · agent · crew</text>
+  </svg>
+  <p class="takeaway">Swap the engine behind the wall socket — no downstream container changes a single line.</p>
+  <div class="pageno">CAP·04</div>
+</section>
+
+<!-- ============ SLIDE 5 — MOVE 2 · RUN THE CREW ============ -->
+<section>
+  <h2 class="t">Move 2 — Run the Incident Crew</h2>
+  <p class="s">Four specialists in sequence — MCP tools via ToolHive, Docs Assistant as shared knowledge.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Triage to Investigate to Fix to Review pipeline all served by one model with ToolHive and ChromaDB below">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="40"  y="70" width="210" height="90" rx="10"/>
+      <rect x="300" y="70" width="210" height="90" rx="10"/>
+      <rect x="560" y="70" width="210" height="90" rx="10"/>
+      <rect x="820" y="70" width="240" height="90" rx="10"/>
+      <path d="M255,115 L295,115" marker-end="url(#ah)"/>
+      <path d="M515,115 L555,115" marker-end="url(#ah)"/>
+      <path d="M775,115 L815,115" marker-end="url(#ah)"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="145" y="123">Triage</text>
+      <text x="405" y="123">Investigate</text>
+      <text x="665" y="123">Fix</text>
+      <text x="940" y="123">Review</text>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="360" y="290" width="180" height="70" rx="10"/>
+      <rect x="600" y="290" width="180" height="70" rx="10"/>
+    </g>
+    <text x="450" y="333" text-anchor="middle" class="lbl-sm">ToolHive · MCP</text>
+    <text x="690" y="333" text-anchor="middle" class="lbl-sm">ChromaDB · docs</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M450,285 L450,165" marker-end="url(#ahg)"/>
+      <path d="M690,285 L620,165" marker-end="url(#ahg)"/>
+    </g>
+    <text x="550" y="240" text-anchor="middle" class="lbl-g">one native model serves all four agents</text>
+  </svg>
+  <p class="takeaway">Specialisation with an approval gate — a traceable, auditable incident-response report.</p>
+  <div class="pageno">CAP·05</div>
+</section>
+
+<!-- ============ SLIDE 6 — MOVE 3 · PACKAGE ============ -->
+<section>
+  <h2 class="t">Move 3 — Package as a ModelKit</h2>
+  <p class="s">Weights, system prompt, and quantization config sealed into one OCI artifact.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Three model inputs packed into a ModelKit box then pushed to a registry">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="60" y="80"  width="230" height="52" rx="8"/>
+      <rect x="60" y="164" width="230" height="52" rx="8"/>
+      <rect x="60" y="248" width="230" height="52" rx="8"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="175" y="113">model weights</text>
+      <text x="175" y="197">system prompt</text>
+      <text x="175" y="281">quant config</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M295,106 L440,170" marker-end="url(#ahg)"/>
+      <path d="M295,190 L440,190" marker-end="url(#ahg)"/>
+      <path d="M295,274 L440,210" marker-end="url(#ahg)"/>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="450" y="120" width="230" height="140" rx="12"/>
+      <line x1="450" y1="150" x2="680" y2="150"/>
+      <line x1="565" y1="120" x2="565" y2="150"/>
+    </g>
+    <text x="565" y="205" text-anchor="middle" class="lbl-b">ModelKit</text>
+    <text x="565" y="235" text-anchor="middle" class="lbl-g">one OCI artifact</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M685,190 L810,190" marker-end="url(#ah)"/>
+      <rect x="830" y="145" width="220" height="90" rx="12"/>
+    </g>
+    <text x="748" y="175" text-anchor="middle" class="lbl-g">kit push</text>
+    <text x="940" y="185" text-anchor="middle" class="lbl-b">Registry</text>
+    <text x="940" y="215" text-anchor="middle" class="lbl-g">GHCR · versioned</text>
+  </svg>
+  <p class="takeaway">One command pulls exactly that version — no shared drives, no stray prompt files.</p>
+  <div class="pageno">CAP·06</div>
+</section>
+
+<!-- ============ SLIDE 7 — MOVE 4 · SECURE ============ -->
+<section>
+  <h2 class="t">Move 4 — Secure the image</h2>
+  <p class="s">Inventory it, scan it, sign it — and sandbox every tool the agents run.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="An image passes through SBOM then scan gate then signing, with sandboxed tool execution shown below">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="50"  y="70" width="200" height="86" rx="10"/>
+      <rect x="320" y="70" width="200" height="86" rx="10"/>
+      <rect x="590" y="70" width="200" height="86" rx="10"/>
+      <rect x="860" y="70" width="200" height="86" rx="10"/>
+      <path d="M255,113 L315,113" marker-end="url(#ah)"/>
+      <path d="M525,113 L585,113" marker-end="url(#ah)"/>
+      <path d="M795,113 L855,113" marker-end="url(#ah)"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="150" y="108">SBOM</text>
+      <text x="420" y="108">Scan</text>
+      <text x="690" y="108">Sign</text>
+      <text x="960" y="108">Verify</text>
+    </g>
+    <g class="lbl-g" text-anchor="middle" font-size="16px">
+      <text x="150" y="135">Syft</text>
+      <text x="420" y="135">Trivy · Grype</text>
+      <text x="690" y="135">Cosign</text>
+      <text x="960" y="135">any consumer</text>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M420,160 L420,235" marker-end="url(#ahg)"/>
+    </g>
+    <text x="470" y="205" text-anchor="start" class="lbl-g">fail threshold → rejected</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-dasharray="10 6">
+      <rect x="330" y="270" width="440" height="80" rx="12"/>
+    </g>
+    <text x="550" y="305" text-anchor="middle" class="lbl">Sandboxed tool execution</text>
+    <text x="550" y="333" text-anchor="middle" class="lbl-g">ToolHive isolates every MCP tool call</text>
+  </svg>
+  <p class="takeaway">An image that fails the scan never reaches the registry; a passing one is signed and attested.</p>
+  <div class="pageno">CAP·07</div>
+</section>
+
+<!-- ============ SLIDE 8 — MOVE 5 · SHIP ============ -->
+<section>
+  <h2 class="t">Move 5 — Ship via CI</h2>
+  <p class="s">Push to <code>main</code> and the pipeline builds, scans, signs, and publishes on its own.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A CI pipeline from git push through build scan sign to a published signed image in the registry">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="40"  y="140" width="170" height="90" rx="10"/>
+      <rect x="270" y="140" width="170" height="90" rx="10"/>
+      <rect x="500" y="140" width="170" height="90" rx="10"/>
+      <rect x="730" y="140" width="170" height="90" rx="10"/>
+      <path d="M215,185 L265,185" marker-end="url(#ah)"/>
+      <path d="M445,185 L495,185" marker-end="url(#ah)"/>
+      <path d="M675,185 L725,185" marker-end="url(#ah)"/>
+      <path d="M905,185 L965,185" marker-end="url(#ah)"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="125" y="180">push</text>
+      <text x="355" y="180">build</text>
+      <text x="585" y="180">scan</text>
+      <text x="815" y="180">sign</text>
+    </g>
+    <g class="lbl-g" text-anchor="middle" font-size="16px">
+      <text x="125" y="208">to main</text>
+      <text x="355" y="208">image</text>
+      <text x="585" y="208">gate</text>
+      <text x="815" y="208">cosign</text>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="965" y="135" width="110" height="100" rx="10"/>
+    </g>
+    <text x="1020" y="180" text-anchor="middle" class="lbl-b">GHCR</text>
+    <text x="1020" y="208" text-anchor="middle" class="lbl-g" font-size="15px">signed</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M585,235 L585,300"/>
+      <path d="M585,300 L360,300 L360,235" marker-end="url(#ahg)"/>
+    </g>
+    <text x="470" y="330" text-anchor="middle" class="lbl-g">failed scan blocks the push — nothing ships</text>
+  </svg>
+  <p class="takeaway">A passing build produces a signed, attested image any host can pull and verify.</p>
+  <div class="pageno">CAP·08</div>
+</section>
+
+<!-- ============ SLIDE 9 — MOVE 6 · PORTABILITY PROOF ============ -->
+<section>
+  <h2 class="t">Move 6 — The portability proof</h2>
+  <p class="s">Swap the runtime, re-run <code>platform-check.sh</code> — the output is identical.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Colima Rancher and OrbStack all run the same unchanged platform because OCI Compose and host.docker.internal are shared standards">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60"  y="60" width="220" height="70" rx="10"/>
+      <rect x="60"  y="155" width="220" height="70" rx="10"/>
+      <rect x="60"  y="250" width="220" height="70" rx="10"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="170" y="103">Colima</text>
+      <text x="170" y="198">Rancher</text>
+      <text x="170" y="293">OrbStack</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M285,95  L470,185" marker-end="url(#ahg)"/>
+      <path d="M285,190 L470,195" marker-end="url(#ahg)"/>
+      <path d="M285,285 L470,205" marker-end="url(#ahg)"/>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="480" y="120" width="330" height="150" rx="12"/>
+    </g>
+    <text x="645" y="160" text-anchor="middle" class="lbl-b">Same platform</text>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="645" y="195">OCI images · Compose Spec</text>
+      <text x="645" y="223">host.docker.internal</text>
+      <text x="645" y="251">ModelKit · Cosign referrers</text>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M815,195 L905,195" marker-end="url(#ah)"/>
+      <rect x="925" y="150" width="150" height="90" rx="12"/>
+    </g>
+    <text x="1000" y="190" text-anchor="middle" class="lbl">Identical</text>
+    <text x="1000" y="218" text-anchor="middle" class="lbl-g" font-size="15px">output</text>
+  </svg>
+  <p class="takeaway">The spec, not the vendor, defines the contract — steps 1–7 run unchanged on every runtime.</p>
+  <div class="pageno">CAP·09</div>
+</section>
+
+<!-- ============ SLIDE 10 — THE ARC OF INTELLIGENCE ============ -->
+<section>
+  <h2 class="t">The arc you shipped</h2>
+  <p class="s">Naive RAG → Agentic RAG → Crew — each pattern earning its keep in turn.</p>
+  <svg viewBox="0 0 1100 340" role="img" aria-label="A progression from always-retrieve naive RAG to routing agentic RAG to a decomposing multi-agent crew">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="50"  y="110" width="270" height="110" rx="10"/>
+      <rect x="415" y="110" width="270" height="110" rx="10"/>
+      <rect x="780" y="110" width="270" height="110" rx="10"/>
+      <path d="M325,165 L410,165" marker-end="url(#ah)"/>
+      <path d="M690,165 L775,165" marker-end="url(#ah)"/>
+    </g>
+    <g class="lbl-b" text-anchor="middle">
+      <text x="185" y="155">Naive RAG</text>
+      <text x="550" y="155">Agentic RAG</text>
+      <text x="915" y="155">Crew</text>
+    </g>
+    <g class="lbl-g" text-anchor="middle" font-size="17px">
+      <text x="185" y="190">always retrieves</text>
+      <text x="550" y="190">routes, then acts</text>
+      <text x="915" y="190">decomposes the task</text>
+    </g>
+    <text x="550" y="270" text-anchor="middle" class="lbl-g">simple &amp; predictable  ————————→  capable &amp; auditable</text>
+  </svg>
+  <p class="takeaway">You learned not just how each pattern works, but when it is the right one to reach for.</p>
+  <div class="pageno">CAP·10</div>
+</section>
+
+<!-- ============ SLIDE 11 — CLOSING ============ -->
+<section>
+  <p class="kicker">YOU SHIPPED IT</p>
+  <h2 class="t" style="font-size:2.4em">You can now ship AI on any runtime</h2>
+  <svg viewBox="0 0 1100 320" role="img" aria-label="A sealed container carrying the Acme AI platform rolling forward toward any runtime">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
+      <rect x="340" y="90" width="320" height="140" rx="10"/>
+      <line x1="400" y1="100" x2="400" y2="220"/>
+      <line x1="460" y1="100" x2="460" y2="220"/>
+      <line x1="540" y1="100" x2="540" y2="220"/>
+      <line x1="600" y1="100" x2="600" y2="220"/>
+      <circle cx="410" cy="255" r="18"/>
+      <circle cx="590" cy="255" r="18"/>
+      <path d="M690,160 L860,160" marker-end="url(#ah)"/>
+      <rect x="875" y="118" width="185" height="84" rx="10"/>
+    </g>
+    <text x="500" y="70" text-anchor="middle" class="lbl-g">serve · run · package · secure · ship</text>
+    <text x="500" y="175" text-anchor="middle" class="lbl-b">Acme AI</text>
+    <text x="967" y="167" text-anchor="middle" class="lbl">Any runtime</text>
+  </svg>
+  <p class="s" style="font-size:1.15em">Same architecture, new domain — swap the runbooks, keep the wiring.</p>
+  <p class="credit">Build it once. Run it anywhere. &nbsp;·&nbsp; <b>Gourav Shah</b> · School of DevOps &amp; AI</p>
+  <div class="pageno">CAP·11</div>
+</section>
+
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280,
+    height: 720,
+    margin: 0.04,
+    minScale: 0.2,
+    maxScale: 2.0,
+    hash: true,
+    center: false,
+    slideNumber: false,
+    transition: 'slide',
+    controlsTutorial: true
+  });
+</script>
+</body>
+</html>

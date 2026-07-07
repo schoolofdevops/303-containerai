@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Containers for GenAI &amp; Agentic AI — Securing &amp; Governing AI Workloads</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/white.min.css" id="theme">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap">
+
+<style>
+  :root{
+    --ink:#1e1e1e;
+    --gray:#757575;
+    --paper:#ffffff;
+  }
+  .reveal{ font-family:'Patrick Hand', cursive; color:var(--ink); }
+  .reveal .slides{ text-align:center; }
+  .reveal .slides section{ position:absolute; inset:0; box-sizing:border-box; flex-direction:column; justify-content:center; padding:20px 48px 42px; overflow:hidden; }
+  .reveal .slides > section.present{ display:flex; }
+
+  .reveal h1,.reveal h2,.reveal h3{
+    font-family:'Patrick Hand', cursive;
+    color:var(--ink);
+    text-transform:none;
+    font-weight:700;
+    letter-spacing:0;
+    margin:0 0 6px 0;
+    line-height:1.15;
+  }
+  .reveal h2.t{ font-size:1.75em; }
+  .reveal p.s{ font-size:0.95em; color:var(--gray); margin:0 0 8px 0; }
+  .reveal p.takeaway{
+    font-size:0.92em; color:var(--gray);
+    margin:10px auto 0; max-width:1050px;
+  }
+  .reveal p.takeaway::before{ content:"\2192  "; color:var(--ink); font-weight:700; }
+  .reveal svg{ width:100%; flex:1 1 0; min-height:0; max-height:58%; display:block; margin:8px auto 0; }
+  .reveal .kicker{ font-size:.8em; color:var(--gray); letter-spacing:2px; }
+  .reveal .credit{ font-size:.85em; color:var(--gray); margin-top:16px; }
+  .reveal .credit b{ color:var(--ink); font-weight:700; }
+  .reveal .pageno{ position:absolute; bottom:14px; right:22px; font-size:.6em; color:#bdbdbd; }
+  .reveal .slide-number{ font-family:'Patrick Hand',cursive; }
+
+  /* SVG typographic helpers */
+  text{ font-family:'Patrick Hand', cursive; }
+  .lbl{ fill:var(--ink); font-size:21px; }
+  .lbl-sm{ fill:var(--ink); font-size:17px; }
+  .lbl-g{ fill:var(--gray); font-size:17px; }
+  .lbl-b{ fill:var(--ink); font-size:23px; font-weight:700; }
+  .num{ fill:var(--ink); font-size:24px; font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- shared SVG defs: hand-drawn wobble filter + arrowhead -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="ah" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="ahg" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="reveal"><div class="slides">
+
+<!-- ============ SLIDE 1 — TITLE ============ -->
+<section data-auto-animate>
+  <p class="kicker">MODULE 8 &nbsp;·&nbsp; DAY 2</p>
+  <h2 class="t" style="font-size:2.3em">Securing &amp; Governing AI Workloads</h2>
+  <p class="s" style="font-size:1.2em">Harden and ship the crew — the open-source way</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A shipped container carrying an agent, sealed with a tamper-evident signature">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
+      <!-- container body -->
+      <rect x="360" y="120" width="380" height="180" rx="10"/>
+      <line x1="410" y1="130" x2="410" y2="290"/>
+      <line x1="460" y1="130" x2="460" y2="290"/>
+      <line x1="640" y1="130" x2="640" y2="290"/>
+      <line x1="690" y1="130" x2="690" y2="290"/>
+      <!-- seal badge -->
+      <circle cx="550" cy="210" r="42"/>
+      <path d="M532,210 L546,224 L570,196"/>
+      <!-- ground -->
+      <line x1="230" y1="320" x2="870" y2="320"/>
+      <circle cx="430" cy="345" r="20"/>
+      <circle cx="670" cy="345" r="20"/>
+    </g>
+    <text x="550" y="360" text-anchor="middle" class="lbl-g">signed · scanned · sandboxed · governed</text>
+  </svg>
+  <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI &nbsp;·&nbsp; Hands-on</p>
+  <div class="pageno">M8·01</div>
+</section>
+
+<!-- ============ SLIDE 2 — WHAT YOU'LL LEARN ============ -->
+<section>
+  <h2 class="t">What you'll learn</h2>
+  <p class="s">Six controls that make a containerized agent safe to ship to production.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Six learning outcomes listed as numbered rows">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <circle cx="110" cy="55"  r="22"/>
+      <circle cx="110" cy="120" r="22"/>
+      <circle cx="110" cy="185" r="22"/>
+      <circle cx="110" cy="250" r="22"/>
+      <circle cx="110" cy="315" r="22"/>
+      <circle cx="110" cy="378" r="22"/>
+    </g>
+    <g class="num" text-anchor="middle">
+      <text x="110" y="63">1</text><text x="110" y="128">2</text>
+      <text x="110" y="193">3</text><text x="110" y="258">4</text>
+      <text x="110" y="323">5</text><text x="110" y="386">6</text>
+    </g>
+    <g class="lbl" text-anchor="start">
+      <text x="155" y="62">Build a supply chain: SBOM → scan → sign with Syft, Grype, Cosign</text>
+      <text x="155" y="127">Sandbox tool and generated code in ephemeral, isolated containers</text>
+      <text x="155" y="192">Harden the agent image: least privilege, read-only, capped, secrets out</text>
+      <text x="155" y="257">Add input / output guardrails and human-in-the-loop review</text>
+      <text x="155" y="322">Run lightweight evals and tracing to catch regressions in CI</text>
+      <text x="155" y="385">Govern the agent without a vendor — a policy the pipeline enforces</text>
+    </g>
+  </svg>
+  <p class="takeaway">By the end: the M7 crew shipped through a pipeline that gates on security before it signs.</p>
+  <div class="pageno">M8·02</div>
+</section>
+
+<!-- ============ SLIDE 3 — THE MOTIVATING PROBLEM ============ -->
+<section>
+  <h2 class="t">An agent is a security surface</h2>
+  <p class="s">It runs tools, may execute generated code, reads credentials, and reaches the network.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="An agent at the center with four unguarded exposures fanning out around it">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="440" y="160" width="220" height="90" rx="14"/>
+    </g>
+    <text x="550" y="200" text-anchor="middle" class="lbl-b">Agent</text>
+    <text x="550" y="230" text-anchor="middle" class="lbl-g">M7 crew</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M440,180 L250,90"  marker-end="url(#ahg)"/>
+      <path d="M440,235 L250,330" marker-end="url(#ahg)"/>
+      <path d="M660,180 L850,90"  marker-end="url(#ahg)"/>
+      <path d="M660,235 L850,330" marker-end="url(#ahg)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="60"  y="55"  width="200" height="60" rx="8"/>
+      <rect x="60"  y="305" width="200" height="60" rx="8"/>
+      <rect x="840" y="55"  width="200" height="60" rx="8"/>
+      <rect x="840" y="305" width="200" height="60" rx="8"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="160" y="90">runs MCP tools</text>
+      <text x="160" y="342">executes code</text>
+      <text x="940" y="90">reads secrets</text>
+      <text x="940" y="342">calls the network</text>
+    </g>
+  </svg>
+  <p class="takeaway">Every exposure above is untrusted by default. Left unguarded, one compromised tool call becomes host access.</p>
+  <div class="pageno">M8·03</div>
+</section>
+
+<!-- ============ SLIDE 4 — THE FOOD-FACTORY ANALOGY ============ -->
+<section>
+  <h2 class="t">Three things every shipped product needs</h2>
+  <p class="s">Ship an AI image like a food manufacturer ships a ready-meal — label, inspection, seal.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Ingredients label, health inspection, and tamper-evident seal mapped to SBOM, scan, and signature">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="60"  y="80" width="290" height="220" rx="12"/>
+      <rect x="405" y="80" width="290" height="220" rx="12"/>
+      <rect x="750" y="80" width="290" height="220" rx="12"/>
+    </g>
+    <!-- label lines -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <line x1="110" y1="160" x2="300" y2="160"/>
+      <line x1="110" y1="195" x2="300" y2="195"/>
+      <line x1="110" y1="230" x2="260" y2="230"/>
+    </g>
+    <!-- inspection check -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
+      <circle cx="550" cy="185" r="38"/>
+      <path d="M532,185 L546,200 L570,170"/>
+    </g>
+    <!-- seal -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <circle cx="895" cy="180" r="34"/>
+      <path d="M895,145 L873,205 M895,145 L917,205 M873,205 L917,205"/>
+    </g>
+    <g class="lbl-b" text-anchor="middle">
+      <text x="205" y="130">Ingredients label</text>
+      <text x="550" y="130">Health inspection</text>
+      <text x="895" y="130">Tamper seal</text>
+    </g>
+    <g class="lbl-g" text-anchor="middle">
+      <text x="205" y="280">= SBOM (Syft)</text>
+      <text x="550" y="270">= Vuln scan</text>
+      <text x="550" y="295">(Grype / Trivy)</text>
+      <text x="895" y="280">= Signature (Cosign)</text>
+    </g>
+  </svg>
+  <p class="takeaway">Together they make the image trustworthy, auditable, and verifiable at every hop — laptop to registry to host.</p>
+  <div class="pageno">M8·04</div>
+</section>
+
+<!-- ============ SLIDE 5 — THE SUPPLY-CHAIN PIPELINE (CENTERPIECE) ============ -->
+<section>
+  <h2 class="t">The supply-chain pipeline</h2>
+  <p class="s">Every agent, model, or code image passes through this before it deploys.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A linear flow: source to build to SBOM to scan to a gate, then sign, registry, and verify">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="40"  y="70" width="160" height="80" rx="10"/>
+      <rect x="240" y="70" width="160" height="80" rx="10"/>
+      <rect x="440" y="70" width="160" height="80" rx="10"/>
+      <rect x="640" y="70" width="160" height="80" rx="10"/>
+      <path d="M205,110 L235,110" marker-end="url(#ah)"/>
+      <path d="M405,110 L435,110" marker-end="url(#ah)"/>
+      <path d="M605,110 L635,110" marker-end="url(#ah)"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="120" y="105">Source</text><text x="120" y="132" class="lbl-g" style="font-size:16px">Dockerfile</text>
+      <text x="320" y="105">Build</text><text x="320" y="132" class="lbl-g" style="font-size:16px">docker build</text>
+      <text x="520" y="105">SBOM</text><text x="520" y="132" class="lbl-g" style="font-size:16px">Syft</text>
+      <text x="720" y="105">Scan</text><text x="720" y="132" class="lbl-g" style="font-size:16px">Trivy + Grype</text>
+    </g>
+    <!-- gate diamond -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8" stroke-linecap="round">
+      <path d="M900,70 L960,110 L900,150 L840,110 Z"/>
+      <path d="M800,110 L838,110" marker-end="url(#ah)"/>
+    </g>
+    <text x="900" y="116" text-anchor="middle" class="lbl-sm">Gate</text>
+    <!-- clean path down -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="640" y="250" width="150" height="80" rx="10"/>
+      <rect x="440" y="250" width="150" height="80" rx="10"/>
+      <rect x="240" y="250" width="150" height="80" rx="10"/>
+      <path d="M900,152 L900,290 L795,290" marker-end="url(#ah)"/>
+      <path d="M638,290 L595,290" marker-end="url(#ah)"/>
+      <path d="M438,290 L395,290" marker-end="url(#ah)"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="715" y="285">Sign</text><text x="715" y="312" class="lbl-g" style="font-size:16px">Cosign</text>
+      <text x="515" y="285">Registry</text><text x="515" y="312" class="lbl-g" style="font-size:16px">GHCR</text>
+      <text x="315" y="285">Verify</text><text x="315" y="312" class="lbl-g" style="font-size:16px">on deploy</text>
+    </g>
+    <text x="905" y="230" text-anchor="middle" class="lbl-g">clean ↓</text>
+    <!-- blocked branch -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-dasharray="8 6" stroke-linecap="round">
+      <path d="M960,110 L1050,110" marker-end="url(#ahg)"/>
+    </g>
+    <text x="1005" y="95" text-anchor="middle" class="lbl-g" style="font-size:15px">blocked</text>
+    <text x="1005" y="135" text-anchor="middle" class="lbl-g" style="font-size:15px">fix &amp;</text>
+    <text x="1005" y="155" text-anchor="middle" class="lbl-g" style="font-size:15px">rebuild</text>
+  </svg>
+  <p class="takeaway">The scan must run <em>before</em> the sign — and the sign must <em>not</em> run if the scan fails.</p>
+  <div class="pageno">M8·05</div>
+</section>
+
+<!-- ============ SLIDE 6 — TWO SCANNERS ============ -->
+<section>
+  <h2 class="t">Two scanners disagree — that's the feature</h2>
+  <p class="s">Different advisory feeds catch different CVEs. Run both; triage by fixable + severity.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="One image scanned by Trivy and Grype producing different counts, merged and triaged">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="440" y="40" width="220" height="70" rx="12"/>
+    </g>
+    <text x="550" y="72" text-anchor="middle" class="lbl-b">Agent image</text>
+    <text x="550" y="97" text-anchor="middle" class="lbl-g">96 packages</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M490,112 L300,175" marker-end="url(#ahg)"/>
+      <path d="M610,112 L800,175" marker-end="url(#ahg)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="120" y="185" width="290" height="90" rx="10"/>
+      <rect x="690" y="185" width="290" height="90" rx="10"/>
+    </g>
+    <text x="265" y="222" text-anchor="middle" class="lbl-b">Trivy</text>
+    <text x="265" y="252" text-anchor="middle" class="lbl-g">2 Critical · 9 High</text>
+    <text x="835" y="222" text-anchor="middle" class="lbl-b">Grype</text>
+    <text x="835" y="252" text-anchor="middle" class="lbl-g">5 Critical · 28 High</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <rect x="390" y="300" width="320" height="60" rx="12"/>
+      <path d="M300,278 L470,300" marker-end="url(#ah)"/>
+      <path d="M800,278 L630,300" marker-end="url(#ah)"/>
+    </g>
+    <text x="550" y="338" text-anchor="middle" class="lbl">Triage: fixable + severity</text>
+  </svg>
+  <p class="takeaway">Fixable Critical/High → rebuild on a patched base. No fix → mitigate &amp; log. Medium → track, don't block CI.</p>
+  <div class="pageno">M8·06</div>
+</section>
+
+<!-- ============ SLIDE 7 — SIGNING / TAMPER SEAL ============ -->
+<section>
+  <h2 class="t">Cosign: the tamper-evident seal</h2>
+  <p class="s">Key-based locally so you see the mechanics; keyless OIDC in CI so there's no key to leak.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Cosign signs an image into the registry; a verify step on deploy checks the seal before the image runs">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="60"  y="130" width="200" height="90" rx="10"/>
+      <rect x="450" y="120" width="200" height="110" rx="10"/>
+      <rect x="840" y="130" width="200" height="90" rx="10"/>
+    </g>
+    <text x="160" y="170" text-anchor="middle" class="lbl-b">Cosign sign</text>
+    <text x="160" y="200" text-anchor="middle" class="lbl-g">key or keyless</text>
+
+    <text x="550" y="160" text-anchor="middle" class="lbl-b">Registry</text>
+    <text x="550" y="190" text-anchor="middle" class="lbl-g">image +</text>
+    <text x="550" y="212" text-anchor="middle" class="lbl-g">signature</text>
+
+    <text x="940" y="170" text-anchor="middle" class="lbl-b">Verify</text>
+    <text x="940" y="200" text-anchor="middle" class="lbl-g">on deploy</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M265,175 L445,175" marker-end="url(#ah)"/>
+      <path d="M655,175 L835,175" marker-end="url(#ah)"/>
+    </g>
+    <!-- policy gate on verify -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-dasharray="8 6" stroke-linecap="round">
+      <path d="M940,225 L940,320"/>
+    </g>
+    <text x="940" y="345" text-anchor="middle" class="lbl-g">valid seal → run · else refuse</text>
+  </svg>
+  <p class="takeaway">A policy engine (Kyverno, OPA, or a pre-deploy script) refuses any image without a valid signature.</p>
+  <div class="pageno">M8·07</div>
+</section>
+
+<!-- ============ SLIDE 8 — SANDBOXING / BLAST RADIUS ============ -->
+<section>
+  <h2 class="t">Sandbox: a box with no blast radius</h2>
+  <p class="s">Run tool and generated code in an ephemeral, locked-down container — then throw it away.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Generated code runs inside an isolated box with network cut, read-only filesystem, and dropped capabilities">
+    <!-- outer host -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="4 6">
+      <rect x="40" y="40" width="1020" height="300" rx="16"/>
+    </g>
+    <text x="70" y="70" class="lbl-g" text-anchor="start">Host</text>
+
+    <!-- sandbox box -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="380" y="110" width="340" height="180" rx="14"/>
+    </g>
+    <text x="550" y="150" text-anchor="middle" class="lbl-b">Sandbox</text>
+    <text x="550" y="185" text-anchor="middle" class="lbl">generated code</text>
+    <text x="550" y="215" text-anchor="middle" class="lbl-g">runs, returns, is discarded</text>
+    <text x="550" y="262" text-anchor="middle" class="lbl-g">--rm · ephemeral</text>
+
+    <!-- barred exits -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M380,200 L250,200"/>
+      <path d="M720,200 L850,200"/>
+      <path d="M290,178 L290,222"/>
+      <path d="M810,178 L810,222"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="150" y="150">--network none</text>
+      <text x="150" y="180">no egress</text>
+      <text x="950" y="150">--read-only</text>
+      <text x="950" y="180">--cap-drop ALL</text>
+      <text x="150" y="300">--pids-limit · --memory · no-new-privileges</text>
+    </g>
+  </svg>
+  <p class="takeaway">Deeper isolation: gVisor intercepts syscalls in user space; ToolHive runs each MCP tool in its own box.</p>
+  <div class="pageno">M8·08</div>
+</section>
+
+<!-- ============ SLIDE 9 — HARDENING CHECKLIST ============ -->
+<section>
+  <h2 class="t">Hardening the agent image</h2>
+  <p class="s">The sandbox is for untrusted code. The agent image itself still needs a small attack surface.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="A hardening checklist of six numbered controls">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="60" y="45" width="980" height="52" rx="8"/>
+      <rect x="60" y="107" width="980" height="52" rx="8"/>
+      <rect x="60" y="169" width="980" height="52" rx="8"/>
+      <rect x="60" y="231" width="980" height="52" rx="8"/>
+      <rect x="60" y="293" width="980" height="52" rx="8"/>
+      <rect x="60" y="355" width="980" height="52" rx="8"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M92,60 L104,74 L124,52"/>
+      <path d="M92,122 L104,136 L124,114"/>
+      <path d="M92,184 L104,198 L124,176"/>
+      <path d="M92,246 L104,260 L124,238"/>
+      <path d="M92,308 L104,322 L124,300"/>
+      <path d="M92,370 L104,384 L124,362"/>
+    </g>
+    <g class="lbl" text-anchor="start">
+      <text x="160" y="79">Least privilege — run as a non-root user (USER appuser)</text>
+      <text x="160" y="141">Read-only rootfs — --read-only / ReadOnlyRootFilesystem</text>
+      <text x="160" y="203">Drop capabilities — --cap-drop ALL, add back only what's needed</text>
+      <text x="160" y="265">No privilege escalation — --security-opt no-new-privileges</text>
+      <text x="160" y="327">Resource caps — --memory · --pids-limit · --cpus</text>
+      <text x="160" y="389">Secrets out of the image · HEALTHCHECK + probes</text>
+    </g>
+  </svg>
+  <p class="takeaway">These controls are additive — even an exploited dependency finds almost nothing to work with.</p>
+  <div class="pageno">M8·09</div>
+</section>
+
+<!-- ============ SLIDE 10 — GUARDRAILS + HUMAN-IN-THE-LOOP ============ -->
+<section>
+  <h2 class="t">Guardrails at the model boundary</h2>
+  <p class="s">Supply chain protects the infra; guardrails protect what goes in and comes out.</p>
+  <svg viewBox="0 0 1100 360" role="img" aria-label="Input screen, then model, then output screen with a human-in-the-loop gate before any destructive action">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="40"  y="120" width="180" height="90" rx="10"/>
+      <rect x="300" y="120" width="180" height="90" rx="10"/>
+      <rect x="560" y="120" width="180" height="90" rx="10"/>
+      <rect x="820" y="120" width="220" height="90" rx="10"/>
+      <path d="M225,165 L295,165" marker-end="url(#ah)"/>
+      <path d="M485,165 L555,165" marker-end="url(#ah)"/>
+      <path d="M745,165 L815,165" marker-end="url(#ah)"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="130" y="158">Input</text><text x="130" y="185" class="lbl-g" style="font-size:16px">screen</text>
+      <text x="390" y="158">Model</text><text x="390" y="185" class="lbl-g" style="font-size:16px">agent</text>
+      <text x="650" y="158">Output</text><text x="650" y="185" class="lbl-g" style="font-size:16px">screen</text>
+      <text x="930" y="158">Human</text><text x="930" y="185" class="lbl-g" style="font-size:16px">approves</text>
+    </g>
+    <text x="130" y="245" text-anchor="middle" class="lbl-g" style="font-size:16px">injection ·</text>
+    <text x="130" y="267" text-anchor="middle" class="lbl-g" style="font-size:16px">out-of-scope</text>
+    <text x="650" y="245" text-anchor="middle" class="lbl-g" style="font-size:16px">PII · off-brand ·</text>
+    <text x="650" y="267" text-anchor="middle" class="lbl-g" style="font-size:16px">bad URLs</text>
+    <text x="930" y="252" text-anchor="middle" class="lbl-g" style="font-size:16px">gate on destructive</text>
+    <text x="930" y="274" text-anchor="middle" class="lbl-g" style="font-size:16px">commands</text>
+  </svg>
+  <p class="takeaway">Reuse M6's guardrail: a cheap classification call in front, and a reviewer that blocks destructive actions.</p>
+  <div class="pageno">M8·10</div>
+</section>
+
+<!-- ============ SLIDE 11 — EVALS + TRACING ============ -->
+<section>
+  <h2 class="t">Lightweight eval — smoke test for behavior</h2>
+  <p class="s">A handful of labeled cases, run in CI on every push, catches regressions before production.</p>
+  <svg viewBox="0 0 1100 360" role="img" aria-label="Three eval dimensions each with a small set of cases, all passing, wired into CI with tracing">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="60"  y="70" width="300" height="200" rx="12"/>
+      <rect x="400" y="70" width="300" height="200" rx="12"/>
+      <rect x="740" y="70" width="300" height="200" rx="12"/>
+    </g>
+    <g class="lbl-b" text-anchor="middle">
+      <text x="210" y="115">Safety</text>
+      <text x="550" y="115">Quality</text>
+      <text x="890" y="115">Scope</text>
+    </g>
+    <g class="lbl-g" text-anchor="middle">
+      <text x="210" y="150">refuses injection</text>
+      <text x="550" y="150">answers in-scope</text>
+      <text x="890" y="150">declines gracefully</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <path d="M150,210 L168,230 L200,192"/>
+      <path d="M490,210 L508,230 L540,192"/>
+      <path d="M830,210 L848,230 L880,192"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="245" y="228">PASS</text>
+      <text x="585" y="228">PASS</text>
+      <text x="925" y="228">PASS</text>
+    </g>
+    <text x="550" y="315" text-anchor="middle" class="lbl-g">3 cases per dimension · runs in CI · tracing records every step</text>
+  </svg>
+  <p class="takeaway">You don't ship what you can't measure — evals plus tracing tell you the guardrails still work.</p>
+  <div class="pageno">M8·11</div>
+</section>
+
+<!-- ============ SLIDE 12 — GOVERNANCE AS A POLICY GATE ============ -->
+<section>
+  <h2 class="t">Governance without a vendor</h2>
+  <p class="s">Governance is four documented, enforced answers — written in YAML, enforced by open tools.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Four governance questions feed a policy gate that permits or denies a deployment">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="40" y="50"  width="380" height="52" rx="8"/>
+      <rect x="40" y="120" width="380" height="52" rx="8"/>
+      <rect x="40" y="190" width="380" height="52" rx="8"/>
+      <rect x="40" y="260" width="380" height="52" rx="8"/>
+    </g>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="60" y="82">What may it reach? — egress rules</text>
+      <text x="60" y="152">What credentials? — scoped, external</text>
+      <text x="60" y="222">Which MCP tools? — ToolHive allowlist</text>
+      <text x="60" y="292">Who approved it? — signed image + CI</text>
+    </g>
+    <!-- arrows to gate -->
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M425,76  L620,175" marker-end="url(#ahg)"/>
+      <path d="M425,146 L620,180" marker-end="url(#ahg)"/>
+      <path d="M425,216 L620,190" marker-end="url(#ahg)"/>
+      <path d="M425,286 L620,200" marker-end="url(#ahg)"/>
+    </g>
+    <!-- policy gate -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="630" y="130" width="200" height="110" rx="14"/>
+    </g>
+    <text x="730" y="175" text-anchor="middle" class="lbl-b">Policy gate</text>
+    <text x="730" y="208" text-anchor="middle" class="lbl-g">OPA · Kyverno</text>
+    <!-- outcomes -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M835,160 L1000,110" marker-end="url(#ah)"/>
+      <path d="M835,210 L1000,300" marker-end="url(#ah)"/>
+    </g>
+    <text x="1015" y="105" text-anchor="middle" class="lbl">permit</text>
+    <text x="1015" y="300" text-anchor="middle" class="lbl-g">deny</text>
+  </svg>
+  <p class="takeaway">The SBOM → scan → sign pipeline is the evidence trail that makes "who approved it?" auditable.</p>
+  <div class="pageno">M8·12</div>
+</section>
+
+<!-- ============ SLIDE 13 — CLOSING / LAB LEAD-IN ============ -->
+<section>
+  <p class="kicker">SHIP IT SAFELY</p>
+  <h2 class="t" style="font-size:2.3em">Trust is a pipeline, not a promise</h2>
+  <svg viewBox="0 0 1100 320" role="img" aria-label="A build-scan-sign-serve pipeline in GitHub Actions delivering a sealed, governed image">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8" stroke-linecap="round">
+      <rect x="40"  y="110" width="180" height="90" rx="10"/>
+      <rect x="270" y="110" width="180" height="90" rx="10"/>
+      <rect x="500" y="110" width="180" height="90" rx="10"/>
+      <rect x="730" y="110" width="180" height="90" rx="10"/>
+      <path d="M225,155 L265,155" marker-end="url(#ah)"/>
+      <path d="M455,155 L495,155" marker-end="url(#ah)"/>
+      <path d="M685,155 L725,155" marker-end="url(#ah)"/>
+      <path d="M915,155 L1000,155" marker-end="url(#ah)"/>
+      <circle cx="1035" cy="155" r="26"/>
+      <path d="M1020,155 L1031,166 L1052,143"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="130" y="162">Build</text>
+      <text x="360" y="162">Scan</text>
+      <text x="590" y="162">Sign</text>
+      <text x="820" y="162">Serve</text>
+    </g>
+    <text x="475" y="245" text-anchor="middle" class="lbl-g">GitHub Actions — gates on security before it signs</text>
+  </svg>
+  <p class="s" style="font-size:1.1em">In the lab: run Syft, Trivy, Grype &amp; Cosign on the crew image; prove sandbox isolation; wire a guardrail + eval; read the CI pipeline.</p>
+  <p class="credit">Head to <b>Module 8 · Lab</b>. &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
+  <div class="pageno">M8·13</div>
+</section>
+
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280,
+    height: 720,
+    margin: 0.04,
+    minScale: 0.2,
+    maxScale: 2.0,
+    hash: true,
+    center: false,
+    slideNumber: false,
+    transition: 'slide',
+    controlsTutorial: true
+  });
+</script>
+</body>
+</html>

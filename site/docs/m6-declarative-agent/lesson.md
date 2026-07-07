@@ -3,11 +3,19 @@ sidebar_position: 1
 title: 'Lesson: Declarative Agent — Agentic RAG'
 ---
 
+import Slides from '@site/src/components/Slides';
+
 # Lesson: Declarative Agent — Agentic RAG
 
 > **Module goal:** Build an agent by *writing it down* — a persona, a set of instructions, and a skill in Markdown — backed by ChromaDB memory and MCP tools delivered through ToolHive. Understand how agentic RAG differs from Module 5's naive pipeline, what guardrails do, and when a declarative agent is enough versus when you need a framework.
 
 ---
+
+## Module slides
+
+Walk this short whiteboard deck for the big picture before the hands-on lab — or open it fullscreen.
+
+<Slides src="decks/06-declarative-agent.html" title="Module 6 — The Declarative Agent" />
 
 ## 1. From a docs assistant to an agent
 

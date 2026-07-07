@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Containers for GenAI &amp; Agentic AI — Introduction</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/white.min.css" id="theme">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap">
+
+<style>
+  :root{
+    --ink:#1e1e1e;
+    --gray:#757575;
+    --paper:#ffffff;
+  }
+  .reveal{ font-family:'Patrick Hand', cursive; color:var(--ink); }
+  .reveal .slides{ text-align:center; }
+  .reveal .slides section{ position:absolute; inset:0; box-sizing:border-box; flex-direction:column; justify-content:center; padding:20px 48px 42px; overflow:hidden; }
+  .reveal .slides > section.present{ display:flex; }
+
+  .reveal h1,.reveal h2,.reveal h3{
+    font-family:'Patrick Hand', cursive;
+    color:var(--ink);
+    text-transform:none;
+    font-weight:700;
+    letter-spacing:0;
+    margin:0 0 6px 0;
+    line-height:1.15;
+  }
+  .reveal h2.t{ font-size:1.75em; }
+  .reveal p.s{ font-size:0.95em; color:var(--gray); margin:0 0 8px 0; }
+  .reveal p.takeaway{
+    font-size:0.92em; color:var(--gray);
+    margin:10px auto 0; max-width:1050px;
+  }
+  .reveal p.takeaway::before{ content:"\2192  "; color:var(--ink); font-weight:700; }
+  .reveal svg{ width:100%; flex:1 1 0; min-height:0; max-height:58%; display:block; margin:8px auto 0; }
+  .reveal .kicker{ font-size:.8em; color:var(--gray); letter-spacing:2px; }
+  .reveal .credit{ font-size:.85em; color:var(--gray); margin-top:16px; }
+  .reveal .credit b{ color:var(--ink); font-weight:700; }
+  .reveal .pageno{ position:absolute; bottom:14px; right:22px; font-size:.6em; color:#bdbdbd; }
+  .reveal .slide-number{ font-family:'Patrick Hand',cursive; }
+
+  /* SVG typographic helpers */
+  text{ font-family:'Patrick Hand', cursive; }
+  .lbl{ fill:var(--ink); font-size:21px; }
+  .lbl-sm{ fill:var(--ink); font-size:17px; }
+  .lbl-g{ fill:var(--gray); font-size:17px; }
+  .lbl-b{ fill:var(--ink); font-size:23px; font-weight:700; }
+  .num{ fill:var(--ink); font-size:24px; font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- shared SVG defs: hand-drawn wobble filter + arrowhead -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="ah" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="ahg" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="reveal"><div class="slides">
+
+<!-- ============ SLIDE 1 — TITLE ============ -->
+<section data-auto-animate>
+  <p class="kicker">MODULE 6 &nbsp;·&nbsp; DAY 2</p>
+  <h2 class="t" style="font-size:2.3em">The Declarative Agent</h2>
+  <p class="s" style="font-size:1.2em">Agentic RAG — an agent you write down, not code up</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="An agent named Aria assembled from Markdown files, skills and MCP tools inside a container">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
+      <!-- container boundary -->
+      <rect x="300" y="90" width="500" height="220" rx="14" stroke-dasharray="10 6"/>
+      <!-- brain / persona core -->
+      <rect x="470" y="150" width="160" height="100" rx="12"/>
+    </g>
+    <text x="550" y="130" text-anchor="middle" class="lbl-g">container</text>
+    <text x="550" y="195" text-anchor="middle" class="lbl-b">Aria</text>
+    <text x="550" y="228" text-anchor="middle" class="lbl-g">the agent</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M330,150 L465,180" marker-end="url(#ahg)"/>
+      <path d="M330,250 L465,220" marker-end="url(#ahg)"/>
+      <path d="M770,150 L635,180" marker-end="url(#ahg)"/>
+      <path d="M770,250 L635,220" marker-end="url(#ahg)"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="360" y="145">SOUL.md</text>
+      <text x="360" y="270">AGENTS.md</text>
+      <text x="745" y="145">SKILL.md</text>
+      <text x="745" y="270">MCP tools</text>
+    </g>
+  </svg>
+  <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; Containers for GenAI &amp; Agentic AI &nbsp;·&nbsp; School of DevOps &amp; AI</p>
+  <div class="pageno">M6·01</div>
+</section>
+
+<!-- ============ SLIDE 2 — WHAT YOU'LL LEARN ============ -->
+<section>
+  <h2 class="t">What you'll learn</h2>
+  <p class="s">By the end of this module — you can write an agent, not just call a model.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Five learning objectives listed as numbered rows">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <circle cx="120" cy="70"  r="24"/>
+      <circle cx="120" cy="140" r="24"/>
+      <circle cx="120" cy="210" r="24"/>
+      <circle cx="120" cy="280" r="24"/>
+      <circle cx="120" cy="350" r="24"/>
+    </g>
+    <g class="num" text-anchor="middle">
+      <text x="120" y="78">1</text><text x="120" y="148">2</text>
+      <text x="120" y="218">3</text><text x="120" y="288">4</text>
+      <text x="120" y="358">5</text>
+    </g>
+    <g class="lbl" text-anchor="start">
+      <text x="170" y="78">Define an agent as Markdown — SOUL.md + AGENTS.md + a SKILL.md</text>
+      <text x="170" y="148">See why agentic RAG beats naive RAG — decide first, then retrieve</text>
+      <text x="170" y="218">Give the agent real tools through the ToolHive MCP gateway</text>
+      <text x="170" y="288">Add guardrails and memory — refuse hard, remember long-term</text>
+      <text x="170" y="358">Know when a declarative agent is enough vs when to reach for a framework</text>
+    </g>
+  </svg>
+  <p class="takeaway">The agent IS Markdown + skills + tools — minimal glue, shipped inside a container.</p>
+  <div class="pageno">M6·02</div>
+</section>
+
+<!-- ============ SLIDE 3 — THE PROBLEM ============ -->
+<section>
+  <h2 class="t">Naive RAG is passive — it always retrieves</h2>
+  <p class="s">Module 5's pipeline has no judgment: every question takes the same road.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Two different questions both forced through embed retrieve generate, wasting work on a math question">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="60"  y="70"  width="230" height="70" rx="10"/>
+      <rect x="60"  y="240" width="230" height="70" rx="10"/>
+      <rect x="420" y="155" width="240" height="80" rx="10"/>
+      <rect x="790" y="155" width="250" height="80" rx="10"/>
+      <path d="M295,105 L415,180" marker-end="url(#ah)"/>
+      <path d="M295,275 L415,210" marker-end="url(#ah)"/>
+      <path d="M665,195 L785,195" marker-end="url(#ah)"/>
+    </g>
+    <text x="175" y="102" text-anchor="middle" class="lbl-sm">"Restart payments?"</text>
+    <text x="175" y="125" text-anchor="middle" class="lbl-g">ops question</text>
+    <text x="175" y="272" text-anchor="middle" class="lbl-sm">"What is 2+2?"</text>
+    <text x="175" y="295" text-anchor="middle" class="lbl-g">trivia — no runbook needed</text>
+    <text x="540" y="190" text-anchor="middle" class="lbl">embed → retrieve</text>
+    <text x="540" y="218" text-anchor="middle" class="lbl">→ generate</text>
+    <text x="915" y="200" text-anchor="middle" class="lbl-b">answer</text>
+    <text x="540" y="290" text-anchor="middle" class="lbl-g">same path for both — wasted embed + search on 2+2</text>
+  </svg>
+  <p class="takeaway">Naive RAG can't decide, can't route, can't use tools — it only ever retrieves-then-generates.</p>
+  <div class="pageno">M6·03</div>
+</section>
+
+<!-- ============ SLIDE 4 — JOB DESCRIPTION ANALOGY ============ -->
+<section>
+  <h2 class="t">Onboard an engineer — don't script a robot</h2>
+  <p class="s">You don't hand a new hire a flowchart. You hand them three documents.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Three onboarding documents — a job description, operating procedures and skill guides — handed to a new engineer who becomes the agent">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60"  y="80" width="230" height="230" rx="10"/>
+      <rect x="320" y="80" width="230" height="230" rx="10"/>
+      <rect x="580" y="80" width="230" height="230" rx="10"/>
+      <rect x="880" y="130" width="170" height="140" rx="12"/>
+    </g>
+    <g class="lbl-b" text-anchor="middle">
+      <text x="175" y="125">Job desc</text>
+      <text x="435" y="125">Rulebook</text>
+      <text x="695" y="125">Skill guides</text>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="175" y="185">who they are,</text>
+      <text x="175" y="212">how they speak</text>
+      <text x="175" y="270">= SOUL.md</text>
+      <text x="435" y="185">when to look up,</text>
+      <text x="435" y="212">what's off-limits</text>
+      <text x="435" y="270">= AGENTS.md</text>
+      <text x="695" y="185">step-by-step</text>
+      <text x="695" y="212">procedures</text>
+      <text x="695" y="270">= SKILL.md</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M815,195 L875,195" marker-end="url(#ahg)"/>
+    </g>
+    <text x="965" y="190" text-anchor="middle" class="lbl-b">model</text>
+    <text x="965" y="217" text-anchor="middle" class="lbl-g">= engineer</text>
+  </svg>
+  <p class="takeaway">Write the three documents as Markdown; the model reads them and becomes the engineer.</p>
+  <div class="pageno">M6·04</div>
+</section>
+
+<!-- ============ SLIDE 5 — AGENT ANATOMY ============ -->
+<section>
+  <h2 class="t">The anatomy of a 2026 agent</h2>
+  <p class="s">Five labelled parts — persona, instructions, skill, tools, guardrails — plus minimal glue.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Labelled anatomy of an agent showing SOUL, AGENTS, SKILL, MCP tools and guardrails feeding a thin glue script">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60"  y="70"  width="300" height="52" rx="8"/>
+      <rect x="60"  y="140" width="300" height="52" rx="8"/>
+      <rect x="60"  y="210" width="300" height="52" rx="8"/>
+      <rect x="60"  y="280" width="300" height="52" rx="8"/>
+      <rect x="60"  y="350" width="300" height="52" rx="8" stroke-dasharray="8 5"/>
+    </g>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="82" y="102"><tspan class="lbl-b" style="font-size:19px">SOUL.md</tspan>  — identity &amp; voice</text>
+      <text x="82" y="172"><tspan class="lbl-b" style="font-size:19px">AGENTS.md</tspan>  — instructions</text>
+      <text x="82" y="242"><tspan class="lbl-b" style="font-size:19px">SKILL.md</tspan>  — agentic-RAG</text>
+      <text x="82" y="312"><tspan class="lbl-b" style="font-size:19px">MCP</tspan>  — real tools</text>
+      <text x="82" y="382"><tspan class="lbl-b" style="font-size:19px">Guardrails</tspan>  — hard rules</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M365,96  L560,225" marker-end="url(#ahg)"/>
+      <path d="M365,166 L560,228" marker-end="url(#ahg)"/>
+      <path d="M365,236 L560,231" marker-end="url(#ahg)"/>
+      <path d="M365,306 L560,234" marker-end="url(#ahg)"/>
+      <path d="M365,376 L560,240" marker-end="url(#ahg)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="580" y="180" width="200" height="100" rx="12"/>
+    </g>
+    <text x="680" y="220" text-anchor="middle" class="lbl-b">agent.py</text>
+    <text x="680" y="248" text-anchor="middle" class="lbl-g">~130 lines glue</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8" stroke-linecap="round">
+      <path d="M785,230 L905,230" marker-end="url(#ah)"/>
+      <rect x="920" y="185" width="140" height="90" rx="12"/>
+    </g>
+    <text x="990" y="225" text-anchor="middle" class="lbl-b">Aria</text>
+    <text x="990" y="252" text-anchor="middle" class="lbl-g">runs</text>
+  </svg>
+  <p class="takeaway">No framework, no class hierarchy — just Markdown read at startup and stitched into the system prompt.</p>
+  <div class="pageno">M6·05</div>
+</section>
+
+<!-- ============ SLIDE 6 — DECLARATIVE VS HAND-CODED ============ -->
+<section>
+  <h2 class="t">Declarative Markdown vs a hand-coded robot</h2>
+  <p class="s">Changing Aria's tone or adding a guardrail is an edit — not a code change.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Left column shows a brittle hand-coded Python if-tree, right column shows editable Markdown files">
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4" stroke-dasharray="9 7">
+      <rect x="60" y="60" width="380" height="300" rx="12"/>
+    </g>
+    <text x="250" y="95" text-anchor="middle" class="lbl-g" style="font-size:19px">Hand-coded robot</text>
+    <g fill="var(--gray)" font-size="18px" text-anchor="start">
+      <text x="90" y="145">if-tree of conditions</text>
+      <text x="90" y="190">prompts baked into strings</text>
+      <text x="90" y="235">explicit tool-call chains</text>
+      <text x="90" y="280">fragile · opaque</text>
+      <text x="90" y="325">edit tone = touch code</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+      <path d="M455,210 L640,210" marker-end="url(#ah)"/>
+    </g>
+    <text x="547" y="196" text-anchor="middle" class="lbl-g">declare instead</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8" stroke-linecap="round">
+      <rect x="670" y="60" width="370" height="300" rx="12"/>
+    </g>
+    <text x="855" y="95" text-anchor="middle" class="lbl" style="font-size:19px;font-weight:700">Declarative agent</text>
+    <g fill="var(--ink)" font-size="18px" text-anchor="start">
+      <text x="705" y="145">behavior written in Markdown</text>
+      <text x="705" y="190">persona + rules + skills</text>
+      <text x="705" y="235">tools from standard MCP</text>
+      <text x="705" y="280">legible · adjustable</text>
+      <text x="705" y="325">edit tone = edit a file</text>
+    </g>
+  </svg>
+  <p class="takeaway">Declarative vs framework is decided up front — one agent + clear rules stays Markdown; frameworks wait for M7.</p>
+  <div class="pageno">M6·06</div>
+</section>
+
+<!-- ============ SLIDE 7 — AGENTIC RAG DECISION LOOP ============ -->
+<section>
+  <h2 class="t">Agentic RAG — decide first, then act</h2>
+  <p class="s">The agent routes each question before retrieving: <em>does this need Acme's runbooks?</em></p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="A decision loop: guardrail check, then route YES to retrieve and ground, or NO to answer directly">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="40"  y="160" width="150" height="70" rx="10"/>
+      <rect x="250" y="160" width="150" height="70" rx="10"/>
+      <path d="M40,60 L340,60 L340,155" stroke-dasharray="0" marker-end="url(#ah)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="460" y="70"  width="200" height="70" rx="10"/>
+      <rect x="460" y="250" width="200" height="70" rx="10"/>
+      <rect x="740" y="70"  width="180" height="70" rx="10"/>
+      <rect x="970" y="150" width="120" height="90" rx="10"/>
+    </g>
+    <text x="115" y="200" text-anchor="middle" class="lbl">Question</text>
+    <text x="325" y="192" text-anchor="middle" class="lbl">Guardrail</text>
+    <text x="325" y="216" text-anchor="middle" class="lbl-g">check</text>
+    <text x="200" y="50" text-anchor="start" class="lbl-g">blocked → hard refusal</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M405,195 L455,135" marker-end="url(#ah)"/>
+      <path d="M405,195 L455,285" marker-end="url(#ah)"/>
+      <path d="M665,105 L735,105" marker-end="url(#ah)"/>
+      <path d="M920,105 L1010,145" marker-end="url(#ah)"/>
+      <path d="M665,285 L1010,235" marker-end="url(#ah)"/>
+    </g>
+    <text x="560" y="100" text-anchor="middle" class="lbl-b">Route: YES</text>
+    <text x="560" y="126" text-anchor="middle" class="lbl-g">needs runbooks</text>
+    <text x="560" y="280" text-anchor="middle" class="lbl-b">Route: NO</text>
+    <text x="560" y="306" text-anchor="middle" class="lbl-g">answer directly</text>
+    <text x="830" y="100" text-anchor="middle" class="lbl">Retrieve +</text>
+    <text x="830" y="126" text-anchor="middle" class="lbl">ground</text>
+    <text x="1030" y="200" text-anchor="middle" class="lbl-b">Answer</text>
+  </svg>
+  <p class="takeaway">Routing at temperature 0 is deterministic — whether, what, multi-hop, self-correct — before any embedding call.</p>
+  <div class="pageno">M6·07</div>
+</section>
+
+<!-- ============ SLIDE 8 — ROUTING TABLE ============ -->
+<section>
+  <h2 class="t">A 1.5B model can route reliably</h2>
+  <p class="s">Two classes, temperature 0 — the decision is simple, so a laptop model nails it.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A table of four example queries each labelled YES retrieve or NO answer directly">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="80" y="60" width="940" height="280" rx="10"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="1.6">
+      <line x1="100" y1="120" x2="1000" y2="120"/>
+      <line x1="100" y1="180" x2="1000" y2="180"/>
+      <line x1="100" y1="240" x2="1000" y2="240"/>
+      <line x1="100" y1="300" x2="1000" y2="300"/>
+      <line x1="720" y1="80"  x2="720" y2="320"/>
+    </g>
+    <g class="lbl-g" text-anchor="start" style="font-size:17px">
+      <text x="110" y="105">QUERY</text>
+      <text x="750" y="105">ROUTE</text>
+    </g>
+    <g class="lbl" text-anchor="start">
+      <text x="110" y="158">"How do I restart the payments service?"</text>
+      <text x="110" y="218">"Where are database backups stored?"</text>
+      <text x="110" y="278">"What is 2+2?"</text>
+    </g>
+    <g class="lbl-b" text-anchor="start">
+      <text x="750" y="158">YES — retrieve</text>
+      <text x="750" y="218">YES — retrieve</text>
+      <text x="750" y="278">NO — direct</text>
+    </g>
+  </svg>
+  <p class="takeaway">Route deterministically at temp 0; generate the nuanced answer at higher temp, grounded in evidence.</p>
+  <div class="pageno">M6·08</div>
+</section>
+
+<!-- ============ SLIDE 9 — MCP GATEWAY HUB-AND-SPOKE ============ -->
+<section>
+  <h2 class="t">Real tools through an MCP gateway</h2>
+  <p class="s">ToolHive at the hub; each MCP server an isolated container on a spoke.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="ToolHive gateway at the center with isolated MCP tool containers on spokes: web fetch, GitHub, filesystem, HTTP, database">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <circle cx="550" cy="200" r="80"/>
+    </g>
+    <text x="550" y="193" text-anchor="middle" class="lbl-b">ToolHive</text>
+    <text x="550" y="220" text-anchor="middle" class="lbl-g">virtual MCP</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="70"  y="60"  width="170" height="66" rx="10"/>
+      <rect x="70"  y="270" width="170" height="66" rx="10"/>
+      <rect x="465" y="330" width="170" height="60" rx="10"/>
+      <rect x="860" y="60"  width="170" height="66" rx="10"/>
+      <rect x="860" y="270" width="170" height="66" rx="10"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M478,158 L242,100" marker-end="url(#ahg)"/>
+      <path d="M478,242 L242,300" marker-end="url(#ahg)"/>
+      <path d="M550,280 L550,325" marker-end="url(#ahg)"/>
+      <path d="M622,158 L858,100" marker-end="url(#ahg)"/>
+      <path d="M622,242 L858,300" marker-end="url(#ahg)"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="155" y="99">web.fetch</text>
+      <text x="155" y="309">GitHub</text>
+      <text x="550" y="367">filesystem</text>
+      <text x="945" y="99">HTTP</text>
+      <text x="945" y="309">database</text>
+    </g>
+  </svg>
+  <p class="takeaway">Per-request Cedar policy, per-server network isolation, no local creds — the agent points at one endpoint URL.</p>
+  <div class="pageno">M6·09</div>
+</section>
+
+<!-- ============ SLIDE 10 — TOOLHIVE ISOLATION ============ -->
+<section>
+  <h2 class="t">Each tool server in its own sandbox</h2>
+  <p class="s"><code>thv run fetch</code> — ToolHive wraps the server in proxy + DNS containers.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A fetch MCP server boxed with ingress, egress and DNS proxy containers, reaching the internet but not the host">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-dasharray="10 6">
+      <rect x="70" y="70" width="560" height="260" rx="14"/>
+    </g>
+    <text x="350" y="105" text-anchor="middle" class="lbl-g">ToolHive-managed isolation</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="260" y="150" width="180" height="80" rx="10"/>
+      <rect x="100" y="150" width="130" height="60" rx="8"/>
+      <rect x="470" y="150" width="130" height="60" rx="8"/>
+      <rect x="285" y="260" width="130" height="55" rx="8"/>
+    </g>
+    <text x="350" y="185" text-anchor="middle" class="lbl-b">fetch server</text>
+    <text x="350" y="212" text-anchor="middle" class="lbl-g">gofetch</text>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="165" y="185">ingress</text>
+      <text x="535" y="185">egress</text>
+      <text x="350" y="293">DNS</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M635,180 L790,180" marker-end="url(#ah)"/>
+      <rect x="800" y="140" width="230" height="80" rx="12"/>
+    </g>
+    <text x="915" y="175" text-anchor="middle" class="lbl">public internet</text>
+    <text x="915" y="205" text-anchor="middle" class="lbl-g">reachable</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="6 5" stroke-linecap="round">
+      <path d="M350,335 L350,362"/>
+    </g>
+    <text x="580" y="360" text-anchor="middle" class="lbl-g">✕ cannot touch host filesystem or other containers</text>
+  </svg>
+  <p class="takeaway">You never install a tool server on your laptop — IDE mode for dev, stack mode for headless compose runs.</p>
+  <div class="pageno">M6·10</div>
+</section>
+
+<!-- ============ SLIDE 11 — GUARDRAILS ============ -->
+<section>
+  <h2 class="t">Guardrails — refuse before the model runs</h2>
+  <p class="s">A hard regex gate in application code, not a soft plea in the system prompt.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A regex guardrail blocks unsafe queries before the LLM is called, while safe queries pass through">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="60"  y="90"  width="220" height="66" rx="10"/>
+      <rect x="60"  y="240" width="220" height="66" rx="10"/>
+      <rect x="430" y="150" width="200" height="96" rx="12"/>
+      <rect x="800" y="90"  width="230" height="66" rx="10"/>
+      <rect x="800" y="240" width="230" height="66" rx="10"/>
+    </g>
+    <text x="170" y="118" text-anchor="middle" class="lbl-sm">"reveal the password"</text>
+    <text x="170" y="142" text-anchor="middle" class="lbl-g">unsafe</text>
+    <text x="170" y="268" text-anchor="middle" class="lbl-sm">"restart payments"</text>
+    <text x="170" y="292" text-anchor="middle" class="lbl-g">safe</text>
+    <text x="530" y="192" text-anchor="middle" class="lbl-b">regex</text>
+    <text x="530" y="218" text-anchor="middle" class="lbl-g">guardrail</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M285,123 L425,180" marker-end="url(#ah)"/>
+      <path d="M285,273 L425,215" marker-end="url(#ah)"/>
+      <path d="M635,180 L795,123" marker-end="url(#ah)"/>
+      <path d="M635,215 L795,273" marker-end="url(#ah)"/>
+    </g>
+    <text x="915" y="118" text-anchor="middle" class="lbl-b">✕ refused</text>
+    <text x="915" y="142" text-anchor="middle" class="lbl-g">LLM never called</text>
+    <text x="915" y="268" text-anchor="middle" class="lbl-b">→ to the model</text>
+    <text x="915" y="292" text-anchor="middle" class="lbl-g">route → answer</text>
+  </svg>
+  <p class="takeaway">A clever prompt can't bypass a gate that fires before any text reaches the model — plus memory: short &amp; long term.</p>
+  <div class="pageno">M6·11</div>
+</section>
+
+<!-- ============ SLIDE 12 — MEMORY ============ -->
+<section>
+  <h2 class="t">Memory — a librarian who shelves by meaning</h2>
+  <p class="s">ChromaDB is Aria's long-term semantic memory, reused unchanged from Module 5.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="On a YES route the agent embeds the query and retrieves the nearest runbook chunks from ChromaDB to ground its answer">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="60"  y="140" width="190" height="90" rx="10"/>
+      <rect x="770" y="140" width="240" height="90" rx="10"/>
+    </g>
+    <text x="155" y="180" text-anchor="middle" class="lbl">query</text>
+    <text x="155" y="208" text-anchor="middle" class="lbl-g">(route = YES)</text>
+    <!-- shelves = vector store -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="400" y="90" width="300" height="200" rx="12"/>
+      <line x1="400" y1="140" x2="700" y2="140"/>
+      <line x1="400" y1="190" x2="700" y2="190"/>
+      <line x1="400" y1="240" x2="700" y2="240"/>
+    </g>
+    <text x="550" y="75" text-anchor="middle" class="lbl-g">ChromaDB · acme_runbooks (5 chunks)</text>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="415" y="123">restart · scaling</text>
+      <text x="415" y="173">backups · restore</text>
+      <text x="415" y="223">on-call escalation</text>
+      <text x="415" y="273">deploy · rollback</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M255,185 L395,185" marker-end="url(#ah)"/>
+      <path d="M705,185 L765,185" marker-end="url(#ah)"/>
+    </g>
+    <text x="325" y="168" text-anchor="middle" class="lbl-g">embed</text>
+    <text x="890" y="180" text-anchor="middle" class="lbl-b">grounded</text>
+    <text x="890" y="208" text-anchor="middle" class="lbl-b">answer</text>
+  </svg>
+  <p class="takeaway">Same HTTP API, same collection — scales from five chunks to millions of vectors unchanged.</p>
+  <div class="pageno">M6·12</div>
+</section>
+
+<!-- ============ SLIDE 13 — CONTAINER STORY ============ -->
+<section>
+  <h2 class="t">The whole agent ships in a container</h2>
+  <p class="s">Markdown + skills + MCP config bundled — portable, reproducible, one image.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="An agent container packing SOUL, AGENTS, SKILL, MCP config and glue, wired to native Ollama, ChromaDB and ToolHive">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8" stroke-dasharray="10 6">
+      <rect x="60" y="70" width="420" height="250" rx="14"/>
+    </g>
+    <text x="270" y="105" text-anchor="middle" class="lbl-b">agent container</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="90"  y="130" width="170" height="52" rx="8"/>
+      <rect x="290" y="130" width="170" height="52" rx="8"/>
+      <rect x="90"  y="200" width="170" height="52" rx="8"/>
+      <rect x="290" y="200" width="170" height="52" rx="8"/>
+      <rect x="150" y="270" width="240" height="40" rx="8"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="175" y="162">SOUL.md</text>
+      <text x="375" y="162">AGENTS.md</text>
+      <text x="175" y="232">SKILL.md</text>
+      <text x="375" y="232">MCP config</text>
+      <text x="270" y="296">agent.py glue</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="740" y="70"  width="300" height="70" rx="10"/>
+      <rect x="740" y="165" width="300" height="70" rx="10"/>
+      <rect x="740" y="260" width="300" height="70" rx="10"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="890" y="102">Ollama — NATIVE</text>
+      <text x="890" y="126" class="lbl-g">host.docker.internal:11434</text>
+      <text x="890" y="197">ChromaDB</text>
+      <text x="890" y="221" class="lbl-g">semantic memory</text>
+      <text x="890" y="292">ToolHive</text>
+      <text x="890" y="316" class="lbl-g">MCP gateway</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M485,150 L735,105" marker-end="url(#ahg)"/>
+      <path d="M485,195 L735,200" marker-end="url(#ahg)"/>
+      <path d="M485,245 L735,290" marker-end="url(#ahg)"/>
+    </g>
+  </svg>
+  <p class="takeaway">Build the image once; the same agent runs identically on any laptop, CI, or headless compose stack.</p>
+  <div class="pageno">M6·13</div>
+</section>
+
+<!-- ============ SLIDE 14 — CLOSING / LAB LEAD-IN ============ -->
+<section>
+  <p class="kicker">TO THE LAB</p>
+  <h2 class="t" style="font-size:2.3em">The agent IS Markdown + skills + tools</h2>
+  <svg viewBox="0 0 1100 320" role="img" aria-label="Three Markdown files feeding a thin glue script that routes three queries: retrieve, answer, refuse">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
+      <rect x="120" y="90" width="150" height="140" rx="12"/>
+      <path d="M280,160 L370,160" marker-end="url(#ah)"/>
+      <rect x="380" y="110" width="180" height="100" rx="12"/>
+      <path d="M570,160 L660,160" marker-end="url(#ah)"/>
+    </g>
+    <text x="195" y="150" text-anchor="middle" class="lbl-sm">SOUL ·</text>
+    <text x="195" y="178" text-anchor="middle" class="lbl-sm">AGENTS ·</text>
+    <text x="195" y="206" text-anchor="middle" class="lbl-sm">SKILL</text>
+    <text x="470" y="152" text-anchor="middle" class="lbl-b">Aria</text>
+    <text x="470" y="182" text-anchor="middle" class="lbl-g">routes</text>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="690" y="120">→ ops question — retrieve &amp; ground</text>
+      <text x="690" y="165">→ "2+2" — answer directly</text>
+      <text x="690" y="210">→ credential ask — refuse hard</text>
+    </g>
+  </svg>
+  <p class="s" style="font-size:1.15em">Read the three files that are Aria, start ChromaDB + the agent, then wire in a live MCP tool.</p>
+  <p class="credit">Next: <b>Module 6 Lab</b>, then M7 — the crew. &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
+  <div class="pageno">M6·14</div>
+</section>
+
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280,
+    height: 720,
+    margin: 0.04,
+    minScale: 0.2,
+    maxScale: 2.0,
+    hash: true,
+    center: false,
+    slideNumber: false,
+    transition: 'slide',
+    controlsTutorial: true
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Containers for GenAI &amp; Agentic AI — Module 1: Container-Native GenAI</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/white.min.css" id="theme">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap">
+
+<style>
+  :root{
+    --ink:#1e1e1e;
+    --gray:#757575;
+    --paper:#ffffff;
+  }
+  .reveal{ font-family:'Patrick Hand', cursive; color:var(--ink); }
+  .reveal .slides{ text-align:center; }
+  .reveal .slides section{ position:absolute; inset:0; box-sizing:border-box; flex-direction:column; justify-content:center; padding:20px 48px 42px; overflow:hidden; }
+  .reveal .slides > section.present{ display:flex; }
+
+  .reveal h1,.reveal h2,.reveal h3{
+    font-family:'Patrick Hand', cursive;
+    color:var(--ink);
+    text-transform:none;
+    font-weight:700;
+    letter-spacing:0;
+    margin:0 0 6px 0;
+    line-height:1.15;
+  }
+  .reveal h2.t{ font-size:1.75em; }
+  .reveal p.s{ font-size:0.95em; color:var(--gray); margin:0 0 8px 0; }
+  .reveal p.takeaway{
+    font-size:0.92em; color:var(--gray);
+    margin:10px auto 0; max-width:1050px;
+  }
+  .reveal p.takeaway::before{ content:"\2192  "; color:var(--ink); font-weight:700; }
+  .reveal svg{ width:100%; flex:1 1 0; min-height:0; max-height:58%; display:block; margin:8px auto 0; }
+  .reveal .kicker{ font-size:.8em; color:var(--gray); letter-spacing:2px; }
+  .reveal .credit{ font-size:.85em; color:var(--gray); margin-top:16px; }
+  .reveal .credit b{ color:var(--ink); font-weight:700; }
+  .reveal .pageno{ position:absolute; bottom:14px; right:22px; font-size:.6em; color:#bdbdbd; }
+  .reveal .slide-number{ font-family:'Patrick Hand',cursive; }
+
+  /* SVG typographic helpers */
+  text{ font-family:'Patrick Hand', cursive; }
+  .lbl{ fill:var(--ink); font-size:21px; }
+  .lbl-sm{ fill:var(--ink); font-size:17px; }
+  .lbl-g{ fill:var(--gray); font-size:17px; }
+  .lbl-b{ fill:var(--ink); font-size:23px; font-weight:700; }
+  .num{ fill:var(--ink); font-size:24px; font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- shared SVG defs: hand-drawn wobble filter + arrowhead -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="ah" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="ahg" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="reveal"><div class="slides">
+
+<!-- ============ SLIDE 1 — TITLE ============ -->
+<section data-auto-animate>
+  <p class="kicker">MODULE 1 &nbsp;·&nbsp; DAY 1</p>
+  <h2 class="t" style="font-size:2.3em">Container-Native GenAI</h2>
+  <p class="s" style="font-size:1.2em">Why the open standard — not Docker — is the through-line for AI</p>
+  <svg viewBox="0 0 1100 360" role="img" aria-label="A shipping container labelled AI that loads unchanged onto four different runtime carriers">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
+      <rect x="420" y="70" width="260" height="130" rx="10"/>
+      <line x1="470" y1="80" x2="470" y2="190"/>
+      <line x1="520" y1="80" x2="520" y2="190"/>
+      <line x1="580" y1="80" x2="580" y2="190"/>
+      <line x1="630" y1="80" x2="630" y2="190"/>
+    </g>
+    <text x="550" y="140" text-anchor="middle" class="lbl-b">AI</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-linecap="round">
+      <path d="M470,205 L200,290" marker-end="url(#ahg)"/>
+      <path d="M525,205 L440,290" marker-end="url(#ahg)"/>
+      <path d="M575,205 L660,290" marker-end="url(#ahg)"/>
+      <path d="M630,205 L900,290" marker-end="url(#ahg)"/>
+    </g>
+    <g class="lbl-g" text-anchor="middle">
+      <text x="175" y="320">Colima</text>
+      <text x="435" y="320">Rancher</text>
+      <text x="675" y="320">OrbStack</text>
+      <text x="925" y="320">Podman</text>
+    </g>
+  </svg>
+  <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI &nbsp;·&nbsp; Lesson + Lab + Quiz</p>
+  <div class="pageno">M1·01</div>
+</section>
+
+<!-- ============ SLIDE 2 — WHAT YOU'LL LEARN ============ -->
+<section>
+  <h2 class="t">What you'll learn</h2>
+  <p class="s">Five ideas that shape every lab in the rest of the course.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Five learning goals listed as numbered rows">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <circle cx="110" cy="60"  r="22"/>
+      <circle cx="110" cy="128" r="22"/>
+      <circle cx="110" cy="196" r="22"/>
+      <circle cx="110" cy="264" r="22"/>
+      <circle cx="110" cy="332" r="22"/>
+    </g>
+    <g class="num" text-anchor="middle">
+      <text x="110" y="68">1</text><text x="110" y="136">2</text>
+      <text x="110" y="204">3</text><text x="110" y="272">4</text>
+      <text x="110" y="340">5</text>
+    </g>
+    <g class="lbl" text-anchor="start">
+      <text x="158" y="68">Why "container-native" beats "Docker-native" — OCI + the Compose Spec</text>
+      <text x="158" y="136">What containers actually buy an AI stack: package, serve, isolate, ship</text>
+      <text x="158" y="204">The Apple-Silicon GPU limit and the native-server / containerized-app fix</text>
+      <text x="158" y="272">The OpenAI-compatible endpoint as one universal, swappable contract</text>
+      <text x="158" y="340">The 2026 map: declarative agents vs orchestration, and the Acme ladder</text>
+    </g>
+  </svg>
+  <p class="takeaway">Concepts first — the lab then proves the container-to-native-model wiring with your own hands.</p>
+  <div class="pageno">M1·02</div>
+</section>
+
+<!-- ============ SLIDE 3 — THE MOTIVATING PROBLEM ============ -->
+<section>
+  <h2 class="t">The assumption that just broke</h2>
+  <p class="s">Docker Desktop is now paid for orgs over 250 staff or $10M revenue. "Container = Docker" no longer holds.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="An old equation container equals Docker Desktop crossed out, replaced by container equals the open OCI standard">
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4" stroke-dasharray="9 7">
+      <rect x="90" y="80" width="420" height="110" rx="12"/>
+    </g>
+    <text x="300" y="130" text-anchor="middle" class="lbl-g" style="font-size:20px">the old assumption</text>
+    <text x="300" y="165" text-anchor="middle" class="lbl" style="font-size:22px">container = Docker Desktop</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <line x1="120" y1="180" x2="480" y2="95"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M300,200 L300,255" marker-end="url(#ah)"/>
+    </g>
+    <text x="565" y="235" text-anchor="middle" class="lbl-g">a pricing change,</text>
+    <text x="565" y="262" text-anchor="middle" class="lbl-g">not a technical one</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="90" y="270" width="420" height="90" rx="12"/>
+    </g>
+    <text x="300" y="305" text-anchor="middle" class="lbl-g" style="font-size:20px">what still holds</text>
+    <text x="300" y="340" text-anchor="middle" class="lbl-b">container = the open OCI standard</text>
+  </svg>
+  <p class="takeaway">The standard under Docker was always open. This module builds on that standard, not on any one vendor.</p>
+  <div class="pageno">M1·03</div>
+</section>
+
+<!-- ============ SLIDE 4 — SHIPPING CONTAINER ANALOGY ============ -->
+<section>
+  <h2 class="t">Container-native, not Docker-native</h2>
+  <p class="s">An OCI image is a shipping container — the same steel box loads onto any carrier. Docker is just one carrier.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="One compose.yaml feeds four interchangeable runtimes that all produce identical containers">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="60" y="150" width="220" height="90" rx="12"/>
+    </g>
+    <text x="170" y="188" text-anchor="middle" class="lbl-b">compose.yaml</text>
+    <text x="170" y="216" text-anchor="middle" class="lbl-g">open Compose Spec</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-linecap="round">
+      <path d="M285,180 L420,90"  marker-end="url(#ahg)"/>
+      <path d="M285,190 L420,160" marker-end="url(#ahg)"/>
+      <path d="M285,200 L420,230" marker-end="url(#ahg)"/>
+      <path d="M285,210 L420,300" marker-end="url(#ahg)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="430" y="60"  width="240" height="56" rx="8"/>
+      <rect x="430" y="130" width="240" height="56" rx="8"/>
+      <rect x="430" y="200" width="240" height="56" rx="8"/>
+      <rect x="430" y="270" width="240" height="56" rx="8"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="550" y="94">Colima</text>
+      <text x="550" y="164">OrbStack</text>
+      <text x="550" y="234">Rancher Desktop</text>
+      <text x="550" y="304">Podman Desktop</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M675,88  L830,180" marker-end="url(#ah)"/>
+      <path d="M675,158 L830,185" marker-end="url(#ah)"/>
+      <path d="M675,228 L830,195" marker-end="url(#ah)"/>
+      <path d="M675,298 L830,200" marker-end="url(#ah)"/>
+      <rect x="840" y="150" width="210" height="90" rx="12"/>
+    </g>
+    <text x="945" y="185" text-anchor="middle" class="lbl-b">Same app</text>
+    <text x="945" y="215" text-anchor="middle" class="lbl-g">identical containers</text>
+  </svg>
+  <p class="takeaway">One file, four runtimes, same result — the carrier you pick is your business, not the course's.</p>
+  <div class="pageno">M1·04</div>
+</section>
+
+<!-- ============ SLIDE 5 — WHAT CONTAINERS BUY ============ -->
+<section>
+  <h2 class="t">What containers buy an AI stack</h2>
+  <p class="s">Think of each component as a hermetically sealed shipment you can open on any machine.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Four sealed boxes labelled package, serve, isolate and ship">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="60"  y="90" width="220" height="200" rx="12"/>
+      <rect x="330" y="90" width="220" height="200" rx="12"/>
+      <rect x="600" y="90" width="220" height="200" rx="12"/>
+      <rect x="870" y="90" width="170" height="200" rx="12"/>
+      <line x1="60"  y1="130" x2="280"  y2="130"/>
+      <line x1="330" y1="130" x2="550"  y2="130"/>
+      <line x1="600" y1="130" x2="820"  y2="130"/>
+      <line x1="870" y1="130" x2="1040" y2="130"/>
+    </g>
+    <g text-anchor="middle">
+      <text x="170" y="120" class="lbl-b">Package</text>
+      <text x="170" y="185" class="lbl-sm">Pin Python, CUDA,</text>
+      <text x="170" y="212" class="lbl-sm">library versions —</text>
+      <text x="170" y="239" class="lbl-sm">"works everywhere"</text>
+
+      <text x="440" y="120" class="lbl-b">Serve</text>
+      <text x="440" y="185" class="lbl-sm">Embed, vector DB,</text>
+      <text x="440" y="212" class="lbl-sm">API behind fixed</text>
+      <text x="440" y="239" class="lbl-sm">ports, no pollution</text>
+
+      <text x="710" y="120" class="lbl-b">Isolate</text>
+      <text x="710" y="185" class="lbl-sm">Conflicting deps?</text>
+      <text x="710" y="212" class="lbl-sm">Each framework in</text>
+      <text x="710" y="239" class="lbl-sm">its own sealed box</text>
+
+      <text x="955" y="120" class="lbl-b">Ship</text>
+      <text x="955" y="185" class="lbl-sm">Push to any</text>
+      <text x="955" y="212" class="lbl-sm">OCI registry,</text>
+      <text x="955" y="239" class="lbl-sm">pull anywhere</text>
+    </g>
+  </svg>
+  <p class="takeaway">Package, serve, isolate, ship — the four jobs a container does for every piece of your AI stack.</p>
+  <div class="pageno">M1·05</div>
+</section>
+
+<!-- ============ SLIDE 6 — APPLE SILICON REALITY (analogy) ============ -->
+<section>
+  <h2 class="t">The Apple-Silicon GPU reality</h2>
+  <p class="s">macOS containers are like guest rooms with no power outlets — the building has power, the rooms aren't wired in.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A building whose mains power the Metal GPU is not wired into the guest rooms the containers so they fall back to battery the CPU">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="70" y="60" width="360" height="290" rx="10"/>
+      <line x1="70" y1="110" x2="430" y2="110"/>
+    </g>
+    <text x="250" y="95" text-anchor="middle" class="lbl-b">The building (your Mac)</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="100" y="135" width="300" height="55" rx="8"/>
+    </g>
+    <text x="250" y="170" text-anchor="middle" class="lbl-sm">Mains power = Metal GPU + unified memory</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4" stroke-dasharray="9 7">
+      <rect x="100" y="215" width="300" height="115" rx="8"/>
+    </g>
+    <text x="250" y="248" text-anchor="middle" class="lbl-g">Guest rooms = containers</text>
+    <text x="250" y="282" text-anchor="middle" class="lbl-sm">no outlet on the wall —</text>
+    <text x="250" y="309" text-anchor="middle" class="lbl-sm">they fall back to battery (CPU)</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M445,205 L590,205" marker-end="url(#ah)"/>
+    </g>
+    <text x="740" y="150" text-anchor="middle" class="lbl-g">Hypervisor.framework</text>
+    <text x="740" y="178" text-anchor="middle" class="lbl-g">exposes no virtual GPU</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="600" y="210" width="440" height="90" rx="12"/>
+    </g>
+    <text x="820" y="248" text-anchor="middle" class="lbl-b">Model inside a container</text>
+    <text x="820" y="280" text-anchor="middle" class="lbl">runs 3–6× slower on CPU</text>
+  </svg>
+  <p class="takeaway">The single most important practical lesson: get this wrong and every lab crawls. So don't fight it — wire around it.</p>
+  <div class="pageno">M1·06</div>
+</section>
+
+<!-- ============ SLIDE 7 — NATIVE SERVER / CONTAINERIZED APP PATTERN ============ -->
+<section>
+  <h2 class="t">The fix: native server, containerized everything else</h2>
+  <p class="s">Serve the model natively on Metal; put the app, agent and vector DB in containers; bridge them with one magic hostname.</p>
+  <svg viewBox="0 0 1100 390" role="img" aria-label="Ollama runs native on the host while app agent and vector DB run in containers reaching it over host.docker.internal port 11434">
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="4 6">
+      <rect x="40" y="40" width="1020" height="320" rx="16"/>
+    </g>
+    <text x="66" y="70" class="lbl-g" text-anchor="start">macOS host (Apple Silicon)</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="80" y="130" width="320" height="160" rx="12"/>
+    </g>
+    <text x="240" y="180" text-anchor="middle" class="lbl-b">Ollama — NATIVE</text>
+    <text x="240" y="215" text-anchor="middle" class="lbl">Metal-accelerated</text>
+    <text x="240" y="248" text-anchor="middle" class="lbl-g">unified memory</text>
+    <text x="240" y="278" text-anchor="middle" class="lbl-g">listens on :11434</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-dasharray="10 6">
+      <rect x="620" y="110" width="410" height="220" rx="12"/>
+    </g>
+    <text x="825" y="138" text-anchor="middle" class="lbl-g">Container runtime</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="650" y="160" width="170" height="65" rx="8"/>
+      <rect x="840" y="160" width="170" height="65" rx="8"/>
+      <rect x="650" y="245" width="360" height="65" rx="8"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="735" y="198">App (Streamlit)</text>
+      <text x="925" y="198">Agent (crew)</text>
+      <text x="830" y="283">Vector DB (ChromaDB)</text>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M615,200 L405,200" marker-end="url(#ah)"/>
+    </g>
+    <text x="510" y="185" text-anchor="middle" class="lbl-g">http://host.docker.internal</text>
+    <text x="510" y="228" text-anchor="middle" class="lbl-g">:11434</text>
+  </svg>
+  <p class="takeaway">On Windows + WSL2 + NVIDIA the toolkit passes the GPU in, so the server <em>can</em> be containerized there.</p>
+  <div class="pageno">M1·07</div>
+</section>
+
+<!-- ============ SLIDE 8 — WALL SOCKET ANALOGY ============ -->
+<section>
+  <h2 class="t">One universal contract: the OpenAI-compatible endpoint</h2>
+  <p class="s">The API is a wall socket. Swap the power station behind it and your appliance never notices.</p>
+  <svg viewBox="0 0 1100 360" role="img" aria-label="Ollama vLLM and llama.cpp all plug into one OpenAI compatible socket that the app plugs into unchanged">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60" y="70"  width="200" height="60" rx="8"/>
+      <rect x="60" y="150" width="200" height="60" rx="8"/>
+      <rect x="60" y="230" width="200" height="60" rx="8"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="160" y="108">Ollama</text>
+      <text x="160" y="188">vLLM</text>
+      <text x="160" y="268">llama.cpp</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M265,100 L460,175" marker-end="url(#ahg)"/>
+      <path d="M265,180 L460,180" marker-end="url(#ahg)"/>
+      <path d="M265,260 L460,185" marker-end="url(#ahg)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="470" y="120" width="180" height="130" rx="14"/>
+      <circle cx="530" cy="165" r="10"/>
+      <circle cx="590" cy="165" r="10"/>
+      <line x1="560" y1="195" x2="560" y2="225"/>
+    </g>
+    <text x="560" y="105" text-anchor="middle" class="lbl-g">/v1/chat/completions</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M655,185 L775,185" marker-end="url(#ah)"/>
+      <rect x="795" y="140" width="245" height="90" rx="12"/>
+    </g>
+    <text x="917" y="180" text-anchor="middle" class="lbl-b">Your app / agent</text>
+    <text x="917" y="210" text-anchor="middle" class="lbl-g">code never changes</text>
+  </svg>
+  <p class="takeaway">The same request runs against Ollama on a laptop, vLLM on a GPU VM, or OpenAI — every lab speaks this language.</p>
+  <div class="pageno">M1·08</div>
+</section>
+
+<!-- ============ SLIDE 9 — DECLARATIVE vs ORCHESTRATION ============ -->
+<section>
+  <h2 class="t">The 2026 map: declarative vs orchestration</h2>
+  <p class="s">Two ways to build an agent. Start with the light one; reach for the heavy one only when you must.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Declarative agents defined in plain files on the left versus orchestration frameworks with explicit control flow on the right, with a rule of thumb between them">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="60" y="70" width="420" height="240" rx="12"/>
+    </g>
+    <text x="270" y="108" text-anchor="middle" class="lbl-b">Declarative agents (M6)</text>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="90" y="150">Who the agent is + what tools it has,</text>
+      <text x="90" y="178">written in plain files</text>
+      <text x="90" y="220">The runtime executes them</text>
+      <text x="90" y="262">Change a markdown file →</text>
+      <text x="90" y="290">change the behaviour</text>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="620" y="70" width="420" height="240" rx="12"/>
+    </g>
+    <text x="830" y="108" text-anchor="middle" class="lbl-b">Orchestration (M7)</text>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="650" y="150">LangGraph — deterministic control flow</text>
+      <text x="650" y="178">explicit state machines, branching</text>
+      <text x="650" y="220">Retries, human-in-the-loop checkpoints</text>
+      <text x="650" y="262">For hard sequencing a declarative</text>
+      <text x="650" y="290">agent can't self-determine</text>
+    </g>
+
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M485,190 L615,190" marker-end="url(#ahg)"/>
+    </g>
+    <text x="550" y="175" text-anchor="middle" class="lbl-g">add only</text>
+    <text x="550" y="215" text-anchor="middle" class="lbl-g">when needed</text>
+  </svg>
+  <p class="takeaway">The rule: start declarative; add orchestration only when the task has hard sequencing you can't express in tools.</p>
+  <div class="pageno">M1·09</div>
+</section>
+
+<!-- ============ SLIDE 10 — ANATOMY OF A DECLARATIVE AGENT ============ -->
+<section>
+  <h2 class="t">Anatomy of a declarative agent</h2>
+  <p class="s">Four plain parts define an agent — no framework code required to describe who it is.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A large outlined agent box with four labelled inner sections: identity files, skills, MCP tools and guardrails">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="120" y="55" width="860" height="285" rx="14"/>
+    </g>
+    <text x="550" y="90" text-anchor="middle" class="lbl-b">A declarative agent</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="150" y="115" width="380" height="95" rx="10"/>
+      <rect x="570" y="115" width="380" height="95" rx="10"/>
+      <rect x="150" y="230" width="380" height="95" rx="10"/>
+      <rect x="570" y="230" width="380" height="95" rx="10"/>
+    </g>
+    <g text-anchor="middle">
+      <text x="340" y="150" class="lbl">AGENTS.md / SOUL.md</text>
+      <text x="340" y="182" class="lbl-g">who the agent is — role &amp; intent</text>
+
+      <text x="760" y="150" class="lbl">SKILL.md</text>
+      <text x="760" y="182" class="lbl-g">reusable capabilities it can call</text>
+
+      <text x="340" y="265" class="lbl">MCP tool connections</text>
+      <text x="340" y="297" class="lbl-g">what it can reach in the world</text>
+
+      <text x="760" y="265" class="lbl">Guardrails</text>
+      <text x="760" y="297" class="lbl-g">limits on what it may do</text>
+    </g>
+  </svg>
+  <p class="takeaway">Identity, skills, tools, guardrails — all in files you can read, diff, and version like any other code.</p>
+  <div class="pageno">M1·10</div>
+</section>
+
+<!-- ============ SLIDE 11 — ACME USE CASE ============ -->
+<section>
+  <h2 class="t">Meet Acme — two connected tools</h2>
+  <p class="s">One fictional company, runbooks nobody reads, and two AI tools that fix it across the two days.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Acme's runbooks feed a Docs Assistant on day one, which the day-two Incident Crew then uses as one of its tools">
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4">
+      <rect x="60" y="140" width="180" height="110" rx="10"/>
+    </g>
+    <text x="150" y="185" text-anchor="middle" class="lbl">Acme's</text>
+    <text x="150" y="215" text-anchor="middle" class="lbl">runbooks</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M245,195 L340,195" marker-end="url(#ah)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="350" y="120" width="300" height="150" rx="12"/>
+    </g>
+    <text x="500" y="105" text-anchor="middle" class="lbl-g">DAY 1 · GenAI</text>
+    <text x="500" y="170" text-anchor="middle" class="lbl-b">Docs Assistant</text>
+    <text x="500" y="205" text-anchor="middle" class="lbl">Naive RAG:</text>
+    <text x="500" y="235" text-anchor="middle" class="lbl-g">question → docs → answer</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M655,195 L750,195" marker-end="url(#ah)"/>
+    </g>
+    <text x="700" y="180" text-anchor="middle" class="lbl-g">used as</text>
+    <text x="700" y="238" text-anchor="middle" class="lbl-g">a tool</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="760" y="120" width="290" height="150" rx="12"/>
+    </g>
+    <text x="905" y="105" text-anchor="middle" class="lbl-g">DAY 2 · Agentic</text>
+    <text x="905" y="170" text-anchor="middle" class="lbl-b">Support Agent →</text>
+    <text x="905" y="202" text-anchor="middle" class="lbl-b">Incident Crew</text>
+    <text x="905" y="238" text-anchor="middle" class="lbl-g">single → multi-agent</text>
+  </svg>
+  <p class="takeaway">Use Case B <em>uses</em> Use Case A as one of its tools — skills compound instead of tangling.</p>
+  <div class="pageno">M1·11</div>
+</section>
+
+<!-- ============ SLIDE 12 — THE BUILD LADDER ============ -->
+<section>
+  <h2 class="t">The build ladder — one step per module</h2>
+  <p class="s">Every module adds exactly one rung to the same growing <code>compose.yaml</code>.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="A staircase of modules rising from M1 a model responding up to the shipped platform capstone">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="50"  y="320" width="118" height="46" rx="7"/>
+      <rect x="178" y="285" width="118" height="81" rx="7"/>
+      <rect x="306" y="250" width="118" height="116" rx="7"/>
+      <rect x="434" y="215" width="118" height="151" rx="7"/>
+      <rect x="562" y="180" width="118" height="186" rx="7"/>
+      <rect x="690" y="145" width="118" height="221" rx="7"/>
+      <rect x="818" y="110" width="118" height="256" rx="7"/>
+      <path d="M40,370 L1050,370"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="109" y="348">M1 model</text>
+      <text x="237" y="312">M2 serve</text>
+      <text x="365" y="278">M3 scale</text>
+      <text x="493" y="242">M4 package</text>
+      <text x="621" y="208">M5 RAG</text>
+      <text x="749" y="172">M6 agent</text>
+      <text x="877" y="138">M7 crew</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="946" y="75" width="120" height="291" rx="8"/>
+    </g>
+    <text x="1006" y="205" text-anchor="middle" class="lbl-b" transform="rotate(-90 1006 205)">M8 · Ship + Capstone</text>
+    <text x="330" y="395" text-anchor="middle" class="lbl-g">← DAY 1 · Serve &amp; Package</text>
+    <text x="760" y="395" text-anchor="middle" class="lbl-g">DAY 2 · RAG → Agentic → Ship →</text>
+  </svg>
+  <p class="takeaway">Module 1 is step 0: a runtime and a model responding to a call. You hand-author every block from here.</p>
+  <div class="pageno">M1·12</div>
+</section>
+
+<!-- ============ SLIDE 13 — CLOSING ============ -->
+<section>
+  <p class="kicker">TO THE LAB</p>
+  <h2 class="t" style="font-size:2.3em">Build it once. Run it anywhere.</h2>
+  <svg viewBox="0 0 1100 300" role="img" aria-label="A throwaway container reaches out to the native Ollama model server and gets a real answer back">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8" stroke-dasharray="10 6">
+      <rect x="120" y="90" width="290" height="120" rx="12"/>
+    </g>
+    <text x="265" y="140" text-anchor="middle" class="lbl-b">throwaway</text>
+    <text x="265" y="172" text-anchor="middle" class="lbl">container</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <path d="M415,130 L680,130" marker-end="url(#ah)"/>
+      <path d="M680,175 L415,175" marker-end="url(#ah)"/>
+    </g>
+    <text x="547" y="118" text-anchor="middle" class="lbl-g">host.docker.internal:11434</text>
+    <text x="547" y="200" text-anchor="middle" class="lbl-g">a real response back</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="690" y="90" width="290" height="120" rx="12"/>
+    </g>
+    <text x="835" y="140" text-anchor="middle" class="lbl-b">Ollama</text>
+    <text x="835" y="172" text-anchor="middle" class="lbl-g">native · Metal GPU</text>
+  </svg>
+  <p class="s" style="font-size:1.1em">In the lab you'll prove this wiring yourself — container calls native model, and it answers.</p>
+  <p class="credit">Now open <b>Module 1 · Lab</b>. &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
+  <div class="pageno">M1·13</div>
+</section>
+
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280,
+    height: 720,
+    margin: 0.04,
+    minScale: 0.2,
+    maxScale: 2.0,
+    hash: true,
+    center: false,
+    slideNumber: false,
+    transition: 'slide',
+    controlsTutorial: true
+  });
+</script>
+</body>
+</html>
