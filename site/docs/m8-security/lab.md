@@ -404,7 +404,7 @@ The `exit-code: '1'` in the Trivy step means the step fails (and blocks the sign
 
 ## Step 9 — Run the full pipeline with `secure-image.sh`
 
-`labs/m8/secure-image.sh` wraps the SBOM → scan → sign flow in one script:
+`labs/m8/secure-image.sh` wraps the SBOM → scan → sign flow in one script. Pass a **local** image tag — the script scans the local image store without pulling from any registry, then pushes to the local `registry:2` for signing:
 
 ```bash
 ./labs/m8/secure-image.sh acme-support-agent:latest
@@ -413,18 +413,45 @@ The `exit-code: '1'` in the Trivy step means the step fails (and blocks the sign
 **Expected output:**
 
 ```
-==> [1/4] SBOM with syft
+==> [1/4] SBOM with syft  (local image — no registry pull)
     wrote sbom.spdx.json
-==> [2/4] Vulnerability scan with trivy (CRITICAL/HIGH)
+==> [2/4] Vulnerability scan with trivy  (CRITICAL/HIGH — local image)
 Total: 64 (MEDIUM: 53, HIGH: 9, CRITICAL: 2)
-==> [3/4] Second opinion with grype
+==> [3/4] Second opinion with grype  (local image)
 Vulnerabilities by severity:  Critical 5, High 28, Medium 60, Low 7, Negligible 51
-==> [4/4] Sign with cosign (key-based)
+==> [4/4] Sign with cosign (key-based, via local registry)
 The signatures were verified against the specified public key
-Done. Signed and verified acme-support-agent:latest.
+Done. SBOM + scanned + signed acme-support-agent:latest (signed ref: localhost:5001/acme-support-agent:latest).
 ```
 
 The script uses `|| true` on the scan steps so it does not stop on findings — that is appropriate for the local development version where you want to see all output. In CI (the GitHub Actions pipeline), `exit-code: '1'` gates the pipeline.
+
+:::warning[MANIFEST_UNKNOWN / DENIED when passing a GHCR ref]
+
+If you pass a `ghcr.io/<user>/...` reference directly to the script, syft and trivy will try to **pull** the image from GHCR. This fails with `MANIFEST_UNKNOWN` (image not pushed yet) or `DENIED` (private package, anonymous pull denied).
+
+Fix: always pass the **local** image tag to the script. Build locally first, scan locally, then push separately:
+
+```bash
+# Build locally
+docker build -t acme-support-agent:latest labs/m6/
+
+# Scan + sign local image
+./labs/m8/secure-image.sh acme-support-agent:latest
+
+# Push to your GHCR namespace (requires docker login ghcr.io + write:packages PAT)
+docker tag acme-support-agent:latest ghcr.io/<your-github-user>/acme-support-agent:v1.0
+docker push ghcr.io/<your-github-user>/acme-support-agent:v1.0
+
+# Sign the pushed ref
+COSIGN_PASSWORD="" cosign sign --yes --key cosign.key \
+  ghcr.io/<your-github-user>/acme-support-agent:v1.0
+```
+
+Note: GHCR often rejects the plain `gh auth token` for `docker login`. Use a classic PAT with `write:packages` scope instead.
+
+:::
+
 
 ---
 
