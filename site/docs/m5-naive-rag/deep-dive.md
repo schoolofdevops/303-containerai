@@ -195,11 +195,30 @@ English prose is roughly 100–130 tokens (about 4 characters per token). With `
 At this lab's scale the prompt uses under 15% of the 4096-token ceiling — there's no pressure on
 this corpus. The arithmetic starts to matter the moment you scale either axis: raise `k` to 10 on
 a corpus with `chunk_size=1500`, and 10 × 1500 chars ≈ 3,750 tokens of context alone — that
-crowds out the answer entirely inside a 4096 window, and Ollama silently truncates from the front
-of the context (the oldest tokens) once the window fills, which on this prompt shape means your
-*earliest retrieved chunks* are what gets cut, not the question. Sizing `top-k × chunk_size`
-against your actual `num_ctx` before scaling either knob up is the check that catches this before
-it becomes a silent, hard-to-diagnose "the model ignored my context" bug.
+crowds out the answer entirely inside a 4096 window, and Ollama silently truncates the prompt once
+it exceeds `num_ctx`.
+
+**Verified live, not assumed.** A deliberately oversized prompt (~40K raw tokens: a unique marker
+sentence, a large filler block, then the real question) sent to `qwen2.5:1.5b` with `num_ctx=4096`
+produced `prompt_eval_count: 2050` — Ollama cut the prompt down to roughly half the context
+window, not the full 4096, leaving headroom for the answer. The underlying `llama-server`'s debug
+log shows exactly how:
+
+```text
+level=WARN msg="truncating input prompt" limit=2050 prompt=33742 keep=4 new=2050
+```
+
+It keeps a tiny fixed prefix (`n_keep=4` tokens — effectively nothing) and then discards everything
+else *except* the most recent `limit` tokens — the truncation keeps the **tail** of the prompt, not
+the head. Sending the model the marker-at-the-front / question-at-the-back prompt confirmed this
+directly: the model answered using the *back* marker, and had lost the *front* marker entirely —
+proof the front of an over-budget prompt is what gets dropped, and the tail survives. On this
+app's prompt shape (`Context:\n{context}\n\nQuestion: {prompt}\n\nAnswer:` — retrieved chunks
+first, the question last), that means an over-budget prompt loses your **earliest retrieved
+chunks** first while the question itself, sitting at the very end, is the last thing to go. Sizing
+`top-k × chunk_size` against your actual `num_ctx` before scaling either knob up is the check that
+catches this before it becomes a silent, hard-to-diagnose "the model ignored my context" bug —
+watch for the `"truncating input prompt"` warning in Ollama's server log as the tell.
 
 ---
 
@@ -245,8 +264,37 @@ curl -s http://localhost:${M5_CHROMA_PORT:-8000}/api/v1/collections | python3 -m
 **Expected output**
 
 ```text
-<expected output — folded in during live lab validation>
+[
+    {
+        "id": "9212c584-0f8e-4bb0-a261-995553f28640",
+        "name": "documents",
+        "configuration_json": {
+            "hnsw_configuration": {
+                "space": "l2",
+                "ef_construction": 100,
+                "ef_search": 10,
+                "num_threads": 5,
+                "M": 16,
+                "resize_factor": 1.2,
+                "batch_size": 100,
+                "sync_threshold": 1000,
+                "_type": "HNSWConfigurationInternal"
+            },
+            "_type": "CollectionConfigurationInternal"
+        },
+        "metadata": null,
+        "dimension": 768,
+        "tenant": "default_tenant",
+        "database": "default_database",
+        "version": 0,
+        "log_position": 0
+    }
+]
 ```
+
+`"space": "l2"` in `hnsw_configuration` is ChromaDB confirming, straight from its own API, the
+default index metric claimed above — no override was ever set, so the collection came up on L2.
+`"dimension": 768` confirms `nomic-embed-text`'s embedding size.
 
 Query it directly for a question, using the same embedding model the app uses, and see the raw
 distances behind the ranking (this one-liner runs inside the `genai-app` container, where
@@ -268,13 +316,50 @@ for doc, score in vs.similarity_search_with_score('How do I restart the payments
 **Expected output**
 
 ```text
-<expected output — folded in during live lab validation>
+0.6956 Acme Platform Runbooks  Payments service  To restart the Acme payments service,
+1.0968 Checkout 503 errors  If the checkout page returns HTTP 503, the web tier is satu
 ```
 
+Only two lines print even though `k=3` was requested — this collection has exactly 2 chunks
+(§1), so ChromaDB hands back everything it has and stops; there is no third chunk to return.
 `similarity_search_with_score` returns raw L2 distance (§3) — **lower is better**, the opposite
 of a similarity percentage. This is the exact number ChromaDB's index is ranking on when the
-Streamlit app decides which 3 chunks to hand the LLM; the UI never shows you this figure, only
+Streamlit app decides which chunks to hand the LLM; the UI never shows you this figure, only
 the resulting text.
+
+**Embedding norm — verifying the L2≈cosine claim from §3.** The claim above (`nomic-embed-text`
+produces close-to-unit-norm vectors, so L2 and cosine rank chunks identically) is only true if it
+holds through *this app's exact code path* — `langchain-ollama`'s `OllamaEmbeddings`, not just
+the raw Ollama API. Verify it directly:
+
+```bash
+docker exec genai-app python3 -c "
+import os, math
+from langchain_ollama import OllamaEmbeddings
+emb = OllamaEmbeddings(model='nomic-embed-text', base_url=os.environ['OLLAMA_BASE_URL'])
+vecs = emb.embed_documents([
+    'How do I restart the payments service?',
+    'Checkout 503 errors are caused by web tier saturation.',
+    'Database backups are retained for 30 days.',
+])
+for i, v in enumerate(vecs):
+    norm = math.sqrt(sum(x*x for x in v))
+    print(f'vector {i}: dim={len(v)} L2norm={norm:.6f}')
+"
+```
+
+**Expected output**
+
+```text
+vector 0: dim=768 L2norm=1.000000
+vector 1: dim=768 L2norm=1.000001
+vector 2: dim=768 L2norm=1.000000
+```
+
+Confirmed, not assumed: three arbitrary sentences through `langchain-ollama`'s `OllamaEmbeddings`
+all land at L2 norm ≈ 1.000000 (the 1.000001 on vector 1 is float rounding noise, not a real
+deviation). The L2≈cosine claim in §3 holds for this exact app code path — not a general Ollama
+guarantee, but true here, measured.
 
 ---
 
@@ -301,7 +386,10 @@ docker exec genai-app ls -la /tmp/deepdive-docs/
 **Expected output**
 
 ```text
-<expected output — folded in during live lab validation>
+total 12
+drwxr-xr-x 2 root root    4096 Jul 22 17:26 .
+drwxrwxrwt 1 root root    4096 Jul 22 17:24 ..
+-rw-r--r-- 1  501 dialout  823 Jul 22 06:29 acme-runbooks.md
 ```
 
 Write the ingest-and-compare script. The question set is embedded directly in the script (not a
@@ -380,7 +468,63 @@ real artifact you can grep, diff, or fold into the table below.
 **Expected output**
 
 ```text
-<expected output — folded in during live lab validation>
+COLLECTION: deepdive-baseline
+=== baseline (chunk_size=500, overlap=50) -> 2 chunks ===
+  Q: How do I restart the payments service?
+    top distance: 0.6956  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
+    answer: To restart the Acme payments service, run:
+
+```bash
+kubectl rollout restart deploy/payments -n prod
+```
+
+This command wi
+  Q: What happens if checkout is overloaded?
+    top distance: 0.7755  chunk: 'Checkout 503 errors\n\nIf the checkout page returns HTTP 503, the web ti'
+    answer: If the checkout page returns HTTP 503, it indicates that the web tier is saturated. To scale up and address this issue,
+  Q: How long are database backups retained?
+    top distance: 0.7746  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
+    answer: The database backups are retained for 30 days.
+  Q: Who do I page for an unacknowledged incident?
+    top distance: 0.9238  chunk: 'Checkout 503 errors\n\nIf the checkout page returns HTTP 503, the web ti'
+    answer: The on-call engineer is paged for an unacknowledged incident.
+COLLECTION: deepdive-variant-a
+=== variant-a (chunk_size=150, overlap=0) -> 11 chunks ===
+  Q: How do I restart the payments service?
+    top distance: 0.5146  chunk: 'To restart the Acme payments service, run: kubectl rollout restart dep'
+    answer: To restart the Payments service, you should run the following command:
+
+```bash
+kubectl rollout restart deploy/payments
+  Q: What happens if checkout is overloaded?
+    top distance: 0.7244  chunk: 'If the checkout page returns HTTP 503, the web tier is saturated. Scal'
+    answer: If the checkout page returns HTTP 503, it indicates that the web tier is saturated and needs to be scaled up. The comman
+  Q: How long are database backups retained?
+    top distance: 0.3700  chunk: 'Database backups'
+    answer: The database backups are retained for 30 days.
+  Q: Who do I page for an unacknowledged incident?
+    top distance: 0.7124  chunk: 'Page the on-call engineer via the #acme-oncall Slack channel. If unack'
+    answer: The on-call engineer via the #acme-oncall Slack channel. If unacknowledged for 15 minutes, the incident auto-escalates t
+COLLECTION: deepdive-variant-b
+=== variant-b (chunk_size=1200, overlap=200) -> 1 chunks ===
+  Q: How do I restart the payments service?
+    top distance: 0.7515  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
+    answer: To restart the Acme payments service, run:
+
+```bash
+kubectl rollout restart deploy/payments -n prod
+```
+
+This command wi
+  Q: What happens if checkout is overloaded?
+    top distance: 0.9773  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
+    answer: If the checkout page returns HTTP 503 (Service Unavailable), it indicates that the web tier is saturated and needs scali
+  Q: How long are database backups retained?
+    top distance: 0.8759  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
+    answer: The database backups are retained for 30 days.
+  Q: Who do I page for an unacknowledged incident?
+    top distance: 1.0830  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
+    answer: The on-call engineer is paged for an unacknowledged incident via the #acme-oncall Slack channel. If unacknowledged for 1
 ```
 
 Fold the three variants' results into a comparison table (variant, chunk count, retrieved-chunk
@@ -388,9 +532,24 @@ snippet, whether the retrieved context actually contained the answer, model's an
 
 | Variant | Chunk size / overlap | Chunk count | Retrieved top chunk (payments Q) | Contains the answer? | Model's answer |
 |---|---|---|---|---|---|
-| baseline | 500 / 50 | <!-- folded in --> | <!-- folded in --> | <!-- folded in --> | <!-- folded in --> |
-| variant-a | 150 / 0 | <!-- folded in --> | <!-- folded in --> | <!-- folded in --> | <!-- folded in --> |
-| variant-b | 1200 / 200 | <!-- folded in --> | <!-- folded in --> | <!-- folded in --> | <!-- folded in --> |
+| baseline | 500 / 50 | 2 | dist 0.6956 — `"Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments…"` | Yes | "To restart the Acme payments service, run: `kubectl rollout restart deploy/payments -n prod`…" |
+| variant-a | 150 / 0 | 11 | dist 0.5146 — `"To restart the Acme payments service, run: kubectl rollout restart dep…"` | Yes | "To restart the Payments service, you should run the following command: `kubectl rollout restart deploy/payments`…" |
+| variant-b | 1200 / 200 | 1 | dist 0.7515 — `"Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments…"` (the whole corpus is one chunk) | Yes | "To restart the Acme payments service, run: `kubectl rollout restart deploy/payments -n prod`…" |
+
+The three variants tell three different stories about the *same* corpus. **variant-a** (150 chars,
+no overlap) produces the tightest, lowest-distance match on the payments question (0.5146, the
+best of all three) because its 11 tiny chunks let one chunk be *purely* about the restart command
+— nothing else diluting the vector. It also isolates "Database backups" into its own chunk,
+dropping that question's distance to 0.3700, the single best match across the whole experiment.
+**baseline** (500/50) sits in the middle — 2 chunks, each covering roughly two runbook sections,
+distances in the 0.69–0.92 range. **variant-b** (1200/200) collapses the entire ~823-byte corpus
+into a **single chunk** — at this chunk size on this small a corpus, there's nothing left to
+retrieve *from*; every question, regardless of topic, returns the same one chunk, and the highest
+distances in the table (0.75–1.08) show the vector working harder to match a chunk that's an
+average of four unrelated procedures. All three variants still produced grounded, correct answers
+here — this corpus is small enough that even variant-b's single do-everything chunk contains the
+whole answer space. On a larger corpus, variant-b's collapse-everything failure mode would start
+returning topically wrong chunks instead of just imprecise ones.
 
 Judge the deterministic side of this table strictly — chunk counts and distance scores are exact,
 reproducible facts about this corpus and these parameters. Judge the model's prose answers by
@@ -420,7 +579,9 @@ container's `/dev/stdin` inside the `-c` script, and without `-i` that stdin is 
 **Expected output**
 
 ```text
-<expected output — folded in during live lab validation>
+deleted deepdive-baseline
+deleted deepdive-variant-a
+deleted deepdive-variant-b
 ```
 
 ---
