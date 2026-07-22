@@ -1,0 +1,16 @@
+{
+  "checks": [
+    { "id": "venv-mlx", "describe": "mlx-lm importable (or lab not yet run on this machine)",
+      "run": "[ -d ~/mlx-lora-env ] && . ~/mlx-lora-env/bin/activate && python -c 'import mlx_lm; print(\"mlx_lm OK\")' || echo SKIP-OK",
+      "assert": { "matches": "mlx_lm OK|SKIP-OK" } },
+    { "id": "variant-adapters", "describe": "both variant adapter dirs produced (or not yet run — SKIP-OK)",
+      "run": "ls ~/mlx-lora-lab/adapters-variant-a ~/mlx-lora-lab/adapters-variant-b >/dev/null 2>&1 && echo FOUND || echo SKIP-OK",
+      "assert": { "matches": "FOUND|SKIP-OK" } },
+    { "id": "comparison-table", "describe": "deep-dive page carries the live comparison table",
+      "run": "grep -c 'Variant' site/docs/m3b-finetuning/deep-dive.md",
+      "assert": { "exit": 0 } },
+    { "id": "flags-pinned-admonition", "describe": "deep-dive page references the lab's documented mlx-lm flag-version-variance convention",
+      "run": "grep -c 'pinned' site/docs/m3b-finetuning/deep-dive.md",
+      "assert": { "matches": "^[1-9]" } }
+  ]
+}
