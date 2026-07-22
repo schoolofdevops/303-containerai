@@ -1,0 +1,22 @@
+{
+  "checks": [
+    { "id": "vllm-up-if-running", "describe": "vLLM-CPU endpoint responds if the m3 lab is currently up (else SKIP-OK)",
+      "run": "curl -sf http://localhost:${VLLM_PORT:-8009}/v1/models >/dev/null 2>&1 && echo UP || echo SKIP-OK",
+      "assert": { "matches": "^UP$|^SKIP-OK$" } },
+    { "id": "metrics-endpoint-if-running", "describe": "vLLM /metrics exposes the running/waiting gauges if up (else SKIP-OK)",
+      "run": "curl -sf http://localhost:${VLLM_PORT:-8009}/metrics 2>/dev/null | grep -q 'vllm:num_requests_running' && echo UP || echo SKIP-OK",
+      "assert": { "matches": "^UP$|^SKIP-OK$" } },
+    { "id": "comparison-results", "describe": "throughput comparison results file exists if the experiment has been run (else SKIP-OK)",
+      "run": "[ -f ~/vllm-deepdive-lab/comparison-results.txt ] && echo FOUND || echo SKIP-OK",
+      "assert": { "matches": "^FOUND$|^SKIP-OK$" } },
+    { "id": "comparison-table-in-page", "describe": "deep-dive page carries the tokens/sec comparison table",
+      "run": "grep -c 'tokens/sec' site/docs/m3-vllm/deep-dive.md",
+      "assert": { "exit": 0 } },
+    { "id": "pagedattention-section", "describe": "deep-dive page covers PagedAttention as paged KV cache",
+      "run": "grep -c 'PagedAttention' site/docs/m3-vllm/deep-dive.md",
+      "assert": { "matches": "^[1-9]" } },
+    { "id": "continuous-batching-section", "describe": "deep-dive page covers continuous batching mid-flight admission",
+      "run": "grep -c 'continuous batching' site/docs/m3-vllm/deep-dive.md",
+      "assert": { "matches": "^[1-9]" } }
+  ]
+}
