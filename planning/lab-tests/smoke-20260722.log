@@ -1,0 +1,699 @@
+===== invocation: 2026-07-22 14:59:36 :: scripts/test-course.sh m1 =====
+
+════════ m1 ════════
+✅ runtime-up — container runtime responds
+✅ ollama-native — native Ollama serving with qwen2.5:1.5b pulled
+✅ container-to-host — throwaway container reaches host Ollama and gets an inference response
+
+3/3 checks · score 3/3
+PASS m1
+
+════════ SUMMARY ════════
+ALL MODULES PASS
+===== invocation: 2026-07-22 14:59:42 :: scripts/test-course.sh m2 =====
+
+════════ m2 ════════
+ Image m2-client Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 552B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 155B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.12-slim
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 31B done
+#5 DONE 0.0s
+
+#6 [1/4] FROM docker.io/library/python:3.12-slim@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de
+#6 resolve docker.io/library/python:3.12-slim@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de 0.0s done
+#6 DONE 0.0s
+
+#7 [2/4] RUN pip install --no-cache-dir openai
+#7 CACHED
+
+#8 [3/4] WORKDIR /app
+#8 CACHED
+
+#9 [4/4] COPY client.py .
+#9 CACHED
+
+#10 exporting to image
+#10 exporting layers done
+#10 exporting manifest sha256:66f731d3507a46761f45313742a090520aa6eac209971bfc9ca8e452bacc119b done
+#10 exporting config sha256:61bd432ed4724378d15ca551753df95532702c2f552f78632881cf925a11c6e1 done
+#10 exporting attestation manifest sha256:93e78a1998ca80ff85b287f1289610d12132f4a977ef097f2e3be3d78f58a772 0.0s done
+#10 exporting manifest list sha256:b0f7bd21b68b5816446b67ba6ee58027576377583035ece13d8d94c55f009a88 done
+#10 naming to docker.io/library/m2-client:latest done
+#10 unpacking to docker.io/library/m2-client:latest 0.0s done
+#10 DONE 0.1s
+
+#11 resolving provenance for metadata file
+#11 DONE 0.0s
+ Image m2-client Built 
+m2 ready: native Ollama reachable, client image built.
+✅ ollama-v1-models — native Ollama OpenAI-compatible /v1/models lists qwen2.5:1.5b
+✅ compose-build — m2 compose client image builds
+✅ client-answers-via-v1 — containerized client reaches Ollama /v1 through host.docker.internal and gets a chat completion
+✅ compose-teardown — compose down removes the m2 network cleanly (teardown-safe)
+
+4/4 checks · score 4/4
+PASS m2
+
+════════ SUMMARY ════════
+ALL MODULES PASS
+===== invocation: 2026-07-22 14:59:54 :: scripts/test-course.sh m3 (default port) =====
+
+════════ m3 ════════
+ Image vllm-cpu-optimized:latest Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 574B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 939B 0.0s done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/openeuler/vllm-cpu:0.9.1-oe2403lts
+#3 ...
+
+#4 [auth] openeuler/vllm-cpu:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/openeuler/vllm-cpu:0.9.1-oe2403lts
+#3 DONE 1.8s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 2B done
+#5 DONE 0.0s
+
+#6 [1/2] FROM docker.io/openeuler/vllm-cpu:0.9.1-oe2403lts@sha256:f0ca41ceaa7de6d49ca5c6bfc43deb075c921e54edbf93671dd791669ff5bde5
+#6 resolve docker.io/openeuler/vllm-cpu:0.9.1-oe2403lts@sha256:f0ca41ceaa7de6d49ca5c6bfc43deb075c921e54edbf93671dd791669ff5bde5 0.0s done
+#6 DONE 0.0s
+
+#7 [2/2] RUN sed -i 's/cpu_count_per_numa = cpu_count \/\/ numa_size/cpu_count_per_numa = cpu_count \/\/ numa_size if numa_size > 0 else cpu_count/g'     /workspace/vllm/vllm/worker/cpu_worker.py
+#7 CACHED
+
+#8 exporting to image
+#8 exporting layers done
+#8 exporting manifest sha256:02df48a80bb3366a078575d62454ed1fc13450548f8e7d124aae375143beb9f5 done
+#8 exporting config sha256:94fa013e275cf9e08533ba65995db5b62937274b43f2443d1783f00ee7703049 done
+#8 exporting attestation manifest sha256:9a891a3f47a055871fb428b5d61bced49d487119248601a60fce0ee729736ad9 0.0s done
+#8 exporting manifest list sha256:8c966fdbd3c49bf9c0d2212ea8d1ca00908834fd6e275c14553a8fc74bc522ce
+#8 exporting manifest list sha256:8c966fdbd3c49bf9c0d2212ea8d1ca00908834fd6e275c14553a8fc74bc522ce 0.0s done
+#8 naming to docker.io/library/vllm-cpu-optimized:latest done
+#8 unpacking to docker.io/library/vllm-cpu-optimized:latest done
+#8 DONE 0.1s
+
+#9 resolving provenance for metadata file
+#9 DONE 0.0s
+ Image vllm-cpu-optimized:latest Built 
+ Network m3_default Creating 
+ Network m3_default Created 
+ Volume m3_hf-cache Creating 
+ Volume m3_hf-cache Created 
+ Container vllm-smollm2 Creating 
+ Container vllm-smollm2 Created 
+ Container vllm-smollm2 Starting 
+ Container vllm-smollm2 Started 
+FAIL: vllm-smollm2 did not become ready within 300s.
+vllm-smollm2  | INFO 07-22 09:30:29 [cpu_worker.py:226] 	OMP tid: 74, core 3
+vllm-smollm2  | INFO 07-22 09:30:29 [cpu_worker.py:226] 	OMP tid: 75, core 4
+vllm-smollm2  | INFO 07-22 09:30:29 [cpu_worker.py:226] 
+vllm-smollm2  | INFO 07-22 09:30:29 [parallel_state.py:1065] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, TP rank 0, EP rank 0
+vllm-smollm2  | INFO 07-22 09:30:29 [weight_utils.py:292] Using model weights format ['*.safetensors']
+vllm-smollm2  | INFO 07-22 09:32:49 [weight_utils.py:308] Time spent downloading weights for HuggingFaceTB/SmolLM2-135M-Instruct: 140.020693 seconds
+vllm-smollm2  | INFO 07-22 09:32:50 [weight_utils.py:345] No model.safetensors.index.json found in remote.
+vllm-smollm2  | Loading safetensors checkpoint shards:   0% Completed | 0/1 [00:00<?, ?it/s]
+vllm-smollm2  | Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:01<00:00,  1.18s/it]
+vllm-smollm2  | Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:01<00:00,  1.18s/it]
+vllm-smollm2  | 
+vllm-smollm2  | INFO 07-22 09:32:51 [default_loader.py:272] Loading weights took 1.19 seconds
+vllm-smollm2  | INFO 07-22 09:32:51 [executor_base.py:113] # cpu blocks: 1456, # CPU blocks: 0
+vllm-smollm2  | INFO 07-22 09:32:51 [executor_base.py:118] Maximum concurrency for 1024 tokens per request: 22.75x
+vllm-smollm2  | INFO 07-22 09:32:54 [llm_engine.py:428] init engine (profile, create kv cache, warmup model) took 3.71 seconds
+vllm-smollm2  | INFO 07-22 09:32:56 [api_server.py:1349] Starting vLLM API server 0 on http://0.0.0.0:8000
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:29] Available routes are:
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /openapi.json, Methods: HEAD, GET
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /docs, Methods: HEAD, GET
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /docs/oauth2-redirect, Methods: HEAD, GET
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /redoc, Methods: HEAD, GET
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /health, Methods: GET
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /load, Methods: GET
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /ping, Methods: POST
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /ping, Methods: GET
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /tokenize, Methods: POST
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /detokenize, Methods: POST
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /v1/models, Methods: GET
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /version, Methods: GET
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /v1/chat/completions, Methods: POST
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /v1/completions, Methods: POST
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /v1/embeddings, Methods: POST
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /pooling, Methods: POST
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /classify, Methods: POST
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /score, Methods: POST
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /v1/score, Methods: POST
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /v1/audio/transcriptions, Methods: POST
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /rerank, Methods: POST
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /v1/rerank, Methods: POST
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /v2/rerank, Methods: POST
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /invocations, Methods: POST
+vllm-smollm2  | INFO 07-22 09:32:56 [launcher.py:37] Route: /metrics, Methods: GET
+vllm-smollm2  | INFO:     Started server process [1]
+vllm-smollm2  | INFO:     Waiting for application startup.
+vllm-smollm2  | INFO:     Application startup complete.
+vllm-smollm2  | INFO:     127.0.0.1:51454 - "GET /health HTTP/1.1" 200 OK
+vllm-smollm2  | INFO:     127.0.0.1:44530 - "GET /health HTTP/1.1" 200 OK
+vllm-smollm2  | INFO:     127.0.0.1:46564 - "GET /health HTTP/1.1" 200 OK
+vllm-smollm2  | INFO:     127.0.0.1:59968 - "GET /health HTTP/1.1" 200 OK
+vllm-smollm2  | INFO:     127.0.0.1:50498 - "GET /health HTTP/1.1" 200 OK
+FAIL m3 (up.sh)
+
+════════ SUMMARY ════════
+FAILED: m3
+===== invocation: 2026-07-22 15:05:31 :: VLLM_PORT=8010 scripts/test-course.sh m3 (port workaround — see known-issue note) =====
+
+════════ m3 ════════
+ Image vllm-cpu-optimized:latest Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 574B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 939B done
+#2 DONE 0.0s
+
+#3 [auth] openeuler/vllm-cpu:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#4 [internal] load metadata for docker.io/openeuler/vllm-cpu:0.9.1-oe2403lts
+#4 DONE 1.3s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 2B done
+#5 DONE 0.0s
+
+#6 [1/2] FROM docker.io/openeuler/vllm-cpu:0.9.1-oe2403lts@sha256:f0ca41ceaa7de6d49ca5c6bfc43deb075c921e54edbf93671dd791669ff5bde5
+#6 resolve docker.io/openeuler/vllm-cpu:0.9.1-oe2403lts@sha256:f0ca41ceaa7de6d49ca5c6bfc43deb075c921e54edbf93671dd791669ff5bde5 0.0s done
+#6 DONE 0.0s
+
+#7 [2/2] RUN sed -i 's/cpu_count_per_numa = cpu_count \/\/ numa_size/cpu_count_per_numa = cpu_count \/\/ numa_size if numa_size > 0 else cpu_count/g'     /workspace/vllm/vllm/worker/cpu_worker.py
+#7 CACHED
+
+#8 exporting to image
+#8 exporting layers done
+#8 exporting manifest sha256:02df48a80bb3366a078575d62454ed1fc13450548f8e7d124aae375143beb9f5 done
+#8 exporting config sha256:94fa013e275cf9e08533ba65995db5b62937274b43f2443d1783f00ee7703049 done
+#8 exporting attestation manifest sha256:828e5bfb7ab02623e3ab4caeecf2774fdaf20a8ef16c6ecf44f9b70700d5916a 0.0s done
+#8 exporting manifest list sha256:fbc60d400fa4f025a66bf779a124d4020105aa96c2482492699227bc97b902cb
+#8 exporting manifest list sha256:fbc60d400fa4f025a66bf779a124d4020105aa96c2482492699227bc97b902cb 0.0s done
+#8 naming to docker.io/library/vllm-cpu-optimized:latest done
+#8 unpacking to docker.io/library/vllm-cpu-optimized:latest done
+#8 DONE 0.1s
+
+#9 resolving provenance for metadata file
+#9 DONE 0.0s
+ Image vllm-cpu-optimized:latest Built 
+ Network m3_default Creating 
+ Network m3_default Created 
+ Volume m3_hf-cache Creating 
+ Volume m3_hf-cache Created 
+ Container vllm-smollm2 Creating 
+ Container vllm-smollm2 Created 
+ Container vllm-smollm2 Starting 
+ Container vllm-smollm2 Started 
+vllm-smollm2 ready after ~220s.
+✅ container-running — vllm-smollm2 container is up
+✅ v1-models-smollm2 — /v1/models lists SmolLM2
+✅ chat-completion-choices — chat completion returns a choices array
+✅ health-endpoint — /health returns HTTP 200
+
+4/4 checks · score 4/4
+PASS m3
+ Container vllm-smollm2 Stopping 
+ Container vllm-smollm2 Stopped 
+ Container vllm-smollm2 Removing 
+ Container vllm-smollm2 Removed 
+ Network m3_default Removing 
+ Volume m3_hf-cache Removing 
+ Volume m3_hf-cache Removed 
+ Network m3_default Removed 
+
+════════ SUMMARY ════════
+ALL MODULES PASS
+===== invocation: 2026-07-22 15:09:28 :: scripts/test-course.sh m3b =====
+
+════════ m3b ════════
+✅ lab-assets-exist — labs/m3b/README.md reference asset exists
+✅ version-variance-admonition — lab.md documents the mlx-lm flag-name version variance (machine-independent, GPU-agnostic)
+✅ mlx-lm-importable-if-venv-present — if ~/mlx-lora-env exists, mlx_lm imports inside it; else SKIP-OK (no GPU/venv assumed on this runner)
+
+3/3 checks · score 3/3
+PASS m3b
+
+════════ SUMMARY ════════
+ALL MODULES PASS
+===== invocation: 2026-07-22 15:09:36 :: scripts/test-course.sh m4 =====
+
+════════ m4 ════════
+local registry ready on :5001 after ~2s.
+✅ kit-installed — kit CLI installed and runs
+✅ registry-up — local registry:2 responds on the v2 API
+✅ pack-push-pull-roundtrip — pack a synthetic modelkit, push to local registry, unpack on a clean dir — tag survives the round trip
+
+3/3 checks · score 3/3
+PASS m4
+
+════════ SUMMARY ════════
+ALL MODULES PASS
+===== invocation: 2026-07-22 15:09:48 :: scripts/test-course.sh m5 =====
+
+════════ m5 ════════
+ Image m5-genai-app Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 572B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 663B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.11-slim
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [1/7] FROM docker.io/library/python:3.11-slim@sha256:db3ff2e1800a8581e2c48a27c3995339d47bdf046da21c7627accd3d51053a93
+#5 resolve docker.io/library/python:3.11-slim@sha256:db3ff2e1800a8581e2c48a27c3995339d47bdf046da21c7627accd3d51053a93 0.0s done
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 124B done
+#6 DONE 0.0s
+
+#7 [2/7] WORKDIR /app
+#7 CACHED
+
+#8 [3/7] RUN apt-get update && apt-get install -y     curl     && rm -rf /var/lib/apt/lists/*
+#8 CACHED
+
+#9 [5/7] RUN pip install --no-cache-dir -r requirements.txt
+#9 CACHED
+
+#10 [6/7] COPY . .
+#10 CACHED
+
+#11 [4/7] COPY requirements.txt .
+#11 CACHED
+
+#12 [7/7] RUN mkdir -p /app/uploads
+#12 CACHED
+
+#13 exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:5b2a709bf6e3eb4e5ae4bec86ae87c7254f7e3e64db76126c28233f8918db9ed done
+#13 exporting config sha256:caed05f3e1840e0449b2d58558d6851e371e571a0615ecb75bc6e8b0592a7f8c done
+#13 exporting attestation manifest sha256:f2c9387a4ac46cec031039762eaea654fcd8d011f046a8f0b4feb8cd4fcb8a30 0.0s done
+#13 exporting manifest list sha256:118fe4326fddf44019180234455b2cd38ae2aa6671ff688863fb3343e4348a15 0.0s done
+#13 naming to docker.io/library/m5-genai-app:latest done
+#13 unpacking to docker.io/library/m5-genai-app:latest 0.0s done
+#13 DONE 0.1s
+
+#14 resolving provenance for metadata file
+#14 DONE 0.0s
+ Image m5-genai-app Built 
+ Network m5_default Creating 
+ Network m5_default Created 
+ Volume m5_chroma_data Creating 
+ Volume m5_chroma_data Created 
+ Container chromadb Creating 
+ Container chromadb Created 
+ Container genai-app Creating 
+ Container genai-app Created 
+ Container chromadb Starting 
+ Container chromadb Started 
+ Container genai-app Starting 
+ Container genai-app Started 
+m5 ready: chromadb + genai-app healthy.
+✅ chromadb-heartbeat — ChromaDB container answers the v2 heartbeat
+✅ streamlit-health — genai-app Streamlit health endpoint returns 200
+✅ app-log-streamlit-started — genai-app log shows Streamlit came up
+✅ rag-roundtrip-grounded-answer — scripted ingest->embed->retrieve->generate round-trip returns the exact runbook command
+
+4/4 checks · score 4/4
+PASS m5
+ Container genai-app Stopping 
+ Container genai-app Stopped 
+ Container genai-app Removing 
+ Container genai-app Removed 
+ Container chromadb Stopping 
+ Container chromadb Stopped 
+ Container chromadb Removing 
+ Container chromadb Removed 
+ Network m5_default Removing 
+ Network m5_default Removed 
+
+════════ SUMMARY ════════
+ALL MODULES PASS
+===== invocation: 2026-07-22 15:10:04 :: scripts/test-course.sh m6 =====
+
+════════ m6 ════════
+ Network m6_default Creating 
+ Network m6_default Created 
+ Volume m6_chroma_data Creating 
+ Volume m6_chroma_data Created 
+ Container chromadb Creating 
+ Container chromadb Created 
+ Container chromadb Starting 
+ Container chromadb Started 
+ Image acme-support-agent:latest Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 565B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 302B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.12-slim
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 358B done
+#5 DONE 0.0s
+
+#6 [1/4] FROM docker.io/library/python:3.12-slim@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de
+#6 resolve docker.io/library/python:3.12-slim@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de 0.0s done
+#6 DONE 0.0s
+
+#7 [3/4] COPY agent/ ./agent/
+#7 CACHED
+
+#8 [2/4] WORKDIR /app
+#8 CACHED
+
+#9 [4/4] COPY docs/ ./docs/
+#9 CACHED
+
+#10 exporting to image
+#10 exporting layers done
+#10 exporting manifest sha256:425eac5a97101d3431a60106eec6e5294721365654d84030ba4b05b371d11be6 done
+#10 exporting config sha256:9220a1c759a0517fa25b62fe4a044422d39955cb44c3351a7ecd1de4ce903c8f done
+#10 exporting attestation manifest sha256:194739952ebf75e26dc5fd2da2a3549e752bddd65b993d8ec8722e617fd46f6a 0.0s done
+#10 exporting manifest list sha256:b965360ee8b48978146f098b88ef918979342d48bd0ba652a56bc9545a723e87 done
+#10 naming to docker.io/library/acme-support-agent:latest done
+#10 unpacking to docker.io/library/acme-support-agent:latest 0.0s done
+#10 DONE 0.1s
+
+#11 resolving provenance for metadata file
+#11 DONE 0.0s
+ Image acme-support-agent:latest Built 
+A new version of ToolHive is available: v0.40.1
+Currently running: v0.33.0
+{"time":"2026-07-22T15:10:17+05:30","level":"INFO","msg":"logging to","path":"/Users/gshah/Library/Application Support/toolhive/logs/fetch.log"}
+m6 ready: chromadb healthy, agent image built, ToolHive fetch server running.
+✅ chromadb-heartbeat — ChromaDB container answers the v2 heartbeat
+✅ agent-agentic-retrieve — agent decides to RETRIEVE and grounds the answer in the exact runbook command
+✅ agent-direct-answer — agent routes a general question to ANSWER DIRECTLY (no retrieval)
+✅ agent-guardrail-blocks — agent's guardrail blocks an unsafe request before any LLM call
+✅ toolhive-fetch-running — ToolHive lists the fetch MCP server as running (after up.sh runs `thv run fetch`)
+✅ toolhive-teardown — thv rm removes the fetch server and its isolation sidecars cleanly
+
+6/6 checks · score 6/6
+PASS m6
+ Container chromadb Stopping 
+ Container chromadb Stopped 
+ Container chromadb Removing 
+ Container chromadb Removed 
+ Network m6_default Removing 
+ Network m6_default Removed 
+
+════════ SUMMARY ════════
+ALL MODULES PASS
+===== invocation: 2026-07-22 15:11:08 :: scripts/test-course.sh m7 =====
+
+════════ m7 ════════
+ Network m7_default Creating 
+ Network m7_default Created 
+ Volume m7_chroma_data Creating 
+ Volume m7_chroma_data Created 
+ Container chromadb Creating 
+ Container chromadb Created 
+ Container chromadb Starting 
+ Container chromadb Started 
+ Image acme-incident-crew:latest Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 562B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 327B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.12-slim
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 369B done
+#5 DONE 0.0s
+
+#6 [1/4] FROM docker.io/library/python:3.12-slim@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de
+#6 resolve docker.io/library/python:3.12-slim@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de 0.0s done
+#6 DONE 0.0s
+
+#7 [2/4] WORKDIR /app
+#7 CACHED
+
+#8 [3/4] COPY crew/ ./crew/
+#8 CACHED
+
+#9 [4/4] COPY docs/ ./docs/
+#9 CACHED
+
+#10 exporting to image
+#10 exporting layers done
+#10 exporting manifest sha256:a4ee852c6b430bd7356870ff606ff10a486bd5e47e3aacfd6ea0a039b2b1bd09 done
+#10 exporting config sha256:2632001f8d2c20f05fa50497ec49d26af9da2a99c69bdcc5b5725dbbbd8d6822 done
+#10 exporting attestation manifest sha256:0baa44c1d1d05c23ac7d30355072db80231360802188109772f462e190f7a763 0.0s done
+#10 exporting manifest list sha256:e8dc0a91b2606c49b89db87e8f6e04aa71e01095a73c4ba9e28d30d6bd23ad02 0.0s done
+#10 naming to docker.io/library/acme-incident-crew:latest done
+#10 unpacking to docker.io/library/acme-incident-crew:latest 0.0s done
+#10 DONE 0.1s
+
+#11 resolving provenance for metadata file
+#11 DONE 0.0s
+ Image acme-incident-crew:latest Built 
+m7 ready: chromadb healthy, crew image built.
+✅ chromadb-heartbeat — ChromaDB container answers the v2 heartbeat
+✅ crew-approve-path — runbook-backed incident (checkout 503) is APPROVED with the exact remediation command
+✅ crew-approve-command — the Fixer quotes the exact runbook command for the approve path
+✅ crew-escalate-path — the relevance gate REJECTS/escalates an incident with no matching runbook (Kafka)
+✅ compose-teardown — compose down removes the m7 network cleanly (teardown-safe)
+
+5/5 checks · score 5/5
+PASS m7
+
+════════ SUMMARY ════════
+ALL MODULES PASS
+===== invocation: 2026-07-22 15:11:30 :: scripts/test-course.sh m8 =====
+
+════════ m8 ════════
+m8 ready: acme-support-agent:latest present locally.
+✅ syft-sbom-packages — syft SBOM (spdx-json) of the local lab image lists packages
+✅ trivy-scan-gated-exit0 — trivy vuln scan of the local image runs with an explicit exit-code gate and exits 0
+✅ grype-second-opinion — grype produces a second vulnerability-scan opinion on the local image
+✅ cosign-present — cosign CLI is installed and runs
+✅ sandbox-network-isolated — the sandbox proves egress is genuinely blocked for generated code (URLError: unreachable or DNS resolution fails under --network none)
+✅ guardrail-eval-passes — the M6 agent's guardrail mini-eval passes deterministically (no model, no ChromaDB)
+
+6/6 checks · score 6/6
+PASS m8
+
+════════ SUMMARY ════════
+ALL MODULES PASS
+===== invocation: 2026-07-22 15:11:55 :: scripts/test-course.sh capstone =====
+--- pre-run docker stats ---
+CONTAINER ID   NAME               CPU %     MEM USAGE / LIMIT   MEM %     NET I/O          BLOCK I/O     PIDS
+315568b4b8e0   opsmate-registry   1.01%     172.7MiB / 256MiB   67.48%    4.34MB / 3.2GB   20.6GB / 0B   10
+
+════════ capstone ════════
+ Image capstone-genai-app Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 584B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 663B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.11-slim
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [1/7] FROM docker.io/library/python:3.11-slim@sha256:db3ff2e1800a8581e2c48a27c3995339d47bdf046da21c7627accd3d51053a93
+#5 resolve docker.io/library/python:3.11-slim@sha256:db3ff2e1800a8581e2c48a27c3995339d47bdf046da21c7627accd3d51053a93 0.0s done
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 124B done
+#6 DONE 0.0s
+
+#7 [2/7] WORKDIR /app
+#7 CACHED
+
+#8 [4/7] COPY requirements.txt .
+#8 CACHED
+
+#9 [5/7] RUN pip install --no-cache-dir -r requirements.txt
+#9 CACHED
+
+#10 [3/7] RUN apt-get update && apt-get install -y     curl     && rm -rf /var/lib/apt/lists/*
+#10 CACHED
+
+#11 [6/7] COPY . .
+#11 CACHED
+
+#12 [7/7] RUN mkdir -p /app/uploads
+#12 CACHED
+
+#13 exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:9e263f3242555fc52431f5b3cea531df0038c2aa9e36c349bd637a5b802e123f done
+#13 exporting config sha256:b44b964434f1568e3b6e1a90ab661ea82a4d1bd5fdc86c9b103329906eb7672e done
+#13 exporting attestation manifest sha256:954665f0475227c8ccfdad287b3a92f76a225d8a64ea0213790b3940677a8a3e 0.0s done
+#13 exporting manifest list sha256:2b3698eba7a640b8d5c41c083e15c025896b7cc2d384ec0ceb7e1383fdd52010 0.0s done
+#13 naming to docker.io/library/capstone-genai-app:latest done
+#13 unpacking to docker.io/library/capstone-genai-app:latest 0.0s done
+#13 DONE 0.1s
+
+#14 resolving provenance for metadata file
+#14 DONE 0.0s
+ Image capstone-genai-app Built 
+ Network capstone_default Creating 
+ Network capstone_default Created 
+ Volume capstone_chroma_data Creating 
+ Volume capstone_chroma_data Created 
+ Container chromadb Creating 
+ Container chromadb Created 
+ Container genai-app Creating 
+ Container genai-app Created 
+ Container chromadb Starting 
+ Container chromadb Started 
+ Container chromadb Waiting 
+ Container chromadb Healthy 
+ Container genai-app Starting 
+ Container genai-app Started 
+ Image acme-incident-crew:latest Building 
+ Image acme-support-agent:latest Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.05kB done
+#1 DONE 0.0s
+
+#2 [agent internal] load build definition from Dockerfile
+#2 transferring dockerfile: 302B done
+#2 DONE 0.0s
+
+#3 [crew internal] load build definition from Dockerfile
+#3 transferring dockerfile: 327B done
+#3 DONE 0.0s
+
+#4 [agent internal] load metadata for docker.io/library/python:3.12-slim
+#4 DONE 0.0s
+
+#5 [crew internal] load .dockerignore
+#5 transferring context: 2B done
+#5 DONE 0.0s
+
+#6 [agent internal] load .dockerignore
+#6 transferring context: 2B done
+#6 DONE 0.0s
+
+#7 [agent internal] load build context
+#7 transferring context: 358B 0.0s done
+#7 DONE 0.0s
+
+#8 [crew internal] load build context
+#8 transferring context: 369B done
+#8 DONE 0.0s
+
+#9 [crew 1/4] FROM docker.io/library/python:3.12-slim@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de
+#9 resolve docker.io/library/python:3.12-slim@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de 0.1s done
+#9 DONE 0.1s
+
+#10 [crew 3/4] COPY crew/ ./crew/
+#10 CACHED
+
+#11 [agent 3/4] COPY agent/ ./agent/
+#11 CACHED
+
+#12 [agent 2/4] WORKDIR /app
+#12 CACHED
+
+#13 [crew 4/4] COPY docs/ ./docs/
+#13 CACHED
+
+#14 [agent 4/4] COPY docs/ ./docs/
+#14 CACHED
+
+#15 [agent] exporting to image
+#15 exporting layers done
+#15 exporting manifest sha256:87a5cdc0432b9e750abd79c08b90b15bc8be1c9a8512d6023f55ef2b03dd3f43 done
+#15 exporting config sha256:66abc7b5c038d71801712012de27fc8eb7f59bd180fcb56dfe160e81244015aa done
+#15 exporting attestation manifest sha256:9d978c8046dde5dfc4358af878814a4608f50b2705fbea035d7d28eb607c84cd
+#15 exporting attestation manifest sha256:9d978c8046dde5dfc4358af878814a4608f50b2705fbea035d7d28eb607c84cd 0.0s done
+#15 exporting manifest list sha256:82dd19beb6a8d7ff6e3faac58e20e161c1940931f8fe293bdbcd7918df435b35 0.0s done
+#15 naming to docker.io/library/acme-support-agent:latest done
+#15 unpacking to docker.io/library/acme-support-agent:latest 0.0s done
+#15 DONE 0.1s
+
+#16 [crew] exporting to image
+#16 exporting layers done
+#16 exporting manifest sha256:84dee62a97d792cd2387ab12ee6dd2239ab5a8849f63043a4ff2b8e307ad7a9c done
+#16 exporting config sha256:20908405ae880c4f6ce91d61f9f852f7722d95e1673c4b16fe681e2f98b3d2fc done
+#16 exporting attestation manifest sha256:c3c08b767bd8d5da1f9d222991e0a64ef03bc7476b713dc5155981332dcf440e 0.0s done
+#16 exporting manifest list sha256:c418ee8465c21871f6108a1af5da9ade0370ecf0bad47646e0a5588dbf46dc70 0.0s done
+#16 naming to docker.io/library/acme-incident-crew:latest done
+#16 unpacking to docker.io/library/acme-incident-crew:latest 0.0s done
+#16 DONE 0.1s
+
+#17 [agent] resolving provenance for metadata file
+#17 DONE 0.0s
+
+#18 [crew] resolving provenance for metadata file
+#18 DONE 0.0s
+ Image acme-support-agent:latest Built 
+ Image acme-incident-crew:latest Built 
+capstone ready: chromadb + genai-app healthy, agent + crew images built.
+✅ platform-check-ready — platform-check.sh confirms every layer (runtime, model serving, host wiring, supply-chain tooling) is present
+✅ chromadb-healthy — shared ChromaDB answers the v2 heartbeat
+✅ genai-app-healthy — Docs Assistant (Streamlit) exposed endpoint returns 200
+✅ agent-grounded-answer — the one-shot support agent grounds its answer in the exact runbook command
+✅ crew-approves-incident — the one-shot incident crew approves a runbook-backed incident end-to-end
+✅ compose-teardown-with-volumes — compose down -v removes containers, network, and volumes cleanly
+
+6/6 checks · score 6/6
+PASS capstone
+
+════════ SUMMARY ════════
+ALL MODULES PASS

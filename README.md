@@ -30,6 +30,17 @@ Labs are authored to run on any OCI runtime (Rancher Desktop, Colima, OrbStack, 
 `planning/lab-tests/`. On Apple Silicon the model server runs natively (Ollama/Metal) and containers
 reach it at `http://host.docker.internal:11434`.
 
+## Pre-workshop smoke test
+
+Run every module's live checks sequentially (memory-safe on a 16 GB laptop) before delivering:
+
+```bash
+scripts/test-course.sh              # all modules
+scripts/test-course.sh m3 m5        # or just specific modules
+```
+
+Exits 0 iff all modules pass; prints a per-module PASS/FAIL and a final summary.
+
 ## Status & continuity
 
 - **Current state:** `planning/STATE.md` · **Build tracker:** `planning/ROADMAP.md` · **Design:** `planning/specs/`.
