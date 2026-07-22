@@ -21,7 +21,7 @@ fi
 docker compose up -d --build
 
 PORT="${VLLM_PORT:-8009}"
-TIMEOUT=180
+TIMEOUT="${VLLM_UP_TIMEOUT:-300}"
 ELAPSED=0
 until curl -sf "http://localhost:${PORT}/v1/models" >/dev/null 2>&1; do
   if [ "$ELAPSED" -ge "$TIMEOUT" ]; then
