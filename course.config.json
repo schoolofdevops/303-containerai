@@ -1,0 +1,202 @@
+{
+  "course": {
+    "slug": "303-containerai",
+    "title": "Containers for GenAI & Agentic AI — The Open-Source Way",
+    "tagline": "Build one realistic system, one step per module — from a bare model call to a shipped multi-agent platform.",
+    "description": "A hands-on 2-day corporate workshop / self-paced course (School of DevOps & AI MLOps/LLMOps catalogue) that teaches container-native GenAI and agentic AI end to end: serving local models, packaging them as OCI artifacts, naive RAG, agentic RAG with MCP tools, multi-agent orchestration, and supply-chain security — all validated live on a 16 GB laptop with open-source tooling.",
+    "author": "Gourav Shah",
+    "organization": "School of DevOps & AI",
+    "audience": "Platform, DevOps, and MLOps engineers comfortable with container basics (build/run/volumes/networks, Compose) who want to run and ship GenAI/agentic workloads container-native.",
+    "project_spine": "Two connected use cases built step by step: the Acme Docs Assistant (naive RAG, Day 1 payoff) and the Acme Support Agent → Incident Crew (agentic RAG → multi-agent, Day 2), shipped together as the Acme AI Support Platform in the capstone.",
+    "advanced_depth_bar": true,
+    "prereq_knowledge": [
+      "Container basics: build, run, volumes, networks, Compose file format",
+      "Git and GitHub; basic CI/CD concepts",
+      "Command-line fluency on macOS or Windows",
+      "Basic Python helps; no ML background required"
+    ]
+  },
+  "repo": {
+    "org": "schoolofdevops",
+    "name": "303-containerai",
+    "src": "schoolofdevops/303-containerai",
+    "labs": "schoolofdevops/303-containerai",
+    "site": "schoolofdevops/303-containerai"
+  },
+  "pages": {
+    "url": "https://schoolofdevops.github.io",
+    "baseUrl": "/303-containerai/"
+  },
+  "stack": {
+    "container_runtime": "Rancher Desktop (docker + docker compose); OCI/Compose-Spec standard, also runs on Colima/OrbStack/Podman/Docker Desktop",
+    "models": "Ollama (native host) — qwen2.5:1.5b, qwen2.5:3b, nomic-embed-text; CPU-vLLM — SmolLM2",
+    "vector_db": "ChromaDB",
+    "registry": "GHCR"
+  },
+  "lab": {
+    "tools": [
+      { "name": "docker", "probe": "docker version", "min": "24", "install": { "macos": "Install Rancher Desktop (includes docker + compose)", "linux": "Install Docker Engine or Rancher Desktop" } },
+      { "name": "docker compose", "probe": "docker compose version", "min": "2" },
+      { "name": "ollama", "probe": "ollama --version", "min": "0.17", "install": { "macos": "brew install ollama", "linux": "curl -fsSL https://ollama.com/install.sh | sh" } },
+      { "name": "kit", "probe": "kit version", "install": { "macos": "brew install jozu-ai/kitops/kitops", "linux": "curl -fsSL https://raw.githubusercontent.com/jozu-ai/kitops/main/install.sh | sh" } },
+      { "name": "thv", "probe": "thv version", "install": { "macos": "brew install stacklok/tap/thv", "linux": "curl -fsSL https://raw.githubusercontent.com/stacklok/toolhive/main/install.sh | sh" } },
+      { "name": "trivy", "probe": "trivy --version", "install": { "macos": "brew install trivy", "linux": "curl -fsSL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh" } },
+      { "name": "syft", "probe": "syft version", "install": { "macos": "brew install syft", "linux": "curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh" } },
+      { "name": "grype", "probe": "grype version", "install": { "macos": "brew install grype", "linux": "curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh" } },
+      { "name": "cosign", "probe": "cosign version", "install": { "macos": "brew install cosign", "linux": "curl -sSfL https://raw.githubusercontent.com/sigstore/cosign/main/install.sh | sh" } },
+      { "name": "node", "probe": "node --version", "min": "22" }
+    ],
+    "environment_noun": "Rancher Desktop lab environment (containers) + native Ollama model server on the host",
+    "requirements": {
+      "ram_min": "16 GB",
+      "ram_recommended": "16 GB",
+      "cpu_min": "4 cores",
+      "cpu_recommended": "8 cores (Apple Silicon M1-M4 or equivalent)",
+      "disk_min": "30 GB free",
+      "disk_recommended": "40 GB free"
+    },
+    "spine": {
+      "mode": "per-module",
+      "path": "labs/<id>",
+      "kind": "compose"
+    },
+    "setup": "Rancher Desktop (docker + compose) running locally; Ollama installed natively on the host serving qwen2.5:1.5b (and nomic-embed-text for RAG modules) at :11434 — on Apple Silicon the model server always runs native, never containerized, and containers reach it at http://host.docker.internal:11434. Each module ships its own labs/<id>/compose.yaml (spine mode: per-module, not grow-in-place).",
+    "simulators": false
+  },
+  "pack": {
+    "domain_module": "devops"
+  },
+  "modules": [
+    {
+      "id": "m1",
+      "slug": "m1-container-native",
+      "label": "M1 · Container-Native GenAI",
+      "title": "Container-Native GenAI",
+      "objectives": [
+        "Explain why container-native (not Docker-native) is the right framing for GenAI workloads",
+        "Identify what containers buy an AI stack",
+        "Understand the Apple Silicon GPU reality and why the model server runs native",
+        "Map the 2026 landscape of declarative agents vs orchestration frameworks",
+        "Use the OpenAI-compatible endpoint as the universal contract"
+      ],
+      "lab_intent": "Stand up the runtime and prove the container-to-native-host wiring: a containerized caller reaches the native Ollama model server via host.docker.internal."
+    },
+    {
+      "id": "m2",
+      "slug": "m2-serving",
+      "label": "M2 · Serving Local Models",
+      "title": "Serving Local Models",
+      "objectives": [
+        "Compare open serving engines: Docker Model Runner, Ollama, llama.cpp, LocalAI",
+        "Explain the OpenAI-compatible endpoint as a universal contract across engines",
+        "Choose GGUF models sized for a 16 GB laptop",
+        "Wire an app to a model endpoint using two patterns (native host vs containerized)"
+      ],
+      "lab_intent": "Call the OpenAI-compatible endpoint from a containerized app pointed at the native Ollama server, and swap engines without changing the app."
+    },
+    {
+      "id": "m3",
+      "slug": "m3-vllm",
+      "label": "M3 · Production Serving with vLLM",
+      "title": "Production Serving with vLLM",
+      "objectives": [
+        "Explain why vLLM exists: throughput and batching versus one-request-at-a-time serving",
+        "Keep the same OpenAI-compatible contract on a bigger engine",
+        "Run the CPU vLLM track locally; understand the GPU track for throughput (documented, not run here)",
+        "Apply quantization in practice and recognize common operational gotchas"
+      ],
+      "lab_intent": "Serve SmolLM2 on CPU vLLM in a container and exercise it through the same OpenAI-compatible contract used in M2."
+    },
+    {
+      "id": "m3b",
+      "slug": "m3b-finetuning",
+      "label": "M3B · Customizing Models with LoRA/QLoRA (optional, GPU-gated)",
+      "title": "Customizing Models with LoRA/QLoRA",
+      "objectives": [
+        "Decide when to fine-tune versus when not to",
+        "Explain LoRA as targeted, low-rank adaptation (the 'sticky notes on a textbook' analogy)",
+        "Understand the fine-tuning toolchain and the GPU reality for this workload",
+        "Treat the frozen container as the reproducible unit of the experiment"
+      ],
+      "lab_intent": "Run a LoRA/QLoRA fine-tune following the Apple Silicon and NVIDIA GPU tracks, and produce a versioned adapter artifact."
+    },
+    {
+      "id": "m4",
+      "slug": "m4-packaging",
+      "label": "M4 · Packaging Models as OCI Artifacts",
+      "title": "Packaging Models as OCI Artifacts",
+      "objectives": [
+        "Explain the problem with loose model files and why OCI artifacts fit models well",
+        "Use KitOps and ModelKit (CNCF + ORAS) to package a model",
+        "Author a Kitfile as a shipping manifest",
+        "Trace the full flow from Kitfile to registry to serving node, including selective pull and multi-registry portability"
+      ],
+      "lab_intent": "Pack a model into a ModelKit with KitOps, push it to a registry, and selectively pull just the layers a serving node needs."
+    },
+    {
+      "id": "m5",
+      "slug": "m5-naive-rag",
+      "label": "M5 · Docs Assistant — Naive RAG",
+      "title": "Docs Assistant — Naive RAG",
+      "objectives": [
+        "Explain the ungrounded-answer problem naive RAG solves",
+        "Map the anatomy of a GenAI application end to end",
+        "Build the naive-RAG pipeline: ingest, embed, retrieve, generate",
+        "Use ChromaDB as a lightweight vector store and recognize where naive RAG breaks down"
+      ],
+      "lab_intent": "Build the Acme Docs Assistant: ingest runbooks, embed them into ChromaDB, and serve grounded answers through a containerized naive-RAG pipeline."
+    },
+    {
+      "id": "m6",
+      "slug": "m6-declarative-agent",
+      "label": "M6 · Declarative Agent — Agentic RAG",
+      "title": "Declarative Agent — Agentic RAG",
+      "objectives": [
+        "Evolve a docs assistant into an agent",
+        "Define an agent declaratively with the three files that define Aria (AGENTS.md + Agent Skills)",
+        "Contrast agentic RAG with naive RAG",
+        "Wire MCP tools via ToolHive, and apply guardrails and memory"
+      ],
+      "lab_intent": "Turn the Docs Assistant into the Aria support agent: declare its profile, connect MCP tools through ToolHive, and add guardrails and memory."
+    },
+    {
+      "id": "m7",
+      "slug": "m7-multi-agent",
+      "label": "M7 · Multi-Agent Incident Crew",
+      "title": "Multi-Agent Incident Crew",
+      "objectives": [
+        "Explain why multi-agent systems earn their keep (the hospital, not superhero, analogy)",
+        "Design a pipeline of specialized agents (Triage → Investigate → Fix → Review)",
+        "Compare two paths to multi-agent orchestration: CrewAI and LangGraph",
+        "Run one shared model endpoint behind four agents and use a Reviewer as a human-in-the-loop proxy"
+      ],
+      "lab_intent": "Stand up the Incident Crew with CrewAI (and optionally LangGraph), all agents sharing one native model endpoint, with the Reviewer agent gating output."
+    },
+    {
+      "id": "m8",
+      "slug": "m8-security",
+      "label": "M8 · Securing & Governing AI Workloads",
+      "title": "Securing & Governing AI Workloads",
+      "objectives": [
+        "Map the AI supply-chain pipeline end to end",
+        "Generate an SBOM as the ingredients label for an image",
+        "Scan for vulnerabilities with two independent scanners and reconcile disagreement",
+        "Sign images for tamper-evidence and sandbox agent/tool/generated-code execution",
+        "Harden the container image"
+      ],
+      "lab_intent": "Generate an SBOM with syft, scan with trivy and grype, sign the image with cosign, and sandbox agent tool execution."
+    },
+    {
+      "id": "m9",
+      "slug": "capstone",
+      "label": "Capstone · Ship the Acme AI Platform",
+      "title": "Capstone: Ship the Acme AI Support Platform",
+      "objectives": [
+        "Assemble the Docs Assistant, Support Agent, and Incident Crew into one deployable Acme AI Support Platform",
+        "Keep the model native and every other component containerized, per the course's defining architectural rule",
+        "Prove the platform ships unchanged across any OCI runtime via CI"
+      ],
+      "lab_intent": "Wire the consolidated compose.yaml for the full platform, run it end to end, and ship it through CI to prove OCI-runtime portability."
+    }
+  ]
+}
