@@ -355,3 +355,12 @@ curl -s http://localhost:11434/api/tags
 You now have a working naive-RAG Docs Assistant. But you have also seen its limits — the pipeline retrieves once, without rewriting the query or verifying whether the retrieved chunks are actually sufficient. Ask "What do I do if the checkout page is slow?" and the answer depends entirely on how well that phrasing matches the embeddings in the index.
 
 Module 6 introduces **agentic RAG**: replacing the single-pass retriever with an agent that can rewrite queries, run multiple retrieval passes, and decide when it has enough evidence to answer — fixing the failure modes from the lesson.
+
+---
+
+## Go deeper
+
+Your Docs Assistant answers questions — but *why* chunk at 500 characters? Why
+top-3? The [Deep Dive (Part 2)](./deep-dive.md) opens the hood: what every
+retrieval parameter controls, how to see the stored chunks and distances
+directly, and a chunking experiment that shows the trade-offs on real data.
