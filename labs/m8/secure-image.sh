@@ -14,7 +14,7 @@
 #       ghcr.io/<your-github-user>/<repo>:<tag>
 # (requires: docker login ghcr.io and a PAT with write:packages scope)
 #
-set -u
+set -eu
 IMAGE="${1:-acme-support-agent:latest}"
 
 echo "==> [1/4] SBOM with syft  (local image — no registry pull)"
