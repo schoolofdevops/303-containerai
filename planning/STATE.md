@@ -4,7 +4,7 @@
 > cleared, reading this + `CLAUDE.md` + `planning/ROADMAP.md` fully restores context. Keep it concise
 > and update it after every task/decision.
 
-**Last updated:** 2026-07-22
+**Last updated:** 2026-07-23
 **Active phase:** ✅ **COURSE COMPLETE** — M1–M8 + Capstone all live + lab-validated. Working on `main`.
 **Live site:** https://schoolofdevops.github.io/303-containerai/ (every page 200)
 **Execution mode:** subagent-driven, grouped into waves; controller reviews + live validation
@@ -48,11 +48,21 @@ separate `deep-dive.checks.json` + new self-contained `05-deepdive.html` deck (2
 decks untouched) + state-tolerant collection re-seed guard + lab "Go deeper" pointer. Gates green:
 `site` build, `run-checks.mjs deep-dive.checks.json` (8/8), deck-diff-since-v1.3.0 (only
 `05-deepdive.html` touched), `scripts/test-course.sh m5` PASS. Learner-QA all-PASS, zero real findings.
-**NEXT:** M7 (v1.5.0) deep-dive plan written and ready to execute, cloned from the M3B plan structure
-with content map from `planning/specs/2026-07-22-depth-retrofit-design.md` §Phase 2:
-- `planning/plans/2026-07-22-m7-deep-dive.md` (agent knobs — temperature, max iterations, tool-loop
-  control, delegation, guardrails; crew knob-variant experiment; deck `07-deepdive.html`; ships as
-  v1.5.0)
+
+M7 Agent-Knobs Deep Dive (`planning/plans/2026-07-22-m7-deep-dive.md`) is **SHIPPED-pending as
+v1.5.0** (2026-07-23, release-prep commit only — no push/tag yet, controller ships after final
+review) — page (real per-agent temps, no-loop design, string-handoff + triage-not-fed-to-retrieval
+finding, code-gates, Variant A temp experiment, Variant B gate-bypass with the gate-is-the-determinism
+teaching) + separate `deep-dive.checks.json` (9/9) + new self-contained `07-deepdive.html` deck
+(18 slides, existing decks untouched) + lab "Go deeper" pointer. Gates green: `site` build,
+`run-checks.mjs deep-dive.checks.json` (9/9), deck-diff-since-v1.4.0 (only `07-deepdive.html`
+touched), `scripts/test-course.sh m7` PASS. Learner-QA PASS (path blocker + honesty claim fixed,
+live-proven).
+
+**PHASE 2 COMPLETE (pending v1.5.0 ship):** all four priority deep dives (M3B → M3 → M5 → M7) done.
+**NEXT:** Phase 3 enrichments (sims, Container X-Ray live-tool) per
+`planning/specs/2026-07-22-depth-retrofit-design.md` — time-permitting / post-workshop. Breadth
+modules (non-priority deep dives) parked.
 
 ## Post-completion work (2026-07-05, later)
 

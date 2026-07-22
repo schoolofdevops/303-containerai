@@ -5,6 +5,16 @@ All notable changes to this course build are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-07-23
+
+### Added
+
+- M7 Deep Dive (Part 2): agent knobs under the hood (per-agent temperature strategy, bounded pipeline
+  vs agentic loops, delegation handoff incl. the triage-not-fed-to-retrieval design observation,
+  code-level guardrails vs prompt asks, live experiments: temperature instability + gate-bypass
+  showing the gate is what pins the outcome), new self-contained 18-slide deck — existing decks
+  unchanged, `deep-dive.checks.json` stage, lab "Go deeper" pointer.
+
 ## [1.4.0] - 2026-07-22
 
 ### Added
