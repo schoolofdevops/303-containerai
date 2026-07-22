@@ -655,7 +655,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- ============ SLIDE 16 — SCENE: rubber stamp over mismatched runbook ============ -->
 <section>
   <h2 class="t">Bypass one gate and the crew launders a fabricated command through two agents</h2>
-  <p class="s">With the relevance gate always passing, the Kafka incident retrieves the wrong runbook, the Fixer invents a command, and the Reviewer approves it as "backed by a runbook."</p>
+  <p class="s">With the relevance gate always passing, the Kafka incident retrieves the wrong runbook, the Fixer invents a command, and in this captured run the Reviewer approves it as "backed by a runbook."</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="A rubber stamp marked approved coming down over a torn mismatched runbook page held together with the wrong staple, with red ink lines bleeding from the stamp mark">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-dasharray="9 7">
       <rect x="140" y="100" width="260" height="180" rx="8" fill="var(--p-red)" transform="rotate(-3 270 190)"/>
@@ -685,9 +685,9 @@ footer, header, hgroup, main, menu, nav, section {
 
 <!-- ============ SLIDE 17 — NUMBERED ROWS: comparison table summary ============ -->
 <section>
-  <h2 class="t">Judge the marker strictly, judge the prose by shape</h2>
-  <p class="s">OUTCOME: and which stages ran are exact reproducible facts. Wording is small-model noise. Variant B is not noise — it's a clean reproducible failure.</p>
-  <svg viewBox="0 0 1100 300" role="img" aria-label="Three numbered rows summarizing baseline approved with five calls, variant A approved across three runs with drifting prose, variant B approved on an incident the baseline correctly rejected, flagged as a clean reproducible failure not instability">
+  <h2 class="t">The gate pins the marker — remove it and the marker stops being pinned</h2>
+  <p class="s">OUTCOME: and which stages ran are exact reproducible facts — while the gate is intact. Wording is small-model noise. Remove the gate: wrong runbook every run, but OUTCOME itself flips run to run.</p>
+  <svg viewBox="0 0 1100 300" role="img" aria-label="Three numbered rows summarizing baseline approved with five calls, variant A approved across three runs with drifting prose, variant B retrieving the wrong runbook every run while its outcome marker flips between approved and rejected run to run because the gate that pinned it is gone">
     <g class="lbl-b" text-anchor="middle" fill="#1e1e1e">
       <circle cx="70" cy="45" r="22" fill="var(--p-blue)" stroke="#1e1e1e" stroke-width="2"/>
       <text x="70" y="53" class="num">1</text>
@@ -700,10 +700,10 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="115" y="60" text-anchor="start" class="lbl-g">the reference run, nothing changed</text>
     <text x="115" y="125" text-anchor="start" class="lbl-b">Variant A — APPROVED &#215;3, prose drifted</text>
     <text x="115" y="145" text-anchor="start" class="lbl-g">structural outcome stable; wording is not</text>
-    <text x="115" y="210" text-anchor="start" class="lbl-b">Variant B — APPROVED (baseline: REJECTED)</text>
-    <text x="115" y="230" text-anchor="start" class="lbl-g" fill="#c62828">not instability — a clean, reproducible failure</text>
+    <text x="115" y="210" text-anchor="start" class="lbl-b">Variant B — gate removed, wrong runbook every run</text>
+    <text x="115" y="230" text-anchor="start" class="lbl-g" fill="#c62828">but OUTCOME itself flips run to run — not stable</text>
   </svg>
-  <p class="takeaway">Variant B isn't noise like Variant A — it's a deterministic consequence of removing a gate, reproducible every time you run it with the gate off.</p>
+  <p class="takeaway">Variant B is structural AND unstable: wrong runbook every run, but no gate left to pin the verdict — that unpredictability is the finding. The gate, not temperature, was the determinism.</p>
   <div class="pageno">M7-DD·17</div>
 </section>
 

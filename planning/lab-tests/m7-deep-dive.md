@@ -85,6 +85,22 @@ said YES), Reviewer approved it (string check `APPROVED`).
 
 ## Experiment: Variant A — Temperature 0 → 0.9 on Triage, 3 sequential repeats
 
+> **2026-07-23 correction:** the commands transcribed below ("Modified `crew.py` line 65" +
+> bare `python3 crew.py`) describe editing the tracked source directly and running it outside a
+> container — that is **not** the method the shipped page uses, and it contradicts this same repo's
+> `crew-source-untouched` check, which asserts `labs/m7/crew/crew.py` is never modified. The page's
+> actual, currently-published method (`site/docs/m7-multi-agent/deep-dive.md`, §6 Variant A) is:
+> copy `crew.py` to a scratch dir, `sed` the copy to swap `temperature=0` → `temperature=0.9` on the
+> Triage call site, build a one-off Docker image from that patched copy (`docker build ... --build-arg
+> CREW_FILE=crew.py.deepdive-hot-triage`), then run the image 3× with `docker run` against the
+> shared `m7_default` network — never a bare `python3 crew.py` against the tracked file. The
+> transcripts and headline finding below (`OUTCOME: APPROVED` stable ×3, Triage prose degrading) are
+> consistent with the real captured evidence folded into the page's Expected-output blocks; only the
+> *commands* shown here were transcribed with the wrong (untracked-edit) method. Same correction
+> applies to the Variant B block below — it shows `python3 crew-no-gate.py` run directly; the actual
+> method is the same patch-a-copy → `docker build` → `docker run` pattern, not a bare local
+> interpreter invocation.
+
 Modified `crew.py` temperature on line 65 from `0` to `0.9`, keeping Investigator, Fixer, Reviewer
 at their original values.
 
@@ -279,6 +295,18 @@ $ node scripts/run-checks.mjs labs/m7/deep-dive.checks.json
 ```
 
 Both runs 7/7. `deep-dive.checks.json` was not modified — all asserts matched end-state exactly.
+
+> **2026-07-23 correction:** the two "Mid-run"/"Post-teardown" blocks above list check IDs
+> (`triage-temperature-documented`, `variant-logs-if-run`, `fixer-default-temp-documented`,
+> `gate-bypass-evidence-present`) that never existed in `labs/m7/deep-dive.checks.json` — they were
+> transcribed wrong at authoring time. The actual check IDs present at that point in history
+> (commit `6313d56`, the pre-QA-fix version, still 7 checks) were: `chromadb-up-if-running`,
+> `crew-source-untouched`, `no-deepdive-images-left`, `variant-transcripts`, `comparison-table`,
+> `outcome-markers-present`, `temperature-values-documented`. The 7/7 pass count itself is accurate
+> (both mid-run and post-teardown genuinely passed 7/7 at that point); only the printed check names
+> were wrong. The file has since grown to 9 checks (commit `7e949a9`, adding
+> `no-hardcoded-author-path` and `gate-determinism-claim-honest`) — see the re-run block after the
+> 2026-07-23 Learner-QA-fixes section below for the current 9/9 result with real IDs.
 
 ---
 

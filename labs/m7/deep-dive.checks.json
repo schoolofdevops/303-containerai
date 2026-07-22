@@ -15,7 +15,7 @@
     { "id": "comparison-table", "describe": "deep-dive page carries the live knob-variant comparison table",
       "run": "grep -c 'Variant' site/docs/m7-multi-agent/deep-dive.md",
       "assert": { "exit": 0 } },
-    { "id": "outcome-markers-present", "describe": "deep-dive page shows both APPROVED and REJECTED outcome markers from the folded experiment transcripts",
+    { "id": "outcome-markers-present", "describe": "deep-dive page shows the APPROVED outcome marker from the folded experiment transcripts",
       "run": "grep -c 'OUTCOME: APPROVED' site/docs/m7-multi-agent/deep-dive.md",
       "assert": { "exit": 0 } },
     { "id": "temperature-values-documented", "describe": "deep-dive page documents the crew's actual per-agent temperature values",
