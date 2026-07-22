@@ -329,3 +329,13 @@ footprint flat.
 ## What's next
 
 Module 8 hardens and ships the crew: adding structured output schemas, retry logic, and a production-grade review workflow. The four profiles and one shared model stay the same; the infrastructure around them gets production-ready.
+
+---
+
+## Go deeper
+
+Your Incident Crew works — but *why* temperature 0 for Triage? What actually
+stops an agent from looping forever? The [Deep Dive (Part 2)](./deep-dive.md)
+opens the hood: every knob this crew sets, where its guardrails live in code,
+and two live experiments — one that shows what higher temperature does, and one
+that shows exactly what breaks when you remove a gate.
