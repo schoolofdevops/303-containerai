@@ -83,7 +83,7 @@ behavior-shaping tasks; reach for that only after `q_proj`/`v_proj` alone platea
 `dropout` on the LoRA path works the same as dropout anywhere in a neural net: during training,
 it randomly zeroes out a fraction of the adapter's activations on each step, so the adapter
 can't over-rely on any one path. On an eight-example toy dataset like the lab's, dropout matters
-less than it will on your real 500–2000-example corpate-docs run — with more data pushing more
+less than it will on your real 500–2000-example corporate-docs run — with more data pushing more
 gradient signal through a small number of parameters, dropout is what keeps the adapter from
 memorizing example order instead of learning the pattern.
 
@@ -265,11 +265,14 @@ so you can compare them side by side instead of overwriting one adapter with the
 
 :::note[Flags pinned during validation]
 
-The core lab already documents that `mlx_lm.lora`'s rank/learning-rate flags vary by version
-(`--num-layers` vs. older `--lora-layers`; see the lab's "Flag name varies by mlx-lm version"
-admonition). The flag names below are drafted from the current documented convention and are
-**pinned to the exact working flags during live lab validation** — check `mlx_lm.lora --help`
-on your installed version before running if the command below errors on an unrecognized flag.
+Pinned live against **mlx-lm 0.31.3**. `mlx_lm.lora --help` on this version has **no dedicated
+rank flag** — `--lora-rank` does not exist. Rank (and `alpha`, exposed here as `scale`) live only
+in `lora_parameters` inside a YAML file passed via `-c/--config`; the CLI default is
+`lora_parameters: {rank: 8, dropout: 0.0, scale: 20.0}`. `--learning-rate` **is** a real CLI flag
+in this version and needs no config file. `--num-layers` is also a direct CLI flag (default 16;
+the lab and this page both override it to 4). If your installed version differs, run
+`mlx_lm.lora --help` first and adjust — Variant A below may need updating back to a `--lora-rank`
+flag on older/newer releases that expose one directly.
 
 :::
 
@@ -291,14 +294,41 @@ mlx_lm.lora \
 **Expected output**
 
 ```text
-<expected output — folded in during live lab validation>
+Loading pretrained model
+Fetching 7 files: 100%|██████████| 7/7 [00:00<00:00]
+Loading datasets
+Training
+Trainable parameters: 0.148% (0.733M/494.033M)
+Starting training..., iters: 50
+Iter 1: Val loss 3.721, Val took 0.726s
+Iter 10: Train loss 2.670, Learning Rate 1.000e-05, It/sec 13.980, Tokens/sec 1326.746, Trained Tokens 949, Peak mem 1.290 GB
+Iter 20: Train loss 1.056, Learning Rate 1.000e-05, It/sec 14.787, Tokens/sec 1418.100, Trained Tokens 1908, Peak mem 1.290 GB
+Iter 25: Saved adapter weights to adapters-baseline/adapters.safetensors and adapters-baseline/0000025_adapters.safetensors.
+Iter 30: Train loss 0.568, Learning Rate 1.000e-05, It/sec 15.192, Tokens/sec 1411.343, Trained Tokens 2837, Peak mem 1.293 GB
+Iter 40: Train loss 0.305, Learning Rate 1.000e-05, It/sec 14.860, Tokens/sec 1431.051, Trained Tokens 3800, Peak mem 1.293 GB
+Iter 50: Val loss 0.148, Val took 0.381s
+Iter 50: Train loss 0.200, Learning Rate 1.000e-05, It/sec 14.987, Tokens/sec 1413.245, Trained Tokens 4743, Peak mem 1.293 GB
+Iter 50: Saved adapter weights to adapters-baseline/adapters.safetensors and adapters-baseline/0000050_adapters.safetensors.
+Saved final weights to adapters-baseline/adapters.safetensors.
 ```
 
+Real run, ~7.5s wall-clock (model was already cached from the core lab; a cold download adds
+several minutes). Trainable parameters: 0.733M of 494.033M (0.148%) — the notepad next to a
+494M-parameter textbook.
+
 **Variant A — smaller rank** (narrower notepad; fewer trainable parameters per adapted layer).
-`mlx_lm.lora` takes rank via `--lora-parameters` config or a dedicated rank flag depending on
-version — pinned during validation:
+On mlx-lm 0.31.3 there is no `--lora-rank` CLI flag — rank only exists inside `lora_parameters`
+in a YAML config passed via `-c`. Write a 4-line config, then pass it alongside the same CLI
+flags used for the baseline:
 
 ```bash
+cat > rank4.yaml << 'EOF'
+lora_parameters:
+  rank: 4
+  dropout: 0.0
+  scale: 20.0
+EOF
+
 mlx_lm.lora \
   --model Qwen/Qwen2.5-0.5B-Instruct \
   --train \
@@ -306,16 +336,37 @@ mlx_lm.lora \
   --iters 50 \
   --batch-size 1 \
   --num-layers 4 \
-  --lora-rank 4 \
   --save-every 25 \
-  --adapter-path ./adapters-variant-a
+  --adapter-path ./adapters-variant-a \
+  -c rank4.yaml
 ```
 
 **Expected output**
 
 ```text
-<expected output — folded in during live lab validation>
+Loading configuration file rank4.yaml
+Loading pretrained model
+Fetching 7 files: 100%|██████████| 7/7 [00:00<00:00]
+Loading datasets
+Training
+Trainable parameters: 0.074% (0.367M/494.033M)
+Starting training..., iters: 50
+Iter 1: Val loss 3.721, Val took 0.704s
+Iter 10: Train loss 3.107, Learning Rate 1.000e-05, It/sec 13.953, Tokens/sec 1324.154, Trained Tokens 949, Peak mem 1.278 GB
+Iter 20: Train loss 1.670, Learning Rate 1.000e-05, It/sec 14.831, Tokens/sec 1422.322, Trained Tokens 1908, Peak mem 1.278 GB
+Iter 25: Saved adapter weights to adapters-variant-a/adapters.safetensors and adapters-variant-a/0000025_adapters.safetensors.
+Iter 30: Train loss 0.977, Learning Rate 1.000e-05, It/sec 15.226, Tokens/sec 1414.482, Trained Tokens 2837, Peak mem 1.280 GB
+Iter 40: Train loss 0.607, Learning Rate 1.000e-05, It/sec 14.909, Tokens/sec 1435.749, Trained Tokens 3800, Peak mem 1.280 GB
+Iter 50: Val loss 0.374, Val took 0.382s
+Iter 50: Train loss 0.449, Learning Rate 1.000e-05, It/sec 15.138, Tokens/sec 1427.513, Trained Tokens 4743, Peak mem 1.280 GB
+Iter 50: Saved adapter weights to adapters-variant-a/adapters.safetensors and adapters-variant-a/0000050_adapters.safetensors.
+Saved final weights to adapters-variant-a/adapters.safetensors.
 ```
+
+Trainable parameters dropped from 0.733M (rank 8) to exactly half, 0.367M (rank 4) — confirms
+the "16x from r=4 to r=64" scaling claim in §1: parameter count scales linearly with rank. Loss
+at Iter 50 is measurably higher than the baseline (0.449 vs. 0.200 train, 0.374 vs. 0.148 val) —
+the narrower notepad genuinely has less capacity, visible even on this trivial 8-example set.
 
 **Variant B — higher learning rate** (10x the default, to see the oscillation/instability signal
 discussed in §3):
@@ -336,8 +387,35 @@ mlx_lm.lora \
 **Expected output**
 
 ```text
-<expected output — folded in during live lab validation>
+Loading pretrained model
+Fetching 7 files: 100%|██████████| 7/7 [00:00<00:00]
+Loading datasets
+Training
+Trainable parameters: 0.148% (0.733M/494.033M)
+Starting training..., iters: 50
+Iter 1: Val loss 3.721, Val took 0.632s
+Iter 10: Train loss 1.353, Learning Rate 1.000e-04, It/sec 13.979, Tokens/sec 1326.580, Trained Tokens 949, Peak mem 1.290 GB
+Iter 20: Train loss 0.226, Learning Rate 1.000e-04, It/sec 14.925, Tokens/sec 1431.295, Trained Tokens 1908, Peak mem 1.290 GB
+Iter 25: Saved adapter weights to adapters-variant-b/adapters.safetensors and adapters-variant-b/0000025_adapters.safetensors.
+Iter 30: Train loss 0.134, Learning Rate 1.000e-04, It/sec 14.829, Tokens/sec 1377.602, Trained Tokens 2837, Peak mem 1.293 GB
+Iter 40: Train loss 0.069, Learning Rate 1.000e-04, It/sec 14.904, Tokens/sec 1435.236, Trained Tokens 3800, Peak mem 1.293 GB
+Iter 50: Val loss 0.028, Val took 0.383s
+Iter 50: Train loss 0.054, Learning Rate 1.000e-04, It/sec 15.020, Tokens/sec 1416.364, Trained Tokens 4743, Peak mem 1.293 GB
+Iter 50: Saved adapter weights to adapters-variant-b/adapters.safetensors and adapters-variant-b/0000050_adapters.safetensors.
+Saved final weights to adapters-variant-b/adapters.safetensors.
 ```
+
+Real result, and it complicates the prediction above: on this eight-example toy set, 10x the
+learning rate converged **faster and lower** (train loss 0.054 vs. baseline's 0.200), with no
+visible oscillation — Val loss drops monotonically from 3.721 straight to 0.028. Read that
+correctly: it does **not** mean "always crank the learning rate." It means eight examples over
+50 iterations is too small and too easy a problem to expose instability — the loss surface here
+is smooth enough that a bigger step still points the right way every time. The instability
+signature from §3 shows up on harder, larger, noisier real datasets where a 10x learning rate
+overshoots a much bumpier loss surface. Toy-scale results like this one are exactly why the
+methodology in §5 insists on held-out prompts, not just a loss number: a suspiciously good loss
+curve on a trivial dataset tells you about the dataset's easiness, not the learning rate's
+safety at production scale.
 
 Generate from all three adapters against the same two fixed prompts (one from the training
 distribution, one novel):
@@ -356,28 +434,101 @@ done
 **Expected output**
 
 ```text
-<expected output — folded in during live lab validation>
+=== adapters-baseline ===
+==========
+{"severity": "high", "host": "web-01", "metric": "cpu", "threshold": "90%", "duration": "5m", "action": "page-oncall"}
+==========
+Prompt: 51 tokens, 157.434 tokens-per-sec
+Generation: 44 tokens, 120.644 tokens-per-sec
+Peak memory: 1.104 GB
+
+=== adapters-variant-a ===
+==========
+{"severity": "high", "host": "web-01", "metric": "cpu", "threshold": "90%", "duration": "5m", "action": "page-oncall"}
+==========
+Prompt: 51 tokens, 510.298 tokens-per-sec
+Generation: 44 tokens, 121.586 tokens-per-sec
+Peak memory: 1.099 GB
+
+=== adapters-variant-b ===
+==========
+{"severity": "high", "host": "web-01", "metric": "cpu", "threshold": "90%", "duration": "5m", "action": "page-oncall"}
+==========
+Prompt: 51 tokens, 684.600 tokens-per-sec
+Generation: 44 tokens, 119.853 tokens-per-sec
+Peak memory: 1.094 GB
 ```
+
+All three reproduce the exact training example verbatim — expected, since this prompt is one of
+the eight training rows, so this only proves memorization, not generalization. The real test is
+a prompt none of the adapters ever saw:
+
+```bash
+for adapter in adapters-baseline adapters-variant-a adapters-variant-b; do
+  echo "=== $adapter (held-out) ==="
+  mlx_lm.generate \
+    --model Qwen/Qwen2.5-0.5B-Instruct \
+    --adapter-path "./$adapter" \
+    --prompt "Summarise this alert: GPU temperature above 85C on ml-worker-07 for 2 minutes." \
+    --max-tokens 80
+done
+```
+
+**Expected output**
+
+```text
+=== adapters-baseline (held-out) ===
+==========
+{"severity": "high", "host": "ml-worker-07", "metric": "gpu", "threshold": "85", "duration": "2m", "action": "page-oncall"}
+==========
+Prompt: 53 tokens, 302.072 tokens-per-sec
+Generation: 45 tokens, 120.082 tokens-per-sec
+Peak memory: 1.103 GB
+
+=== adapters-variant-a (held-out) ===
+==========
+{"severity": "high", "host": "ml-worker-07", "metric": "gpu", "threshold": "85", "duration": "2m", "action": "page-oncall"}
+==========
+Prompt: 53 tokens, 689.625 tokens-per-sec
+Generation: 45 tokens, 121.385 tokens-per-sec
+Peak memory: 1.096 GB
+
+=== adapters-variant-b (held-out) ===
+==========
+{"severity": "high", "host": "ml-worker-07", "metric": "gpu", "threshold": "85", "duration": "2m", "action": "page-oncall"}
+==========
+Prompt: 53 tokens, 274.515 tokens-per-sec
+Generation: 45 tokens, 120.128 tokens-per-sec
+Peak memory: 1.108 GB
+```
+
+All three variants generalized correctly on a genuinely unseen alert — right JSON shape, right
+field values inferred from a metric/host/duration combination none of them trained on. At this
+toy scale, all three ranks and both learning rates cleared the bar; the differences that matter
+show up in the loss numbers above, not in this one generation.
 
 Fold the results into this comparison table:
 
 | Variant | Rank | Learning rate | Final train loss | Loss trajectory | Generation (held-out prompt) |
 |---|---|---|---|---|---|
-| Baseline | default | default (~1e-5) | *pinned during validation* | *pinned during validation* | *pinned during validation* |
-| Variant A — smaller rank | 4 | default (~1e-5) | *pinned during validation* | *pinned during validation* | *pinned during validation* |
-| Variant B — higher LR | default | 1e-4 (10x) | *pinned during validation* | *pinned during validation* | *pinned during validation* |
+| Baseline | 8 (default) | 1e-05 (default) | 0.200 (val 0.148) | 3.721 → 2.670 → 1.056 → 0.568 → 0.305 → 0.200, smooth monotonic drop | Correct JSON, right fields (gpu/85/2m/page-oncall) |
+| Variant A — smaller rank | 4 | 1e-05 (default) | 0.449 (val 0.374) | 3.721 → 3.107 → 1.670 → 0.977 → 0.607 → 0.449, smooth but converges higher | Correct JSON, right fields — capacity cut didn't break generalization at this toy scale |
+| Variant B — higher LR | 8 (default) | 1e-04 (10x) | 0.054 (val 0.028) | 3.721 → 1.353 → 0.226 → 0.134 → 0.069 → 0.054, smooth and *faster* than baseline, no oscillation | Correct JSON, right fields |
 
-What to look for once the real numbers land: Variant A should converge to a similar final loss
-on this toy dataset (eight examples is easy to fit at any reasonable rank) but would show its
-capacity ceiling first on a larger, more varied real corpus. Variant B is the one to watch for
-the instability signature from §3 — a 10x learning rate on this small a dataset is a plausible
-way to see loss oscillate rather than fall smoothly.
+What the real numbers show: Variant A (rank 4) converges to a measurably **higher** final loss
+than the rank-8 baseline (0.449 vs. 0.200) — the capacity cut is real and visible even on eight
+examples, confirming §1's claim that rank is the primary capacity dial. Variant B (10x LR) did
+**not** show the instability signature from §3 — it converged faster and lower, with a smooth
+monotonic curve. That's a genuine result, not a failure to reproduce the theory: eight examples
+over 50 iterations is too small and too easy a loss surface to expose learning-rate instability.
+The instability signature is real, but you need a harder, larger, noisier dataset to see it — a
+useful lesson in its own right about not over-generalizing from toy-scale experiments.
 
 Teardown for this section only — remove the variant dirs, keep the venv and training data if you
 plan to keep experimenting:
 
 ```bash
-rm -rf ~/mlx-lora-lab/adapters-baseline ~/mlx-lora-lab/adapters-variant-a ~/mlx-lora-lab/adapters-variant-b
+rm -rf ~/mlx-lora-lab/adapters-baseline ~/mlx-lora-lab/adapters-variant-a ~/mlx-lora-lab/adapters-variant-b ~/mlx-lora-lab/rank4.yaml
 ```
 
 ---
@@ -387,7 +538,7 @@ rm -rf ~/mlx-lora-lab/adapters-baseline ~/mlx-lora-lab/adapters-variant-a ~/mlx-
 Remove only what this page added on top of the lab:
 
 ```bash
-rm -rf ~/mlx-lora-lab/adapters-baseline ~/mlx-lora-lab/adapters-variant-a ~/mlx-lora-lab/adapters-variant-b
+rm -rf ~/mlx-lora-lab/adapters-baseline ~/mlx-lora-lab/adapters-variant-a ~/mlx-lora-lab/adapters-variant-b ~/mlx-lora-lab/rank4.yaml
 ```
 
 Keep `~/mlx-lora-lab/train.jsonl` / `valid.jsonl` and `~/mlx-lora-env` if you're continuing to
@@ -414,7 +565,7 @@ the core lab's Step A-6 teardown (removes the venv and `~/mlx-lora-lab` entirely
   chat template before touching rank or learning rate.
 - **Gradient accumulation, not a bigger `--batch-size`, is the first lever on a memory-constrained
   machine.** **Use it when:** you're scaling a toy fine-tune (like this lab's eight examples) up
-  to a real 500–2000 example corpate-docs dataset on the same 16 GB laptop and start seeing
+  to a real 500–2000 example corporate-docs dataset on the same 16 GB laptop and start seeing
   memory pressure.
 
 :::
