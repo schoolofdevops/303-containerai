@@ -4,10 +4,16 @@
 > cleared, reading this + `CLAUDE.md` + `planning/ROADMAP.md` fully restores context. Keep it concise
 > and update it after every task/decision.
 
-**Last updated:** 2026-07-05
+**Last updated:** 2026-07-22
 **Active phase:** ✅ **COURSE COMPLETE** — M1–M8 + Capstone all live + lab-validated. Working on `main`.
 **Live site:** https://schoolofdevops.github.io/303-containerai/ (every page 200)
 **Execution mode:** subagent-driven, grouped into waves; controller reviews + live validation
+
+## Depth retrofit (2026-07-22)
+
+**Fork staging live** at https://initcron.github.io/303-containerai/. Deploy flow: push local `main` to
+`fork` remote → fork Actions auto-deploys → QA on staging → merge/push to `origin` only after green gates.
+Enables safe iteration and validation before promoting to the production schoolofdevops site.
 
 ## Post-completion work (2026-07-05, later)
 
