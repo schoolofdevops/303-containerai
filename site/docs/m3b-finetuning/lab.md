@@ -405,3 +405,12 @@ HF_HUB_DISABLE_XET=1 hf download Qwen/Qwen2.5-0.5B-Instruct
 Once cached, the page's Step A-3 command runs as written with no further changes.
 
 :::
+
+---
+
+## Go deeper
+
+You have a working adapter — but *why* rank 8? Why that learning rate? The
+[Deep Dive (Part 2)](./deep-dive.md) opens the hood: what each parameter
+controls, how to read a loss curve, and a side-by-side experiment you can run
+in ~15 minutes.
