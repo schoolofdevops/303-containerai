@@ -81,6 +81,7 @@ const sidebars: SidebarsConfig = {
         'm7-multi-agent/lesson',
         'm7-multi-agent/lab',
         'm7-multi-agent/quiz',
+        'm7-multi-agent/deep-dive',
       ],
     },
     {

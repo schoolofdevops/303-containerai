@@ -1,0 +1,25 @@
+{
+  "checks": [
+    { "id": "chromadb-up-if-running", "describe": "ChromaDB heartbeat responds if the m7 lab is currently up (else SKIP-OK)",
+      "run": "curl -sf http://localhost:${M7_CHROMA_PORT:-8000}/api/v2/heartbeat >/dev/null 2>&1 && echo UP || echo SKIP-OK",
+      "assert": { "matches": "^(UP|SKIP-OK)$" } },
+    { "id": "crew-source-untouched", "describe": "the tracked crew.py is never modified by the deep-dive experiment (patches only ever touch copies)",
+      "run": "cd /Users/gshah/work/apps/learning/303-containerai && git status --short labs/m7/crew/crew.py | wc -l | tr -d ' '",
+      "assert": { "matches": "^0$" } },
+    { "id": "no-deepdive-images-left", "describe": "deep-dive-only images (hot-triage, no-gate) are cleaned up, or were never built (SKIP-OK)",
+      "run": "PATH=\"$HOME/.rd/bin:$PATH\" docker images -q acme-incident-crew:hot-triage acme-incident-crew:no-gate 2>/dev/null | wc -l | tr -d ' '",
+      "assert": { "matches": "^0$" } },
+    { "id": "variant-transcripts", "describe": "knob-variant run transcripts produced by the experiment (or not yet run)",
+      "run": "ls ~/crew-deepdive-lab/variant-*.log 2>/dev/null | wc -l | tr -d ' ' || echo 0",
+      "assert": { "matches": "^[0-9]+$" } },
+    { "id": "comparison-table", "describe": "deep-dive page carries the live knob-variant comparison table",
+      "run": "grep -c 'Variant' site/docs/m7-multi-agent/deep-dive.md",
+      "assert": { "exit": 0 } },
+    { "id": "outcome-markers-present", "describe": "deep-dive page shows both APPROVED and REJECTED outcome markers from the folded experiment transcripts",
+      "run": "grep -c 'OUTCOME: APPROVED' site/docs/m7-multi-agent/deep-dive.md",
+      "assert": { "exit": 0 } },
+    { "id": "temperature-values-documented", "describe": "deep-dive page documents the crew's actual per-agent temperature values",
+      "run": "grep -Ec 'temperature=0|temperature=0.2|temperature=0.9' site/docs/m7-multi-agent/deep-dive.md",
+      "assert": { "exit": 0 } }
+  ]
+}
