@@ -191,6 +191,9 @@ docker compose down
 
 ### Step 5 — Package the model (M4)
 
+This step packages the model weights you downloaded in the [M4 lab](../m4-packaging/lab)'s Step 2 —
+if you skipped M4, run that download first.
+
 ```bash
 export GITHUB_USER=your-github-username
 cd labs/m4

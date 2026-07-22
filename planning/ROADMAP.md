@@ -30,6 +30,19 @@ Legend: ✅ done · 🔄 in progress · ⬜ pending
 | Setup pages (prerequisites, gpu-reality) | ✅ | — | — | — | (authored in polish) |
 
 ## Post-M1 follow-ups
-- ⬜ Extract `course-authoring` + `docusaurus-scaffold` skills from the proven M1 pattern
+- ✅ Extract `course-authoring` + `docusaurus-scaffold` skills from the proven M1 pattern
 - ⬜ Final whole-branch code review of the M1 slice
-- ⬜ Verify GitHub Pages deploy is live after first push
+- ✅ Verify GitHub Pages deploy is live after first push
+
+## Phase 1 — Depth retrofit (2026-07-22) ✅ COMPLETE
+
+| Item | Status |
+| --- | --- |
+| Checks backbone — `labs/<module>/checks.json` all 10 modules + zero-dep `scripts/run-checks.mjs` runner | ✅ |
+| Smoke test — `scripts/test-course.sh` (all modules, 10/10 green this session) | ✅ |
+| `course.config.json` — schema-validated as-built course description | ✅ |
+| Learner-QA sweep — 33 pages walked, 68 findings, 46 fixed, remainder deferred with reason | ✅ |
+| Fork staging pipeline (`initcron.github.io/303-containerai`) for pre-promotion validation | ✅ |
+| Shipped as v1.1.0 (`CHANGELOG.md`) | ✅ |
+
+**Next:** `planning/plans/2026-07-22-m3b-deep-dive.md`.

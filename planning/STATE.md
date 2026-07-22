@@ -15,6 +15,13 @@
 `fork` remote → fork Actions auto-deploys → QA on staging → merge/push to `origin` only after green gates.
 Enables safe iteration and validation before promoting to the production schoolofdevops site.
 
+**Phase 1 COMPLETE.** Checks backbone (`labs/<module>/checks.json` all 10 modules + zero-dep
+`scripts/run-checks.mjs` runner) + `scripts/test-course.sh` smoke test (10/10 green) +
+`course.config.json` (schema-validated) + full learner-QA sweep (33 pages, 68 findings, 46 fixed,
+remainder deferred with documented reason — see `.superpowers/sdd/progress.md`) all done. Staging
+verified on the fork. Shipping as **v1.1.0** (see `CHANGELOG.md`).
+**NEXT:** after v1.1.0 ships, the M3B deep dive plan at `planning/plans/2026-07-22-m3b-deep-dive.md`.
+
 ## Post-completion work (2026-07-05, later)
 
 - ✅ **Phase A — full learner-QA pass (M1→Capstone).** A learner-simulating subagent followed each
