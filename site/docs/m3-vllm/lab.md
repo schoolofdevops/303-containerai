@@ -393,4 +393,15 @@ docker compose down -v
 
 ---
 
+---
+
+## Go deeper
+
+The lab proved a production-grade server runs on your laptop — but *why* does
+vLLM behave the way it does? The [Deep Dive (Part 2)](./deep-dive.md) opens the
+hood: PagedAttention's memory paging, continuous batching, what every flag you
+set actually did, and a live throughput experiment against Ollama.
+
+---
+
 **What's next:** In M4 you'll package models and their configuration as **OCI artifacts** — shipping a model the same way you ship a container image.

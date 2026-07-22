@@ -10,7 +10,7 @@
      deck) because this deep-dive's material is dense mechanics the learner reasons
      with directly, same as 3B's. -->
 
-This companion doc maps the 17-slide explainer deck (`site/static/decks/03-deepdive.html`) to the
+This companion doc maps the 18-slide explainer deck (`site/static/decks/03-deepdive.html`) to the
 Module 3 deep-dive page (`site/docs/m3-vllm/deep-dive.md`). Like 3B's deep-dive deck, this page's
 material is dense mechanics (paged memory allocation, scheduler internals, a real flag-by-flag
 memory inequality, a live metrics reading, and a real two-server experiment) the learner needs to
