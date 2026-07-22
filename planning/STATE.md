@@ -20,7 +20,8 @@ Enables safe iteration and validation before promoting to the production schoolo
 `course.config.json` (schema-validated) + full learner-QA sweep (33 pages, 68 findings, 46 fixed,
 remainder deferred with documented reason — see `.superpowers/sdd/progress.md`) all done. Staging
 verified on the fork. Shipping as **v1.1.0** (see `CHANGELOG.md`).
-**NEXT:** after v1.1.0 ships, the M3B deep dive plan at `planning/plans/2026-07-22-m3b-deep-dive.md`.
+**SHIPPED:** v1.1.0 live on origin (2026-07-22), deploy green, fork staging in sync.
+**NEXT:** the M3B deep dive plan at `planning/plans/2026-07-22-m3b-deep-dive.md` (in progress).
 
 ## Post-completion work (2026-07-05, later)
 
