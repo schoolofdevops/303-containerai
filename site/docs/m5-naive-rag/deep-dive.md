@@ -296,6 +296,55 @@ curl -s http://localhost:${M5_CHROMA_PORT:-8000}/api/v1/collections | python3 -m
 default index metric claimed above — no override was ever set, so the collection came up on L2.
 `"dimension": 768` confirms `nomic-embed-text`'s embedding size.
 
+:::note[If your `documents` collection is empty]
+
+The base lab only populates `documents` through a **Streamlit UI upload** — there's no headless
+ingest path in the app itself. If you tore the stack down with `docker compose down -v` (the
+lab's own teardown offers this) and brought it back up, the volume is gone and `documents` is
+empty, so the query below would return nothing. This guarded step checks first and only
+re-ingests if needed, replicating the app's own `process_uploaded_file` code path
+(`UnstructuredMarkdownLoader` + `chunk_size=500, chunk_overlap=50` — same as §1) — not the UI:
+
+```bash
+docker exec genai-app mkdir -p /tmp/deepdive-docs
+docker cp docs/acme-runbooks.md genai-app:/tmp/deepdive-docs/acme-runbooks.md
+docker exec genai-app python3 -c "
+import chromadb, os
+from langchain_ollama import OllamaEmbeddings
+from langchain_chroma import Chroma
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import UnstructuredMarkdownLoader
+client = chromadb.HttpClient(host=os.environ['CHROMA_HOST'], port=int(os.environ['CHROMA_PORT']))
+try:
+    n = client.get_collection('documents').count()
+except Exception:
+    n = 0
+if n > 0:
+    print(f'documents collection already populated: {n} chunks. No re-seed needed.')
+else:
+    emb = OllamaEmbeddings(model='nomic-embed-text', base_url=os.environ['OLLAMA_BASE_URL'])
+    vs = Chroma(client=client, collection_name='documents', embedding_function=emb)
+    docs = UnstructuredMarkdownLoader('/tmp/deepdive-docs/acme-runbooks.md').load()
+    chunks = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50).split_documents(docs)
+    vs.add_documents(chunks)
+    print(f're-seeded documents collection: {len(chunks)} chunks ingested.')
+"
+```
+
+**Expected output** (tested against both states live — freshly wiped and already-populated):
+
+```text
+re-seeded documents collection: 2 chunks ingested.
+```
+
+or, if the collection was already populated (the common case right after the lab):
+
+```text
+documents collection already populated: 2 chunks. No re-seed needed.
+```
+
+:::
+
 Query it directly for a question, using the same embedding model the app uses, and see the raw
 distances behind the ranking (this one-liner runs inside the `genai-app` container, where
 `langchain-chroma` and the Ollama client are already installed):

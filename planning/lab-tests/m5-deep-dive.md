@@ -259,3 +259,51 @@ Server + Client both compiled successfully. Green.
 the app's own ingest path) — matches "leave the m5 stack and the `documents` collection exactly as
 the lab left them," per the page's own final Teardown note. Deep-dive touched only the
 `deepdive-*` collections, all of which were dropped in §7's teardown.
+
+---
+
+## Review fix (2026-07-22) — §6 state-tolerant re-seed
+
+**Finding:** §6's direct-Chroma query assumes `documents` is populated, but the base lab only
+seeds it via a Streamlit UI upload, and the lab's own teardown offers `docker compose down -v`
+(wipes the volume). A learner who tore down with `-v` and came back for the deep-dive would hit
+an empty collection and get results contradicting the page's folded Expected output.
+
+**Fix:** added a `:::note[If your documents collection is empty]` block right before §6's first
+query (smaller, clearer placement than extending the top-of-page "Where this picks up" admonition)
+— a guarded, idempotent snippet: check `documents` chunk count; if `>0`, print a no-op message; if
+empty, copy the corpus in and re-ingest via the app's exact code path
+(`UnstructuredMarkdownLoader` + `RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)`,
+matching `process_uploaded_file`), then print the chunk count.
+
+**Verified live, both states, on this machine** (`PATH="$HOME/.rd/bin:$PATH"`, native Ollama up):
+
+- **Populated state:** `documents` already had 2 chunks (left over from the original validation
+  run above). Ran the guarded script — printed `documents collection already populated: 2 chunks.
+  No re-seed needed.` — confirmed no-op, no re-ingest triggered.
+- **Empty state:** ran `docker compose down -v --remove-orphans` (the lab's own teardown option)
+  to wipe the `m5_chroma_data` volume, then `bash up.sh` to bring the stack back with a fresh,
+  empty collection (verified: `get_collection('documents')` raised `InvalidCollectionException`
+  — no collection existed yet). Copied the corpus in per §7's existing `docker cp` pattern, ran
+  the guarded script — printed `re-seeded documents collection: 2 chunks ingested.` Ran it again
+  immediately after — correctly printed the no-op message on the second pass (idempotent,
+  confirmed). Re-ran §6's actual similarity-search query against the freshly re-seeded
+  collection — got back **the identical distances already folded into the page**
+  (`0.6956` / `1.0968` for the payments question), confirming the re-seed path reproduces the
+  page's existing evidence deterministically.
+- Cleaned up `/tmp/deepdive-docs` inside the container after testing; left the stack up with
+  `documents` populated (2 chunks) — same end state as before this fix, no drift introduced.
+
+**Gates re-run after the edit:**
+
+```
+$ cd site && npm run build
+[SUCCESS] Generated static files in "build".
+```
+
+```
+$ node scripts/run-checks.mjs labs/m5/deep-dive.checks.json
+8/8 checks · score 8/8
+```
+
+Both green, no regressions.
