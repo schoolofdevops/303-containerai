@@ -30,7 +30,7 @@ untouched) + lab "Go deeper" pointer, all four gates green (build, `test-course.
 Final review done (one technical fix: mlx scale = alpha/r composite). Tagged + pushed; live pages 200. (No
 push/tag performed by the release-prep step itself).
 
-M3 vLLM Deep Dive (`planning/plans/2026-07-22-m3-deep-dive.md`) is **SHIPPED-pending as v1.3.0**
+M3 vLLM Deep Dive (`planning/plans/2026-07-22-m3-deep-dive.md`) is **SHIPPED as v1.3.0** (live)
 (2026-07-22, release-prep commit only — no push/tag yet, controller ships after final review) — page +
 separate `deep-dive.checks.json` + new self-contained `03-deepdive.html` deck (18 slides, existing decks
 untouched) + lab "Go deeper" pointer. Gates green: `site` build, `run-checks.mjs deep-dive.checks.json`
@@ -42,15 +42,14 @@ machine-local.
 on `origin` (23ddfc8) before QA had completed — QA finding F7 was still open at push time. F7 was
 fixed and fast-followed with a corrective commit; see `.superpowers/sdd/progress.md` for the
 process note on what triggered the early push and the guard added to prevent recurrence.
-M5 RAG-params deep dive (`planning/plans/2026-07-22-m5-deep-dive.md`) is **SHIPPED-pending as v1.4.0**
+M5 RAG-params deep dive (`planning/plans/2026-07-22-m5-deep-dive.md`) is **SHIPPED as v1.4.0** (live)
 (2026-07-22, release-prep commit only — no push/tag yet, controller ships after final review) — page +
 separate `deep-dive.checks.json` + new self-contained `05-deepdive.html` deck (21 slides, existing
 decks untouched) + state-tolerant collection re-seed guard + lab "Go deeper" pointer. Gates green:
 `site` build, `run-checks.mjs deep-dive.checks.json` (8/8), deck-diff-since-v1.3.0 (only
 `05-deepdive.html` touched), `scripts/test-course.sh m5` PASS. Learner-QA all-PASS, zero real findings.
 
-M7 Agent-Knobs Deep Dive (`planning/plans/2026-07-22-m7-deep-dive.md`) is **SHIPPED-pending as
-v1.5.0** (2026-07-23, release-prep commit only — no push/tag yet, controller ships after final
+M7 Agent-Knobs Deep Dive (`planning/plans/2026-07-22-m7-deep-dive.md`) is **SHIPPED as v1.5.0** (2026-07-23, live, deploy green — Phase 2 depth COMPLETE; final
 review) — page (real per-agent temps, no-loop design, string-handoff + triage-not-fed-to-retrieval
 finding, code-gates, Variant A temp experiment, Variant B gate-bypass with the gate-is-the-determinism
 teaching) + separate `deep-dive.checks.json` (9/9) + new self-contained `07-deepdive.html` deck
