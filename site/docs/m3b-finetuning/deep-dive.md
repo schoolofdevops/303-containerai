@@ -36,7 +36,7 @@ mkdir -p ~/mlx-lora-lab && cd ~/mlx-lora-lab
 {"messages": [{"role": "user", "content": "Summarise this alert: SSL certificate expires in 7 days on api.example.com."}, {"role": "assistant", "content": "{\"severity\": \"medium\", \"host\": \"api.example.com\", \"metric\": \"ssl-expiry\", \"threshold\": \"7d\", \"duration\": \"now\", \"action\": \"renew-cert\"}"}]}
 {"messages": [{"role": "user", "content": "Summarise this alert: Queue depth above 10000 on rabbitmq-01 for 15 minutes."}, {"role": "assistant", "content": "{\"severity\": \"high\", \"host\": \"rabbitmq-01\", \"metric\": \"queue-depth\", \"threshold\": \"10000\", \"duration\": \"15m\", \"action\": \"page-oncall\"}"}]}
 EOF
-cp -n train.jsonl valid.jsonl
+[ -f valid.jsonl ] || cp train.jsonl valid.jsonl
 source ~/mlx-lora-env/bin/activate
 ```
 
