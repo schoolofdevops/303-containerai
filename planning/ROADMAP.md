@@ -46,3 +46,12 @@ Legend: ✅ done · 🔄 in progress · ⬜ pending
 | Shipped as v1.1.0 (`CHANGELOG.md`) | ✅ |
 
 **Next:** `planning/plans/2026-07-22-m3b-deep-dive.md`.
+
+## Phase 2 — Depth retrofit deep dives (2026-07-22)
+
+| Item | Status |
+| --- | --- |
+| M3B · Fine-Tuning Deep Dive — page + `deep-dive.checks.json` + `03b-deepdive.html` deck (19 slides) + lab pointer, learner-QA all-PASS | ✅ (v1.2.0) |
+| M3 · vLLM Internals Deep Dive — plan written (`planning/plans/2026-07-22-m3-deep-dive.md`) | ⬜ |
+| M5 · RAG Parameters Deep Dive — plan written (`planning/plans/2026-07-22-m5-deep-dive.md`) | ⬜ |
+| M7 · Agent Knobs Deep Dive — plan written (`planning/plans/2026-07-22-m7-deep-dive.md`) | ⬜ |

@@ -19,9 +19,25 @@ Enables safe iteration and validation before promoting to the production schoolo
 `scripts/run-checks.mjs` runner) + `scripts/test-course.sh` smoke test (10/10 green) +
 `course.config.json` (schema-validated) + full learner-QA sweep (33 pages, 68 findings, 46 fixed,
 remainder deferred with documented reason — see `.superpowers/sdd/progress.md`) all done. Staging
-verified on the fork. Shipping as **v1.1.0** (see `CHANGELOG.md`).
+verified on the fork. Shipped as **v1.1.0** (see `CHANGELOG.md`).
 **SHIPPED:** v1.1.0 live on origin (2026-07-22), deploy green, fork staging in sync.
-**NEXT:** the M3B deep dive plan at `planning/plans/2026-07-22-m3b-deep-dive.md` (in progress).
+
+**Phase 2 — deep dives (priority order M3B → M3 → M5 → M7).** M3B fine-tuning deep dive
+(`planning/plans/2026-07-22-m3b-deep-dive.md`) is **SHIPPED-pending as v1.2.0** — page + separate
+`deep-dive.checks.json` + new self-contained `03b-deepdive.html` deck (19 slides, existing decks
+untouched) + lab "Go deeper" pointer, all four gates green (build, `test-course.sh m3b`,
+`run-checks.mjs deep-dive.checks.json`, deck-diff-since-v1.1.0), learner-QA all-PASS on staging.
+Pending only the controller's final review before tag/push (per this task's contract — no
+push/tag performed by the release-prep step itself).
+**NEXT:** M3 → M5 → M7 deep-dive plans written and ready to execute, cloned from the M3B plan
+structure with content maps from `planning/specs/2026-07-22-depth-retrofit-design.md` §Phase 2:
+- `planning/plans/2026-07-22-m3-deep-dive.md` (vLLM internals — PagedAttention, continuous batching,
+  our lab flags, throughput vs Ollama; deck `03-deepdive.html`; ships as v1.3.0)
+- `planning/plans/2026-07-22-m5-deep-dive.md` (RAG params — chunk size/overlap, top-k, embedding
+  choice, context budget; re-ingest experiment; deck `05-deepdive.html`; ships as v1.4.0)
+- `planning/plans/2026-07-22-m7-deep-dive.md` (agent knobs — temperature, max iterations, tool-loop
+  control, delegation, guardrails; crew knob-variant experiment; deck `07-deepdive.html`; ships as
+  v1.5.0)
 
 ## Post-completion work (2026-07-05, later)
 

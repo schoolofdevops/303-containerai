@@ -5,6 +5,19 @@ All notable changes to this course build are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-07-22
+
+### Added
+
+- M3B Deep Dive (Part 2): fine-tuning parameters under the hood (LoRA rank/alpha, NF4, loss-curve
+  reading, chat-template pitfalls, live 3-variant experiment with real losses on mlx-lm 0.31.3), new
+  self-contained whiteboard deck (19 slides) — existing decks unchanged, `deep-dive.checks.json`
+  validation stage, lab "Go deeper" pointer.
+
+### Fixed
+
+- BSD `cp` idempotence in the seed, deck slide-18 val loss.
+
 ## [1.1.0] - 2026-07-22
 
 ### Added
