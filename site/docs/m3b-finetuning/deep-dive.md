@@ -89,7 +89,7 @@ it randomly zeroes out a fraction of the adapter's activations on each step, so 
 can't over-rely on any one path. On an eight-example toy dataset like the lab's, dropout matters
 less than it will on your real 500–2000-example corporate-docs run — with more data pushing more
 gradient signal through a small number of parameters, dropout is what keeps the adapter from
-memorizing example order instead of learning the pattern.
+over-relying on any single direction or co-adapted weights instead of learning the general pattern.
 
 ```mermaid
 graph TD
@@ -270,9 +270,17 @@ so you can compare them side by side instead of overwriting one adapter with the
 :::note[Flags pinned during validation]
 
 Pinned live against **mlx-lm 0.31.3**. `mlx_lm.lora --help` on this version has **no dedicated
-rank flag** — `--lora-rank` does not exist. Rank (and `alpha`, exposed here as `scale`) live only
-in `lora_parameters` inside a YAML file passed via `-c/--config`; the CLI default is
-`lora_parameters: {rank: 8, dropout: 0.0, scale: 20.0}`. `--learning-rate` **is** a real CLI flag
+rank flag** — `--lora-rank` does not exist. Rank and the adapter scale live only in
+`lora_parameters` inside a YAML file passed via `-c/--config`; the CLI default is
+`lora_parameters: {rank: 8, dropout: 0.0, scale: 20.0}`. Note that mlx-lm's `scale` is **not**
+`alpha` — its source (`LoRALinear.__call__`: `y + self.scale * z`) applies `scale` directly as the
+effective multiplier, so mlx-lm's `scale` already **is** the `alpha/r` composite from §1, not a
+raw alpha you'd divide by rank yourself. Frameworks like HF PEFT instead take a raw `alpha` and
+compute `alpha/r` internally — so porting `rank: 4, scale: 20` here to PEFT as `alpha=20` would
+give you a 4x-different effective scale. Carry the *effective* multiplier across frameworks, not
+the raw number. (One upside: because Variant A below only changes `rank` and leaves `scale: 20.0`
+untouched, the effective step-size multiplier stays fixed between baseline and Variant A — which
+is exactly why that experiment cleanly isolates adapter capacity.) `--learning-rate` **is** a real CLI flag
 in this version and needs no config file. `--num-layers` is also a direct CLI flag (default 16;
 the lab and this page both override it to 4). If your installed version differs, run
 `mlx_lm.lora --help` first and adjust — Variant A below may need updating back to a `--lora-rank`
