@@ -60,7 +60,7 @@ Concretely, `RecursiveCharacterTextSplitter` tries to cut on paragraph and line 
 (its separator list is `["\n\n", "\n", " ", ""]` — paragraphs, then lines, then words, then a
 hard character cut as the last resort), so it avoids slicing through a word or a mid-sentence
 run wherever a paragraph break gives it a cleaner place to cut. At 500 characters, the whole
-~1,000-character Acme corpus is small enough that the splitter packs roughly **two of the four
+~800-character Acme corpus is small enough that the splitter packs roughly **two of the four
 runbook sections into each chunk** — which is exactly why the lab's ingest reported **2 chunks**
 for the whole document. That's small enough that overlap barely matters here; overlap earns its
 keep on longer documents where a procedure genuinely spans a chunk boundary.
@@ -214,8 +214,9 @@ level=WARN msg="truncating input prompt" limit=2050 prompt=33742 keep=4 new=2050
 
 It keeps a tiny fixed prefix (`n_keep=4` tokens — effectively nothing) and then discards everything
 else *except* the most recent `limit` tokens — the truncation keeps the **tail** of the prompt, not
-the head. Sending the model the marker-at-the-front / question-at-the-back prompt confirmed this
-directly: the model answered using the *back* marker, and had lost the *front* marker entirely —
+the head. This is the behavior on this course's Ollama (v0.17.4); the exact keep/limit split is an
+implementation detail that can change. Sending the model the marker-at-the-front / question-at-the-back
+prompt confirmed this directly: the model answered using the *back* marker, and had lost the *front* marker entirely —
 proof the front of an over-budget prompt is what gets dropped, and the tail survives. On this
 app's prompt shape (`Context:\n{context}\n\nQuestion: {prompt}\n\nAnswer:` — retrieved chunks
 first, the question last), that means an over-budget prompt loses your **earliest retrieved
@@ -247,8 +248,8 @@ system commonly adds a re-ranker (a smaller, more precise model that re-scores t
 candidates from the vector search before choosing what to hand the LLM) specifically to catch
 cases where embedding similarity and true relevance diverge — two runbook sections can be
 semantically adjacent in embedding space (both are "ops procedures") while only one actually
-answers the question. This module's naive RAG has no such step; that gap is exactly what M6's
-agentic approach adds back.
+answers the question. This module's naive RAG has no such step; that gap is the class of gap
+M6's agentic retrieval addresses.
 
 ---
 
@@ -375,7 +376,7 @@ for doc, score in vs.similarity_search_with_score('How do I restart the payments
 
 Only two lines print even though `k=3` was requested — this collection has exactly 2 chunks
 (§1), so ChromaDB hands back everything it has and stops; there is no third chunk to return.
-`similarity_search_with_score` returns raw L2 distance (§3) — **lower is better**, the opposite
+`similarity_search_with_score` returns raw (squared) L2 distance (§3) — **lower is better**, the opposite
 of a similarity percentage. This is the exact number ChromaDB's index is ranking on when the
 Streamlit app decides which chunks to hand the LLM; the UI never shows you this figure, only
 the resulting text.
@@ -520,7 +521,7 @@ real artifact you can grep, diff, or fold into the table below.
 
 **Expected output**
 
-```text
+````text
 COLLECTION: deepdive-baseline
 === baseline (chunk_size=500, overlap=50) -> 2 chunks ===
   Q: How do I restart the payments service?
@@ -578,7 +579,7 @@ This command wi
   Q: Who do I page for an unacknowledged incident?
     top distance: 1.0830  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
     answer: The on-call engineer is paged for an unacknowledged incident via the #acme-oncall Slack channel. If unacknowledged for 1
-```
+````
 
 Fold the three variants' results into a comparison table (variant, chunk count, retrieved-chunk
 snippet, whether the retrieved context actually contained the answer, model's answer):
@@ -593,9 +594,12 @@ The three variants tell three different stories about the *same* corpus. **varia
 no overlap) produces the tightest, lowest-distance match on the payments question (0.5146, the
 best of all three) because its 11 tiny chunks let one chunk be *purely* about the restart command
 — nothing else diluting the vector. It also isolates "Database backups" into its own chunk,
-dropping that question's distance to 0.3700, the single best match across the whole experiment.
+dropping that question's distance to 0.3700, the single best match across the whole experiment —
+but that top chunk is a heading with no body text (`'Database backups'`, nothing else), exactly the
+orphaned-fact failure mode §1 warns small chunks can produce; the answer only reads correctly here
+because `k=3` also pulled in a neighboring chunk that actually contains the retention period.
 **baseline** (500/50) sits in the middle — 2 chunks, each covering roughly two runbook sections,
-distances in the 0.69–0.92 range. **variant-b** (1200/200) collapses the entire ~823-byte corpus
+distances in the 0.69–0.92 range. **variant-b** (1200/200) collapses the entire ~800-character corpus
 into a **single chunk** — at this chunk size on this small a corpus, there's nothing left to
 retrieve *from*; every question, regardless of topic, returns the same one chunk, and the highest
 distances in the table (0.75–1.08) show the vector working harder to match a chunk that's an
