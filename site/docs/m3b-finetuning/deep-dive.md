@@ -5,6 +5,7 @@ sidebar_label: 'Deep Dive (Part 2)'
 ---
 
 import Slides from '@site/src/components/Slides';
+import Embed from '@site/src/components/Embed';
 
 # Deep Dive: Fine-Tuning Parameters Under the Hood
 
@@ -261,6 +262,12 @@ prompting and RAG are genuinely exhausted — this deep dive's whole point is th
 path has real knobs with real failure modes, not that it's free once you know the flags.
 
 ---
+
+Feel the trade-offs here first, then prove them live below. Drag rank, learning rate, and
+iterations and watch the loss curves respond — including what happens when you push iterations
+well past the real 50 the lab ran.
+
+<Embed src="/sims/m3b-lora-tradeoff.html" title="LoRA Trade-off Playground" ratio="16 / 9" />
 
 ## 6 — Experiment: comparing rank and learning-rate variants
 

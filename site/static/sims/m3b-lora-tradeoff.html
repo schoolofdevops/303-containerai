@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LoRA Trade-off Playground — rank, learning rate, and the overfit line</title>
+<style>
+  :root{
+    --bg:#0d1220; --panel:#151c2e; --panel2:#111827; --line:#26324e; --line2:#1c2740;
+    --txt:#dbe4f5; --dim:#8494b3; --faint:#5a6a8c;
+    --accent:#4cc9f0; --accent2:#7b6cf6;
+    --ok:#3ddc97; --warn:#f5b942; --bad:#ff6b6b;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{font-size:clamp(10.5px,0.4vw + 9.1px,16px)}
+  html,body{height:100%}
+  body{
+    background:var(--bg); color:var(--txt);
+    font:1rem/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    overflow:hidden;
+  }
+  #app{display:flex;flex-direction:column;height:100%;padding:8px 10px;gap:6px}
+
+  /* ---------- header ---------- */
+  header{display:flex;align-items:center;gap:12px;flex:0 0 auto;flex-wrap:wrap}
+  header h1{font-size:1.05rem;font-weight:650;letter-spacing:.2px;white-space:nowrap}
+  header h1 .llm{color:var(--accent2)}
+  #hsub{margin-left:auto;font-family:var(--mono);font-size:.8rem;color:var(--faint);white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis}
+  #reset{background:none;border:1px solid var(--line);color:var(--dim);border-radius:6px;
+    padding:3px 9px;font-size:.88rem;cursor:pointer;min-height:24px;flex:0 0 auto}
+  #reset:hover{color:var(--txt);border-color:var(--faint)}
+
+  /* ---------- challenge banner ---------- */
+  #challenge{flex:0 0 auto;display:flex;align-items:center;gap:10px;
+    background:linear-gradient(90deg,rgba(123,108,246,.14),rgba(76,201,240,.07));
+    border:1px solid #3a3f6e;border-radius:8px;padding:4px 11px;min-height:30px}
+  #challenge .tag{font-size:.8rem;font-weight:700;letter-spacing:.8px;color:var(--accent2);
+    text-transform:uppercase;white-space:nowrap}
+  #challenge .steps{display:flex;gap:5px}
+  #challenge .dot{width:1.3rem;height:1.3rem;border-radius:50%;border:1.5px solid var(--faint);
+    font-size:.76rem;display:flex;align-items:center;justify-content:center;color:var(--faint);font-weight:700}
+  #challenge .dot.cur{border-color:var(--accent);color:var(--accent)}
+  #challenge .dot.done{border-color:var(--ok);background:rgba(61,220,151,.15);color:var(--ok)}
+  #challenge .txt{flex:1;color:var(--txt);font-size:.94rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  #challenge .txt code{font-family:var(--mono);font-size:.86rem;color:var(--accent);background:rgba(76,201,240,.08);
+    padding:0 4px;border-radius:4px}
+  #challenge.success{background:linear-gradient(90deg,rgba(61,220,151,.16),rgba(61,220,151,.05));border-color:#2c7a5b}
+  #challenge.success .tag{color:var(--ok)}
+  #challenge.success .txt{white-space:normal;line-height:1.3}
+
+  /* ---------- main grid ---------- */
+  #main{flex:1 1 auto;display:grid;grid-template-columns:clamp(238px,20.5rem,340px) 1fr;gap:6px;min-height:0}
+  #main>.panel{min-width:0}
+  .panel{background:var(--panel);border:1px solid var(--line2);border-radius:10px;padding:7px 10px;min-height:0}
+  .panel h2{font-size:.76rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--faint);margin-bottom:5px}
+  .panel h2 span{text-transform:none;letter-spacing:0;color:var(--faint);font-weight:400}
+
+  /* ---------- controls (left) ---------- */
+  #controls{display:flex;flex-direction:column;gap:9px;overflow-y:auto;scrollbar-width:thin}
+
+  .ctl .cl{font-family:var(--mono);font-size:.76rem;color:var(--dim);display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
+  .ctl .cl b{color:var(--txt);font-weight:700}
+  .ctl .cl .hint{color:var(--faint);font-size:.68rem;font-weight:400}
+  .ctl input[type=range]{width:100%;accent-color:var(--accent2);cursor:pointer;height:1.2rem}
+
+  /* rank pill group */
+  .pillhead{font-family:var(--mono);font-size:.76rem;color:var(--dim);margin-bottom:3px}
+  #rankPills,#lrPills{display:flex;flex-wrap:wrap;gap:4px}
+  .pill{font-family:var(--mono);font-size:.8rem;line-height:1.2;border:1px solid var(--line);
+    border-radius:999px;background:var(--panel2);color:var(--dim);padding:4px 12px;cursor:pointer;
+    transition:border-color .12s,color .12s,background .12s;user-select:none}
+  .pill:hover{border-color:var(--accent2);color:var(--txt)}
+  .pill.on{border-color:var(--accent2);color:var(--accent);
+    background:color-mix(in srgb,var(--accent2) 16%,var(--panel2))}
+
+  /* readouts */
+  .readout{display:flex;flex-direction:column;gap:3px;border:1px solid var(--line2);border-radius:8px;
+    background:var(--panel2);padding:7px 10px}
+  .readout,.readout *{cursor:default}
+  .rrow{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:1px 0}
+  .rrow .rl{font-family:var(--mono);font-size:.78rem;color:var(--dim)}
+  .rrow .rv{font-family:var(--mono);font-size:.86rem;font-weight:700;color:var(--txt)}
+  .rrow .rv.big{font-size:1rem}
+  .rrow .rv.good{color:var(--ok)} .rrow .rv.warn{color:var(--warn)} .rrow .rv.bad{color:var(--bad)}
+  .rsep{height:1px;background:var(--line2);margin:3px 0}
+
+  /* adapter-size gauge */
+  .meterWrap{border:1px solid var(--line2);border-radius:8px;background:var(--panel2);padding:7px 10px}
+  .meterWrap,.meterWrap *{cursor:default}
+  .meterWrap .ml{font-family:var(--mono);font-size:.74rem;color:var(--dim);display:flex;justify-content:space-between;margin-bottom:4px}
+  .meterWrap .ml b{color:var(--txt)}
+  #meterBar{height:.7rem;border-radius:5px;background:#0a0f1c;border:1px solid var(--line2);overflow:hidden;position:relative}
+  #meterFill{position:absolute;inset:0 auto 0 0;width:0%;border-radius:5px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .3s ease}
+  .meterWrap .mnote{font-family:var(--mono);font-size:.68rem;color:var(--faint);margin-top:4px;line-height:1.35}
+
+  /* overfit indicator */
+  .overfitBox{border:1px solid var(--line2);border-radius:8px;background:var(--panel2);padding:7px 10px}
+  .overfitBox,.overfitBox *{cursor:default}
+  .overfitBox .ol{font-family:var(--mono);font-size:.74rem;color:var(--dim);display:flex;justify-content:space-between;margin-bottom:3px}
+  #overfitBadge{font-family:var(--mono);font-size:.78rem;font-weight:700;padding:2px 9px;border-radius:999px;
+    border:1px solid var(--line);display:inline-block}
+  #overfitBadge.healthy{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 50%,var(--line));background:rgba(61,220,151,.08)}
+  #overfitBadge.watch{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 50%,var(--line));background:rgba(245,185,66,.08)}
+  #overfitBadge.diverging{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 50%,var(--line));background:rgba(255,107,107,.1)}
+  .overfitBox .onote{font-family:var(--mono);font-size:.68rem;color:var(--faint);margin-top:4px;line-height:1.35}
+
+  /* ---------- chart view (right) ---------- */
+  #view{display:flex;flex-direction:column;min-height:0;gap:6px}
+  #stage{flex:1 1 auto;position:relative;min-height:0;border:1px solid var(--line2);border-radius:8px;
+    background:radial-gradient(circle at 50% 30%,#0f1626 0%,#0a0f1c 100%);overflow:hidden;
+    display:flex;flex-direction:column;padding:8px}
+  #chartHead{display:flex;align-items:center;gap:14px;flex:0 0 auto;padding:0 4px 4px;font-family:var(--mono);font-size:.74rem;color:var(--dim)}
+  #chartHead .leg{display:flex;align-items:center;gap:4px}
+  #chartHead .sw{width:.9rem;height:.14rem;border-radius:2px;display:inline-block}
+  #chartHead .sw.train{background:var(--accent)}
+  #chartHead .sw.val{background:var(--warn)}
+  #itersLive{margin-left:auto;color:var(--txt);font-weight:700}
+  #chartWrap{flex:1 1 auto;min-height:0;position:relative}
+  svg#chart{width:100%;height:100%;display:block}
+  #chart .gridline{stroke:var(--line2);stroke-width:1}
+  #chart .axislabel{font-family:var(--mono);font-size:8px;fill:var(--faint)}
+  #chart .curve{fill:none;stroke-width:2}
+  #chart .curve.train{stroke:var(--accent)}
+  #chart .curve.val{stroke:var(--warn)}
+  #chart .cursorline{stroke:var(--faint);stroke-width:1;stroke-dasharray:3 3}
+  #chart .dot{r:3.2}
+  #chart .dot.train{fill:var(--accent)}
+  #chart .dot.val{fill:var(--warn)}
+  #chart .anchor{r:2.4;fill:var(--panel);stroke-width:1.4}
+  #chart .anchor.train{stroke:var(--accent)}
+  #chart .anchor.val{stroke:var(--warn)}
+  #chart .onsetline{stroke:var(--bad);stroke-width:1.2;stroke-dasharray:4 3;opacity:.7}
+
+  /* ---------- iters control (bottom of controls) ---------- */
+  #itersRange{width:100%}
+
+  /* ---------- event log ---------- */
+  #events{flex:0 0 clamp(84px,7.5rem,132px);display:flex;flex-direction:column;min-height:0}
+  #events,#events *{cursor:default}
+  #evList{flex:1;overflow-y:auto;font-family:var(--mono);font-size:.78rem;line-height:1.6;scrollbar-width:thin}
+  .ev{display:flex;gap:8px;white-space:nowrap;overflow:hidden}
+  .ev .et{color:var(--faint);flex:0 0 4.2rem}
+  .ev .er{flex:0 0 6.6rem;color:var(--accent2);font-weight:700;overflow:hidden;text-overflow:ellipsis}
+  .ev.warn .er{color:var(--warn)} .ev.try .er{color:var(--accent)} .ev.ok .er{color:var(--ok)} .ev.bad .er{color:var(--bad)}
+  .ev .em{flex:1;color:var(--txt);opacity:.9;overflow:hidden;text-overflow:ellipsis}
+  .ev.new{animation:evin .4s ease-out}
+  @keyframes evin{0%{background:rgba(123,108,246,.12)}100%{background:transparent}}
+  #note{margin-left:auto;font-size:1rem;color:var(--faint);cursor:help;position:relative;padding:0 4px}
+  #note:hover{color:var(--dim)}
+  #note:hover::after,#note:active::after{content:attr(data-tip);position:absolute;right:0;bottom:calc(100% + 7px);
+    z-index:40;width:50ch;max-width:80vw;background:#0a0f1c;border:1px solid var(--line);border-radius:7px;padding:7px 10px;
+    color:var(--txt);text-align:left;white-space:normal;pointer-events:none;
+    font:.82rem/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    box-shadow:0 4px 16px rgba(0,0,0,.55)}
+
+  /* narrow fallback */
+  @media (max-width:620px){
+    body{overflow:auto}
+    #main{grid-template-columns:1fr}
+    #app{height:auto;min-height:100%}
+    #stage{min-height:56vw}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <h1><span class="llm">◆</span> LoRA Trade-off Playground</h1>
+    <span id="hsub">rank × learning rate × iterations — feel the capacity/speed/overfit trade-off</span>
+    <button id="reset" title="Reset the simulator to its starting state (rank 8, lr 1e-5, iters 50)">↺ Reset</button>
+  </header>
+
+  <div id="challenge">
+    <span class="tag">Try this</span>
+    <span class="steps">
+      <span class="dot" id="d1">1</span><span class="dot" id="d2">2</span><span class="dot" id="d3">3</span>
+    </span>
+    <span class="txt" id="chTxt"></span>
+  </div>
+
+  <div id="main">
+    <!-- LEFT: controls + readouts -->
+    <div class="panel" id="controls">
+
+      <div class="ctl" title="LoRA rank r — width of the low-rank adapter. Trainable params scale LINEARLY with r: 2×r×d×(target modules).">
+        <div class="pillhead">rank <code style="color:var(--accent2)">r</code></div>
+        <div id="rankPills"></div>
+      </div>
+
+      <div class="ctl" title="Learning rate — how big a step the optimizer takes each iteration. mlx_lm.lora's default is 1e-5; 1e-4 is 10x more aggressive.">
+        <div class="pillhead">learning rate</div>
+        <div id="lrPills"></div>
+      </div>
+
+      <div class="ctl" title="Training iterations — the real lab ran 50. Push past that to see where overfitting would emerge on this toy 8-example dataset.">
+        <div class="cl">iterations <span><b><span id="itersVal">50</span></b> <span class="hint">/ 200</span></span></div>
+        <input type="range" id="itersRange" min="1" max="200" step="1" value="50">
+        <div class="cl"><span class="hint">real lab stopped at 50 · beyond is extrapolated</span></div>
+      </div>
+
+      <div class="readout" id="readout">
+        <div class="rrow"><span class="rl">train loss</span><span class="rv big" id="ovTrain">—</span></div>
+        <div class="rrow"><span class="rl">val loss</span><span class="rv big" id="ovVal">—</span></div>
+        <div class="rsep"></div>
+        <div class="rrow"><span class="rl">train − val gap</span><span class="rv" id="ovGap">—</span></div>
+      </div>
+
+      <div class="meterWrap" title="Adapter size = trainable params × 2 bytes (fp16). Trainable params = 2 × r × d × (num target modules), real math from the deep-dive page.">
+        <div class="ml">adapter size <b><span id="sizeVal">—</span></b></div>
+        <div id="meterBar"><div id="meterFill"></div></div>
+        <div class="mnote" id="sizeNote"></div>
+      </div>
+
+      <div class="overfitBox" title="Overfit signature: train loss keeps falling while val loss stalls or rises. Modeled here as an extrapolated teaching behavior beyond the real 50-iter captures — see the footnote.">
+        <div class="ol">overfit signature <span id="overfitBadge" class="healthy">healthy</span></div>
+        <div class="onote" id="overfitNote"></div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: the loss-curve chart -->
+    <div class="panel" id="view">
+      <div id="stage">
+        <div id="chartHead">
+          <span class="leg"><span class="sw train"></span>train loss</span>
+          <span class="leg"><span class="sw val"></span>val loss</span>
+          <span id="itersLive">iter 50</span>
+        </div>
+        <div id="chartWrap">
+          <svg id="chart" viewBox="0 0 600 320" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="events">
+    <h2>Training trace <span>— what mlx_lm.lora would print</span>
+      <span id="note" data-tip="Teaching model, not a live trainer. Curves are interpolated/extrapolated from THREE real single captured runs on this course's lab machine (mlx-lm 0.31.3, Qwen2.5-0.5B-Instruct, 8-example toy dataset): rank 8/lr 1e-5 (train 0.200, val 0.148), rank 4/lr 1e-5 (train 0.449, val 0.374), rank 8/lr 1e-4 (train 0.054, val 0.028) — all at iter 50. Untested dial combos (rank 16, lr 3e-5, and everything past iter 50) are smoothly interpolated/extrapolated from those three anchors, not measured. Run-to-run variance is not modeled — a real run will jitter; this will not.">ⓘ</span></h2>
+    <div id="evList"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var $=function(id){return document.getElementById(id)};
+
+  /* ============================================================= REAL MODEL
+     Ground truth: planning/lab-tests/m3b-deep-dive.md, mlx-lm 0.31.3, Apple Silicon,
+     Qwen2.5-0.5B-Instruct, --num-layers 4, --batch-size 1, 8-example toy dataset.
+
+     Three REAL captured runs (iter 1..50), all starting at Val loss 3.721:
+       baseline  rank=8,  lr=1e-5 : train [3.721,2.670,1.056,0.568,0.305,0.200] @ [1,10,20,30,40,50], val50=0.148
+       variant A rank=4,  lr=1e-5 : train [3.721,3.107,1.670,0.977,0.607,0.449] @ same iters,          val50=0.374
+       variant B rank=8,  lr=1e-4 : train [3.721,1.353,0.226,0.134,0.069,0.054] @ same iters,          val50=0.028
+
+     Model: monotone cubic Hermite (Fritsch-Carlson) interpolation through each anchor's
+     real 6 TRAIN points reproduces those curves EXACTLY (zero error at anchors, no overshoot —
+     monotone by construction). The lab only logged VAL loss at iter 1 (3.721, shared by every
+     run) and iter 50 (the real per-config number below) — no interior val points exist to fit.
+     So each config's val curve is built by normalizing that SAME config's own real train shape
+     to its own real val(1) and val(50) anchors: val(t) = val1 + (val50-val1) * (train(t)-train1)
+     / (train50-train1). This reproduces every real val anchor EXACTLY and uses a defensible
+     interior shape (val tracks train shape in these healthy short runs) instead of inventing
+     unmeasured interior numbers.
+
+     rank=4 and lr=1e-4 TRAIN curves are turned into per-t RATIO factors against the
+     rank=8/lr=1e-5 baseline; those ratio factors extend the model to rank=16 and lr=3e-5
+     (log-interpolated) as an honest EXTRAPOLATION — never claimed as measured.
+
+     Beyond iter 50 (never run on this machine): train continues a slow bounded decay: it is
+     still gradient-descending on the same 8 examples, so it keeps memorizing them harder.
+     Val is modeled to plateau near its iter-50 floor, then — past an lr/rank-dependent
+     "overfit onset" — drift upward while train keeps falling: the memorization signature
+     the deep-dive's §3 describes in prose. This is the sim's one deliberately extrapolated
+     teaching behavior; the footnote discloses it plainly. */
+
+  var CTRL=[1,10,20,30,40,50];
+  var RAW={
+    base:  [3.721,2.670,1.056,0.568,0.305,0.200],   // rank8, lr1e-5 — train (REAL)
+    rank4: [3.721,3.107,1.670,0.977,0.607,0.449],   // rank4, lr1e-5 — train (REAL)
+    lr4:   [3.721,1.353,0.226,0.134,0.069,0.054]    // rank8, lr1e-4 — train (REAL)
+  };
+  var ANCHOR50={ // real anchor readout table (rank,lr) -> {train,val}, both REAL captured numbers
+    '8|0.00001':{train:0.200, val:0.148},
+    '4|0.00001':{train:0.449, val:0.374},
+    '8|0.0001':{train:0.054, val:0.028}
+  };
+
+  function fritschCarlsonSlopes(xs, ys) {
+    var n=xs.length, d=[];
+    for (var i=0;i<n-1;i++) d.push((ys[i+1]-ys[i])/(xs[i+1]-xs[i]));
+    var m=[d[0]];
+    for (var i=1;i<n-1;i++) m.push(d[i-1]*d[i]<=0 ? 0 : (d[i-1]+d[i])/2);
+    m.push(d[d.length-1]);
+    for (var i=0;i<n-1;i++){
+      if (d[i]===0){ m[i]=0; m[i+1]=0; continue; }
+      var a=m[i]/d[i], b=m[i+1]/d[i], s=a*a+b*b;
+      if (s>9){ var t=3/Math.sqrt(s); m[i]=t*a*d[i]; m[i+1]=t*b*d[i]; }
+    }
+    return m;
+  }
+  function hermiteEval(xs, ys, ms, x){
+    var n=xs.length;
+    if (x<=xs[0]) return ys[0];
+    if (x>=xs[n-1]) return ys[n-1];
+    var i=0; while (i<n-2 && x>xs[i+1]) i++;
+    var h=xs[i+1]-xs[i], t=(x-xs[i])/h, t2=t*t, t3=t2*t;
+    var h00=2*t3-3*t2+1, h10=t3-2*t2+t, h01=-2*t3+3*t2, h11=t3-t2;
+    return h00*ys[i] + h10*h*ms[i] + h01*ys[i+1] + h11*h*ms[i+1];
+  }
+  function makeCurve(ys){ var ms=fritschCarlsonSlopes(CTRL,ys); return function(t){return hermiteEval(CTRL,ys,ms,t);}; }
+
+  var baseTrainC = makeCurve(RAW.base);
+  var rank4TrainC= makeCurve(RAW.rank4);
+  var lr4TrainC  = makeCurve(RAW.lr4);
+
+  function rankFactor4(t){ return rank4TrainC(t)/baseTrainC(t); }
+  function lrFactor4(t){ return lr4TrainC(t)/baseTrainC(t); }
+  function clampT(t){ return Math.max(1, Math.min(50, t)); }
+
+  /* val curve for ANY (rank,lr) at t<=50: normalize this config's own train-shape trajectory
+     to its own real val(1)=3.721 and val(50) anchor (looked up / derived below). Exact at both
+     ends, monotone whenever the train curve is monotone (true here by construction). */
+  function valAt50(rank, lr){
+    var key=rank+'|'+lr;
+    if (ANCHOR50[key]) return ANCHOR50[key].val;
+    // untested combo: derive from the SAME multiplicative factor model, applied to the
+    // baseline's real val(50)=0.148 anchor (honest extrapolation, matches the train-factor logic).
+    var tc=50;
+    return 0.148*rankFactor(rank,tc)*lrFactor(lr,tc);
+  }
+
+  /* rank=16: diminishing-returns gain beyond rank=8 (damped inverse of the rank4 distance-from-1) */
+  function rankFactor(rank, t){
+    var tc=clampT(t);
+    if (rank===8) return 1;
+    if (rank===4) return rankFactor4(tc);
+    if (rank===16){ var dist4=rankFactor4(tc)-1; return Math.max(0.55, 1-dist4*0.30); }
+    return 1;
+  }
+  /* lr=3e-5: log-lr interpolation between 1e-5 (factor 1) and 1e-4 (measured factor) */
+  function lrFactor(lr, t){
+    var tc=clampT(t);
+    var x=(Math.log10(lr)-Math.log10(1e-5))/(Math.log10(1e-4)-Math.log10(1e-5));
+    x=Math.max(0,Math.min(1,x));
+    return 1+(lrFactor4(tc)-1)*x;
+  }
+  function lrX(lr){ return Math.max(0,Math.min(1,(Math.log10(lr)-Math.log10(1e-5))/(Math.log10(1e-4)-Math.log10(1e-5)))); }
+
+  function overfitOnset(rank, lr){
+    var x=lrX(lr);
+    var base=180-x*110;          // lr1e-5 ~180, lr1e-4 ~70
+    var rankAdj=(rank-8)*-2.5;   // higher rank -> slightly earlier onset (more capacity to overfit)
+    return Math.max(55, base+rankAdj);
+  }
+
+  function trainLossAt(rank, lr, t){
+    var tc=Math.min(t,50);
+    var v50=baseTrainC(tc)*rankFactor(rank,tc)*lrFactor(lr,tc);
+    if (t<=50) return v50;
+    var extra=t-50;
+    var speed=0.15+0.35*lrX(lr);
+    var floor=v50*0.35;
+    return floor+(v50-floor)*Math.exp(-speed*extra/40);
+  }
+  function valLossAt(rank, lr, t){
+    var tc=Math.min(t,50);
+    // train-shape-normalized val: exact at t=1 (3.721) and t=50 (real/derived anchor above).
+    var train1=trainLossAt(rank,lr,1), train50=trainLossAt(rank,lr,50), trainT=trainLossAt(rank,lr,tc);
+    var val1=3.721, val50=valAt50(rank,lr);
+    var frac = (train50===train1) ? 1 : (trainT-train1)/(train50-train1);
+    var v50val = val1 + (val50-val1)*frac;
+    if (t<=50) return v50val;
+    var onset=overfitOnset(rank,lr);
+    if (t<=onset){
+      var extra=t-50;
+      var floor=v50val*0.85;
+      return floor+(v50val-floor)*Math.exp(-0.08*extra/10);
+    } else {
+      var floor=v50val*0.85;
+      var valFloorAtOnset=floor+(v50val-floor)*Math.exp(-0.08*(onset-50)/10);
+      var ceiling=Math.max(1.2, valFloorAtOnset*8);
+      var rise=1-Math.exp(-(t-onset)/40);
+      return valFloorAtOnset+(ceiling-valFloorAtOnset)*rise;
+    }
+  }
+
+  /* adapter params: 2 * r * d * (num target modules). d=1024 (Qwen2.5-0.5B hidden size,
+     matches this course's model), 2 target modules (q_proj+v_proj, the deep-dive's default). */
+  var HIDDEN=1024, TARGET_MODULES=2;
+  function trainableParams(rank){ return 2*rank*HIDDEN*TARGET_MODULES; }
+  function adapterMB(rank){ return trainableParams(rank)*2/1048576; } // fp16, 2 bytes/param
+
+  /* ------------------------------------------------------------ state */
+  var RANKS=[4,8,16], LRS=[1e-5,3e-5,1e-4];
+  var DEFAULTS={rank:8, lr:1e-5, iters:50};
+  var S={rank:DEFAULTS.rank, lr:DEFAULTS.lr, iters:DEFAULTS.iters, t0:Date.now()};
+
+  var CH={step:1, done:[false,false,false]};
+  var sawRank4Gap=false, sawOverfit=false, sawSmallestAdapter=false;
+
+  /* ------------------------------------------------------------ events log */
+  var evList=$('evList');
+  function clock(){var s=Math.floor((Date.now()-S.t0)/1000);return Math.floor(s/60)+':'+('0'+s%60).slice(-2);}
+  function logEv(kind,reason,msg){
+    var d=document.createElement('div');
+    d.className='ev new '+(kind||'');
+    d.innerHTML='<span class="et"></span><span class="er"></span><span class="em"></span>';
+    d.children[0].textContent=clock();
+    d.children[1].textContent=reason; d.children[2].textContent=msg;
+    d.title=reason+'  —  '+msg;
+    evList.appendChild(d);
+    while(evList.children.length>90)evList.removeChild(evList.firstChild);
+    evList.scrollTop=evList.scrollHeight;
+  }
+
+  /* ------------------------------------------------------------ number fmt */
+  function fmtMB(mb){ if(mb<1) return (mb*1024).toFixed(0)+' KB'; return mb.toFixed(2)+' MB'; }
+  function fmt3(n){ return n.toFixed(3); }
+
+  /* ------------------------------------------------------------ render: pills */
+  function renderPills(){
+    var rw=$('rankPills'); rw.innerHTML='';
+    RANKS.forEach(function(r){
+      var el=document.createElement('button');
+      el.className='pill'+(S.rank===r?' on':'');
+      el.setAttribute('role','radio'); el.setAttribute('aria-checked', S.rank===r?'true':'false');
+      el.title='Set LoRA rank to '+r+' — '+(r===4?'narrowest, cheapest, least capacity':r===8?'the lab baseline':'widest of the three, most capacity, largest adapter');
+      el.textContent='r='+r;
+      el.addEventListener('click',function(){setRank(r);});
+      rw.appendChild(el);
+    });
+    var lw=$('lrPills'); lw.innerHTML='';
+    LRS.forEach(function(lr){
+      var el=document.createElement('button');
+      el.className='pill'+(S.lr===lr?' on':'');
+      el.setAttribute('role','radio'); el.setAttribute('aria-checked', S.lr===lr?'true':'false');
+      var label=lr===1e-5?'1e-5':lr===3e-5?'3e-5':'1e-4';
+      el.title='Set learning rate to '+label+' — '+(lr===1e-5?'mlx_lm.lora default, conservative':lr===1e-4?'10x default, aggressive':'midpoint, interpolated');
+      el.textContent=label;
+      el.addEventListener('click',function(){setLR(lr);});
+      lw.appendChild(el);
+    });
+  }
+
+  /* ------------------------------------------------------------ chart geometry */
+  var CW=600, CH_H=320, PAD_L=34, PAD_R=8, PAD_T=8, PAD_B=18;
+  var PLOT_W=CW-PAD_L-PAD_R, PLOT_H=CH_H-PAD_T-PAD_B;
+  var Y_MAX=3.9; // fixed scale so growth/overfit is visible without the chart jumping around
+
+  function xOf(t){ return PAD_L + (t/200)*PLOT_W; }
+  function yOf(v){ var vv=Math.max(0,Math.min(Y_MAX,v)); return PAD_T + (1-vv/Y_MAX)*PLOT_H; }
+
+  function buildPath(fn, tMax){
+    var pts=[]; var n=90;
+    for (var i=0;i<=n;i++){
+      var t=1+(tMax-1)*(i/n);
+      pts.push(xOf(t)+','+yOf(fn(t)));
+    }
+    return 'M '+pts.join(' L ');
+  }
+
+  function renderChart(){
+    var svg=$('chart'); svg.innerHTML='';
+    var ns='http://www.w3.org/2000/svg';
+    function el(tag,attrs){ var e=document.createElementNS(ns,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+
+    // gridlines (loss = 0,1,2,3) + iter gridlines (0,50,100,150,200)
+    [0,1,2,3].forEach(function(v){
+      var y=yOf(v);
+      svg.appendChild(el('line',{x1:PAD_L,y1:y,x2:CW-PAD_R,y2:y,class:'gridline'}));
+      var t=el('text',{x:2,y:y+3,class:'axislabel'}); t.textContent=v; svg.appendChild(t);
+    });
+    [0,50,100,150,200].forEach(function(it){
+      var x=xOf(it);
+      var t=el('text',{x:x-6,y:CH_H-4,class:'axislabel'}); t.textContent=it; svg.appendChild(t);
+    });
+
+    var tMax=S.iters;
+
+    // overfit onset marker, if within range
+    var onset=overfitOnset(S.rank,S.lr);
+    if (onset<=tMax){
+      var xo=xOf(onset);
+      svg.appendChild(el('line',{x1:xo,y1:PAD_T,x2:xo,y2:CH_H-PAD_B,class:'onsetline'}));
+    }
+
+    // curves
+    var trainPath=buildPath(function(t){return trainLossAt(S.rank,S.lr,t);}, tMax);
+    var valPath=buildPath(function(t){return valLossAt(S.rank,S.lr,t);}, tMax);
+    svg.appendChild(el('path',{d:trainPath,class:'curve train'}));
+    svg.appendChild(el('path',{d:valPath,class:'curve val'}));
+
+    // real anchor markers when tMax>=50 and this exact (rank,lr) combo was really captured
+    var key=S.rank+'|'+S.lr;
+    if (ANCHOR50[key] && tMax>=1){
+      var a=ANCHOR50[key];
+      var showT=Math.min(50,tMax);
+      if (showT>=50){
+        svg.appendChild(el('circle',{cx:xOf(50),cy:yOf(a.train),class:'anchor train'}));
+        svg.appendChild(el('circle',{cx:xOf(50),cy:yOf(a.val),class:'anchor val'}));
+      }
+    }
+
+    // current cursor dot at t=tMax
+    var tv=trainLossAt(S.rank,S.lr,tMax), vv=valLossAt(S.rank,S.lr,tMax);
+    svg.appendChild(el('line',{x1:xOf(tMax),y1:PAD_T,x2:xOf(tMax),y2:CH_H-PAD_B,class:'cursorline'}));
+    svg.appendChild(el('circle',{cx:xOf(tMax),cy:yOf(tv),class:'dot train'}));
+    svg.appendChild(el('circle',{cx:xOf(tMax),cy:yOf(vv),class:'dot val'}));
+  }
+
+  /* ------------------------------------------------------------ render: everything */
+  function render(){
+    $('itersVal').textContent=S.iters;
+    $('itersRange').value=S.iters;
+    $('itersLive').textContent='iter '+S.iters;
+
+    var train=trainLossAt(S.rank,S.lr,S.iters);
+    var val=valLossAt(S.rank,S.lr,S.iters);
+    var gap=val-train;
+
+    $('ovTrain').textContent=fmt3(train);
+    $('ovVal').textContent=fmt3(val);
+    var gapEl=$('ovGap');
+    gapEl.textContent=(gap>=0?'+':'')+fmt3(gap);
+    gapEl.className='rv '+(gap>0.15?'bad':gap>0.05?'warn':'good');
+
+    var mb=adapterMB(S.rank), tp=trainableParams(S.rank);
+    $('sizeVal').textContent=fmtMB(mb);
+    // gauge fills relative to the largest option (rank16) so it reads as a real comparison
+    var maxMB=adapterMB(16);
+    $('meterFill').style.width=(100*mb/maxMB).toFixed(1)+'%';
+    $('sizeNote').textContent=tp.toLocaleString('en-US')+' trainable params (2×r×d×modules, r='+S.rank+', d=1024, 2 target modules)';
+
+    // overfit indicator
+    var onset=overfitOnset(S.rank,S.lr);
+    var badge=$('overfitBadge'), note=$('overfitNote');
+    if (S.iters<onset-15){
+      badge.className='healthy'; badge.textContent='healthy';
+      note.textContent='train and val falling together — still learning the general pattern.';
+    } else if (S.iters<onset){
+      badge.className='watch'; badge.textContent='watch';
+      note.textContent='approaching the overfit onset for this rank/lr (~iter '+Math.round(onset)+') — val is flattening.';
+    } else {
+      badge.className='diverging'; badge.textContent='diverging';
+      note.textContent='train keeps falling, val is rising — the memorization signature from §3. The adapter is over-fitting the 8 toy examples.';
+    }
+
+    renderPills();
+    renderChart();
+    evalChallenge();
+  }
+
+  /* ------------------------------------------------------------ challenge */
+  /* Step 1: at iters=50, switch to rank 4 and observe the capacity gap vs baseline
+              (rank4 train loss stays measurably above rank8's ~0.20, i.e. > 0.35).
+     Step 2: crank lr to 1e-4 (or 3e-5) and push iters until val diverges from train
+              (gap > 0.3 while past the onset line).
+     Step 3: find the smallest rank (prefer rank 4) that still reaches train <= 0.25
+              at the current iters. */
+  function evalChallenge(){
+    var train=trainLossAt(S.rank,S.lr,S.iters);
+    var val=valLossAt(S.rank,S.lr,S.iters);
+    var gap=val-train;
+    var onset=overfitOnset(S.rank,S.lr);
+
+    if (CH.step===1){
+      if (S.rank===4 && S.iters>=45 && train>0.35){
+        sawRank4Gap=true; CH.done[0]=true; CH.step=2;
+        logEv('try','try-this','Step 1 done — rank 4 train loss '+fmt3(train)+' vs the rank-8 baseline’s real 0.200. The narrower adapter genuinely has less capacity.');
+      }
+    } else if (CH.step===2){
+      if (S.lr>1e-5 && S.iters>onset && gap>0.3){
+        sawOverfit=true; CH.done[1]=true; CH.step=3;
+        logEv('warn','try-this','Step 2 done — at iter '+S.iters+' train='+fmt3(train)+' but val='+fmt3(val)+'. Train keeps falling, val is rising: the overfit signature.');
+      }
+    } else if (CH.step===3){
+      if (S.rank===4 && train<=0.25){
+        sawSmallestAdapter=true; CH.done[2]=true; CH.step=4;
+        logEv('ok','try-this','Step 3 done — rank 4 ('+fmtMB(adapterMB(4))+') reaches train '+fmt3(train)+' ≤ 0.25 at iter '+S.iters+'. Smallest adapter, still on budget: crank lr instead of rank.');
+      }
+    }
+    paintChallenge();
+  }
+
+  var CH_TEXT=[
+    'Step 1 — Set <code>iters</code> to 50 and switch to <code>rank 4</code>. Watch train loss land well above the rank-8 baseline’s real <b>0.200</b> — that is the capacity gap.',
+    'Step 2 — Raise the learning rate and drag <code>iterations</code> well past 50. Watch <b>val loss rise while train keeps falling</b> — the overfit signature.',
+    'Step 3 — Find the <b>smallest adapter</b> (lowest rank) that still reaches <b>train loss ≤ 0.25</b>. Hint: a higher learning rate gets a small adapter there fast.'
+  ];
+  var SUCCESS='Challenge complete! You felt the whole trade-off triangle. <b>Rank</b> buys capacity — cut it and the floor loss rises, exactly as rank 4’s real 0.449 vs rank 8’s real 0.200 showed. <b>Learning rate</b> buys speed — crank it and the same iteration budget gets you much lower, faster. But speed without a stopping point curdles into <b>overfitting</b>: push iterations far enough at a high learning rate and train loss keeps sliding while validation loss turns around and rises — the model is memorizing eight rows, not learning the pattern. The practical answer is never "biggest rank, most iterations" — it is the <b>smallest adapter and shortest run that clears your loss bar</b>, which is exactly what step 3 just found.';
+
+  function paintChallenge(){
+    for (var i=1;i<=3;i++){
+      var d=$('d'+i); d.className='dot'+(CH.done[i-1]?' done':CH.step===i?' cur':'');
+      d.textContent=CH.done[i-1]?'✓':i;
+    }
+    var box=$('challenge'), txt=$('chTxt');
+    if (CH.step>=4){ box.classList.add('success'); txt.innerHTML=SUCCESS; }
+    else { box.classList.remove('success'); txt.innerHTML=CH_TEXT[CH.step-1]; }
+  }
+
+  /* ------------------------------------------------------------ actions */
+  function setRank(r){
+    S.rank=r; render();
+    logEv('','rank r='+r,'adapter rank '+r+' · '+trainableParams(r).toLocaleString('en-US')+' trainable · '+fmtMB(adapterMB(r))+' saved');
+  }
+  function setLR(lr){
+    S.lr=lr; render();
+    var label=lr===1e-5?'1e-05':lr===3e-5?'3e-05':'1e-04';
+    logEv('','lr='+label,'learning rate set to '+label+' — '+(lr>1e-5?'faster convergence, watch for overfit at high iters':'conservative, slow and steady'));
+  }
+  var lastLoggedIter=-1;
+  function setIters(n){
+    S.iters=n; render();
+    if (n%10===0 && n!==lastLoggedIter){
+      lastLoggedIter=n;
+      var train=trainLossAt(S.rank,S.lr,n), val=valLossAt(S.rank,S.lr,n);
+      var line='iter '+n+': train '+fmt3(train)+' | val '+fmt3(val);
+      logEv(val-train>0.3 && n>overfitOnset(S.rank,S.lr) ? 'bad':'', 'iter '+n, line);
+    }
+  }
+
+  /* ------------------------------------------------------------ wiring */
+  $('itersRange').addEventListener('input',function(){ setIters(+this.value); });
+  $('reset').addEventListener('click',function(){ location.reload(); });
+
+  /* ------------------------------------------------------------ boot */
+  render();
+  paintChallenge();
+  logEv('','ready','base Qwen2.5-0.5B-Instruct loaded · adapter rank 8, lr 1e-05, 8-example toy set');
+  logEv('','iter 50','train 0.200 | val 0.148   (real captured baseline)');
+  logEv('ok','adapter saved','adapters-baseline/adapters.safetensors · '+fmtMB(adapterMB(8)));
+
+  /* ------------------------------------------------------------ test hook */
+  window.__sim={
+    S:S, CH:CH,
+    RANKS:RANKS, LRS:LRS, CTRL:CTRL, ANCHOR50:ANCHOR50,
+    consts:{DEFAULTS:DEFAULTS},
+    setRank:setRank, setLR:setLR, setIters:setIters,
+    trainLossAt:trainLossAt, valLossAt:valLossAt,
+    trainableParams:trainableParams, adapterMB:adapterMB,
+    overfitOnset:overfitOnset
+  };
+})();
+</script>
+</body>
+</html>
