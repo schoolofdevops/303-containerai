@@ -4,7 +4,7 @@
 > cleared, reading this + `CLAUDE.md` + `planning/ROADMAP.md` fully restores context. Keep it concise
 > and update it after every task/decision.
 
-**Last updated:** 2026-07-23
+**Last updated:** 2026-07-23 (Phase 3 complete, pending v1.6.0 ship)
 **Active phase:** ✅ **COURSE COMPLETE** — M1–M8 + Capstone all live + lab-validated. Working on `main`.
 **Live site:** https://schoolofdevops.github.io/303-containerai/ (every page 200)
 **Execution mode:** subagent-driven, grouped into waves; controller reviews + live validation
@@ -59,9 +59,18 @@ touched), `scripts/test-course.sh m7` PASS. Learner-QA PASS (path blocker + hone
 live-proven).
 
 **PHASE 2 COMPLETE (pending v1.5.0 ship):** all four priority deep dives (M3B → M3 → M5 → M7) done.
-**NEXT:** Phase 3 enrichments (sims, Container X-Ray live-tool) per
-`planning/specs/2026-07-22-depth-retrofit-design.md` — time-permitting / post-workshop. Breadth
-modules (non-priority deep dives) parked.
+
+**PHASE 3 COMPLETE (pending v1.6.0 ship):** interactive simulators — LoRA Trade-off Playground (m3b,
+harness 44/44) + RAG Retrieval Playground (m5, harness 49/49, real corpus byte-identical) — plus the
+Container X-Ray live-tool (`labs/tools/container-xray`, 22/22 live assertions, 3 lenses: wiring/stack/
+platform) over the learner's real docker state. Learner-QA all-PASS, zero findings
+(`planning/learner-qa/phase3-report.md`). Release-prep gates green: `site` build, both sim harnesses,
+`bash -n` on `container-xray/serve.sh`, `scripts/test-course.sh m1 m3b m5` PASS. **NEXT:** ship
+v1.6.0 (push + tag, controller-driven, not part of this release-prep step).
+
+**Parked (post-ship):** breadth modules (non-priority deep dives), narration kits, the existing-deck
+CDN question, the three-repo split (skillcoco/skillcoco-pro/skillcoco-hub — see
+`~/work/apps/learning/CLAUDE.md`).
 
 ## Post-completion work (2026-07-05, later)
 

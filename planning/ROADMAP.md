@@ -55,3 +55,13 @@ Legend: ✅ done · 🔄 in progress · ⬜ pending
 | M3 · vLLM Internals Deep Dive — page + `deep-dive.checks.json` + `03-deepdive.html` deck (18 slides) + lab pointer, learner-QA PASS (F7 fixed) | ✅ (v1.3.0) |
 | M5 · RAG Parameters Deep Dive — page + `deep-dive.checks.json` + `05-deepdive.html` deck (21 slides) + state-tolerant re-seed guard + lab pointer, learner-QA all-PASS (zero findings) | ✅ (v1.4.0) |
 | M7 · Agent Knobs Deep Dive — page + `deep-dive.checks.json` + `07-deepdive.html` deck (18 slides) + lab pointer, learner-QA PASS | ✅ (v1.5.0) |
+
+## Phase 3 — Depth retrofit enrichments (2026-07-23)
+
+| Item | Status |
+| --- | --- |
+| LoRA Trade-off Playground sim (m3b deep-dive) — self-contained, harness-gated (44/44), grounded in real captured runs | ✅ (v1.6.0) |
+| RAG Retrieval Playground sim (m5 deep-dive) — self-contained, harness-gated (49/49), real corpus byte-identical | ✅ (v1.6.0) |
+| Container X-Ray live-tool (`labs/tools/container-xray`) — 3 lenses (wiring/stack/platform), 22/22 live assertions | ✅ (v1.6.0) |
+| Embed component (coursesmith) | ✅ (v1.6.0) |
+| Learner-QA — all PASS, zero findings (`planning/learner-qa/phase3-report.md`) | ✅ |

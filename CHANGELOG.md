@@ -5,6 +5,16 @@ All notable changes to this course build are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-07-23
+
+### Added
+
+- Interactive simulators: LoRA Trade-off Playground (m3b) + RAG Retrieval Playground (m5), both
+  self-contained, harness-gated, grounded in the deep dives' real captured runs.
+- Container X-Ray live-tool (`labs/tools/container-xray`) — 3 lenses (wiring/stack/platform) over
+  the learner's real docker state, validated live.
+- Embed component (coursesmith).
+
 ## [1.5.0] - 2026-07-23
 
 ### Added
