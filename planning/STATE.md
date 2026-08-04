@@ -11,9 +11,10 @@
 
 ## Depth retrofit (2026-07-22)
 
-**Fork staging live** at https://initcron.github.io/303-containerai/. Deploy flow: push local `main` to
-`fork` remote → fork Actions auto-deploys → QA on staging → merge/push to `origin` only after green gates.
-Enables safe iteration and validation before promoting to the production schoolofdevops site.
+**Fork staging retired (2026-08-04).** The `fork` remote (initcron/303-containerai) is fully merged
+into upstream as of v1.7.0 and has been removed from this workspace. `origin` = `schoolofdevops/303-containerai`
+(upstream, the live site) and is now the only remote. Workflow going forward: branch → PR into
+`origin/main` → merge → tag. No separate staging deploy step.
 
 **Phase 1 COMPLETE.** Checks backbone (`labs/<module>/checks.json` all 10 modules + zero-dep
 `scripts/run-checks.mjs` runner) + `scripts/test-course.sh` smoke test (10/10 green) +
