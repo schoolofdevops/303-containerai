@@ -4,35 +4,50 @@
 > cleared, reading this + `CLAUDE.md` + `planning/ROADMAP.md` fully restores context. Keep it concise
 > and update it after every task/decision.
 
-**Last updated:** 2026-08-05 (M1 voice+divider pilot on branch `pilot-m1-voice-deck`, awaiting founder merge decision)
+**Last updated:** 2026-08-05 (voice+divider rollout COMPLETE across all 10 modules, branch `voice-divider-rollout` awaiting PR/merge)
 **Active phase:** ✅ **COURSE COMPLETE** — M1–M8 + Capstone all live + lab-validated. Working on `main`.
 **Live site:** https://schoolofdevops.github.io/303-containerai/ (every page 200)
 **Execution mode:** subagent-driven, grouped into waves; controller reviews + live validation
 
-## M1 voice + divider-slide pilot (2026-08-05, on branch `pilot-m1-voice-deck`, NOT merged)
+## Voice + divider-slide rollout (2026-08-05) — all 10 modules done
 
 Coursesmith commit `82c3b17` (deck-author + module-author) codified two new hard rules learned
 from a 307-aipython correction round: (1) every lesson paragraph must pass the `gourav-voice`
 skill before shipping (same pipeline as narration), and (2) decks get one title-only **divider
 slide per lesson `##` section** instead of a per-slide kicker, with subtitles tightened to
 ≤10-word/≤60-char anchoring phrases (down from the ≤80-char sentence rule the July regen used).
-Piloted on M1 only, per founder request, before deciding on the other 8 modules:
 
-- `lesson.md`: voice-passed, +12% word count (fragments → full sentences, jargon explained
-  inline), headers unchanged, facts/commands untouched. 3 new vocabulary-swap candidates found
-  (not yet added to the skill's table — founder review pending).
-- `01-container-native.html`: 13 → 19 slides (6 dividers added), subtitles rewritten to the
-  tighter target, all on-slide text voice-passed, propagated the lesson's word swaps.
-- **Caught + fixed same-day:** divider numbers initially rendered out of lesson order (1,2,3,6,4,5)
-  because the deck's pre-existing narrative visited §6 right after §3 — invisible before dividers
-  existed, a real defect once they made section order visible. Fixed by reordering the deck's own
-  §6 slides to close the walk, matching the lesson's 1→6 order exactly. Sequence spec rewritten
-  to match.
-- All gates green (build, subtitle audit, zero-ref, tag balance, headless render, divider-verbatim
-  match to lesson headers). Reviewed via local headless-Chrome screenshots (no staging deploy needed
-  post-fork-retirement).
-- **NEXT:** founder reviews the branch, decides merge + whether to roll the same pipeline out to
-  the remaining 8 modules (M2–M8, Capstone) module-by-module or in a batch.
+**M1 piloted first** (branch `pilot-m1-voice-deck`, merged via PR #2, live). Caught a real
+defect: divider numbers rendered out of lesson order (1,2,3,6,4,5) because the deck's
+pre-existing narrative visited §6 right after §3 — invisible before dividers existed. Fixed by
+reordering the deck to match the lesson's 1→6 order exactly.
+
+**Founder approved rollout to the remaining 9 modules** (M2, M3, M3B, M4, M5, M6, M7, M8,
+Capstone), done in 3 batches of 3 on branch `voice-divider-rollout` (not yet merged — PR next):
+
+- All 9 lessons voice-passed (headers unchanged, facts/commands/numbers untouched). Batch 1
+  needed a follow-up fix (em dashes under-stripped from deck titles/subtitles); batches 2–3 held
+  the em-dash gate clean on the first pass once the instruction was tightened.
+- All 9 decks regenerated with dividers, checking divider order against the lesson **before**
+  building this time (M1's bug wasn't repeated) — M2, M4, M6 each needed one small content-slide
+  reorder, caught proactively and fixed cleanly, no build-ups broken.
+- **Cross-module terminology catch:** M6/M7's voice pass swapped "orchestration/orchestrator" →
+  "coordination/coordinator" generically, but M7's *deck* had kept "orchestrator" in 3 places
+  referring to CrewAI/LangGraph as the swappable engine — the same category M1 deliberately
+  named "Orchestration Frameworks" (real industry term, kept on purpose in the pilot). Reverted
+  the one drifted lesson instance back to "orchestrator"; added a caveat to the gourav-voice
+  skill's vocab table so future passes don't rename this specific term.
+- **M5 markup consistency:** dividers were rendering correctly via CSS (`section.divider` class)
+  but lacked the inline `font-size:2.2em` every other module's divider markup carries — cosmetic
+  only, fixed for source consistency across all 10 decks.
+- gourav-voice skill table updated with 5 new entries total: hermetically sealed→tightly sealed,
+  contract abstraction→shared contract, N–Mx (+ bare Nx)→spelled out, orchestrate(verb)→
+  coordinate (with the Orchestration-Frameworks-stays-as-is caveat), §N→Section N.
+- **All 10 decks pass a final cross-module audit:** subtitle ≤80 (mostly ≤60), zero external
+  refs, zero on-slide takeaways, exactly 2 kickers (title+closing), divider sequences all
+  strictly 1→N with no gaps, tag balance, build green.
+- **NEXT:** push `voice-divider-rollout`, open one PR covering all 9 modules, merge, verify live
+  deploy, tag.
 
 ## Depth retrofit (2026-07-22)
 
