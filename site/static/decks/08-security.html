@@ -82,6 +82,8 @@ footer, header, hgroup, main, menu, nav, section {
   .reveal .slides{ text-align:center; }
   .reveal .slides section{ position:absolute; inset:0; box-sizing:border-box; flex-direction:column; justify-content:center; padding:20px 48px 42px; overflow:hidden; }
   .reveal .slides > section.present{ display:flex; }
+  .reveal .slides section.divider{ justify-content:center; align-items:center; }
+  .reveal .slides section.divider h2.t{ order:0; font-size:2.2em; max-width:88%; }
 
   .reveal h1,.reveal h2,.reveal h3{
     font-family:'Patrick Hand', cursive;
@@ -138,7 +140,7 @@ footer, header, hgroup, main, menu, nav, section {
 <section data-auto-animate>
   <p class="kicker">MODULE 8 &nbsp;·&nbsp; DAY 2</p>
   <h2 class="t" style="font-size:2.3em">Securing &amp; Governing AI Workloads</h2>
-  <p class="s" style="font-size:1.2em">Harden and ship the crew — the open-source way</p>
+  <p class="s" style="font-size:1.2em">Harden and ship the crew, the open source way</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="A shipped container carrying an agent, sealed with a tamper-evident signature">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
       <!-- container body -->
@@ -164,7 +166,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- ============ SLIDE 2 — WHAT YOU'LL LEARN ============ -->
 <section>
   <h2 class="t">What you'll learn</h2>
-  <p class="s">Six controls that make a containerized agent safe to ship to production.</p>
+  <p class="s">Six controls that make the agent safe to ship.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="Six learning outcomes listed as numbered rows">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
       <circle cx="110" cy="55"  r="22"/>
@@ -185,7 +187,7 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="155" y="192">Harden the agent image: least privilege, read-only, capped, secrets out</text>
       <text x="155" y="257">Add input / output guardrails and human-in-the-loop review</text>
       <text x="155" y="322">Run lightweight evals and tracing to catch regressions in CI</text>
-      <text x="155" y="385">Govern the agent without a vendor — a policy the pipeline enforces</text>
+      <text x="155" y="385">Govern the agent without a vendor: a policy the pipeline enforces</text>
     </g>
   </svg>
   <div class="pageno">M8·02</div>
@@ -194,7 +196,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- ============ SLIDE 3 — THE MOTIVATING PROBLEM ============ -->
 <section>
   <h2 class="t">An agent is a security surface</h2>
-  <p class="s">It runs tools, executes code, reads secrets, calls the network.</p>
+  <p class="s">Four unguarded exposures, untrusted by default.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="An agent at the center with four unguarded exposures fanning out around it">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
       <rect x="440" y="160" width="220" height="90" rx="14"/>
@@ -224,10 +226,16 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M8·03</div>
 </section>
 
-<!-- ============ SLIDE 4 — THE FOOD-FACTORY ANALOGY ============ -->
+<!-- ============ DIVIDER 1 — SECTION 1 ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">1 &middot; The analogy: ingredients label, health inspection, tamper seal</h2>
+  <div class="pageno">M8·04</div>
+</section>
+
+<!-- ============ SLIDE — THE FOOD-FACTORY ANALOGY (§1) ============ -->
 <section>
   <h2 class="t">Three things every shipped product needs</h2>
-  <p class="s">Ship an AI image like a food maker ships a ready-meal: label, check, seal.</p>
+  <p class="s">Ship AI like a ready meal: label, check, seal.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Ingredients label, health inspection, and tamper-evident seal mapped to SBOM, scan, and signature">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
       <rect x="60"  y="80" width="290" height="220" rx="12"/>
@@ -262,13 +270,27 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="895" y="280">= Signature (Cosign)</text>
     </g>
   </svg>
-  <div class="pageno">M8·04</div>
+  <div class="pageno">M8·05</div>
 </section>
 
-<!-- ============ SLIDE 5 — THE SUPPLY-CHAIN PIPELINE (CENTERPIECE) ============ -->
+<!-- ============ DIVIDER 2 — SECTION 2 ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">2 &middot; The supply chain pipeline</h2>
+  <div class="pageno">M8·06</div>
+</section>
+
+<!-- ============ DIVIDER 3 — SECTION 3 (no dedicated slide; the pipeline slide below already
+     draws the SBOM stage as its own labelled box — folded here rather than a redundant slide,
+     same editorial call as the pre-divider baseline spec; see sequence-spec coverage table) ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">3 &middot; The SBOM: ingredients label for your image</h2>
+  <div class="pageno">M8·07</div>
+</section>
+
+<!-- ============ SLIDE — THE SUPPLY-CHAIN PIPELINE (CENTERPIECE, §2 + §3) ============ -->
 <section>
   <h2 class="t">The supply-chain pipeline</h2>
-  <p class="s">Every agent, model, or code image passes through this before it deploys.</p>
+  <p class="s">Every image passes through this before it deploys.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="A linear flow: source to build to SBOM to scan to a gate, then sign, registry, and verify">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
       <rect x="40"  y="70" width="160" height="80" rx="10"/>
@@ -314,13 +336,19 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="1005" y="135" text-anchor="middle" class="lbl-g" style="font-size:15px">fix &amp;</text>
     <text x="1005" y="155" text-anchor="middle" class="lbl-g" style="font-size:15px">rebuild</text>
   </svg>
-  <div class="pageno">M8·05</div>
+  <div class="pageno">M8·08</div>
 </section>
 
-<!-- ============ SLIDE 6 — TWO SCANNERS ============ -->
+<!-- ============ DIVIDER 4 — SECTION 4 (header keeps its em dash verbatim, per lesson) ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">4 &middot; Vulnerability scanning: two scanners disagree — that is a feature</h2>
+  <div class="pageno">M8·09</div>
+</section>
+
+<!-- ============ SLIDE — TWO SCANNERS (§4) ============ -->
 <section>
-  <h2 class="t">Two scanners disagree — that's the feature</h2>
-  <p class="s">Different advisory feeds catch different CVEs — triage, don't average.</p>
+  <h2 class="t">Two scanners disagree, that's the point</h2>
+  <p class="s">Different feeds, different CVEs: triage, don't average.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="One image scanned by Trivy and Grype producing different counts, merged and triaged">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="440" y="40" width="220" height="70" rx="12"/>
@@ -348,13 +376,19 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="550" y="338" text-anchor="middle" class="lbl">Triage: fixable + severity</text>
   </svg>
-  <div class="pageno">M8·06</div>
+  <div class="pageno">M8·10</div>
 </section>
 
-<!-- ============ SLIDE 7 — SIGNING / TAMPER SEAL ============ -->
+<!-- ============ DIVIDER 5 — SECTION 5 ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">5 &middot; Signing: the tamper-evident seal</h2>
+  <div class="pageno">M8·11</div>
+</section>
+
+<!-- ============ SLIDE — SIGNING / TAMPER SEAL (§5) ============ -->
 <section>
   <h2 class="t">Cosign: the tamper-evident seal</h2>
-  <p class="s">Key-based locally so you see it; keyless OIDC in CI so no key can leak.</p>
+  <p class="s">Key-based locally, keyless OIDC in CI.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Cosign signs an image into the registry; a verify step on deploy checks the seal before the image runs">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
       <rect x="60"  y="130" width="200" height="90" rx="10"/>
@@ -381,13 +415,19 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="940" y="345" text-anchor="middle" class="lbl-g">valid seal → run · else refuse</text>
   </svg>
-  <div class="pageno">M8·07</div>
+  <div class="pageno">M8·12</div>
 </section>
 
-<!-- ============ SLIDE 8 — SANDBOXING / BLAST RADIUS ============ -->
+<!-- ============ DIVIDER 6 — SECTION 6 ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">6 &middot; Sandboxing agent, tool, and generated code</h2>
+  <div class="pageno">M8·13</div>
+</section>
+
+<!-- ============ SLIDE — SANDBOXING / BLAST RADIUS (§6) ============ -->
 <section>
   <h2 class="t">Sandbox: a box with no blast radius</h2>
-  <p class="s">Run untrusted code in an ephemeral, locked-down box — then throw it away.</p>
+  <p class="s">Run untrusted code once, then throw the box away.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Generated code runs inside an isolated box with network cut, read-only filesystem, and dropped capabilities">
     <!-- outer host -->
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="4 6">
@@ -419,13 +459,19 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="150" y="300">--pids-limit · --memory · no-new-privileges</text>
     </g>
   </svg>
-  <div class="pageno">M8·08</div>
+  <div class="pageno">M8·14</div>
 </section>
 
-<!-- ============ SLIDE 9 — HARDENING CHECKLIST ============ -->
+<!-- ============ DIVIDER 7 — SECTION 7 ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">7 &middot; Hardening the container image</h2>
+  <div class="pageno">M8·15</div>
+</section>
+
+<!-- ============ SLIDE — HARDENING CHECKLIST (§7) ============ -->
 <section>
   <h2 class="t">Hardening the agent image</h2>
-  <p class="s">The agent image still needs a small attack surface of its own.</p>
+  <p class="s">The agent image needs a small attack surface too.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="A hardening checklist of six numbered controls">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
       <rect x="60" y="45" width="980" height="52" rx="8"/>
@@ -444,21 +490,27 @@ footer, header, hgroup, main, menu, nav, section {
       <path d="M92,370 L104,384 L124,362"/>
     </g>
     <g class="lbl" text-anchor="start">
-      <text x="160" y="79">Least privilege — run as a non-root user (USER appuser)</text>
-      <text x="160" y="141">Read-only rootfs — --read-only / ReadOnlyRootFilesystem</text>
-      <text x="160" y="203">Drop capabilities — --cap-drop ALL, add back only what's needed</text>
-      <text x="160" y="265">No privilege escalation — --security-opt no-new-privileges</text>
-      <text x="160" y="327">Resource caps — --memory · --pids-limit · --cpus</text>
+      <text x="160" y="79">Least privilege: run as a non-root user (USER appuser)</text>
+      <text x="160" y="141">Read-only rootfs: --read-only / ReadOnlyRootFilesystem</text>
+      <text x="160" y="203">Drop capabilities: --cap-drop ALL, add back only what's needed</text>
+      <text x="160" y="265">No privilege escalation: --security-opt no-new-privileges</text>
+      <text x="160" y="327">Resource caps: --memory · --pids-limit · --cpus</text>
       <text x="160" y="389">Secrets out of the image · HEALTHCHECK + probes</text>
     </g>
   </svg>
-  <div class="pageno">M8·09</div>
+  <div class="pageno">M8·16</div>
 </section>
 
-<!-- ============ SLIDE 10 — GUARDRAILS + HUMAN-IN-THE-LOOP ============ -->
+<!-- ============ DIVIDER 8 — SECTION 8 ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">8 &middot; Guardrails and evaluation</h2>
+  <div class="pageno">M8·17</div>
+</section>
+
+<!-- ============ SLIDE — GUARDRAILS + HUMAN-IN-THE-LOOP (§8) ============ -->
 <section>
   <h2 class="t">Guardrails at the model boundary</h2>
-  <p class="s">Supply chain protects the infra; guardrails protect what goes in and comes out.</p>
+  <p class="s">Guardrails protect what goes in and comes out.</p>
   <svg viewBox="0 0 1100 360" role="img" aria-label="Input screen, then model, then output screen with a human-in-the-loop gate before any destructive action">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
       <rect x="40"  y="120" width="180" height="90" rx="10"/>
@@ -482,13 +534,13 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="930" y="252" text-anchor="middle" class="lbl-g" style="font-size:16px">gate on destructive</text>
     <text x="930" y="274" text-anchor="middle" class="lbl-g" style="font-size:16px">commands</text>
   </svg>
-  <div class="pageno">M8·10</div>
+  <div class="pageno">M8·18</div>
 </section>
 
-<!-- ============ SLIDE 11 — EVALS + TRACING ============ -->
+<!-- ============ SLIDE — EVALS + TRACING (§8, cont.) ============ -->
 <section>
-  <h2 class="t">Lightweight eval — smoke test for behavior</h2>
-  <p class="s">A handful of labeled cases in CI catches regressions before production.</p>
+  <h2 class="t">A lightweight eval proves the guardrails work</h2>
+  <p class="s">A few labeled cases in CI catch regressions.</p>
   <svg viewBox="0 0 1100 360" role="img" aria-label="Three eval dimensions each with a small set of cases, all passing, wired into CI with tracing">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
       <rect x="60"  y="70" width="300" height="200" rx="12"/>
@@ -517,13 +569,19 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="550" y="315" text-anchor="middle" class="lbl-g">3 cases per dimension · runs in CI on every push · tracing records every step</text>
   </svg>
-  <div class="pageno">M8·11</div>
+  <div class="pageno">M8·19</div>
 </section>
 
-<!-- ============ SLIDE 12 — GOVERNANCE AS A POLICY GATE ============ -->
+<!-- ============ DIVIDER 9 — SECTION 9 ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">9 &middot; Governance without a vendor</h2>
+  <div class="pageno">M8·20</div>
+</section>
+
+<!-- ============ SLIDE — GOVERNANCE AS A POLICY GATE (§9) ============ -->
 <section>
   <h2 class="t">Governance without a vendor</h2>
-  <p class="s">Four documented, enforced answers — written in YAML, enforced by open tools.</p>
+  <p class="s">Four documented answers, enforced in YAML.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Four governance questions feed a policy gate that permits or denies a deployment">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
       <rect x="40" y="50"  width="380" height="52" rx="8"/>
@@ -532,10 +590,10 @@ footer, header, hgroup, main, menu, nav, section {
       <rect x="40" y="260" width="380" height="52" rx="8"/>
     </g>
     <g class="lbl-sm" text-anchor="start">
-      <text x="60" y="82">What may it reach? — egress rules</text>
-      <text x="60" y="152">What credentials? — scoped, external</text>
-      <text x="60" y="222">Which MCP tools? — ToolHive allowlist</text>
-      <text x="60" y="292">Who approved it? — signed image + CI</text>
+      <text x="60" y="82">What may it reach: egress rules</text>
+      <text x="60" y="152">What credentials: scoped, external</text>
+      <text x="60" y="222">Which MCP tools: ToolHive allowlist</text>
+      <text x="60" y="292">Who approved it: signed image + CI</text>
     </g>
     <!-- arrows to gate -->
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
@@ -558,10 +616,10 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="1015" y="105" text-anchor="middle" class="lbl">permit</text>
     <text x="1015" y="300" text-anchor="middle" class="lbl-g">deny</text>
   </svg>
-  <div class="pageno">M8·12</div>
+  <div class="pageno">M8·21</div>
 </section>
 
-<!-- ============ SLIDE 13 — CLOSING / LAB LEAD-IN ============ -->
+<!-- ============ SLIDE 22 — CLOSING / LAB LEAD-IN ============ -->
 <section>
   <p class="kicker">SHIP IT SAFELY</p>
   <h2 class="t" style="font-size:2.3em">Trust is a pipeline, not a promise</h2>
@@ -584,11 +642,11 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="590" y="162">Sign</text>
       <text x="820" y="162">Serve</text>
     </g>
-    <text x="475" y="245" text-anchor="middle" class="lbl-g">GitHub Actions — gates on security before it signs</text>
+    <text x="475" y="245" text-anchor="middle" class="lbl-g">GitHub Actions: gates on security before it signs</text>
   </svg>
-  <p class="s" style="font-size:1.1em">In the lab: run the tools, prove isolation, wire a guardrail + eval.</p>
+  <p class="s" style="font-size:1.1em">In the lab: run the tools, prove isolation.</p>
   <p class="credit">Head to <b>Module 8 · Lab</b>. &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
-  <div class="pageno">M8·13</div>
+  <div class="pageno">M8·22</div>
 </section>
 
 

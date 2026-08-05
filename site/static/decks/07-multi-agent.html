@@ -82,6 +82,8 @@ footer, header, hgroup, main, menu, nav, section {
   .reveal .slides{ text-align:center; }
   .reveal .slides section{ position:absolute; inset:0; box-sizing:border-box; flex-direction:column; justify-content:center; padding:20px 48px 42px; overflow:hidden; }
   .reveal .slides > section.present{ display:flex; }
+  .reveal .slides section.divider{ justify-content:center; align-items:center; }
+  .reveal .slides section.divider h2.t{ order:0; font-size:2.2em; max-width:88%; }
 
   .reveal h1,.reveal h2,.reveal h3{
     font-family:'Patrick Hand', cursive;
@@ -138,7 +140,7 @@ footer, header, hgroup, main, menu, nav, section {
 <section data-auto-animate>
   <p class="kicker">MODULE 7 &nbsp;·&nbsp; DAY 2</p>
   <h2 class="t" style="font-size:2.3em">The Multi-Agent Incident Crew</h2>
-  <p class="s" style="font-size:1.2em">One agent grows into a crew of four — sharing one model</p>
+  <p class="s" style="font-size:1.2em">One agent grows into a crew of four.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Four specialised agents Triage, Investigator, Fixer, Reviewer in a pipeline">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8" stroke-linecap="round">
       <rect x="60"  y="150" width="210" height="90" rx="10"/>
@@ -153,7 +155,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="425" y="203" text-anchor="middle" class="lbl-b">Investigate</text>
     <text x="685" y="203" text-anchor="middle" class="lbl-b">Fix</text>
     <text x="945" y="203" text-anchor="middle" class="lbl-b">Review</text>
-    <text x="555" y="290" text-anchor="middle" class="lbl-g">each role has exactly one job — no single agent decides everything</text>
+    <text x="555" y="290" text-anchor="middle" class="lbl-g">each role has exactly one job. No single agent decides everything</text>
   </svg>
   <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI &nbsp;·&nbsp; Hands-on</p>
   <div class="pageno">M7·01</div>
@@ -162,7 +164,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- ============ SLIDE 2 — WHAT YOU'LL LEARN ============ -->
 <section>
   <h2 class="t">What you'll learn</h2>
-  <p class="s">Why a crew, when one agent is enough, and the two ways to build one.</p>
+  <p class="s">What this module locks in before the lab.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="Four learning objectives listed as numbered rows">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
       <circle cx="120" cy="80"  r="24"/>
@@ -184,10 +186,16 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M7·02</div>
 </section>
 
-<!-- ============ SLIDE 3 — THE PROBLEM ============ -->
+<!-- ============ SLIDE 3 — DIVIDER 1: THE ANALOGY ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">1 &middot; The analogy: a hospital, not a superhero</h2>
+  <div class="pageno">M7·03</div>
+</section>
+
+<!-- ============ SLIDE 4 — THE PROBLEM ============ -->
 <section>
   <h2 class="t">One agent doing everything gets unfocused</h2>
-  <p class="s">Cram triage, retrieval, fixing and safety into one prompt and roles blur.</p>
+  <p class="s">One prompt for everything blurs every role.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="A single overloaded agent juggling four tasks at once versus a clean split">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <circle cx="290" cy="190" r="120"/>
@@ -216,13 +224,13 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="940" y="202">easy to audit</text>
     </g>
   </svg>
-  <div class="pageno">M7·03</div>
+  <div class="pageno">M7·04</div>
 </section>
 
-<!-- ============ SLIDE 4 — HOSPITAL ANALOGY ============ -->
+<!-- ============ SLIDE 5 — HOSPITAL ANALOGY ============ -->
 <section>
   <h2 class="t">A hospital, not a superhero</h2>
-  <p class="s">No single doctor greets, diagnoses, prescribes, and signs their own order.</p>
+  <p class="s">No single doctor does every step alone.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="Hospital roles map onto crew roles: triage nurse, doctor, pharmacist, attending physician">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
       <rect x="50"  y="70" width="230" height="120" rx="12"/>
@@ -263,13 +271,19 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="885" y="325">Reviewer</text>
     </g>
   </svg>
-  <div class="pageno">M7·04</div>
+  <div class="pageno">M7·05</div>
 </section>
 
-<!-- ============ SLIDE 5 — WHY MULTI-AGENT ============ -->
+<!-- ============ SLIDE 6 — DIVIDER 2: WHY MULTI-AGENT ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">2 &middot; Why multi-agent?</h2>
+  <div class="pageno">M7·06</div>
+</section>
+
+<!-- ============ SLIDE 7 — WHY MULTI-AGENT ============ -->
 <section>
   <h2 class="t">Three things a single agent can't replicate</h2>
-  <p class="s">The properties that earn the extra prompts and latency.</p>
+  <p class="s">What earns the extra prompts and latency.</p>
   <svg viewBox="0 0 1100 360" role="img" aria-label="Three pillars: specialisation, separation of concerns, review loops">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
       <rect x="60"  y="70" width="300" height="240" rx="12"/>
@@ -298,13 +312,13 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="890" y="265">the safety net</text>
     </g>
   </svg>
-  <div class="pageno">M7·05</div>
+  <div class="pageno">M7·07</div>
 </section>
 
-<!-- ============ SLIDE 6 — WHEN ONE AGENT IS ENOUGH ============ -->
+<!-- ============ SLIDE 8 — WHEN ONE AGENT IS ENOUGH ============ -->
 <section>
   <h2 class="t">When is a single agent enough?</h2>
-  <p class="s">Multi-agent adds real overhead. Don't reach for it by default.</p>
+  <p class="s">Don't reach for a crew by default.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Decision: single agent for simple tasks, crew for consequential actions needing review">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="330" y="30" width="440" height="70" rx="12"/>
@@ -335,13 +349,19 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="850" y="322">specialisation lifts reliability</text>
     </g>
   </svg>
-  <div class="pageno">M7·06</div>
+  <div class="pageno">M7·08</div>
 </section>
 
-<!-- ============ SLIDE 7 — THE PIPELINE ============ -->
+<!-- ============ SLIDE 9 — DIVIDER 3: THE PIPELINE ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">3 &middot; The incident crew's pipeline</h2>
+  <div class="pageno">M7·09</div>
+</section>
+
+<!-- ============ SLIDE 10 — THE PIPELINE ============ -->
 <section>
   <h2 class="t">The Incident Crew pipeline</h2>
-  <p class="s">A sequential pipeline with a relevance gate that can short-circuit.</p>
+  <p class="s">A pipeline with one relevance gate.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="Incident flows through Triage, Investigator, a relevance gate, Fixer, Reviewer to APPROVED or ESCALATE">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
       <rect x="40"  y="150" width="150" height="80" rx="10"/>
@@ -373,13 +393,19 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="1020" y="285" text-anchor="middle" class="lbl">ESCALATE</text>
     <text x="600" y="345" text-anchor="middle" class="lbl-g">NO runbook found → escalate</text>
   </svg>
-  <div class="pageno">M7·07</div>
+  <div class="pageno">M7·10</div>
 </section>
 
-<!-- ============ SLIDE 8 — TWO PATHS ============ -->
+<!-- ============ SLIDE 11 — DIVIDER 4: TWO PATHS ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">4 &middot; Two paths to multi-agent</h2>
+  <div class="pageno">M7·11</div>
+</section>
+
+<!-- ============ SLIDE 12 — TWO PATHS ============ -->
 <section>
   <h2 class="t">Two paths to multi-agent</h2>
-  <p class="s">Declarative profiles by default; a framework when you need more control.</p>
+  <p class="s">Markdown profiles by default, a framework when needed.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="Declarative markdown profiles versus CrewAI and LangGraph frameworks">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="60" y="60" width="440" height="300" rx="12"/>
@@ -406,13 +432,13 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="630" y="330">for dynamic, non-sequential work</text>
     </g>
   </svg>
-  <div class="pageno">M7·08</div>
+  <div class="pageno">M7·12</div>
 </section>
 
-<!-- ============ SLIDE 9 — SWAP THE ORCHESTRATOR ============ -->
+<!-- ============ SLIDE 13 — SWAP THE ORCHESTRATOR ============ -->
 <section>
   <h2 class="t">Swap the orchestrator, not the tools</h2>
-  <p class="s">Skills, MCP tools, and guardrails are the same layer under every crew.</p>
+  <p class="s">One shared layer under every orchestrator.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="Three interchangeable orchestrators sit above one shared layer of skills, MCP tools, and model">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
       <rect x="80"  y="50" width="270" height="70" rx="10"/>
@@ -447,13 +473,19 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="820" y="298">Guardrails</text>
     </g>
   </svg>
-  <div class="pageno">M7·09</div>
+  <div class="pageno">M7·13</div>
 </section>
 
-<!-- ============ SLIDE 10 — ONE MODEL, FOUR AGENTS ============ -->
+<!-- ============ SLIDE 14 — DIVIDER 5: ONE MODEL, FOUR AGENTS ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">5 &middot; One model, four agents</h2>
+  <div class="pageno">M7·14</div>
+</section>
+
+<!-- ============ SLIDE 15 — ONE MODEL, FOUR AGENTS ============ -->
 <section>
   <h2 class="t">One model, four agents</h2>
-  <p class="s">Agents are cheap Python calls. The model is expensive — and shared.</p>
+  <p class="s">Agents are cheap, the model is shared.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="Four agent spokes all connect to one native Ollama model hub">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
       <circle cx="550" cy="200" r="95"/>
@@ -483,13 +515,13 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="550" y="375" text-anchor="middle" class="lbl-g">crew container ~50 MB + ChromaDB ~200 MB  ≈  1.3 GB total</text>
   </svg>
-  <div class="pageno">M7·10</div>
+  <div class="pageno">M7·15</div>
 </section>
 
-<!-- ============ SLIDE 11 — COMPOSE WIRING ============ -->
+<!-- ============ SLIDE 16 — COMPOSE WIRING ============ -->
 <section>
   <h2 class="t">Wire the crew with the Compose Spec</h2>
-  <p class="s">Each agent a lightweight service, all sharing one endpoint and memory.</p>
+  <p class="s">Each agent is a light service, one shared model.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="Crew, ToolHive and ChromaDB services in a compose file reaching a native model over host.docker.internal">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-dasharray="10 6">
       <rect x="60" y="60" width="560" height="300" rx="14"/>
@@ -520,13 +552,19 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="690" y="195" text-anchor="middle" class="lbl-g">:11434</text>
     <text x="690" y="245" text-anchor="middle" class="lbl-g">host.docker.internal</text>
   </svg>
-  <div class="pageno">M7·11</div>
+  <div class="pageno">M7·16</div>
 </section>
 
-<!-- ============ SLIDE 12 — THE REVIEWER ============ -->
+<!-- ============ SLIDE 17 — DIVIDER 6: THE REVIEWER ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">6 &middot; The Reviewer as human-in-the-loop proxy</h2>
+  <div class="pageno">M7·17</div>
+</section>
+
+<!-- ============ SLIDE 18 — THE REVIEWER ============ -->
 <section>
-  <h2 class="t">The Reviewer — human-in-the-loop proxy</h2>
-  <p class="s">It doesn't decide to fix; it decides if the fix is safe to show a human.</p>
+  <h2 class="t">The Reviewer, human-in-the-loop proxy</h2>
+  <p class="s">Decides if the fix is safe to show.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="The Reviewer approves runbook-backed non-destructive fixes and rejects the rest, then a human decides">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="70" y="140" width="240" height="110" rx="12"/>
@@ -553,14 +591,14 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="1000" y="200" text-anchor="middle" class="lbl-b">Human</text>
     <text x="1000" y="232" text-anchor="middle" class="lbl-g">decides</text>
   </svg>
-  <div class="pageno">M7·12</div>
+  <div class="pageno">M7·18</div>
 </section>
 
-<!-- ============ SLIDE 13 — CLOSING / LAB LEAD-IN ============ -->
+<!-- ============ SLIDE 19 — CLOSING / LAB LEAD-IN ============ -->
 <section>
   <p class="kicker">TO THE LAB</p>
   <h2 class="t" style="font-size:2.3em">Swap the orchestrator, keep the crew</h2>
-  <p class="s" style="font-size:1.1em">Read the four profiles, run both incidents, watch the gate work.</p>
+  <p class="s" style="font-size:1.1em">Run both incidents, watch the gate work.</p>
   <svg viewBox="0 0 1100 320" role="img" aria-label="The four-agent crew runs a 503 incident to APPROVED and a Kafka incident to ESCALATE">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8" stroke-linecap="round">
       <rect x="80"  y="120" width="150" height="80" rx="10"/>
@@ -583,7 +621,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="985" y="220" text-anchor="middle" class="lbl">Kafka → ESCALATE</text>
   </svg>
   <p class="credit">Then Module 8 — <b>harden &amp; ship</b>. &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
-  <div class="pageno">M7·13</div>
+  <div class="pageno">M7·19</div>
 </section>
 
 </div></div>
