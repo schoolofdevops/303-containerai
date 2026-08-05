@@ -112,6 +112,10 @@ footer, header, hgroup, main, menu, nav, section {
   .lbl-g{ fill:var(--gray); font-size:17px; }
   .lbl-b{ fill:var(--ink); font-size:23px; font-weight:700; }
   .num{ fill:var(--ink); font-size:24px; font-weight:700; }
+
+  /* section divider slides (style-guide §3a) */
+  .reveal .slides section.divider{ justify-content:center; align-items:center; }
+  .reveal .slides section.divider h2.t{ order:0; font-size:2.2em; max-width:88%; }
 </style>
 </head>
 <body>
@@ -134,11 +138,10 @@ footer, header, hgroup, main, menu, nav, section {
 
 <div class="reveal"><div class="slides">
 
-<!-- ============ SLIDE 1 — TITLE ============ -->
 <section data-auto-animate>
   <p class="kicker">MODULE 4 &nbsp;·&nbsp; DAY 1</p>
   <h2 class="t" style="font-size:2.3em">Packaging Models as OCI Artifacts</h2>
-  <p class="s" style="font-size:1.2em">Ship a model like a container image — versioned, layered, registry-native</p>
+  <p class="s" style="font-size:1.2em">Versioned, signed, and ready for any registry.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="A labelled crate holding model weights, adapter, config and prompts, sealed for any registry">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
       <!-- crate body -->
@@ -155,16 +158,15 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="635" y="168" text-anchor="middle" class="lbl-sm">adapter</text>
     <text x="465" y="268" text-anchor="middle" class="lbl-sm">config</text>
     <text x="635" y="268" text-anchor="middle" class="lbl-sm">prompts</text>
-    <text x="550" y="352" text-anchor="middle" class="lbl-g">one sealed ModelKit — pushable to any OCI registry</text>
+    <text x="550" y="352" text-anchor="middle" class="lbl-g">one sealed ModelKit, pushable to any OCI registry</text>
   </svg>
   <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI &nbsp;·&nbsp; KitOps · ModelKit · ORAS</p>
   <div class="pageno">M4·01</div>
 </section>
 
-<!-- ============ SLIDE 2 — WHAT YOU'LL LEARN ============ -->
 <section>
   <h2 class="t">What you'll learn</h2>
-  <p class="s">Why models belong in OCI registries — how to pack, push, and pull them.</p>
+  <p class="s">Pack, push, and pull models like container images.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Four learning objectives listed as numbered rows">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
       <circle cx="120" cy="80"  r="24"/>
@@ -177,19 +179,23 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="120" y="268">3</text><text x="120" y="358">4</text>
     </g>
     <g class="lbl" text-anchor="start">
-      <text x="170" y="88">Why an OCI artifact is the right home for a model — versioned &amp; layered</text>
+      <text x="170" y="88">Why an OCI artifact is the right home for a model, versioned and layered</text>
       <text x="170" y="178">Author a Kitfile and pack a ModelKit with the <tspan font-style="italic">kit</tspan> CLI</text>
-      <text x="170" y="268">Push &amp; pull across GHCR, Docker Hub, Quay, Harbor — one syntax</text>
+      <text x="170" y="268">Push and pull across GHCR, Docker Hub, Quay, Harbor with one syntax</text>
       <text x="170" y="358">Selective-pull just the weights; contrast KitOps with docker model</text>
     </g>
   </svg>
   <div class="pageno">M4·02</div>
 </section>
 
-<!-- ============ SLIDE 3 — THE PROBLEM ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">1 &middot; The problem with loose model files</h2>
+  <div class="pageno">M4·03</div>
+</section>
+
 <section>
   <h2 class="t">The problem with loose model files</h2>
-  <p class="s">Weights, prompt, config scattered — every receiver re-assembles by hand.</p>
+  <p class="s">Scattered files force every receiver to guess.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Scattered model files across drives and links that a receiver must re-collect manually, versions drifting">
     <!-- scattered sources -->
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="8 6">
@@ -223,49 +229,17 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="840" y="270">nothing signed</text>
     </g>
   </svg>
-  <div class="pageno">M4·03</div>
-</section>
-
-<!-- ============ SLIDE 4 — MODELKIT AS A LABELLED CRATE ============ -->
-<section>
-  <h2 class="t">A ModelKit is a sealed, labelled crate</h2>
-  <p class="s">One signed bundle — open it and the contents match the manifest exactly.</p>
-  <svg viewBox="0 0 1100 380" role="img" aria-label="A ModelKit crate anatomy with a Kitfile manifest tag and four inner sections: model weights, LoRA adapter, config, prompts">
-    <!-- manifest tag -->
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
-      <rect x="440" y="30" width="220" height="44" rx="8"/>
-      <line x1="550" y1="74" x2="550" y2="96"/>
-    </g>
-    <text x="550" y="59" text-anchor="middle" class="lbl-b">Kitfile (manifest)</text>
-    <!-- crate outer -->
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
-      <rect x="230" y="96" width="640" height="250" rx="14"/>
-    </g>
-    <!-- inner sections -->
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
-      <rect x="260" y="130" width="270" height="90" rx="10"/>
-      <rect x="570" y="130" width="270" height="90" rx="10"/>
-      <rect x="260" y="240" width="270" height="80" rx="10"/>
-      <rect x="570" y="240" width="270" height="80" rx="10"/>
-    </g>
-    <g text-anchor="middle">
-      <text x="395" y="170" class="lbl-b">model</text>
-      <text x="395" y="200" class="lbl-g">weights .gguf</text>
-      <text x="705" y="170" class="lbl-b">code</text>
-      <text x="705" y="200" class="lbl-g">LoRA adapter (M3B)</text>
-      <text x="395" y="278" class="lbl">config</text>
-      <text x="395" y="305" class="lbl-g">quantization</text>
-      <text x="705" y="278" class="lbl">prompts</text>
-      <text x="705" y="305" class="lbl-g">system prompt</text>
-    </g>
-  </svg>
   <div class="pageno">M4·04</div>
 </section>
 
-<!-- ============ SLIDE 5 — OCI ARTIFACT = LAYERED BLOB STORE ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">2 &middot; What is an OCI artifact (and why models fit perfectly)</h2>
+  <div class="pageno">M4·05</div>
+</section>
+
 <section>
   <h2 class="t">An OCI artifact is a layered blob store</h2>
-  <p class="s">The same mechanism that stores container images stores anything.</p>
+  <p class="s">One layered design stores any typed content.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="A container image and a ModelKit side by side, each a stack of typed layers under one signed manifest">
     <!-- image stack -->
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
@@ -299,13 +273,52 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="960" y="208" text-anchor="middle" class="lbl-g" transform="rotate(90 960 208)">SHA-256 + signed</text>
   </svg>
-  <div class="pageno">M4·05</div>
+  <div class="pageno">M4·06</div>
 </section>
 
-<!-- ============ SLIDE 6 — KITOPS + ORAS STACK ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">3 &middot; KitOps and ModelKit (CNCF + ORAS)</h2>
+  <div class="pageno">M4·07</div>
+</section>
+
+<section>
+  <h2 class="t">A ModelKit is a sealed, labelled crate</h2>
+  <p class="s">Open it, and the contents match the manifest.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A ModelKit crate anatomy with a Kitfile manifest tag and four inner sections: model weights, LoRA adapter, config, prompts">
+    <!-- manifest tag -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="440" y="30" width="220" height="44" rx="8"/>
+      <line x1="550" y1="74" x2="550" y2="96"/>
+    </g>
+    <text x="550" y="59" text-anchor="middle" class="lbl-b">Kitfile (manifest)</text>
+    <!-- crate outer -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="230" y="96" width="640" height="250" rx="14"/>
+    </g>
+    <!-- inner sections -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="260" y="130" width="270" height="90" rx="10"/>
+      <rect x="570" y="130" width="270" height="90" rx="10"/>
+      <rect x="260" y="240" width="270" height="80" rx="10"/>
+      <rect x="570" y="240" width="270" height="80" rx="10"/>
+    </g>
+    <g text-anchor="middle">
+      <text x="395" y="170" class="lbl-b">model</text>
+      <text x="395" y="200" class="lbl-g">weights .gguf</text>
+      <text x="705" y="170" class="lbl-b">code</text>
+      <text x="705" y="200" class="lbl-g">LoRA adapter (M3B)</text>
+      <text x="395" y="278" class="lbl">config</text>
+      <text x="395" y="305" class="lbl-g">quantization</text>
+      <text x="705" y="278" class="lbl">prompts</text>
+      <text x="705" y="305" class="lbl-g">system prompt</text>
+    </g>
+  </svg>
+  <div class="pageno">M4·08</div>
+</section>
+
 <section>
   <h2 class="t">KitOps, ModelKit &amp; ORAS</h2>
-  <p class="s">A CNCF stack: the format, the CLI, and the library every registry speaks.</p>
+  <p class="s">One CNCF stack every registry already speaks.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="A three-layer stack: kit CLI on top, ORAS in the middle, OCI distribution API at the base feeding many registries">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="300" y="50"  width="500" height="70" rx="12"/>
@@ -315,7 +328,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="550" y="82"  text-anchor="middle" class="lbl-b">kit CLI</text>
     <text x="550" y="108" text-anchor="middle" class="lbl-g">pack · push · unpack · ModelKit format</text>
     <text x="550" y="172" text-anchor="middle" class="lbl-b">ORAS</text>
-    <text x="550" y="198" text-anchor="middle" class="lbl-g">OCI Registry As Storage — push/pull typed artifacts</text>
+    <text x="550" y="198" text-anchor="middle" class="lbl-g">OCI Registry As Storage: push and pull typed artifacts</text>
     <text x="550" y="262" text-anchor="middle" class="lbl-b">OCI distribution API</text>
     <text x="550" y="288" text-anchor="middle" class="lbl-g">the standard every registry speaks</text>
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
@@ -323,13 +336,17 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="550" y="368" text-anchor="middle" class="lbl-g">GHCR · Docker Hub · Quay · Harbor · Artifactory · registry:2</text>
   </svg>
-  <div class="pageno">M4·06</div>
+  <div class="pageno">M4·09</div>
 </section>
 
-<!-- ============ SLIDE 7 — THE KITFILE ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">4 &middot; The Kitfile: your shipping manifest</h2>
+  <div class="pageno">M4·10</div>
+</section>
+
 <section>
-  <h2 class="t">The Kitfile — your shipping manifest</h2>
-  <p class="s">A tiny YAML file; each field maps to one typed OCI layer.</p>
+  <h2 class="t">The Kitfile is your shipping manifest</h2>
+  <p class="s">Each YAML field maps to one OCI layer.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Kitfile YAML fields on the left mapping by arrows to typed OCI layers on the right">
     <!-- kitfile -->
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
@@ -363,13 +380,17 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="675" y="298" class="lbl-g">prompts / config</text>
     </g>
   </svg>
-  <div class="pageno">M4·07</div>
+  <div class="pageno">M4·11</div>
 </section>
 
-<!-- ============ SLIDE 8 — PACK → PUSH → PULL → RUN LIFECYCLE ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">5 &middot; The full flow: Kitfile → registry → serving node</h2>
+  <div class="pageno">M4·12</div>
+</section>
+
 <section>
   <h2 class="t">The lifecycle: pack → push → pull → run</h2>
-  <p class="s">From a workspace to a serving node — the registry is the hub.</p>
+  <p class="s">Workspace to registry to serving node.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="A left-to-right flow: workspace packs, pushes to a registry hub, a serving node pulls and a runtime runs it">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
       <rect x="40"  y="150" width="180" height="90" rx="10"/>
@@ -399,15 +420,19 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="295" y="180" text-anchor="middle" class="lbl-g">push</text>
     <text x="632" y="180" text-anchor="middle" class="lbl-g">pull</text>
-    <text x="550" y="330" text-anchor="middle" class="lbl-g">weights are never "run" as a container — unpacked to a directory, then loaded by a runtime</text>
+    <text x="550" y="330" text-anchor="middle" class="lbl-g">weights are never "run" as a container, just unpacked and loaded by a runtime</text>
   </svg>
-  <div class="pageno">M4·08</div>
+  <div class="pageno">M4·13</div>
 </section>
 
-<!-- ============ SLIDE 9 — SELECTIVE PULL ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">6 &middot; Selective pull: the KitOps payoff</h2>
+  <div class="pageno">M4·14</div>
+</section>
+
 <section>
-  <h2 class="t">Selective pull — grab only what you need</h2>
-  <p class="s">A warehouse shelved by chapter: pull just the box you need.</p>
+  <h2 class="t">Selective pull grabs only what you need</h2>
+  <p class="s">Pull just the layer you actually need.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="One ModelKit with model, code and datasets layers; three consumers each pull only the layer they need via a filter flag">
     <!-- source modelkit -->
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
@@ -441,20 +466,24 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <g text-anchor="start">
       <text x="595" y="112" class="lbl">Serving node</text>
-      <text x="595" y="138" class="lbl-g">weights only — skips gigabytes</text>
+      <text x="595" y="138" class="lbl-g">weights only, skips gigabytes</text>
       <text x="595" y="197" class="lbl">CI pipeline</text>
       <text x="595" y="223" class="lbl-g">lint the inference scripts</text>
       <text x="595" y="282" class="lbl">Data-science notebook</text>
       <text x="595" y="308" class="lbl-g">analyse data, no weights</text>
     </g>
   </svg>
-  <div class="pageno">M4·09</div>
+  <div class="pageno">M4·15</div>
 </section>
 
-<!-- ============ SLIDE 10 — MULTI-REGISTRY PORTABILITY ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">7 &middot; Multi-registry portability</h2>
+  <div class="pageno">M4·16</div>
+</section>
+
 <section>
   <h2 class="t">One artifact, every registry</h2>
-  <p class="s">Same kit push / unpack syntax — only the target reference changes.</p>
+  <p class="s">Same command, any OCI-compliant registry.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="One ModelKit in the centre pushing out to GHCR, Docker Hub, Quay, Harbor, Artifactory and a local registry">
     <!-- centre modelkit -->
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
@@ -488,13 +517,17 @@ footer, header, hgroup, main, menu, nav, section {
       <path d="M655,215 L795,290" marker-end="url(#ahg)"/>
     </g>
   </svg>
-  <div class="pageno">M4·10</div>
+  <div class="pageno">M4·17</div>
 </section>
 
-<!-- ============ SLIDE 11 — MODELKIT vs docker model package ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">8 &middot; ModelKit vs a plain container image</h2>
+  <div class="pageno">M4·18</div>
+</section>
+
 <section>
   <h2 class="t">ModelKit / ORAS vs docker model package</h2>
-  <p class="s">Both pack a GGUF into an OCI artifact — scope is the difference.</p>
+  <p class="s">Same idea, different reach across registries.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="A comparison table: KitOps ModelKit versus docker model package across five rows">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
       <rect x="60" y="50" width="470" height="330" rx="12"/>
@@ -504,7 +537,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="805" y="90" text-anchor="middle" class="lbl-b">docker model package</text>
     <g class="lbl-sm" text-anchor="start" fill="var(--ink)">
       <text x="85" y="145">CNCF · portable</text>
-      <text x="85" y="200">kit — works anywhere</text>
+      <text x="85" y="200">kit works anywhere</text>
       <text x="85" y="255">any OCI registry</text>
       <text x="85" y="310">typed layers: model/code/data</text>
       <text x="85" y="360">selective pull (--filter)</text>
@@ -527,10 +560,9 @@ footer, header, hgroup, main, menu, nav, section {
       <line x1="590" y1="330" x2="1020" y2="330"/>
     </g>
   </svg>
-  <div class="pageno">M4·11</div>
+  <div class="pageno">M4·19</div>
 </section>
 
-<!-- ============ SLIDE 12 — CLOSING ============ -->
 <section>
   <p class="kicker">TO THE LAB</p>
   <h2 class="t" style="font-size:2.3em">Ship your model like an image</h2>
@@ -557,9 +589,9 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="600" y="170" text-anchor="middle" class="lbl-g">Registry</text>
     <text x="935" y="167" text-anchor="middle" class="lbl-b">Serving node</text>
   </svg>
-  <p class="s" style="font-size:1.15em">Pack SmolLM2 + prompts, push, pull on a clean dir, then selective-pull.</p>
-  <p class="credit">Next up: <b>Lab — Pack &amp; Push a ModelKit with KitOps</b> &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
-  <div class="pageno">M4·12</div>
+  <p class="s" style="font-size:1.15em">Pack, push, pull, then selective-pull in the lab.</p>
+  <p class="credit">Next up: <b>Lab: Pack &amp; Push a ModelKit with KitOps</b> &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
+  <div class="pageno">M4·20</div>
 </section>
 
 </div></div>

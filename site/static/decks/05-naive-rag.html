@@ -100,6 +100,8 @@ footer, header, hgroup, main, menu, nav, section {
   .reveal .kicker{ order:0; font-size:.8em; color:var(--gray); letter-spacing:2px; }
   .reveal .credit{ order:4; font-size:.85em; color:var(--gray); margin-top:16px; }
   .reveal .credit b{ color:var(--ink); font-weight:700; }
+  .reveal .slides section.divider{ justify-content:center; align-items:center; }
+  .reveal .slides section.divider h2.t{ order:0; font-size:2.2em; max-width:88%; }
   .reveal .pageno{ position:absolute; bottom:14px; right:22px; font-size:.6em; color:#bdbdbd; }
   .reveal .slide-number{ font-family:'Patrick Hand',cursive; }
   .reveal code{ font-family:'Patrick Hand',cursive; color:var(--ink); }
@@ -137,8 +139,8 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- ============ SLIDE 1 — TITLE ============ -->
 <section data-auto-animate>
   <p class="kicker">MODULE 5 &nbsp;&middot;&nbsp; DAY 2</p>
-  <h2 class="t" style="font-size:2.3em">Docs Assistant — Naive RAG</h2>
-  <p class="s" style="font-size:1.2em">Grounding an LLM in your own documents</p>
+  <h2 class="t" style="font-size:2.3em">Docs Assistant, Naive RAG</h2>
+  <p class="s" style="font-size:1.2em">Ground an LLM in your own documents</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="A user question flows through retrieved document context into a grounded answer">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
       <rect x="60" y="150" width="200" height="90" rx="12"/>
@@ -155,7 +157,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="940" y="216" text-anchor="middle" class="lbl">answer</text>
     <text x="355" y="130" text-anchor="middle" class="lbl-g">find</text>
     <text x="745" y="130" text-anchor="middle" class="lbl-g">generate</text>
-    <text x="550" y="290" text-anchor="middle" class="lbl-g">Retrieval-Augmented Generation — no fine-tuning, just wiring</text>
+    <text x="550" y="290" text-anchor="middle" class="lbl-g">Retrieval-Augmented Generation, no fine-tuning, just wiring</text>
   </svg>
   <p class="credit"><b>Gourav Shah</b> &nbsp;&middot;&nbsp; School of DevOps &amp; AI &nbsp;&middot;&nbsp; Hands-on</p>
   <div class="pageno">M5&middot;01</div>
@@ -164,7 +166,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- ============ SLIDE 2 — WHAT YOU'LL LEARN ============ -->
 <section>
   <h2 class="t">What you'll learn</h2>
-  <p class="s">The anatomy of a real GenAI app — and how to wire it in containers.</p>
+  <p class="s">Five things before you open the lab.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="Five learning objectives listed as numbered rows">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
       <circle cx="120" cy="70"  r="24"/>
@@ -182,23 +184,29 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="170" y="78">Name the four parts of every GenAI application</text>
       <text x="170" y="148">Understand a vector DB as search by meaning, not by title</text>
       <text x="170" y="218">Walk the naive-RAG pipeline: ingest → chunk → embed → retrieve → generate</text>
-      <text x="170" y="288">Wire it in Compose — ChromaDB + app talking to native Ollama</text>
-      <text x="170" y="358">See where naive RAG breaks — setting up Module 6</text>
+      <text x="170" y="288">Wire it in Compose, ChromaDB and app talking to native Ollama</text>
+      <text x="170" y="358">See where naive RAG breaks, setting up Module 6</text>
     </g>
   </svg>
   <div class="pageno">M5&middot;02</div>
 </section>
 
+<!-- ============ DIVIDER 1 ============ -->
+<section class="divider">
+  <h2 class="t">1 &middot; The problem: ungrounded answers</h2>
+  <div class="pageno">M5&middot;03</div>
+</section>
+
 <!-- ============ SLIDE 3 — THE PROBLEM ============ -->
 <section>
   <h2 class="t">A model alone can't answer about YOUR docs</h2>
-  <p class="s">It answers confidently from training data that predates your runbooks.</p>
+  <p class="s">Confident, but not about your systems.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="A raw model gives a plausible but wrong command while a RAG-grounded model gives the correct one">
     <!-- left: raw model, wrong -->
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4" stroke-dasharray="9 7">
       <rect x="60" y="70" width="440" height="270" rx="12"/>
     </g>
-    <text x="280" y="105" text-anchor="middle" class="lbl-g" style="font-size:19px">Raw LLM — ungrounded</text>
+    <text x="280" y="105" text-anchor="middle" class="lbl-g" style="font-size:19px">Raw LLM, ungrounded</text>
     <text x="280" y="160" text-anchor="middle" class="lbl">"How do I restart</text>
     <text x="280" y="188" text-anchor="middle" class="lbl">the payments service?"</text>
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2">
@@ -211,14 +219,14 @@ footer, header, hgroup, main, menu, nav, section {
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="600" y="70" width="440" height="270" rx="12"/>
     </g>
-    <text x="820" y="105" text-anchor="middle" class="lbl-b" style="font-size:19px">RAG — grounded</text>
+    <text x="820" y="105" text-anchor="middle" class="lbl-b" style="font-size:19px">RAG, grounded</text>
     <text x="820" y="160" text-anchor="middle" class="lbl">same question +</text>
     <text x="820" y="188" text-anchor="middle" class="lbl">the actual runbook</text>
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2">
       <rect x="635" y="220" width="370" height="90" rx="8"/>
     </g>
     <text x="820" y="255" text-anchor="middle" class="lbl">kubectl rollout restart</text>
-    <text x="820" y="283" text-anchor="middle" class="lbl">deploy/payments — correct</text>
+    <text x="820" y="283" text-anchor="middle" class="lbl">deploy/payments, correct</text>
 
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
       <path d="M505,205 L595,205" marker-end="url(#ah)"/>
@@ -226,13 +234,19 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="550" y="190" text-anchor="middle" class="lbl-g">add</text>
     <text x="550" y="235" text-anchor="middle" class="lbl-g">docs</text>
   </svg>
-  <div class="pageno">M5&middot;03</div>
+  <div class="pageno">M5&middot;04</div>
+</section>
+
+<!-- ============ DIVIDER 2 ============ -->
+<section class="divider">
+  <h2 class="t">2 &middot; Anatomy of a GenAI application</h2>
+  <div class="pageno">M5&middot;05</div>
 </section>
 
 <!-- ============ SLIDE 4 — ANATOMY OF A GENAI APP ============ -->
 <section>
-  <h2 class="t">Anatomy of a GenAI application</h2>
-  <p class="s">Four parts, wired together. You already built the first two in M2 and M3.</p>
+  <h2 class="t">Four parts make every GenAI app</h2>
+  <p class="s">You already built two of them in M2/M3.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="Four components of a GenAI app arranged around a central application core">
     <!-- central app -->
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
@@ -263,13 +277,19 @@ footer, header, hgroup, main, menu, nav, section {
       <path d="M420,230 L425,275" marker-end="url(#ahg)"/>
     </g>
   </svg>
-  <div class="pageno">M5&middot;04</div>
+  <div class="pageno">M5&middot;06</div>
+</section>
+
+<!-- ============ DIVIDER 3 ============ -->
+<section class="divider">
+  <h2 class="t">3 &middot; The librarian analogy</h2>
+  <div class="pageno">M5&middot;07</div>
 </section>
 
 <!-- ============ SLIDE 5 — THE LIBRARIAN ANALOGY ============ -->
 <section>
   <h2 class="t">A vector DB shelves by meaning, not title</h2>
-  <p class="s">A filing cabinet needs the exact name. A librarian understands what you mean.</p>
+  <p class="s">A filing cabinet needs the exact name.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="A filing cabinet keyed by exact title fails while a librarian shelving by meaning finds the right book">
     <!-- left: filing cabinet -->
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4" stroke-dasharray="9 7">
@@ -305,13 +325,13 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="820" y="330" text-anchor="middle" class="lbl-g">question → coordinates → nearest shelf</text>
   </svg>
-  <div class="pageno">M5&middot;05</div>
+  <div class="pageno">M5&middot;08</div>
 </section>
 
 <!-- ============ SLIDE 6 — EMBEDDINGS ============ -->
 <section>
   <h2 class="t">Embeddings: text becomes coordinates</h2>
-  <p class="s">An embedding model places each passage as coordinates in meaning-space.</p>
+  <p class="s">Similar text lands close together.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Text passages fed through an embedding model become vectors that cluster by topic in a space">
     <!-- text in -->
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
@@ -350,13 +370,19 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="960" y="245" text-anchor="middle" class="lbl-g" style="font-size:15px">far</text>
     <path d="M792,155 L808,175" fill="none" stroke="#757575" stroke-width="1.8"/>
   </svg>
-  <div class="pageno">M5&middot;06</div>
+  <div class="pageno">M5&middot;09</div>
+</section>
+
+<!-- ============ DIVIDER 4 ============ -->
+<section class="divider">
+  <h2 class="t">4 &middot; The naive-RAG pipeline</h2>
+  <div class="pageno">M5&middot;10</div>
 </section>
 
 <!-- ============ SLIDE 7 — THE PIPELINE (CENTERPIECE) ============ -->
 <section>
-  <h2 class="t">The naive-RAG pipeline</h2>
-  <p class="s">Ingest once. Then answer every question with the same embedding step.</p>
+  <h2 class="t">Ingest once, then answer every question</h2>
+  <p class="s">Same embedding step, both phases.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="Ingest flow loads chunks embeds and stores; query flow embeds retrieves augments and generates">
     <!-- ingest row -->
     <text x="60" y="70" text-anchor="start" class="lbl-g">INGEST · run once</text>
@@ -400,13 +426,13 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="380" y="215" text-anchor="middle" class="lbl-g">same embedding model</text>
   </svg>
-  <div class="pageno">M5&middot;07</div>
+  <div class="pageno">M5&middot;11</div>
 </section>
 
 <!-- ============ SLIDE 8 — CONTAINER BOUNDARY ============ -->
 <section>
   <h2 class="t">Where the pieces run</h2>
-  <p class="s">Models stay native for Metal; the vector store and app are containers.</p>
+  <p class="s">Models native for Metal, everything else in containers.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="Native Ollama runs the LLM and embeddings while ChromaDB and the app run in containers reaching Ollama over host.docker.internal">
     <!-- native side -->
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
@@ -417,7 +443,7 @@ footer, header, hgroup, main, menu, nav, section {
       <rect x="95" y="150" width="310" height="65" rx="8"/>
       <rect x="95" y="235" width="310" height="65" rx="8"/>
     </g>
-    <text x="250" y="190" text-anchor="middle" class="lbl">qwen2.5:1.5b — generate</text>
+    <text x="250" y="190" text-anchor="middle" class="lbl">qwen2.5:1.5b, generate</text>
     <text x="250" y="275" text-anchor="middle" class="lbl">nomic-embed-text</text>
 
     <!-- container side -->
@@ -438,19 +464,25 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="550" y="185" text-anchor="middle" class="lbl-g">host.docker</text>
     <text x="550" y="225" text-anchor="middle" class="lbl-g">.internal</text>
   </svg>
-  <div class="pageno">M5&middot;08</div>
+  <div class="pageno">M5&middot;12</div>
+</section>
+
+<!-- ============ DIVIDER 5 ============ -->
+<section class="divider">
+  <h2 class="t">5 &middot; ChromaDB: the lightest vector store</h2>
+  <div class="pageno">M5&middot;13</div>
 </section>
 
 <!-- ============ SLIDE 9 — CHROMADB, LIGHTEST STORE ============ -->
 <section>
-  <h2 class="t">ChromaDB — the lightest vector store</h2>
-  <p class="s">Zero-config and under 2 GB — the right default for a 16 GB laptop.</p>
+  <h2 class="t">ChromaDB, the lightest vector store</h2>
+  <p class="s">Zero-config, under 2 GB, the default here.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="ChromaDB as the default choice with Qdrant and pgvector as scale-up options">
     <!-- default -->
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
       <rect x="60" y="90" width="380" height="200" rx="14"/>
     </g>
-    <text x="250" y="140" text-anchor="middle" class="lbl-b">ChromaDB — default</text>
+    <text x="250" y="140" text-anchor="middle" class="lbl-b">ChromaDB, default</text>
     <g class="lbl-sm" text-anchor="middle">
       <text x="250" y="180">zero-config · one service</text>
       <text x="250" y="212">Python-native · &lt;10 lines</text>
@@ -474,13 +506,13 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="820" y="238" text-anchor="middle" class="lbl-b">pgvector</text>
     <text x="820" y="268" text-anchor="middle" class="lbl-g">already on Postgres? add a column</text>
   </svg>
-  <div class="pageno">M5&middot;09</div>
+  <div class="pageno">M5&middot;14</div>
 </section>
 
 <!-- ============ SLIDE 10 — WRITE THE COMPOSE ============ -->
 <section>
   <h2 class="t">Wired via environment variables</h2>
-  <p class="s">Hand-author the compose service by service — endpoints are just env vars.</p>
+  <p class="s">One service block at a time.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="A compose file with model, embeddings, ChromaDB and app services connected by environment variables">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
       <rect x="360" y="30" width="380" height="330" rx="12"/>
@@ -513,13 +545,19 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="920" y="190" text-anchor="middle" class="lbl-g">portable across</text>
     <text x="920" y="220" text-anchor="middle" class="lbl-g">runtimes</text>
   </svg>
-  <div class="pageno">M5&middot;10</div>
+  <div class="pageno">M5&middot;15</div>
+</section>
+
+<!-- ============ DIVIDER 6 ============ -->
+<section class="divider">
+  <h2 class="t">6 &middot; Learning Mode: watching the pipeline run</h2>
+  <div class="pageno">M5&middot;16</div>
 </section>
 
 <!-- ============ SLIDE 11 — LEARNING MODE ============ -->
 <section>
-  <h2 class="t">Learning Mode — watch the pipeline run</h2>
-  <p class="s">The app surfaces each step live — the invisible parts of RAG become visible.</p>
+  <h2 class="t">Learning Mode, watch the pipeline run</h2>
+  <p class="s">Watch each step happen, live.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Four Learning Mode panels showing query embedding, similarity search, retrieved context and generation with timings">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
       <rect x="50"  y="70" width="230" height="240" rx="10"/>
@@ -555,13 +593,19 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="939" y="282">which model</text>
     </g>
   </svg>
-  <div class="pageno">M5&middot;11</div>
+  <div class="pageno">M5&middot;17</div>
+</section>
+
+<!-- ============ DIVIDER 7 ============ -->
+<section class="divider">
+  <h2 class="t">7 &middot; Where naive RAG breaks</h2>
+  <div class="pageno">M5&middot;18</div>
 </section>
 
 <!-- ============ SLIDE 12 — WHERE NAIVE RAG BREAKS ============ -->
 <section>
   <h2 class="t">Where naive RAG breaks down</h2>
-  <p class="s">It works when the question matches the wording. It fails in predictable ways.</p>
+  <p class="s">It fails in predictable, fixable ways.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Five failure modes of naive RAG each pointing toward what agentic RAG in Module 6 fixes">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
       <rect x="50"  y="55"  width="620" height="52" rx="8"/>
@@ -571,11 +615,11 @@ footer, header, hgroup, main, menu, nav, section {
       <rect x="50"  y="303" width="620" height="52" rx="8"/>
     </g>
     <g class="lbl" text-anchor="start">
-      <text x="70" y="88">Query mismatch — phrasing differs, misses the chunk</text>
-      <text x="70" y="150">Wrong chunk boundary — a 500-char split cuts a procedure</text>
-      <text x="70" y="212">Single-pass retrieval — one miss, no retry</text>
-      <text x="70" y="274">No query rewriting — jargon and typos hurt scores</text>
-      <text x="70" y="336">Stale index — docs changed, index didn't</text>
+      <text x="70" y="88">Query mismatch: phrasing differs, misses the chunk</text>
+      <text x="70" y="150">Wrong chunk boundary: a 500-char split cuts a procedure</text>
+      <text x="70" y="212">Single-pass retrieval: one miss, no retry</text>
+      <text x="70" y="274">No query rewriting: jargon and typos hurt scores</text>
+      <text x="70" y="336">Stale index: docs changed, index didn't</text>
     </g>
 
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
@@ -586,14 +630,14 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="925" y="222" text-anchor="middle" class="lbl">Agentic RAG</text>
     <text x="925" y="252" text-anchor="middle" class="lbl-g">fixes every row</text>
   </svg>
-  <div class="pageno">M5&middot;12</div>
+  <div class="pageno">M5&middot;19</div>
 </section>
 
 <!-- ============ SLIDE 13 — CLOSING ============ -->
 <section>
   <p class="kicker">TO THE LAB</p>
-  <h2 class="t" style="font-size:2.3em">Retrieve, then generate — grounded.</h2>
-  <p class="s" style="font-size:1.15em">Hand-author the compose, ingest Acme's runbooks, watch Learning Mode explain.</p>
+  <h2 class="t" style="font-size:2.3em">Retrieve, then generate. Stay grounded.</h2>
+  <p class="s" style="font-size:1.15em">Build it, then watch it ground an answer.</p>
   <svg viewBox="0 0 1100 320" role="img" aria-label="A user question retrieving the right runbook chunk and generating the correct kubectl command">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
       <rect x="60" y="120" width="240" height="90" rx="12"/>
@@ -612,7 +656,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="735" y="105" text-anchor="middle" class="lbl-g">generate</text>
   </svg>
   <p class="credit">Next: <b>Lab — build the Docs Assistant</b>. &nbsp;&middot;&nbsp; Gourav Shah &middot; School of DevOps &amp; AI</p>
-  <div class="pageno">M5&middot;13</div>
+  <div class="pageno">M5&middot;20</div>
 </section>
 
 </div></div>
