@@ -4,10 +4,35 @@
 > cleared, reading this + `CLAUDE.md` + `planning/ROADMAP.md` fully restores context. Keep it concise
 > and update it after every task/decision.
 
-**Last updated:** 2026-07-23 (depth retrofit milestone COMPLETE — v1.6.0 shipped)
+**Last updated:** 2026-08-05 (M1 voice+divider pilot on branch `pilot-m1-voice-deck`, awaiting founder merge decision)
 **Active phase:** ✅ **COURSE COMPLETE** — M1–M8 + Capstone all live + lab-validated. Working on `main`.
 **Live site:** https://schoolofdevops.github.io/303-containerai/ (every page 200)
 **Execution mode:** subagent-driven, grouped into waves; controller reviews + live validation
+
+## M1 voice + divider-slide pilot (2026-08-05, on branch `pilot-m1-voice-deck`, NOT merged)
+
+Coursesmith commit `82c3b17` (deck-author + module-author) codified two new hard rules learned
+from a 307-aipython correction round: (1) every lesson paragraph must pass the `gourav-voice`
+skill before shipping (same pipeline as narration), and (2) decks get one title-only **divider
+slide per lesson `##` section** instead of a per-slide kicker, with subtitles tightened to
+≤10-word/≤60-char anchoring phrases (down from the ≤80-char sentence rule the July regen used).
+Piloted on M1 only, per founder request, before deciding on the other 8 modules:
+
+- `lesson.md`: voice-passed, +12% word count (fragments → full sentences, jargon explained
+  inline), headers unchanged, facts/commands untouched. 3 new vocabulary-swap candidates found
+  (not yet added to the skill's table — founder review pending).
+- `01-container-native.html`: 13 → 19 slides (6 dividers added), subtitles rewritten to the
+  tighter target, all on-slide text voice-passed, propagated the lesson's word swaps.
+- **Caught + fixed same-day:** divider numbers initially rendered out of lesson order (1,2,3,6,4,5)
+  because the deck's pre-existing narrative visited §6 right after §3 — invisible before dividers
+  existed, a real defect once they made section order visible. Fixed by reordering the deck's own
+  §6 slides to close the walk, matching the lesson's 1→6 order exactly. Sequence spec rewritten
+  to match.
+- All gates green (build, subtitle audit, zero-ref, tag balance, headless render, divider-verbatim
+  match to lesson headers). Reviewed via local headless-Chrome screenshots (no staging deploy needed
+  post-fork-retirement).
+- **NEXT:** founder reviews the branch, decides merge + whether to roll the same pipeline out to
+  the remaining 8 modules (M2–M8, Capstone) module-by-module or in a batch.
 
 ## Depth retrofit (2026-07-22)
 

@@ -112,6 +112,10 @@ footer, header, hgroup, main, menu, nav, section {
   .lbl-g{ fill:var(--gray); font-size:17px; }
   .lbl-b{ fill:var(--ink); font-size:23px; font-weight:700; }
   .num{ fill:var(--ink); font-size:24px; font-weight:700; }
+
+  /* Section divider slides (style-guide §3a) — base skeleton does not auto-center a lone h2.t */
+  .reveal .slides section.divider{ justify-content:center; align-items:center; }
+  .reveal .slides section.divider h2.t{ order:0; font-size:2.2em; max-width:88%; }
 </style>
 </head>
 <body>
@@ -138,7 +142,7 @@ footer, header, hgroup, main, menu, nav, section {
 <section data-auto-animate>
   <p class="kicker">MODULE 1 &nbsp;·&nbsp; DAY 1</p>
   <h2 class="t" style="font-size:2.3em">Container-Native GenAI</h2>
-  <p class="s" style="font-size:1.2em">Why the open standard &mdash; not Docker &mdash; is the through-line for AI</p>
+  <p class="s" style="font-size:1.2em">The open standard, not Docker</p>
   <svg viewBox="0 0 1100 360" role="img" aria-label="A shipping container labelled AI that loads unchanged onto four different runtime carriers">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
       <rect x="420" y="70" width="260" height="130" rx="10"/>
@@ -163,12 +167,9 @@ footer, header, hgroup, main, menu, nav, section {
   </svg>
   <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI &nbsp;·&nbsp; Lesson + Lab + Quiz</p>
   <div class="pageno">M1·01</div>
-</section>
-
-<!-- ============ SLIDE 2 — WHAT YOU'LL LEARN ============ -->
-<section>
+</section><section>
   <h2 class="t">Five ideas carry the rest of the course</h2>
-  <p class="s">Five ideas that shape every lab in the rest of the course.</p>
+  <p class="s">Five ideas that carry the course</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Five learning goals listed as numbered rows">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
       <circle cx="110" cy="60"  r="22"/>
@@ -183,20 +184,20 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="110" y="340">5</text>
     </g>
     <g class="lbl" text-anchor="start">
-      <text x="158" y="68">Why "container-native" beats "Docker-native" — OCI + the Compose Spec</text>
-      <text x="158" y="136">What containers actually buy an AI stack: package, serve, isolate, ship</text>
-      <text x="158" y="204">The Apple-Silicon GPU limit and the native-server / containerized-app fix</text>
-      <text x="158" y="272">The OpenAI-compatible endpoint as one universal, swappable contract</text>
-      <text x="158" y="340">The 2026 map: declarative agents vs orchestration, and the Acme ladder</text>
+      <text x="158" y="68">Container-native beats Docker-native, thanks to OCI and the Compose Spec</text>
+      <text x="158" y="136">What containers buy an AI stack: package, serve, isolate, ship</text>
+      <text x="158" y="204">The Apple Silicon GPU limit, and the fix: run the model natively</text>
+      <text x="158" y="272">The OpenAI-compatible endpoint: one contract, swap the engine behind it</text>
+      <text x="158" y="340">The 2026 map: declarative agents, orchestration, and the Acme ladder</text>
     </g>
   </svg>
   <div class="pageno">M1·02</div>
-</section>
-
-<!-- ============ SLIDE 3 — THE MOTIVATING PROBLEM ============ -->
-<section>
+</section><section class="divider">
+  <h2 class="t" style="font-size:2.2em">1 &middot; Container-Native, Not Docker-Native</h2>
+  <div class="pageno">M1·03</div>
+</section><section>
   <h2 class="t">The assumption that just broke</h2>
-  <p class="s">Docker Desktop is now paid for orgs over 250 staff or $10M revenue.</p>
+  <p class="s">A pricing change, not a technical one</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="An old equation container equals Docker Desktop crossed out, replaced by container equals the open OCI standard">
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4" stroke-dasharray="9 7">
       <rect x="90" y="80" width="420" height="110" rx="12"/>
@@ -210,7 +211,7 @@ footer, header, hgroup, main, menu, nav, section {
       <path d="M300,200 L300,255" marker-end="url(#ah)"/>
     </g>
     <text x="565" y="220" text-anchor="middle" class="lbl-g">paid over 250 staff</text>
-    <text x="565" y="245" text-anchor="middle" class="lbl-g">or $10M revenue &mdash;</text>
+    <text x="565" y="245" text-anchor="middle" class="lbl-g">or $10M revenue,</text>
     <text x="565" y="270" text-anchor="middle" class="lbl-g">a pricing change,</text>
     <text x="565" y="295" text-anchor="middle" class="lbl-g">not a technical one</text>
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
@@ -219,13 +220,10 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="300" y="305" text-anchor="middle" class="lbl-g" style="font-size:20px">what still holds</text>
     <text x="300" y="340" text-anchor="middle" class="lbl-b">container = the open OCI standard</text>
   </svg>
-  <div class="pageno">M1·03</div>
-</section>
-
-<!-- ============ SLIDE 4 — SHIPPING CONTAINER ANALOGY ============ -->
-<section>
+  <div class="pageno">M1·04</div>
+</section><section>
   <h2 class="t">Container-native, not Docker-native</h2>
-  <p class="s">An OCI image is a shipping container &mdash; the carrier is your business.</p>
+  <p class="s">One compose.yaml, four runtimes, same result</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="One compose.yaml feeds four interchangeable runtimes that all produce identical containers">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="60" y="150" width="220" height="90" rx="12"/>
@@ -260,13 +258,13 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="945" y="185" text-anchor="middle" class="lbl-b">Same app</text>
     <text x="945" y="215" text-anchor="middle" class="lbl-g">identical containers</text>
   </svg>
-  <div class="pageno">M1·04</div>
-</section>
-
-<!-- ============ SLIDE 5 — WHAT CONTAINERS BUY ============ -->
-<section>
+  <div class="pageno">M1·05</div>
+</section><section class="divider">
+  <h2 class="t" style="font-size:2.2em">2 &middot; What Containers Buy an AI Stack</h2>
+  <div class="pageno">M1·06</div>
+</section><section>
   <h2 class="t">What containers buy an AI stack</h2>
-  <p class="s">Think of each component as a hermetically sealed shipment.</p>
+  <p class="s">Package, serve, isolate, ship</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Four sealed boxes labelled package, serve, isolate and ship">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
       <rect x="60"  y="90" width="220" height="200" rx="12"/>
@@ -281,18 +279,18 @@ footer, header, hgroup, main, menu, nav, section {
     <g text-anchor="middle">
       <text x="170" y="120" class="lbl-b">Package</text>
       <text x="170" y="185" class="lbl-sm">Pin Python, CUDA,</text>
-      <text x="170" y="212" class="lbl-sm">library versions &mdash;</text>
+      <text x="170" y="212" class="lbl-sm">library versions,</text>
       <text x="170" y="239" class="lbl-sm">"works everywhere"</text>
 
       <text x="440" y="120" class="lbl-b">Serve</text>
       <text x="440" y="185" class="lbl-sm">Embed, vector DB,</text>
       <text x="440" y="212" class="lbl-sm">API behind fixed</text>
-      <text x="440" y="239" class="lbl-sm">ports, no pollution</text>
+      <text x="440" y="239" class="lbl-sm">ports, no clutter</text>
 
       <text x="710" y="120" class="lbl-b">Isolate</text>
       <text x="710" y="185" class="lbl-sm">Conflicting deps?</text>
       <text x="710" y="212" class="lbl-sm">Each framework in</text>
-      <text x="710" y="239" class="lbl-sm">its own sealed box</text>
+      <text x="710" y="239" class="lbl-sm">its own tightly sealed box</text>
 
       <text x="955" y="120" class="lbl-b">Ship</text>
       <text x="955" y="185" class="lbl-sm">Push to any</text>
@@ -300,13 +298,13 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="955" y="239" class="lbl-sm">pull anywhere</text>
     </g>
   </svg>
-  <div class="pageno">M1·05</div>
-</section>
-
-<!-- ============ SLIDE 6 — APPLE SILICON REALITY (analogy) ============ -->
-<section>
+  <div class="pageno">M1·07</div>
+</section><section class="divider">
+  <h2 class="t" style="font-size:2.2em">3 &middot; The Apple Silicon GPU Reality</h2>
+  <div class="pageno">M1·08</div>
+</section><section>
   <h2 class="t">Guest rooms with no power outlets</h2>
-  <p class="s">macOS containers are like guest rooms with no power outlets.</p>
+  <p class="s">No virtual GPU on macOS</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="A building whose mains power the Metal GPU is not wired into the guest rooms the containers so they fall back to battery the CPU">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="70" y="60" width="360" height="290" rx="10"/>
@@ -321,7 +319,7 @@ footer, header, hgroup, main, menu, nav, section {
       <rect x="100" y="215" width="300" height="115" rx="8"/>
     </g>
     <text x="250" y="248" text-anchor="middle" class="lbl-g">Guest rooms = containers</text>
-    <text x="250" y="282" text-anchor="middle" class="lbl-sm">no outlet on the wall &mdash;</text>
+    <text x="250" y="282" text-anchor="middle" class="lbl-sm">no outlet on the wall,</text>
     <text x="250" y="309" text-anchor="middle" class="lbl-sm">they fall back to battery (CPU)</text>
 
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
@@ -335,13 +333,10 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="820" y="248" text-anchor="middle" class="lbl-b">Model inside a container</text>
     <text x="820" y="280" text-anchor="middle" class="lbl">runs 3&ndash;6&times; slower on CPU</text>
   </svg>
-  <div class="pageno">M1·06</div>
-</section>
-
-<!-- ============ SLIDE 7 — NATIVE SERVER / CONTAINERIZED APP PATTERN ============ -->
-<section>
+  <div class="pageno">M1·09</div>
+</section><section>
   <h2 class="t">Native server, containerized everything else</h2>
-  <p class="s">Serve the model natively; containerize the app, agent, and vector DB.</p>
+  <p class="s">Bridged via host.docker.internal</p>
   <svg viewBox="0 0 1100 390" role="img" aria-label="Ollama runs native on the host while app agent and vector DB run in containers reaching it over host.docker.internal port 11434">
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="4 6">
       <rect x="40" y="40" width="1020" height="320" rx="16"/>
@@ -351,7 +346,7 @@ footer, header, hgroup, main, menu, nav, section {
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
       <rect x="80" y="130" width="320" height="160" rx="12"/>
     </g>
-    <text x="240" y="180" text-anchor="middle" class="lbl-b">Ollama &mdash; NATIVE</text>
+    <text x="240" y="180" text-anchor="middle" class="lbl-b">Ollama &middot; NATIVE</text>
     <text x="240" y="215" text-anchor="middle" class="lbl">Metal-accelerated</text>
     <text x="240" y="248" text-anchor="middle" class="lbl-g">unified memory</text>
     <text x="240" y="278" text-anchor="middle" class="lbl-g">listens on :11434</text>
@@ -377,50 +372,13 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="510" y="185" text-anchor="middle" class="lbl-g">http://host.docker.internal</text>
     <text x="510" y="228" text-anchor="middle" class="lbl-g">:11434</text>
   </svg>
-  <div class="pageno">M1·07</div>
-</section>
-
-<!-- ============ SLIDE 8 — WALL SOCKET ANALOGY ============ -->
-<section>
-  <h2 class="t">One universal contract: the OpenAI-compatible endpoint</h2>
-  <p class="s">The API is a wall socket: swap the power station, appliance never notices.</p>
-  <svg viewBox="0 0 1100 360" role="img" aria-label="Ollama vLLM and llama.cpp all plug into one OpenAI compatible socket that the app plugs into unchanged">
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
-      <rect x="60" y="70"  width="200" height="60" rx="8"/>
-      <rect x="60" y="150" width="200" height="60" rx="8"/>
-      <rect x="60" y="230" width="200" height="60" rx="8"/>
-    </g>
-    <g class="lbl" text-anchor="middle">
-      <text x="160" y="108">Ollama</text>
-      <text x="160" y="188">vLLM</text>
-      <text x="160" y="268">llama.cpp</text>
-    </g>
-    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
-      <path d="M265,100 L460,175" marker-end="url(#ahg)"/>
-      <path d="M265,180 L460,180" marker-end="url(#ahg)"/>
-      <path d="M265,260 L460,185" marker-end="url(#ahg)"/>
-    </g>
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
-      <rect x="470" y="120" width="180" height="130" rx="14"/>
-      <circle cx="530" cy="165" r="10"/>
-      <circle cx="590" cy="165" r="10"/>
-      <line x1="560" y1="195" x2="560" y2="225"/>
-    </g>
-    <text x="560" y="105" text-anchor="middle" class="lbl-g">/v1/chat/completions</text>
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
-      <path d="M655,185 L775,185" marker-end="url(#ah)"/>
-      <rect x="795" y="140" width="245" height="90" rx="12"/>
-    </g>
-    <text x="917" y="180" text-anchor="middle" class="lbl-b">Your app / agent</text>
-    <text x="917" y="210" text-anchor="middle" class="lbl-g">code never changes</text>
-  </svg>
-  <div class="pageno">M1·08</div>
-</section>
-
-<!-- ============ SLIDE 9 — DECLARATIVE vs ORCHESTRATION ============ -->
-<section>
+  <div class="pageno">M1·10</div>
+</section><section class="divider">
+  <h2 class="t" style="font-size:2.2em">4 &middot; The 2026 Map: Declarative Agents vs Orchestration Frameworks</h2>
+  <div class="pageno">M1·11</div>
+</section><section>
   <h2 class="t">The 2026 map: declarative vs orchestration</h2>
-  <p class="s">Two ways to build an agent &mdash; start light, add weight only when needed.</p>
+  <p class="s">Start declarative, add orchestration when needed</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Declarative agents defined in plain files on the left versus orchestration frameworks with explicit control flow on the right, with a rule of thumb between them">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="60" y="70" width="420" height="240" rx="12"/>
@@ -439,7 +397,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="830" y="108" text-anchor="middle" class="lbl-b">Orchestration (M7)</text>
     <g class="lbl-sm" text-anchor="start">
-      <text x="650" y="150">LangGraph &mdash; deterministic control flow</text>
+      <text x="650" y="150">LangGraph, deterministic control flow</text>
       <text x="650" y="178">explicit state machines, branching</text>
       <text x="650" y="220">Retries, human-in-the-loop checkpoints</text>
       <text x="650" y="262">For hard sequencing a declarative</text>
@@ -452,13 +410,10 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="550" y="175" text-anchor="middle" class="lbl-g">add only</text>
     <text x="550" y="215" text-anchor="middle" class="lbl-g">when needed</text>
   </svg>
-  <div class="pageno">M1·09</div>
-</section>
-
-<!-- ============ SLIDE 10 — ANATOMY OF A DECLARATIVE AGENT ============ -->
-<section>
+  <div class="pageno">M1·12</div>
+</section><section>
   <h2 class="t">Anatomy of a declarative agent</h2>
-  <p class="s">Four plain parts define an agent &mdash; no framework code required.</p>
+  <p class="s">Identity, skills, tools, guardrails</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="A large outlined agent box with four labelled inner sections: identity files, skills, MCP tools and guardrails">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="120" y="55" width="860" height="285" rx="14"/>
@@ -472,7 +427,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <g text-anchor="middle">
       <text x="340" y="150" class="lbl">AGENTS.md / SOUL.md</text>
-      <text x="340" y="182" class="lbl-g">who the agent is &mdash; role &amp; intent</text>
+      <text x="340" y="182" class="lbl-g">who the agent is, its role and intent</text>
 
       <text x="760" y="150" class="lbl">SKILL.md</text>
       <text x="760" y="182" class="lbl-g">reusable capabilities it can call</text>
@@ -484,13 +439,13 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="760" y="297" class="lbl-g">limits on what it may do</text>
     </g>
   </svg>
-  <div class="pageno">M1·10</div>
-</section>
-
-<!-- ============ SLIDE 11 — ACME USE CASE ============ -->
-<section>
-  <h2 class="t">Meet Acme &mdash; two connected tools</h2>
-  <p class="s">One fictional company, runbooks nobody reads, two connected AI tools.</p>
+  <div class="pageno">M1·13</div>
+</section><section class="divider">
+  <h2 class="t" style="font-size:2.2em">5 &middot; The Acme Use Case + The Build Ladder</h2>
+  <div class="pageno">M1·14</div>
+</section><section>
+  <h2 class="t">Meet Acme, two connected tools</h2>
+  <p class="s">Runbooks nobody reads, two connected tools</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Acme's runbooks feed a Docs Assistant on day one, which the day-two Incident Crew then uses as one of its tools">
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4">
       <rect x="60" y="140" width="180" height="110" rx="10"/>
@@ -521,13 +476,10 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="905" y="202" text-anchor="middle" class="lbl-b">Incident Crew</text>
     <text x="905" y="238" text-anchor="middle" class="lbl-g">single &rarr; multi-agent</text>
   </svg>
-  <div class="pageno">M1·11</div>
-</section>
-
-<!-- ============ SLIDE 12 — THE BUILD LADDER ============ -->
-<section>
-  <h2 class="t">The build ladder &mdash; one step per module</h2>
-  <p class="s">Every module adds exactly one rung to the same growing compose.yaml.</p>
+  <div class="pageno">M1·15</div>
+</section><section>
+  <h2 class="t">The build ladder, one step per module</h2>
+  <p class="s">One module, one rung, one compose.yaml</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="A staircase of modules rising from M1 a model responding up to the shipped platform capstone">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
       <rect x="50"  y="320" width="118" height="46" rx="7"/>
@@ -555,14 +507,48 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="330" y="395" text-anchor="middle" class="lbl-g">&larr; DAY 1 &middot; Serve &amp; Package</text>
     <text x="760" y="395" text-anchor="middle" class="lbl-g">DAY 2 &middot; RAG &rarr; Agentic &rarr; Ship &rarr;</text>
   </svg>
-  <div class="pageno">M1·12</div>
-</section>
-
-<!-- ============ SLIDE 13 — CLOSING ============ -->
-<section>
+  <div class="pageno">M1·16</div>
+</section><section class="divider">
+  <h2 class="t" style="font-size:2.2em">6 &middot; The OpenAI-Compatible Endpoint: the Universal Contract</h2>
+  <div class="pageno">M1·17</div>
+</section><section>
+  <h2 class="t">One universal contract: the OpenAI-compatible endpoint</h2>
+  <p class="s">Same socket, swap the engine behind it</p>
+  <svg viewBox="0 0 1100 360" role="img" aria-label="Ollama vLLM and llama.cpp all plug into one OpenAI compatible socket that the app plugs into unchanged">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60" y="70"  width="200" height="60" rx="8"/>
+      <rect x="60" y="150" width="200" height="60" rx="8"/>
+      <rect x="60" y="230" width="200" height="60" rx="8"/>
+    </g>
+    <g class="lbl" text-anchor="middle">
+      <text x="160" y="108">Ollama</text>
+      <text x="160" y="188">vLLM</text>
+      <text x="160" y="268">llama.cpp</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M265,100 L460,175" marker-end="url(#ahg)"/>
+      <path d="M265,180 L460,180" marker-end="url(#ahg)"/>
+      <path d="M265,260 L460,185" marker-end="url(#ahg)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
+      <rect x="470" y="120" width="180" height="130" rx="14"/>
+      <circle cx="530" cy="165" r="10"/>
+      <circle cx="590" cy="165" r="10"/>
+      <line x1="560" y1="195" x2="560" y2="225"/>
+    </g>
+    <text x="560" y="105" text-anchor="middle" class="lbl-g">/v1/chat/completions</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M655,185 L775,185" marker-end="url(#ah)"/>
+      <rect x="795" y="140" width="245" height="90" rx="12"/>
+    </g>
+    <text x="917" y="180" text-anchor="middle" class="lbl-b">Your app / agent</text>
+    <text x="917" y="210" text-anchor="middle" class="lbl-g">code never changes</text>
+  </svg>
+  <div class="pageno">M1·18</div>
+</section><section>
   <p class="kicker">TO THE LAB</p>
   <h2 class="t" style="font-size:2.3em">Build it once. Run it anywhere.</h2>
-  <p class="s" style="font-size:1.1em">In the lab you'll prove this wiring yourself, hands on.</p>
+  <p class="s" style="font-size:1.1em">Prove the wiring yourself, hands on</p>
   <svg viewBox="0 0 1100 300" role="img" aria-label="A throwaway container reaches out to the native Ollama model server and gets a real answer back">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8" stroke-dasharray="10 6">
       <rect x="120" y="90" width="290" height="120" rx="12"/>
@@ -582,7 +568,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="835" y="172" text-anchor="middle" class="lbl-g">native &middot; Metal GPU</text>
   </svg>
   <p class="credit">Now open <b>Module 1 &middot; Lab</b>. &nbsp;·&nbsp; Gourav Shah &middot; School of DevOps &amp; AI</p>
-  <div class="pageno">M1·13</div>
+  <div class="pageno">M1·19</div>
 </section>
 </div></div>
 
