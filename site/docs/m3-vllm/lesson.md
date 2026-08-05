@@ -7,32 +7,32 @@ import Slides from '@site/src/components/Slides';
 
 # Lesson: Production Serving with vLLM
 
-> **Module goal:** Understand why vLLM is the production workhorse for model serving, how PagedAttention and continuous batching win ~3× throughput, and how it drops behind the *same* OpenAI-compatible `/v1` contract you met in M2 — so your client never notices the engine swap. You'll learn the CPU track (what you run this module), the GPU track (documented), and where quantization fits.
+> **Module goal:** In this module you'll understand why vLLM is the production workhorse for serving models, and how PagedAttention and continuous batching together win roughly three times the throughput. You'll also see how vLLM sits behind the exact same OpenAI-compatible `/v1` contract you met in M2, so your client never even notices the engine swap underneath it. You'll cover the CPU track, which is what you actually run in this module, the GPU track, which stays documented only, and where quantization fits into all of this.
 
 ---
 
 ## Module slides
 
-Walk this short whiteboard deck for the big picture before the hands-on lab — or open it fullscreen.
+Walk through this short whiteboard deck to get the big picture before you start the hands-on lab. Or open it fullscreen if you'd rather.
 
 <Slides src="decks/03-vllm.html" title="Module 3 — Production Serving with vLLM" />
 
 ## 1. Why vLLM: from one cup at a time to a busy café
 
-**Analogy:** Ollama (M1/M2) is a **home espresso machine**. It pulls one excellent shot at a time. Ask for a second while the first is brewing and you wait your turn. That's perfect for a developer at a laptop — one request, one answer.
+**Analogy:** Think of Ollama, the tool from M1 and M2, as a **home espresso machine**. It pulls one excellent shot at a time. Ask for a second shot while the first one is still brewing, and you wait your turn. That's fine for a developer working alone at a laptop: one request, one answer.
 
-vLLM is the **commercial machine behind the counter at a busy café**. It has a queue system and multiple group heads, and — critically — it never lets a group head sit idle. The moment one shot finishes, the next order slides in *without waiting for the whole batch to complete*. Under a crowd, the café serves far more coffees per hour than a row of home machines, even though each individual shot takes the same time. That "never idle, keep the heads full" trick is **continuous batching**, and it's the single biggest reason vLLM outperforms simpler engines under load.
+vLLM is the **big commercial machine behind the counter at a busy café**. It has a queue system and several group heads, and here's the important part: it never lets a group head sit idle. The moment one shot finishes, the next order slides in, *without waiting for the whole batch to finish first*. During a rush, this café serves far more coffees per hour than a row of home machines, even though each single shot takes the same time. That "never idle, always keep the heads full" trick is called **continuous batching**, and it's the single biggest reason vLLM beats simpler engines when the load is high.
 
-Two innovations give vLLM roughly **3× the throughput** of a naive server on the same GPU:
+Two ideas together give vLLM roughly **three times the throughput** of a simple server running on the same GPU:
 
-- **Continuous batching** — Traditional servers batch requests, run them to completion together, then start the next batch. The slowest request in the batch holds everyone up, and finished slots sit idle. vLLM instead schedules at the *token* level: as soon as one sequence emits its final token and leaves, a waiting request takes its place mid-flight. No idle slots, no waiting for the laggard.
-- **PagedAttention** — the memory trick that makes the above possible. Explained next.
+- **Continuous batching**: Older servers batch requests together, run the whole batch to completion, then start the next batch. The slowest request in that batch holds up everyone else, and any slot that finishes early just sits idle. vLLM instead schedules work at the *token* level. The moment one sequence sends its last token and leaves, a waiting request takes its place right away, mid-flight. So there are no idle slots, and nobody waits around for the slow one.
+- **PagedAttention**: the memory trick that makes this possible. More on this next.
 
 ### PagedAttention = virtual memory for the KV cache
 
-**Analogy:** PagedAttention is **virtual memory paging, applied to the KV cache.** Your operating system doesn't demand one giant contiguous block of RAM per program — it hands out small fixed-size *pages* and maps them wherever there's room, so memory never fragments into unusable gaps. PagedAttention does exactly this for the model's **KV cache** (the per-token attention memory that grows as a response gets longer).
+**Analogy:** PagedAttention is **virtual memory paging, applied to the KV cache.** Think about how your operating system handles memory. It doesn't demand one giant, unbroken block of RAM for every program. Instead it hands out small, fixed-size *pages* and maps them wherever there's room, so memory never breaks up into unusable gaps. PagedAttention does exactly this trick for the model's **KV cache**, which is the per-token attention memory that keeps growing as a response gets longer.
 
-Older servers reserved one big contiguous slab of GPU memory per request, sized for the *maximum possible* length. A 20-token answer in a 2048-token reservation wastes 99% of that slab. Multiply across concurrent users and most of your VRAM is reserved-but-empty — so you can't fit more requests, and throughput stalls. PagedAttention allocates the KV cache in small pages on demand and maps them with a lookup table. Memory waste drops from ~60–80% to under 4%, so far more sequences fit at once — which is what feeds continuous batching enough concurrent work to stay busy.
+Older servers would reserve one big, unbroken slab of GPU memory for every request, sized for the *maximum possible* length. So a 20-token answer sitting in a 2048-token reservation wastes 99 percent of that slab. Now multiply that across many users at once, and most of your VRAM sits reserved but empty. That means you can't fit more requests in, and throughput stalls. PagedAttention instead allocates the KV cache in small pages, on demand, and maps them with a lookup table. Memory waste drops from roughly 60 to 80 percent down to under 4 percent, so far more sequences fit in at once. And that's exactly what feeds continuous batching enough concurrent work to stay busy.
 
 ```mermaid
 graph TB
@@ -51,13 +51,13 @@ graph TB
     NAIVE -->|"same VRAM, far more requests fit"| PAGED
 ```
 
-*Naive serving reserves for the worst case and wastes most of it. PagedAttention pages the KV cache like an OS pages RAM — near-zero waste, many more concurrent sequences.*
+*Naive serving reserves for the worst case and wastes most of it. PagedAttention pages the KV cache the same way an OS pages RAM: almost no waste, and many more sequences running at once.*
 
 ---
 
 ## 2. Same contract, bigger engine
 
-Here's the payoff of M2's universal-contract idea: **vLLM exposes the identical OpenAI-compatible `/v1` API as Ollama.** Same `GET /v1/models`, same `POST /v1/chat/completions`, same response shape (`choices[0].message.content`). Swapping Ollama for vLLM is a **one-line change** — point `OPENAI_BASE_URL` at the new address. No code, no SDK, no image change.
+Here's the payoff of M2's shared-contract idea: **vLLM exposes the exact same OpenAI-compatible `/v1` API as Ollama.** Same `GET /v1/models`, same `POST /v1/chat/completions`, same response shape (`choices[0].message.content`). So swapping Ollama for vLLM is a **one-line change**: you just point `OPENAI_BASE_URL` at the new address. No code changes, no SDK changes, no image changes.
 
 ```mermaid
 graph LR
@@ -71,45 +71,45 @@ graph LR
     CONTRACT --> VLLM
 ```
 
-*The wall socket from M2, again: the client speaks to the contract. Which engine sits behind it — dev Ollama or production vLLM — is a deployment decision, not a code decision.*
+*This is the wall socket idea from M2, again: the client speaks to the contract. Which engine sits behind it, dev Ollama or production vLLM, is a deployment decision, not a code decision.*
 
-This is why the course can teach one client and reuse it everywhere. Your M2 client, unchanged, will talk to the vLLM server you build in this lab.
+This is exactly why the course can teach you one client and reuse it everywhere. Your M2 client, completely unchanged, will talk directly to the vLLM server you build in this lab.
 
 ---
 
 ## 3. The CPU track (what you'll run)
 
-Apple Silicon exposes no virtual GPU to containers (the defining constraint from Setup/M1), so a containerized vLLM on this Mac runs on **CPU**. That's fine — a CPU image exists precisely so you can learn the OpenAI server, the batcher, and quantization mechanics on *any* laptop. **It's slow on purpose. Throughput isn't the lesson here — understanding the machinery is.** The 3× throughput story is real, but it lands on a GPU; on CPU you're studying the same engine at a walking pace.
+Apple Silicon exposes no virtual GPU to containers. That's the defining constraint you already saw back in Setup and M1. So a containerized vLLM on this Mac runs on **CPU**. And that's fine: a CPU image exists exactly so you can learn the OpenAI server, the batcher, and the quantization mechanics on *any* laptop. **It's slow on purpose. Throughput isn't the lesson here. Understanding the machinery is.** The three-times throughput story is real, but it only shows up on a GPU. On CPU, you're studying the exact same engine, just at a walking pace.
 
-The image is `openeuler/vllm-cpu:0.9.1-oe2403lts` — a prebuilt CPU vLLM, multi-arch (includes arm64, so it runs natively on this Mac). But it needs one patch to survive inside a container.
+The image is `openeuler/vllm-cpu:0.9.1-oe2403lts`, a prebuilt CPU version of vLLM. It's multi-arch, which includes arm64, so it runs natively on this Mac. But it needs one patch to survive inside a container.
 
 ### Why containers report 0 NUMA nodes — and why that crashes vLLM
 
-**Analogy:** NUMA (Non-Uniform Memory Access) is the floor plan of a physical server — which bank of RAM sits closest to which cluster of CPU cores, so software can keep data near the core using it. A **container is a furnished apartment inside that building**: it sees its rooms, but the building's floor plan is abstracted away. So inside a container the kernel typically reports **0 NUMA nodes**.
+**Analogy:** NUMA, which stands for Non-Uniform Memory Access, is the floor plan of a physical server. It tells you which bank of RAM sits closest to which cluster of CPU cores, so software can keep data near the core that's actually using it. A **container is like a furnished apartment inside that building**: it can see its own rooms, but the building's overall floor plan is hidden from it. So from inside a container, the kernel typically reports **0 NUMA nodes**.
 
-vLLM's CPU worker computes `cpu_count_per_numa = cpu_count // numa_size` to spread threads across NUMA nodes. When `numa_size` is `0`, that's a **division by zero** — the worker crashes on startup before serving a single token. The fix is one line, and it's the signature teaching point of this module:
+vLLM's CPU worker computes `cpu_count_per_numa = cpu_count // numa_size` to spread its threads across NUMA nodes. When `numa_size` is `0`, that's a **division by zero**, and the worker crashes on startup before it serves a single token. The fix is just one line, and it's the signature teaching point of this module:
 
 ```dockerfile
 RUN sed -i 's/cpu_count_per_numa = cpu_count \/\/ numa_size/cpu_count_per_numa = cpu_count \/\/ numa_size if numa_size > 0 else cpu_count/g' \
     /workspace/vllm/vllm/worker/cpu_worker.py
 ```
 
-It guards the division: if there are no NUMA nodes, just use the full CPU count. This is a perfect example of *why we build a small custom image* rather than run a base image as-is — one surgical patch makes an upstream image behave in a containerized world.
+It guards the division. If there are no NUMA nodes, it just uses the full CPU count instead. This is a perfect example of *why we build a small custom image* rather than run a base image as-is: one small, precise patch is enough to make an upstream image behave well inside a container.
 
 ### CPU tuning knobs that keep the laptop usable
 
 Two environment settings do most of the work:
 
-- **`OMP_NUM_THREADS`** — the main dial. It caps the OpenMP threads vLLM uses for compute. Set it to *part* of your cores (2–4), not all of them, so the OS and your other apps stay responsive and the machine doesn't thermally throttle. On Apple Silicon, keeping it at ~50–75% of the performance cores avoids the slow efficiency cores stealing the work.
-- **`VLLM_CPU_KVCACHE_SPACE`** — how many GB to reserve for the KV cache. Small (1 GB) keeps memory tight on a laptop; raise it only if you need longer contexts or more concurrency.
+- **`OMP_NUM_THREADS`**: this is the main dial. It caps how many OpenMP threads vLLM uses for compute. Set it to *part* of your cores, say two to four, not all of them, so the OS and your other apps stay responsive and the machine doesn't overheat and throttle itself. On Apple Silicon, keeping it around 50 to 75 percent of the performance cores stops the slow efficiency cores from stealing the work.
+- **`VLLM_CPU_KVCACHE_SPACE`**: this sets how many GB to reserve for the KV cache. Keep it small, around 1 GB, to keep memory tight on a laptop. Raise it only if you actually need longer contexts or more concurrency.
 
-Keep BLAS single-threaded (`OPENBLAS_NUM_THREADS=1`, `MKL_NUM_THREADS=1`) so those libraries don't fight the OpenMP threads for cores — multi-threaded BLAS *and* multi-threaded OpenMP thrash the cache and slow everything down.
+Keep BLAS single-threaded (`OPENBLAS_NUM_THREADS=1`, `MKL_NUM_THREADS=1`) so those libraries don't fight the OpenMP threads for the same cores. If BLAS *and* OpenMP are both multi-threaded at once, they thrash the cache and slow everything down.
 
 ---
 
 ## 4. The GPU track (throughput — documented, not run here)
 
-On an NVIDIA box the story changes: vLLM's 3× throughput is the whole point. You use the official CUDA image and pass the GPU through.
+On an NVIDIA box, the story changes: vLLM's three-times throughput is the whole point there. You use the official CUDA image and pass the GPU through to the container.
 
 | | **CPU track (this module)** | **GPU track (production)** |
 |---|---|---|
@@ -117,7 +117,7 @@ On an NVIDIA box the story changes: vLLM's 3× throughput is the whole point. Yo
 | Hardware | any laptop CPU | NVIDIA GPU |
 | Enable GPU | n/a | NVIDIA Container Toolkit + `--gpus all` |
 | Shared memory | default | `--ipc=host` (multi-process attention needs it) |
-| Goal | learn the engine | serve at scale (~3× throughput) |
+| Goal | learn the engine | serve at scale (roughly three times the throughput) |
 
 A representative GPU launch (covered read-only in the lab):
 
@@ -126,17 +126,17 @@ docker run --gpus all --ipc=host -p 8000:8000 \
   vllm/vllm-openai:latest --model mistralai/Mistral-7B-Instruct-v0.3
 ```
 
-- **NVIDIA Container Toolkit** is what makes `--gpus all` work — it exposes the host GPU and drivers to the container. Without it the container falls back to CPU.
-- **`--ipc=host`** shares the host's `/dev/shm`. vLLM uses shared memory for multi-process attention; the tiny default shm size otherwise causes cryptic crashes under load.
-- **VRAM sizing:** at 16-bit, a 7B model needs ~14 GB of weights plus KV-cache headroom — plan for a 24 GB card, or **quantize** (next section) to fit a smaller GPU. TGI (Text Generation Inference) is a reasonable alternative engine that also speaks the `/v1` contract.
+- **NVIDIA Container Toolkit** is what makes `--gpus all` work: it exposes the host's GPU and drivers to the container. Without it, the container just falls back to CPU.
+- **`--ipc=host`** shares the host's `/dev/shm`. vLLM uses shared memory for multi-process attention, and the tiny default shm size would otherwise cause confusing crashes under load.
+- **VRAM sizing:** at 16-bit precision, a 7B model needs roughly 14 GB of weights plus headroom for the KV cache. So plan for a 24 GB card, or **quantize** it (next section) to fit a smaller GPU. TGI, short for Text Generation Inference, is a reasonable alternative engine that also speaks the `/v1` contract.
 
-Apple GPU reality (from Setup) is why we don't run this track here — but the commands above are exactly what you'd run on a Linux GPU VM, and your M2 client wouldn't change.
+This Apple GPU reality, from Setup, is why we don't run this track here. But the commands above are exactly what you would run on a Linux GPU VM, and your M2 client wouldn't change at all.
 
 ---
 
 ## 5. Quantization in practice
 
-**Analogy:** same as M2's JPEG idea — quantization compresses model weights from 16-bit floats to 4- or 8-bit integers. A little precision is lost; the file shrinks dramatically and loads/runs faster. On a GPU it's often the difference between fitting on the card and not.
+**Analogy:** this is the same idea as JPEG compression from M2. Quantization compresses model weights from 16-bit floats down to 4-bit or 8-bit integers. You lose a little precision, but the file shrinks a lot and loads and runs faster. On a GPU, this is often the difference between the model fitting on the card, or not.
 
 | Format | Bits | Best for | Trade-off |
 |--------|------|----------|-----------|
@@ -144,18 +144,18 @@ Apple GPU reality (from Setup) is why we don't run this track here — but the c
 | **GPTQ** | 4-bit (3/8 too) | Mature, lots of pre-quantized checkpoints on the Hub | Slightly more accuracy loss than AWQ on some models |
 | **FP8** | 8-bit float | Newer GPUs (Hopper/Ada) | Near-lossless, needs hardware FP8 support |
 
-Rule of thumb: **4-bit AWQ** roughly quarters VRAM versus FP16 for a small accuracy cost — often how a 7B model fits a consumer 8 GB card. Pass a pre-quantized checkpoint and vLLM detects the method; larger deployments choose FP8 on capable hardware for near-lossless speed.
+Rule of thumb: **4-bit AWQ** roughly cuts VRAM to a quarter of FP16, for a small accuracy cost. That's often how a 7B model fits on a consumer 8 GB card. Pass in a pre-quantized checkpoint and vLLM detects the method on its own. Larger deployments would choose FP8 on capable hardware instead, for near-lossless speed.
 
 ---
 
 ## 6. Operational gotchas
 
-- **`--ipc=host` / shared memory (GPU):** vLLM's multi-process attention needs a large `/dev/shm`. Omit `--ipc=host` and you'll hit obscure crashes under concurrency.
-- **`--max-model-len`:** caps the context window and therefore per-request KV-cache size. Lower it to fit memory; raise it only when you truly need long context.
-- **`--max-num-seqs`:** how many sequences the batcher packs concurrently. Higher = more throughput but more memory; the sweet spot depends on your VRAM/RAM.
-- **VRAM/RAM sizing:** weights + KV cache + working memory. On CPU, an over-large `--max-model-len` × `--max-num-seqs` is the usual cause of an out-of-memory kill — drop either one.
-- **The NUMA patch (CPU):** without it the worker dies with a division-by-zero on startup in any container. It's not optional on containerized CPU hosts.
-- **First run is slow:** the image is multi-GB and the model downloads on first launch (both cached afterward), and CPU inference itself is slow. Expect a wait; it's the machine, not a hang.
+- **`--ipc=host` / shared memory (GPU):** vLLM's multi-process attention needs a large `/dev/shm`. Leave out `--ipc=host` and you will hit confusing crashes under concurrency.
+- **`--max-model-len`:** caps the context window, and therefore the per-request KV-cache size too. Lower it to fit your memory. Raise it only when you genuinely need a long context.
+- **`--max-num-seqs`:** how many sequences the batcher packs in at once. Set it higher and you get more throughput, but you also use more memory. The sweet spot depends on your VRAM or RAM.
+- **VRAM/RAM sizing:** think weights, plus KV cache, plus working memory. On CPU, an over-large `--max-model-len` into `--max-num-seqs` is the usual cause of an out-of-memory kill. Just drop one of the two.
+- **The NUMA patch (CPU):** without it, the worker dies with a division-by-zero error on startup, in any container. This patch is not optional on containerized CPU hosts.
+- **First run is slow:** the image itself is several GB, and the model downloads on first launch too (both get cached after that), and CPU inference is just slow by nature. So expect a wait. That's the machine working, not a hang.
 
 ---
 
@@ -163,15 +163,15 @@ Rule of thumb: **4-bit AWQ** roughly quarters VRAM versus FP16 for a small accur
 
 | Concept | The short version |
 |---------|-----------------|
-| Why vLLM | Continuous batching + PagedAttention → ~3× throughput under load |
-| PagedAttention | Virtual-memory paging for the KV cache — near-zero waste, many more concurrent sequences |
-| Continuous batching | Token-level scheduling — a finished slot is refilled mid-flight, no idle heads |
-| Same `/v1` contract | Drops behind M2's OpenAI API; swap the engine with one env var, never code |
-| CPU track | `openeuler/vllm-cpu` + NUMA patch; slow on purpose, for learning the mechanics |
-| The NUMA patch | Containers report 0 NUMA nodes → guard the `// numa_size` division-by-zero |
-| GPU track | `vllm/vllm-openai` + NVIDIA toolkit + `--gpus all --ipc=host`; the throughput payoff |
-| Quantization | AWQ / GPTQ (4-bit) / FP8 (8-bit) — shrink VRAM for a small accuracy cost |
+| Why vLLM | Continuous batching and PagedAttention together give roughly three times the throughput, under load |
+| PagedAttention | Virtual-memory paging, applied to the KV cache: almost no waste, many more sequences running at once |
+| Continuous batching | Token-level scheduling: a finished slot gets refilled mid-flight, so no head sits idle |
+| Same `/v1` contract | Sits behind M2's OpenAI API. Swap the engine with one environment variable, never with code |
+| CPU track | `openeuler/vllm-cpu` plus the NUMA patch. Slow on purpose, so you can learn the machinery |
+| The NUMA patch | Containers report 0 NUMA nodes, so you guard the `// numa_size` division-by-zero |
+| GPU track | `vllm/vllm-openai` plus the NVIDIA toolkit plus `--gpus all --ipc=host`. This is where the throughput payoff shows up |
+| Quantization | AWQ, GPTQ (4-bit), or FP8 (8-bit): shrink VRAM for a small accuracy cost |
 
 ---
 
-In the lab you'll serve SmolLM2 on CPU vLLM and hit the same `/v1` your M2 client already speaks.
+In the lab, you will serve SmolLM2 on CPU vLLM, and hit the exact same `/v1` endpoint your M2 client already speaks.
