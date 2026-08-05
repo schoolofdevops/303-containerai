@@ -112,6 +112,9 @@ footer, header, hgroup, main, menu, nav, section {
   .lbl-g{ fill:var(--gray); font-size:17px; }
   .lbl-b{ fill:var(--ink); font-size:23px; font-weight:700; }
   .num{ fill:var(--ink); font-size:24px; font-weight:700; }
+
+  .reveal .slides section.divider{ justify-content:center; align-items:center; }
+  .reveal .slides section.divider h2.t{ order:0; font-size:2.2em; max-width:88%; }
 </style>
 </head>
 <body>
@@ -134,11 +137,10 @@ footer, header, hgroup, main, menu, nav, section {
 
 <div class="reveal"><div class="slides">
 
-<!-- ============ SLIDE 1 — TITLE ============ -->
 <section data-auto-animate>
   <p class="kicker">MODULE 3 &nbsp;·&nbsp; DAY 1</p>
   <h2 class="t" style="font-size:2.3em">Production Serving with vLLM</h2>
-  <p class="s" style="font-size:1.2em">Continuous batching + PagedAttention, same /v1 contract</p>
+  <p class="s" style="font-size:1.2em">Continuous batching + PagedAttention, same /v1 API</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="A busy commercial coffee machine serving many cups at once, versus a single home machine">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
       <!-- commercial machine body -->
@@ -163,10 +165,9 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M3·01</div>
 </section>
 
-<!-- ============ SLIDE 2 — WHAT YOU'LL LEARN ============ -->
 <section>
   <h2 class="t">What you'll learn</h2>
-  <p class="s">Why vLLM is the production workhorse — and how to run it here.</p>
+  <p class="s">Batching, the contract, the CPU track, quantization</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Four learning objectives listed as numbered rows">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
       <circle cx="120" cy="70"  r="24"/>
@@ -179,7 +180,7 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="120" y="258">3</text><text x="120" y="348">4</text>
     </g>
     <g class="lbl" text-anchor="start">
-      <text x="170" y="78">Why continuous batching + PagedAttention win ~3x throughput</text>
+      <text x="170" y="78">Continuous batching + PagedAttention: roughly three times the throughput</text>
       <text x="170" y="168">Serve vLLM behind the same OpenAI-compatible /v1 as Ollama</text>
       <text x="170" y="258">Run the CPU track on any laptop — NUMA patch, thread tuning</text>
       <text x="170" y="348">The GPU track + quantization: AWQ · GPTQ · FP8 trade-offs</text>
@@ -188,10 +189,14 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M3·02</div>
 </section>
 
-<!-- ============ SLIDE 3 — THE MOTIVATING PROBLEM ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">1 &middot; Why vLLM: from one cup at a time to a busy caf&eacute;</h2>
+  <div class="pageno">M3·03</div>
+</section>
+
 <section>
-  <h2 class="t">Ollama is great — until the crowd arrives</h2>
-  <p class="s">A home machine pulls one shot; ask for a second and you wait.</p>
+  <h2 class="t">Ollama is great, until the crowd arrives</h2>
+  <p class="s">One espresso shot at a time</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="One request served while a queue of waiting requests backs up behind a single-slot server">
     <!-- queue of requests -->
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2">
@@ -223,13 +228,12 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="940" y="290" text-anchor="middle" class="lbl-g">throughput stalls</text>
   </svg>
-  <div class="pageno">M3·03</div>
+  <div class="pageno">M3·04</div>
 </section>
 
-<!-- ============ SLIDE 4 — CONTINUOUS BATCHING ============ -->
 <section>
-  <h2 class="t">Continuous batching — never let a head sit idle</h2>
-  <p class="s">A finished slot refills mid-flight — no waiting for the whole batch.</p>
+  <h2 class="t">Continuous batching, never let a head sit idle</h2>
+  <p class="s">A finished slot refills mid-flight</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="Static batching wastes idle slots while continuous batching refills a finished slot mid-flight">
     <!-- static batching -->
     <text x="270" y="55" text-anchor="middle" class="lbl-b">Static batch</text>
@@ -266,13 +270,12 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="850" y="278" text-anchor="middle" class="lbl-g">token-level scheduling · no idle slots</text>
   </svg>
-  <div class="pageno">M3·04</div>
+  <div class="pageno">M3·05</div>
 </section>
 
-<!-- ============ SLIDE 5 — PAGEDATTENTION ============ -->
 <section>
-  <h2 class="t">PagedAttention — virtual memory for the KV cache</h2>
-  <p class="s">Small pages on demand, mapped anywhere — like your OS pages RAM.</p>
+  <h2 class="t">PagedAttention, virtual memory for the KV cache</h2>
+  <p class="s">Paging the KV cache like your OS pages RAM</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="Naive serving reserves a huge contiguous slab and wastes most of it, while PagedAttention allocates small pages on demand">
     <!-- naive -->
     <text x="270" y="55" text-anchor="middle" class="lbl-b">Naive · reserved slab</text>
@@ -316,13 +319,12 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="850" y="255" text-anchor="middle" class="lbl-g">lookup table maps pages anywhere</text>
     <text x="850" y="300" text-anchor="middle" class="lbl-g">waste &lt; 4% — many more sequences fit</text>
   </svg>
-  <div class="pageno">M3·05</div>
+  <div class="pageno">M3·06</div>
 </section>
 
-<!-- ============ SLIDE 6 — 3X THROUGHPUT ============ -->
 <section>
-  <h2 class="t">The payoff: ~3x throughput under load</h2>
-  <p class="s">Same GPU, same per-shot time — heads never idle, far more coffees.</p>
+  <h2 class="t">The payoff: roughly three times the throughput</h2>
+  <p class="s">Same hardware, heads never idle</p>
   <svg viewBox="0 0 1100 360" role="img" aria-label="A bar chart comparing naive server throughput to vLLM at roughly three times">
     <!-- axis -->
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
@@ -333,24 +335,28 @@ footer, header, hgroup, main, menu, nav, section {
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4">
       <rect x="290" y="230" width="150" height="70" rx="8"/>
     </g>
-    <text x="365" y="272" text-anchor="middle" class="lbl-g">1x</text>
+    <text x="365" y="272" text-anchor="middle" class="lbl-g">1&times;</text>
     <text x="365" y="330" text-anchor="middle" class="lbl-g">naive server</text>
     <!-- vLLM bar -->
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="640" y="90" width="150" height="210" rx="8"/>
     </g>
     <rect x="642" y="92" width="146" height="206" fill="#f5f5f5"/>
-    <text x="715" y="200" text-anchor="middle" class="lbl-b">~3x</text>
+    <text x="715" y="200" text-anchor="middle" class="lbl-b">3&times;</text>
     <text x="715" y="330" text-anchor="middle" class="lbl">vLLM</text>
     <text x="120" y="185" text-anchor="middle" class="lbl-g" transform="rotate(-90 120 185)">throughput</text>
   </svg>
-  <div class="pageno">M3·06</div>
+  <div class="pageno">M3·07</div>
 </section>
 
-<!-- ============ SLIDE 7 — SAME CONTRACT ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">2 &middot; Same contract, bigger engine</h2>
+  <div class="pageno">M3·08</div>
+</section>
+
 <section>
   <h2 class="t">Same contract, bigger engine</h2>
-  <p class="s">The wall socket from M2, again — the client speaks to the contract.</p>
+  <p class="s">The wall socket idea from M2, again</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="One client speaks to the v1 contract, which routes to either Ollama or vLLM with only an env var change">
     <!-- client -->
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
@@ -384,13 +390,17 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="905" y="285" text-anchor="middle" class="lbl">vLLM · :8009</text>
     <text x="905" y="313" text-anchor="middle" class="lbl-g">production throughput</text>
   </svg>
-  <div class="pageno">M3·07</div>
+  <div class="pageno">M3·09</div>
 </section>
 
-<!-- ============ SLIDE 8 — CPU TRACK ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">3 &middot; The CPU track (what you'll run)</h2>
+  <div class="pageno">M3·10</div>
+</section>
+
 <section>
-  <h2 class="t">The CPU track — learn the machinery anywhere</h2>
-  <p class="s">No GPU passthrough on Apple Silicon, so this runs on CPU — slow on purpose.</p>
+  <h2 class="t">The CPU track, learn the machinery anywhere</h2>
+  <p class="s">No GPU passthrough &mdash; slow on purpose</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="A container running the CPU vLLM image serving SmolLM2 behind the v1 API on any laptop">
     <!-- container boundary -->
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-dasharray="10 6">
@@ -417,13 +427,12 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="945" y="215" text-anchor="middle" class="lbl-g">batcher · quantization</text>
     <text x="945" y="245" text-anchor="middle" class="lbl-g">at a walking pace</text>
   </svg>
-  <div class="pageno">M3·08</div>
+  <div class="pageno">M3·11</div>
 </section>
 
-<!-- ============ SLIDE 9 — NUMA PATCH ============ -->
 <section>
   <h2 class="t">Why containers report 0 NUMA nodes</h2>
-  <p class="s">NUMA is the floor plan; a container is an apartment inside it.</p>
+  <p class="s">The container can&rsquo;t see the floor plan</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="A container sees zero NUMA nodes causing a division by zero, fixed by a one-line guard patch">
     <!-- host building -->
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="4 6">
@@ -459,13 +468,12 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="945" y="212" text-anchor="middle" class="lbl-g">if numa_size &gt; 0</text>
     <text x="945" y="240" text-anchor="middle" class="lbl-g">else cpu_count</text>
   </svg>
-  <div class="pageno">M3·09</div>
+  <div class="pageno">M3·12</div>
 </section>
 
-<!-- ============ SLIDE 10 — THREAD TUNING ============ -->
 <section>
   <h2 class="t">CPU tuning knobs that keep the laptop usable</h2>
-  <p class="s">A few env dials do most of the work — thread cap, not all your cores.</p>
+  <p class="s">A few dials, not all your cores</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Four environment variables that tune CPU threads and KV cache size">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
       <rect x="60"  y="70" width="480" height="130" rx="10"/>
@@ -491,13 +499,17 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="585" y="328" class="lbl-g">the machine won't thermally throttle</text>
     </g>
   </svg>
-  <div class="pageno">M3·10</div>
+  <div class="pageno">M3·13</div>
 </section>
 
-<!-- ============ SLIDE 11 — CPU VS GPU TRACK ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">4 &middot; The GPU track (throughput &mdash; documented, not run here)</h2>
+  <div class="pageno">M3·14</div>
+</section>
+
 <section>
   <h2 class="t">CPU track vs GPU track</h2>
-  <p class="s">Learn the engine on any laptop; reach for throughput on an NVIDIA box.</p>
+  <p class="s">Learn here, scale on an NVIDIA box</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="A comparison table of the CPU track versus the GPU track across image, hardware, GPU enablement, shared memory and goal">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
       <rect x="60" y="55" width="480" height="315" rx="10"/>
@@ -527,45 +539,17 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="585" y="347">--ipc=host · ~3x throughput</text>
     </g>
   </svg>
-  <div class="pageno">M3·11</div>
+  <div class="pageno">M3·15</div>
 </section>
 
-<!-- ============ SLIDE 12 — GPU GOTCHAS ============ -->
-<section>
-  <h2 class="t">GPU operational gotchas</h2>
-  <p class="s">Two flags and one sizing rule separate a working server from cryptic crashes.</p>
-  <svg viewBox="0 0 1100 380" role="img" aria-label="NVIDIA Container Toolkit exposes the GPU, ipc host shares shared memory, and VRAM sizing needs headroom">
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
-      <rect x="60"  y="70" width="310" height="240" rx="12"/>
-      <rect x="395" y="70" width="310" height="240" rx="12"/>
-      <rect x="730" y="70" width="310" height="240" rx="12"/>
-    </g>
-    <text x="215" y="110" text-anchor="middle" class="lbl-b">--gpus all</text>
-    <text x="215" y="150" text-anchor="middle" class="lbl-g">needs NVIDIA</text>
-    <text x="215" y="180" text-anchor="middle" class="lbl-g">Container Toolkit</text>
-    <text x="215" y="225" text-anchor="middle" class="lbl-sm">exposes host GPU</text>
-    <text x="215" y="255" text-anchor="middle" class="lbl-sm">+ drivers to container</text>
-    <text x="215" y="290" text-anchor="middle" class="lbl-g">else falls back to CPU</text>
-
-    <text x="550" y="110" text-anchor="middle" class="lbl-b">--ipc=host</text>
-    <text x="550" y="150" text-anchor="middle" class="lbl-g">shares /dev/shm</text>
-    <text x="550" y="195" text-anchor="middle" class="lbl-sm">multi-process</text>
-    <text x="550" y="222" text-anchor="middle" class="lbl-sm">attention needs it</text>
-    <text x="550" y="290" text-anchor="middle" class="lbl-g">omit → crashes under load</text>
-
-    <text x="885" y="110" text-anchor="middle" class="lbl-b">VRAM sizing</text>
-    <text x="885" y="150" text-anchor="middle" class="lbl-g">7B @ 16-bit</text>
-    <text x="885" y="195" text-anchor="middle" class="lbl-sm">≈ 14 GB weights</text>
-    <text x="885" y="222" text-anchor="middle" class="lbl-sm">+ KV-cache headroom</text>
-    <text x="885" y="290" text-anchor="middle" class="lbl-g">24 GB card, or quantize</text>
-  </svg>
-  <div class="pageno">M3·12</div>
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">5 &middot; Quantization in practice</h2>
+  <div class="pageno">M3·16</div>
 </section>
 
-<!-- ============ SLIDE 13 — QUANTIZATION ============ -->
 <section>
-  <h2 class="t">Quantization — trade a little precision for a lot of room</h2>
-  <p class="s">Like a JPEG for weights — 16-bit floats shrink to 4- or 8-bit ints.</p>
+  <h2 class="t">Quantization, trade a little precision for a lot of room</h2>
+  <p class="s">Like a JPEG, but for model weights</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="AWQ, GPTQ and FP8 quantization formats compared by bits, best use, and trade-off">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
       <rect x="60"  y="70" width="310" height="250" rx="12"/>
@@ -597,14 +581,49 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="885" y="290" fill="#757575">chosen for large deployments</text>
     </g>
   </svg>
-  <div class="pageno">M3·13</div>
+  <div class="pageno">M3·17</div>
 </section>
 
-<!-- ============ SLIDE 14 — CLOSING / LAB LEAD-IN ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">6 &middot; Operational gotchas</h2>
+  <div class="pageno">M3·18</div>
+</section>
+
+<section>
+  <h2 class="t">GPU operational gotchas</h2>
+  <p class="s">Two flags, one sizing rule</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="NVIDIA Container Toolkit exposes the GPU, ipc host shares shared memory, and VRAM sizing needs headroom">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60"  y="70" width="310" height="240" rx="12"/>
+      <rect x="395" y="70" width="310" height="240" rx="12"/>
+      <rect x="730" y="70" width="310" height="240" rx="12"/>
+    </g>
+    <text x="215" y="110" text-anchor="middle" class="lbl-b">--gpus all</text>
+    <text x="215" y="150" text-anchor="middle" class="lbl-g">needs NVIDIA</text>
+    <text x="215" y="180" text-anchor="middle" class="lbl-g">Container Toolkit</text>
+    <text x="215" y="225" text-anchor="middle" class="lbl-sm">exposes host GPU</text>
+    <text x="215" y="255" text-anchor="middle" class="lbl-sm">+ drivers to container</text>
+    <text x="215" y="290" text-anchor="middle" class="lbl-g">else falls back to CPU</text>
+
+    <text x="550" y="110" text-anchor="middle" class="lbl-b">--ipc=host</text>
+    <text x="550" y="150" text-anchor="middle" class="lbl-g">shares /dev/shm</text>
+    <text x="550" y="195" text-anchor="middle" class="lbl-sm">multi-process</text>
+    <text x="550" y="222" text-anchor="middle" class="lbl-sm">attention needs it</text>
+    <text x="550" y="290" text-anchor="middle" class="lbl-g">omit → crashes under load</text>
+
+    <text x="885" y="110" text-anchor="middle" class="lbl-b">VRAM sizing</text>
+    <text x="885" y="150" text-anchor="middle" class="lbl-g">7B @ 16-bit</text>
+    <text x="885" y="195" text-anchor="middle" class="lbl-sm">≈ 14 GB weights</text>
+    <text x="885" y="222" text-anchor="middle" class="lbl-sm">+ KV-cache headroom</text>
+    <text x="885" y="290" text-anchor="middle" class="lbl-g">24 GB card, or quantize</text>
+  </svg>
+  <div class="pageno">M3·19</div>
+</section>
+
 <section>
   <p class="kicker">TO THE LAB</p>
   <h2 class="t" style="font-size:2.3em">Same socket. Bigger engine.</h2>
-  <p class="s" style="font-size:1.1em">Serve SmolLM2 on CPU vLLM behind the same /v1 contract</p>
+  <p class="s" style="font-size:1.1em">Serve SmolLM2 on CPU vLLM, same /v1 API</p>
   <svg viewBox="0 0 1100 320" role="img" aria-label="Build the patched CPU vLLM image, serve SmolLM2, and point the M2 client at it with one line">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
       <rect x="60"  y="110" width="250" height="100" rx="12"/>
@@ -624,7 +643,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="550" y="270" text-anchor="middle" class="lbl-g">the M2 client, unchanged, talks to the vLLM server you build</text>
   </svg>
   <p class="credit">Next: <b>Lab — Serve SmolLM2 on CPU vLLM</b> &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
-  <div class="pageno">M3·14</div>
+  <div class="pageno">M3·20</div>
 </section>
 </div></div>
 

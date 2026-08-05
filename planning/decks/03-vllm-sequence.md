@@ -19,19 +19,76 @@
      external refs — reveal.js 5.2 runtime + Patrick Hand woff2 are now inlined via the skeleton,
      killing the old cdnjs/fonts.googleapis.com loads. -->
 
-This companion doc maps the 14-slide explainer deck (`site/static/decks/03-vllm.html`) to the
+<!-- 2026-08-05 divider + subtitle-tightening + voice-pass regen (this pass):
+     Deck grew from 14 to 20 slides — 6 new §3a section-divider slides (title-only, no
+     kicker/subtitle/svg), one per lesson `##` section, inserted immediately before that
+     section's first content slide, IN LESSON ORDER 1→6. All 14 pagenos renumbered
+     M3·01–M3·20 sequentially.
+
+     REORDER DECISION (the ordering gate this pass exists to catch): mapping the 14
+     original content slides against the lesson's 6 numbered sections found that the
+     original deck visited them almost-but-not-quite in lesson order. The mismatch:
+     old slide 12 "GPU operational gotchas" (--gpus all / --ipc=host / VRAM sizing —
+     content lifted near-verbatim from lesson §4's own GPU-track prose) sat BEFORE old
+     slide 13 "Quantization" in the deck, but the lesson's own document order is
+     §4 GPU track → §5 Quantization → §6 Operational gotchas — i.e. old slide 12's
+     GPU-specific facts are also the closest thing this deck has to an anchor for §6,
+     and §6 comes AFTER quantization in the lesson, not before it.
+
+     Chose option (i) from the regen brief: reorder cleanly, no matched pair broken.
+     Slide 11 ("CPU track vs GPU track") already independently mirrors lesson §4's own
+     5-row comparison table (image / hardware / enable GPU / shared memory / goal) — it
+     is the natural, self-sufficient §4 anchor on its own. That freed old slide 12 to
+     move to AFTER quantization, where it now anchors §6 "Operational gotchas": its
+     facts (--ipc=host, VRAM sizing) are the same two gotchas the lesson's own §6 prose
+     restates almost word-for-word from §4 ("--ipc=host / shared memory (GPU)" and
+     "VRAM/RAM sizing" are literally §6's opening bullets). The presentation-order
+     guidance in the prior version of this spec ("slide 11 is a quick comparison beat
+     before slides 12–13") never asserted 11-12 as a locked build-up/matched pair the
+     way slides 4-5 (continuous batching → PagedAttention) are — so moving 12 past 13
+     broke no fragment build-up, no problem→fix pair, nothing.
+
+     COVERAGE CAVEAT (flagged, not silently dropped): §6 "Operational gotchas" in the
+     lesson also covers `--max-model-len`, `--max-num-seqs`, and "first run is slow" —
+     none of these are drawn in old slide 12's SVG (which is scoped to --gpus all /
+     --ipc=host / VRAM, i.e. GPU-track specifics). This gap pre-dates this pass — the
+     original 14-slide deck never had a slide visualizing those three facts either; the
+     prior spec's coverage table papered over it with "folded into the takeaway" (a
+     presenter-narration note, not on-slide content). This restructuring pass did not
+     invent a new slide/SVG for them (out of scope: no new content, only reorder +
+     divider + subtitle + voice pass per the regen brief) — the divider for §6 still
+     ships (mandatory per style-guide §3a, no skip — the skip exception is narrow and
+     scoped to a lab-bridge closing section, which §6 is not), anchored to the nearest
+     matching content slide (old 12). `--max-model-len`/`--max-num-seqs`/"first run is
+     slow" remain lesson-only until a future content pass adds a dedicated visual.
+
+     Also: every subtitle rewritten to a ≤10-word/≤60-char SHORT anchoring phrase
+     (was full sentences, several near the old 80-char ceiling) — see subtitle table
+     below. Three raw "~3x"/"3x" shorthand occurrences (title-slide numbered-row label,
+     the payoff slide's h2.t, and the CPU-vs-GPU table cell) replaced with the lesson's
+     own spelled-out phrasing "roughly three times (the) throughput" — the lesson never
+     uses bare "3x" for this number, so the deck now matches (propagation rule, deck-
+     author SKILL.md §8). The payoff bar chart's own numeric tick labels ("1×"/"3×")
+     were left as compact chart annotations, not prose — paired with the now-spelled-out
+     h2.t title, that's the equivalent of an axis tick next to a labeled title, not an
+     unexplained developer shorthand standing alone. All on-slide text run through
+     gourav-voice; no unexplained jargon found (NUMA/KV cache/AWQ/GPTQ/FP8/PagedAttention
+     are course vocabulary already explained in the lesson body, kept as-is). -->
+
+This companion doc maps the 20-slide explainer deck (`site/static/decks/03-vllm.html`) to the
 Module 3 lesson (`site/docs/m3-vllm/lesson.md`). The deck teaches **concepts**, not commands — it
 turns the lesson's coffee-machine and virtual-memory analogies into hand-drawn whiteboard visuals a
 learner walks through before opening the lab. The visual language follows the CourseSmith
 whiteboard style contract (`templates/deck/whiteboard-style-guide.md`): Patrick Hand cursive,
 `#1e1e1e` primary / `#757575` secondary strokes on white paper with the five semantic pastel fills
 (§1: green good · red bad/full · blue data · orange caution · purple meta — this deck uses the
-neutral ink/gray palette throughout, no pastel fills in the original slides), the `#rough` wobble
-filter on shapes only, and the shared `#ah`/`#ahg` arrowhead markers. The arc moves — **the crowd
-problem with single-shot serving (Ollama) → the two engine tricks that fix it (continuous batching,
-PagedAttention) → the throughput payoff → the unchanged client contract → how to run it on this
-laptop (CPU track + the NUMA patch + tuning) → the documented GPU track → quantization → hand-off to
-the lab.**
+neutral ink/gray palette throughout, no pastel fills), the `#rough` wobble filter on shapes only,
+and the shared `#ah`/`#ahg` arrowhead markers. The arc moves — **the crowd problem with single-shot
+serving (Ollama) → the two engine tricks that fix it (continuous batching, PagedAttention) → the
+throughput payoff → the unchanged client contract → how to run it on this laptop (CPU track + the
+NUMA patch + tuning) → the documented GPU track → quantization → the gotchas recap → hand-off to
+the lab.** Six section-divider slides now mark the six lesson `##` sections in lesson order, so a
+learner can map deck ↔ lesson section at a glance.
 
 ## Slide table
 
@@ -39,66 +96,108 @@ the lab.**
 |---|-------|---------|--------|----------|
 | 1 | Production Serving with vLLM (title) | Module framing: vLLM is the commercial machine behind the counter — many shots at once, heads never idle | Title sketch: a commercial multi-group espresso machine pulling four cups at once, ink protagonist box | credit line: Gourav Shah · School of DevOps & AI · Containers for GenAI & Agentic AI |
 | 2 | What you'll learn | Set the four learning objectives: batching+paging throughput, same `/v1` contract, CPU track, GPU+quantization | numbered rows (circles 1–4) | Same client, bigger engine — you swap the backend, your application code never notices |
-| 3 | Ollama is great — until the crowd arrives | The motivating problem: a single-slot server queues requests one at a time while slots could be idle | fan-out: a queue of waiting requests (R1–R4) feeding one single-slot server box, a clock signaling stalled throughput | Perfect for a developer at a laptop. Under concurrent load, finished slots sit idle and the queue backs up |
-| 4 | Continuous batching — never let a head sit idle | The core fix: token-level scheduling refills a finished slot mid-flight instead of waiting for the whole batch | two-panel comparison: static batch (idle slot, waits for laggard) vs continuous batch (mid-flight refill, no idle slots) | As soon as a sequence emits its final token and leaves, a waiting request takes its place — the single biggest reason vLLM wins under load |
-| 5 | PagedAttention — virtual memory for the KV cache | The memory trick that makes continuous batching affordable: page the KV cache like an OS pages RAM | two-panel comparison: naive reserved-contiguous-slab (60–80% wasted) vs paged on-demand allocation with a lookup table (<4% waste) | Near-zero memory waste means far more concurrent sequences fit — which is exactly what feeds continuous batching enough work to stay busy |
-| 6 | The payoff: ~3x throughput under load | Quantify the combined effect of both tricks on the same hardware | bar chart: naive server (1x) vs vLLM (~3x) | Continuous batching + PagedAttention together give roughly 3x the throughput of a naive server on the same hardware |
-| 7 | Same contract, bigger engine | The M2 payoff: the client speaks to the `/v1` contract, not the engine — swapping engines is a config change | hub-and-spoke: one client → `/v1` contract socket → branches to Ollama (:11434, dev) and vLLM (:8009, production) | Swapping Ollama for vLLM is a one-line change — point OPENAI_BASE_URL at the new address. No code, no SDK, no image change |
-| 8 | The CPU track — learn the machinery anywhere | Frame why this module runs on CPU: Apple Silicon exposes no GPU to containers, so it's slow on purpose, for learning | big-box anatomy: a dashed container boundary holding the `openeuler/vllm-cpu` image, SmolLM2, and the `/v1` server, arrow out to "study the engine" | Throughput isn't the lesson on CPU — understanding the OpenAI server, the batcher, and quantization mechanics is |
-| 9 | Why containers report 0 NUMA nodes | The signature teaching point: containers abstract away the host's NUMA floor plan, causing a division-by-zero crash, fixed by a guard patch | two-panel: host building with 4 NUMA-node rooms (dashed, gray) vs a container "apartment" (dashed, ink) that sees `numa_size = 0` and crashes, arrow to the one-line patch box | The signature teaching point: a surgical sed patch guards the division so an upstream image behaves in a containerized world |
-| 10 | CPU tuning knobs that keep the laptop usable | The environment dials that keep the machine usable: thread caps, KV cache size, single-threaded BLAS | big-box anatomy: four boxes — `OMP_NUM_THREADS`, `VLLM_CPU_KVCACHE_SPACE`, `OPENBLAS/MKL=1`, "why leave cores free" | Multi-threaded BLAS and multi-threaded OpenMP thrash the cache and slow everything down — keep BLAS at one thread |
-| 11 | CPU track vs GPU track | Compare the two tracks side by side across image, hardware, GPU enablement, shared memory, and goal | two-panel comparison table: CPU track (this module) vs GPU track (production) | Both speak the identical /v1 contract — your M2 client wouldn't change moving from CPU to GPU |
-| 12 | GPU operational gotchas | Name the two flags and one sizing rule that separate a working GPU server from cryptic crashes | big-box anatomy: three boxes — `--gpus all` (NVIDIA Container Toolkit), `--ipc=host` (shared memory), VRAM sizing (7B model ≈14GB + headroom) | --max-model-len and --max-num-seqs cap KV-cache size and concurrency — the usual dials to fit memory |
-| 13 | Quantization — trade a little precision for a lot of room | Compare the three quantization formats by bits, best use, and trade-off, using the JPEG-compression analogy | big-box anatomy: three format boxes — AWQ 4-bit, GPTQ 4-bit, FP8 8-bit, each with best-for + trade-off | Rule of thumb: 4-bit AWQ roughly quarters VRAM vs FP16 for a small accuracy cost — often how a 7B model fits a consumer 8 GB card |
-| 14 | Same socket. Bigger engine. (closing) | Hand off to the lab: build the patched image, serve SmolLM2, point the unchanged M2 client at it | pipeline: Build → Serve → Point client, three boxes with arrows | credit + lab hand-off: Next — Lab: Serve SmolLM2 on CPU vLLM · Gourav Shah · School of DevOps & AI |
+| 3 | **§1 divider** — Why vLLM: from one cup at a time to a busy café | Opens lesson §1 | — (divider) | — |
+| 4 | Ollama is great — until the crowd arrives | The motivating problem: a single-slot server queues requests one at a time while slots could be idle | fan-out: a queue of waiting requests (R1–R4) feeding one single-slot server box, a clock signaling stalled throughput | Perfect for a developer at a laptop. Under concurrent load, finished slots sit idle and the queue backs up |
+| 5 | Continuous batching — never let a head sit idle | The core fix: token-level scheduling refills a finished slot mid-flight instead of waiting for the whole batch | two-panel comparison: static batch (idle slot, waits for laggard) vs continuous batch (mid-flight refill, no idle slots) | As soon as a sequence emits its final token and leaves, a waiting request takes its place — the single biggest reason vLLM wins under load |
+| 6 | PagedAttention — virtual memory for the KV cache | The memory trick that makes continuous batching affordable: page the KV cache like an OS pages RAM | two-panel comparison: naive reserved-contiguous-slab (60–80% wasted) vs paged on-demand allocation with a lookup table (<4% waste) | Near-zero memory waste means far more concurrent sequences fit — which is exactly what feeds continuous batching enough work to stay busy |
+| 7 | The payoff: roughly three times the throughput | Quantify the combined effect of both tricks on the same hardware | bar chart: naive server (1×) vs vLLM (3×) | Continuous batching + PagedAttention together give roughly three times the throughput of a naive server on the same hardware |
+| 8 | **§2 divider** — Same contract, bigger engine | Opens lesson §2 | — (divider) | — |
+| 9 | Same contract, bigger engine | The M2 payoff: the client speaks to the `/v1` contract, not the engine — swapping engines is a config change | hub-and-spoke: one client → `/v1` contract socket → branches to Ollama (:11434, dev) and vLLM (:8009, production) | Swapping Ollama for vLLM is a one-line change — point OPENAI_BASE_URL at the new address. No code, no SDK, no image change |
+| 10 | **§3 divider** — The CPU track (what you'll run) | Opens lesson §3 | — (divider) | — |
+| 11 | The CPU track — learn the machinery anywhere | Frame why this module runs on CPU: Apple Silicon exposes no GPU to containers, so it's slow on purpose, for learning | big-box anatomy: a dashed container boundary holding the `openeuler/vllm-cpu` image, SmolLM2, and the `/v1` server, arrow out to "study the engine" | Throughput isn't the lesson on CPU — understanding the OpenAI server, the batcher, and quantization mechanics is |
+| 12 | Why containers report 0 NUMA nodes | The signature teaching point: containers abstract away the host's NUMA floor plan, causing a division-by-zero crash, fixed by a guard patch | two-panel: host building with 4 NUMA-node rooms (dashed, gray) vs a container "apartment" (dashed, ink) that sees `numa_size = 0` and crashes, arrow to the one-line patch box | The signature teaching point: a surgical sed patch guards the division so an upstream image behaves in a containerized world |
+| 13 | CPU tuning knobs that keep the laptop usable | The environment dials that keep the machine usable: thread caps, KV cache size, single-threaded BLAS | big-box anatomy: four boxes — `OMP_NUM_THREADS`, `VLLM_CPU_KVCACHE_SPACE`, `OPENBLAS/MKL=1`, "why leave cores free" | Multi-threaded BLAS and multi-threaded OpenMP thrash the cache and slow everything down — keep BLAS at one thread |
+| 14 | **§4 divider** — The GPU track (throughput — documented, not run here) | Opens lesson §4 | — (divider) | — |
+| 15 | CPU track vs GPU track | Compare the two tracks side by side across image, hardware, GPU enablement, shared memory, and goal — mirrors lesson §4's own 5-row table | two-panel comparison table: CPU track (this module) vs GPU track (production) | Both speak the identical /v1 contract — your M2 client wouldn't change moving from CPU to GPU |
+| 16 | **§5 divider** — Quantization in practice | Opens lesson §5 | — (divider) | — |
+| 17 | Quantization — trade a little precision for a lot of room | Compare the three quantization formats by bits, best use, and trade-off, using the JPEG-compression analogy | big-box anatomy: three format boxes — AWQ 4-bit, GPTQ 4-bit, FP8 8-bit, each with best-for + trade-off | Rule of thumb: 4-bit AWQ roughly quarters VRAM vs FP16 for a small accuracy cost — often how a 7B model fits a consumer 8 GB card |
+| 18 | **§6 divider** — Operational gotchas | Opens lesson §6 | — (divider) | — |
+| 19 | GPU operational gotchas | Name the two flags and one sizing rule that separate a working GPU server from cryptic crashes — the deck's closest anchor to lesson §6's gotcha recap (see coverage caveat above) | big-box anatomy: three boxes — `--gpus all` (NVIDIA Container Toolkit), `--ipc=host` (shared memory), VRAM sizing (7B model ≈14GB + headroom) | --max-model-len and --max-num-seqs cap KV-cache size and concurrency — the usual dials to fit memory (narration-only; not drawn on this slide, see coverage caveat) |
+| 20 | Same socket. Bigger engine. (closing) | Hand off to the lab: build the patched image, serve SmolLM2, point the unchanged M2 client at it | pipeline: Build → Serve → Point client, three boxes with arrows | credit + lab hand-off: Next — Lab: Serve SmolLM2 on CPU vLLM · Gourav Shah · School of DevOps & AI |
 
-<!-- Visual pattern vocabulary used: title scene (1) · numbered rows (2) · fan-out (3) ·
-     two-panel comparison (4, 5, 9, 11) · bar chart (6) · hub-and-spoke (7) · big-box anatomy
-     (8, 10, 12, 13) · pipeline (14). -->
+<!-- Visual pattern vocabulary used: title scene (1) · numbered rows (2) · dividers (3, 8, 10, 14, 16, 18)
+     · fan-out (4) · two-panel comparison (5, 6, 12, 15) · bar chart (7) · hub-and-spoke (9) ·
+     big-box anatomy (11, 13, 17, 19) · pipeline (20). -->
+
+## Subtitle table (≤10 words / ≤60 chars, short anchoring phrase — style-guide §0)
+
+| Slide | Subtitle | Words | Chars |
+|---|---|---|---|
+| 1 | Continuous batching + PagedAttention, same /v1 API | 7 | 50 |
+| 2 | Batching, the contract, the CPU track, quantization | 7 | 51 |
+| 4 | One espresso shot at a time | 6 | 27 |
+| 5 | A finished slot refills mid-flight | 5 | 34 |
+| 6 | Paging the KV cache like your OS pages RAM | 9 | 42 |
+| 7 | Same hardware, heads never idle | 5 | 31 |
+| 9 | The wall socket idea from M2, again | 7 | 35 |
+| 11 | No GPU passthrough — slow on purpose | 7 | 36 |
+| 12 | The container can't see the floor plan | 7 | 38 |
+| 13 | A few dials, not all your cores | 7 | 31 |
+| 15 | Learn here, scale on an NVIDIA box | 7 | 34 |
+| 17 | Like a JPEG, but for model weights | 7 | 34 |
+| 19 | Two flags, one sizing rule | 5 | 26 |
+| 20 | Serve SmolLM2 on CPU vLLM, same /v1 API | 8 | 39 |
+
+Dividers (3, 8, 10, 14, 16, 18) carry no subtitle by design (style-guide §3a: title-only, no
+subtitle/kicker/svg). All 14 content-slide subtitles pass the ≤60-char target with margin; none
+approach the 80-char hard fail.
 
 ## Recommended presentation order
 
-Present strictly 1 → 14; each slide's vocabulary is used by the next. Open on slide 1 to set the
-café framing, then move briskly through 2 (the roadmap) into the motivating problem on slide 3 —
-don't over-explain the queue picture, it's intuitive. **Slides 4 and 5 are the conceptual hinge of
-the whole deck** — continuous batching and PagedAttention are the two mechanisms everything else
-depends on, so give both diagrams real time and land each takeaway crisply before moving on; slide
-6's payoff bar chart is the fast reward right after. Slide 7 (same contract) is a callback to M2 —
-say it plainly, it should feel obvious once shown. Slides 8–10 are one continuous CPU-track
-build-up (why CPU → the NUMA crash → the tuning knobs) — keep momentum across the three, with slide
-9 (the NUMA patch) as the single most memorable teaching point in the module; don't rush it. Slide
-11 is a quick comparison beat before slides 12–13 cover the GPU track and quantization at a similar
-brisk pace (documented, not run). Slide 14 hands off to the lab. Under time pressure, compress
-11–13 to a single pass each — never compress 4, 5, or 9.
+Present strictly 1 → 20; each slide's vocabulary is used by the next. Open on slide 1 to set the
+café framing, move through 2 (the roadmap), then the §1 divider opens the throughput story proper.
+Don't over-explain slide 4's queue picture, it's intuitive. **Slides 5 and 6 are the conceptual
+hinge of the whole deck** — continuous batching and PagedAttention are the two mechanisms
+everything else depends on, so give both diagrams real time and land each takeaway crisply before
+moving on; slide 7's payoff bar chart is the fast reward right after. The §2 divider then slide 9
+(same contract) is a callback to M2 — say it plainly, it should feel obvious once shown. The §3
+divider opens one continuous CPU-track build-up across slides 11–13 (why CPU → the NUMA crash →
+the tuning knobs) — keep momentum across the three, with slide 12 (the NUMA patch) as the single
+most memorable teaching point in the module; don't rush it. The §4 divider + slide 15 is a quick
+GPU-track comparison beat before the §5 divider + slide 17 covers quantization at a similar brisk
+pace (documented, not run). The §6 divider + slide 19 closes the "documented, not run" arc with the
+gotchas recap before handing off to the lab on slide 20. Under time pressure, compress 15/17/19 to
+a single pass each — never compress 5, 6, or 12.
 
 ## Fragment map
 
-This deck has no hop-by-hop build-ups in the original — every slide is a static comparison,
-anatomy, fan-out, or pipeline diagram that reads better whole. No fragments are used.
+This deck has no hop-by-hop build-ups — every content slide is a static comparison, anatomy,
+fan-out, or pipeline diagram that reads better whole, and divider slides are title-only (nothing to
+fragment). No fragments are used.
 
-Static slides (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14) show the full picture at once.
+Static slides (1, 2, 4, 5, 6, 7, 9, 11, 12, 13, 15, 17, 19, 20) show the full picture at once.
+Divider slides (3, 8, 10, 14, 16, 18) are title-only by definition.
 
 ## Coverage check (HARD GATE — §0)
 
-Every lesson section/concept maps to a slide. No orphans.
+Every lesson section/concept maps to a slide, IN LESSON ORDER. No orphans.
 
 | Lesson section / concept | Slide(s) | Notes (analogy used, echoes/forward pointers) |
 |---|---|---|
-| §1 opener — Ollama as home espresso machine, one shot at a time | 3 | Fan-out: queue backs up behind a single-slot server |
-| §1 — vLLM as the commercial café machine, continuous batching intro | 1, 4 | Title scene sets the café framing; slide 4 is the mechanism |
-| §1 — continuous batching: token-level scheduling, no idle slots | 4 | Two-panel: static batch (idle, waits for laggard) vs continuous batch |
-| §1 — PagedAttention: virtual memory for the KV cache | 5 | Two-panel: naive reserved slab (60–80% waste) vs paged on-demand (<4% waste) |
-| §1 — ~3x throughput payoff | 6 | Bar chart: naive (1x) vs vLLM (~3x) |
-| §2 — same `/v1` OpenAI-compatible contract, one-line engine swap | 7 | Hub-and-spoke: client → contract → Ollama/vLLM branches |
-| §3 — CPU track: Apple Silicon no GPU passthrough, slow on purpose | 8 | Big-box anatomy: container with image, SmolLM2, /v1 server |
-| §3 — why containers report 0 NUMA nodes, division-by-zero crash, the sed patch | 9 | Two-panel: host NUMA floor plan vs container apartment, arrow to patch |
-| §3 — CPU tuning knobs: OMP_NUM_THREADS, VLLM_CPU_KVCACHE_SPACE, single-threaded BLAS | 10 | Big-box anatomy: four env-var boxes |
-| §4 — GPU track: image, hardware, NVIDIA Container Toolkit, --ipc=host, VRAM sizing | 11, 12 | Slide 11 is the CPU-vs-GPU comparison table; slide 12 is the GPU gotchas detail |
-| §5 — quantization: AWQ, GPTQ, FP8 — bits, best-for, trade-off | 13 | Big-box anatomy: three format boxes |
-| §6 — operational gotchas: --max-model-len, --max-num-seqs, VRAM/RAM sizing | 12 | Folded into the GPU gotchas slide's takeaway (sizing dials) |
-| Module roadmap ("what you'll learn") | 2 | Numbered rows, four objectives |
-| Lab hand-off — build patched image, serve SmolLM2, point client | 14 | Pipeline: Build → Serve → Point client |
+| Module roadmap ("what you'll learn") | 2 | Numbered rows, four objectives — precedes the §1 divider, not itself a lesson `##` section |
+| **§1 divider** | 3 | Title-only, verbatim lesson header |
+| §1 opener — Ollama as home espresso machine, one shot at a time | 4 | Fan-out: queue backs up behind a single-slot server |
+| §1 — vLLM as the commercial café machine, continuous batching intro | 1, 5 | Title scene sets the café framing; slide 5 is the mechanism |
+| §1 — continuous batching: token-level scheduling, no idle slots | 5 | Two-panel: static batch (idle, waits for laggard) vs continuous batch |
+| §1 — PagedAttention: virtual memory for the KV cache | 6 | Two-panel: naive reserved slab (60–80% waste) vs paged on-demand (<4% waste) |
+| §1 — roughly three times throughput payoff | 7 | Bar chart: naive (1×) vs vLLM (3×); h2.t and subtitle spell out "roughly three times", matching lesson wording |
+| **§2 divider** | 8 | Title-only, verbatim lesson header |
+| §2 — same `/v1` OpenAI-compatible contract, one-line engine swap | 9 | Hub-and-spoke: client → contract → Ollama/vLLM branches |
+| **§3 divider** | 10 | Title-only, verbatim lesson header |
+| §3 — CPU track: Apple Silicon no GPU passthrough, slow on purpose | 11 | Big-box anatomy: container with image, SmolLM2, /v1 server |
+| §3 — why containers report 0 NUMA nodes, division-by-zero crash, the sed patch | 12 | Two-panel: host NUMA floor plan vs container apartment, arrow to patch |
+| §3 — CPU tuning knobs: OMP_NUM_THREADS, VLLM_CPU_KVCACHE_SPACE, single-threaded BLAS | 13 | Big-box anatomy: four env-var boxes |
+| **§4 divider** | 14 | Title-only, verbatim lesson header |
+| §4 — GPU track: image, hardware, NVIDIA Container Toolkit, --ipc=host, VRAM sizing | 15 | Comparison table mirrors lesson §4's own 5-row table exactly (reordered from the original deck to sit as §4's sole, self-sufficient anchor — see regen note above) |
+| **§5 divider** | 16 | Title-only, verbatim lesson header |
+| §5 — quantization: AWQ, GPTQ, FP8 — bits, best-for, trade-off | 17 | Big-box anatomy: three format boxes (moved earlier, ahead of the gotchas slide, to match lesson order) |
+| **§6 divider** | 18 | Title-only, verbatim lesson header |
+| §6 — operational gotchas: --ipc=host (GPU), VRAM/RAM sizing | 19 | Folded via shared facts with slide 15/§4 (see coverage caveat in the regen note above: `--max-model-len`, `--max-num-seqs`, "first run is slow" are lesson-only, not drawn on any slide — pre-existing gap, not introduced by this pass) |
+| Lab hand-off — build patched image, serve SmolLM2, point client | 20 | Pipeline: Build → Serve → Point client |
 
-**No orphans.** Every lesson section (§1–§6) plus the roadmap intro and the closing lab hand-off has
-at least one slide anchor. The Summary table at the end of the lesson is a recap of concepts already
-covered by slides 1–13 and is not a separate slide anchor.
+**No orphans.** Every lesson section (§1–§6) has its own divider (in lesson order 1→6) plus at
+least one content-slide anchor, and the roadmap intro / closing lab hand-off are covered by slides
+2 and 20 respectively. The Summary table at the end of the lesson is a recap of concepts already
+covered by slides 1–19 and is not a separate slide anchor. One caveat carried forward explicitly
+(not silently dropped): §6's `--max-model-len`/`--max-num-seqs`/"first run is slow" facts have no
+dedicated on-slide visual in this 20-slide deck — see the regen note's "COVERAGE CAVEAT" above.
