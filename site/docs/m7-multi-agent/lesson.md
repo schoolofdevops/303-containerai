@@ -99,7 +99,7 @@ Two frameworks add structure when the declarative approach is not enough.
 
 ### The standards converge
 
-Both frameworks work with the same building blocks you already know: MCP for tools, ChromaDB for memory, Ollama for the model. The coordinator changes, the tools and the model do not. You can swap CrewAI for LangGraph, or for the declarative approach, without touching how agents call tools or how they reach the knowledge base. This is the same idea as the OpenAI-compatible endpoint from earlier modules. Build against the standard, and you can swap out the implementation underneath.
+Both frameworks work with the same building blocks you already know: MCP for tools, ChromaDB for memory, Ollama for the model. The orchestrator changes, the tools and the model do not. You can swap CrewAI for LangGraph, or for the declarative approach, without touching how agents call tools or how they reach the knowledge base. This is the same idea as the OpenAI-compatible endpoint from earlier modules. Build against the standard, and you can swap out the implementation underneath.
 
 ---
 
