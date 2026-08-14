@@ -144,3 +144,31 @@ lesson `##` section's entry point. Close the table with an explicit "no orphans"
 **No orphans.** Every lesson section (§1–§6) now has both a divider slide and its content slide(s), the
 module-goal blockquote, the summary table's pipeline framing, and the closing lab lead-in each have a
 slide. No slide lacks a lesson anchor. 18 rows above = 18 sections in the built HTML.
+
+## 2026-08-14 — narration + rough-filter fix + illustration pass
+
+**Narration:** `planning/narration/03b-narration.md` — 6 videos (talking-head intro, 4 explainers, summary/
+lab bridge) via `lesson-to-video-narration`, run through the `gourav-voice` spoken register. Measured
+5-gram retell-overlap against the lesson: 9.9% (skill's hard gate is <10% — passes, close to the line).
+
+**Rough-filter bug fixed:** the deck's `<filter id="rough">` used the default `objectBoundingBox` region
+(`x="-5%" y="-5%" width="110%" height="110%"`), which makes any perfectly horizontal/vertical line
+invisible. Fixed to `filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600"`.
+
+**Illustrations added (Magnific, pencil-sketch style, `site/static/img/decks/03b-finetuning/`):**
+
+| Slide | File | Scene |
+|---|---|---|
+| 6 — Divider 2, "LoRA — sticky notes on a textbook" | `lora-sticky-note-textbook.jpg` | A hand sticking a small blank sticky note onto the margin of a dense, open textbook |
+| 11 — Divider 4, "The GPU reality" | `gpu-reality-laptop-fenced-rack.jpg` | A laptop on a desk with a fenced-off, humming server rack behind it, out of reach |
+| 13 — Divider 5, "Reproducibility" | `reproducibility-sealed-jar-scroll.jpg` | A sealed glass jar with a scroll inside, beside an old scroll crumbling at the edges |
+
+Added the divider image-on-top/text-below CSS (`section.divider h2.t{order:2}` / `svg{order:1}`) and gave
+dividers a taller autofit ceiling (80% vs 58% for content slides) — this deck had neither yet.
+
+**Generated but not used:** `two-tracks-one-destination.jpg` (two hiking trails converging on one peak) —
+the natural home for it was the closing slide (#18, "Two tracks, one destination"), but that slide's
+existing SVG is a real comparison diagram (Track A/Track B → LoRA adapter, with actual labels) — per the
+style guide, comparison/anatomy slides stay static and read better whole. Replacing it with a decorative
+photo would have lost real information, so the closing slide was left untouched. The file remains on disk
+if a future divider is added for §1, §3, or §6 that could use it, or it can be deleted.

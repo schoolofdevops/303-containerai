@@ -124,3 +124,22 @@ Reviewer's human-in-the-loop role) are covered above with an explicit slide mapp
 (13 content + 6 dividers), pagenos `M7·01`–`M7·19`, renumbered sequentially in final presentation order —
 no content slide reordering was required since the existing sequence already walked the lesson's six
 sections in document order.
+
+## Narration + illustrations (2026-08-14 pass)
+
+- **Narration**: `planning/narration/07-narration.md` — 5 videos (talking-head intro, specialisation/
+  separation/review-loop, pipeline walkthrough, declarative-vs-framework, recap/lab-bridge), authored via
+  `lesson-to-video-narration`.
+- **Rough-filter bug fixed**: the shared `#rough` SVG wobble filter used the default `objectBoundingBox`
+  region (`x="-5%" y="-5%" width="110%" height="110%"`), which silently makes any perfectly horizontal/
+  vertical line invisible. Switched to `filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300"
+  height="600"`.
+- **Magnific illustrations added** (2 images, pencil-sketch style-locked, white-level corrected,
+  `site/static/img/decks/07-multi-agent/`):
+  - Slide 3 (divider 1, "The analogy: a hospital, not a superhero") →
+    `hospital-crew-four-roles.jpg` — triage nurse, doctor, pharmacist, attending physician each doing
+    one job. New `divider-img` class (image-on-top via CSS `order`, text below, taller autofit ceiling)
+    added scoped to only these two illustrated dividers — the other four dividers stay text-only.
+  - Slide 17 (divider 6, "The Reviewer as human-in-the-loop proxy") →
+    `reviewer-human-in-loop-signoff.jpg` — a senior physician reviewing and signing a colleague's note,
+    approve/reject stamp tray on the desk.

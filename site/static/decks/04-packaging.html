@@ -116,6 +116,8 @@ footer, header, hgroup, main, menu, nav, section {
   /* section divider slides (style-guide §3a) */
   .reveal .slides section.divider{ justify-content:center; align-items:center; }
   .reveal .slides section.divider h2.t{ order:0; font-size:2.2em; max-width:88%; }
+  .reveal .slides section.divider.has-image h2.t{ order:2; font-size:1.1em; max-width:76%; }
+  .reveal .slides section.divider.has-image svg{ order:1; }
 </style>
 </head>
 <body>
@@ -123,7 +125,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- shared SVG defs: hand-drawn wobble filter + arrowheads (required, keep as-is) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+    <filter id="rough" filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600">
       <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
       <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
@@ -188,8 +190,11 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M4·02</div>
 </section>
 
-<section class="divider">
-  <h2 class="t" style="font-size:2.2em">1 &middot; The problem with loose model files</h2>
+<section class="divider has-image">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A messy pile of loose files and drives on a table, next to the same items packed neatly into one sealed, tagged crate">
+    <image href="../img/decks/04-packaging/loose-files-vs-sealed-crate.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t">1 &middot; The problem with loose model files</h2>
   <div class="pageno">M4·03</div>
 </section>
 
@@ -339,8 +344,11 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M4·09</div>
 </section>
 
-<section class="divider">
-  <h2 class="t" style="font-size:2.2em">4 &middot; The Kitfile: your shipping manifest</h2>
+<section class="divider has-image">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="Two hands wrapping and sealing a small parcel with a wax stamp on a wooden desk">
+    <image href="../img/decks/04-packaging/title-sealing-package.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t">4 &middot; The Kitfile: your shipping manifest</h2>
   <div class="pageno">M4·10</div>
 </section>
 
@@ -425,8 +433,11 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M4·13</div>
 </section>
 
-<section class="divider">
-  <h2 class="t" style="font-size:2.2em">6 &middot; Selective pull: the KitOps payoff</h2>
+<section class="divider has-image">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A hand pulling a single book out of a long row on a warehouse shelf, leaving the rest undisturbed">
+    <image href="../img/decks/04-packaging/selective-pull-one-book.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t">6 &middot; Selective pull: the KitOps payoff</h2>
   <div class="pageno">M4·14</div>
 </section>
 
@@ -630,7 +641,7 @@ footer, header, hgroup, main, menu, nav, section {
       if(!sec) return;
       var svg = sec.querySelector('svg');
       if(!svg) return;
-      var mh = 58;
+      var mh = sec.classList.contains('has-image') ? 80 : 58;
       svg.style.maxHeight = mh + '%';
       var guard = 0;
       while (sec.scrollHeight > sec.clientHeight + 2 && mh > 18 && guard++ < 20){

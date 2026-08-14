@@ -115,6 +115,8 @@ footer, header, hgroup, main, menu, nav, section {
 
   .reveal .slides section.divider{ justify-content:center; align-items:center; }
   .reveal .slides section.divider h2.t{ order:0; font-size:2.2em; max-width:88%; }
+  .reveal .slides section.divider.illustrated h2.t{ order:2; font-size:1.1em; max-width:76%; }
+  .reveal .slides section.divider.illustrated svg{ order:1; }
 </style>
 </head>
 <body>
@@ -122,7 +124,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- shared SVG defs: hand-drawn wobble filter + arrowheads (required, keep as-is) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+    <filter id="rough" filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600">
       <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
       <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
@@ -141,25 +143,8 @@ footer, header, hgroup, main, menu, nav, section {
   <p class="kicker">MODULE 3 &nbsp;·&nbsp; DAY 1</p>
   <h2 class="t" style="font-size:2.3em">Production Serving with vLLM</h2>
   <p class="s" style="font-size:1.2em">Continuous batching + PagedAttention, same /v1 API</p>
-  <svg viewBox="0 0 1100 380" role="img" aria-label="A busy commercial coffee machine serving many cups at once, versus a single home machine">
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
-      <!-- commercial machine body -->
-      <rect x="330" y="120" width="440" height="150" rx="12"/>
-      <!-- group heads -->
-      <line x1="410" y1="270" x2="410" y2="300"/>
-      <line x1="510" y1="270" x2="510" y2="300"/>
-      <line x1="610" y1="270" x2="610" y2="300"/>
-      <line x1="690" y1="270" x2="690" y2="300"/>
-      <!-- cups -->
-      <rect x="392" y="300" width="36" height="26" rx="5"/>
-      <rect x="492" y="300" width="36" height="26" rx="5"/>
-      <rect x="592" y="300" width="36" height="26" rx="5"/>
-      <rect x="672" y="300" width="36" height="26" rx="5"/>
-      <!-- ground -->
-      <line x1="250" y1="335" x2="850" y2="335"/>
-    </g>
-    <text x="550" y="175" text-anchor="middle" class="lbl-b">vLLM</text>
-    <text x="550" y="215" text-anchor="middle" class="lbl-g">many shots at once — heads never idle</text>
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A small home espresso machine with one person waiting, next to a busy commercial cafe counter with three baristas serving a crowd at once">
+    <image href="../img/decks/03-vllm/title-espresso-vs-cafe.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
   </svg>
   <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI &nbsp;·&nbsp; Containers for GenAI &amp; Agentic AI</p>
   <div class="pageno">M3·01</div>
@@ -189,7 +174,10 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M3·02</div>
 </section>
 
-<section class="divider">
+<section class="divider illustrated">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A busy cafe counter from the customer's point of view, three baristas pulling shots at once, everyone in motion, nobody idle">
+    <image href="../img/decks/03-vllm/divider1-busy-cafe.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
   <h2 class="t" style="font-size:2.2em">1 &middot; Why vLLM: from one cup at a time to a busy caf&eacute;</h2>
   <div class="pageno">M3·03</div>
 </section>
@@ -393,7 +381,10 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M3·09</div>
 </section>
 
-<section class="divider">
+<section class="divider illustrated">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A hotel guest standing in a single small room, doorway open to a hallway, unable to see the rest of the building's floor plan">
+    <image href="../img/decks/03-vllm/divider3-hotel-room.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
   <h2 class="t" style="font-size:2.2em">3 &middot; The CPU track (what you'll run)</h2>
   <div class="pageno">M3·10</div>
 </section>
@@ -681,7 +672,7 @@ footer, header, hgroup, main, menu, nav, section {
       if(!sec) return;
       var svg = sec.querySelector('svg');
       if(!svg) return;
-      var mh = 58;
+      var mh = sec.classList.contains('illustrated') ? 80 : 58;
       svg.style.maxHeight = mh + '%';
       var guard = 0;
       while (sec.scrollHeight > sec.clientHeight + 2 && mh > 18 && guard++ < 20){

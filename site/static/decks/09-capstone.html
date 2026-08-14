@@ -115,7 +115,8 @@ footer, header, hgroup, main, menu, nav, section {
 
   /* section divider slides (style guide §3a) — base layout hugs the top, dividers must center */
   .reveal .slides section.divider{ justify-content:center; align-items:center; }
-  .reveal .slides section.divider h2.t{ order:0; font-size:2.2em; max-width:88%; }
+  .reveal .slides section.divider h2.t{ order:2; font-size:1.1em; max-width:76%; }
+  .reveal .slides section.divider svg{ order:1; }
 </style>
 </head>
 <body>
@@ -123,7 +124,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- shared SVG defs: hand-drawn wobble filter + arrowheads (required, keep as-is) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+    <filter id="rough" filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600">
       <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
       <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
@@ -180,6 +181,9 @@ footer, header, hgroup, main, menu, nav, section {
 
 <!-- ============ DIVIDER 1 — THE PLATFORM AT A GLANCE ============ -->
 <section class="divider">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A dispatch operator at a busy switchboard desk, several phone lines converging on one headset, filing cabinets and a locked cabinet behind the desk">
+    <image href="../img/decks/09-capstone/divider1-dispatch-desk.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
   <h2 class="t" style="font-size:2.2em">1 &middot; The Platform at a Glance</h2>
   <div class="pageno">CAP·02</div>
 </section>
@@ -283,6 +287,9 @@ footer, header, hgroup, main, menu, nav, section {
 
 <!-- ============ DIVIDER 2 — RUN IT END-TO-END ============ -->
 <section class="divider">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A fully loaded cargo ship at a busy port, a crane lowering the last container into place, dockworkers checking a clipboard nearby">
+    <image href="../img/decks/09-capstone/title-shipping-out.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
   <h2 class="t" style="font-size:2.2em">2 &middot; Run It End-to-End</h2>
   <div class="pageno">CAP·05</div>
 </section>
@@ -487,6 +494,9 @@ footer, header, hgroup, main, menu, nav, section {
 
 <!-- ============ DIVIDER 3 — PORTABILITY PROOF ============ -->
 <section class="divider">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="One identical shipping box hanging from a crane hook above a cargo ship, a delivery truck, and a freight train, able to land on any of the three">
+    <image href="../img/decks/09-capstone/divider3-any-runtime.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
   <h2 class="t" style="font-size:2.2em">3 &middot; Portability Proof</h2>
   <div class="pageno">CAP·11</div>
 </section>
@@ -534,6 +544,9 @@ footer, header, hgroup, main, menu, nav, section {
 
 <!-- ============ DIVIDER 4 — WHAT YOU BUILT AND WHERE TO GO NEXT ============ -->
 <section class="divider">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A person standing at the top of a tall ladder looking out over a city skyline at sunrise, having climbed all the way up">
+    <image href="../img/decks/09-capstone/divider4-top-of-ladder.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
   <h2 class="t" style="font-size:2.2em">4 &middot; What You Built — and Where to Go Next</h2>
   <div class="pageno">CAP·13</div>
 </section>
@@ -626,7 +639,7 @@ footer, header, hgroup, main, menu, nav, section {
       if(!sec) return;
       var svg = sec.querySelector('svg');
       if(!svg) return;
-      var mh = 58;
+      var mh = sec.classList.contains('divider') ? 80 : 58;
       svg.style.maxHeight = mh + '%';
       var guard = 0;
       while (sec.scrollHeight > sec.clientHeight + 2 && mh > 18 && guard++ < 20){

@@ -1,5 +1,22 @@
 # Module 5 Deep Dive — RAG Parameters Under the Hood · Explainer Deck Sequence
 
+**2026-08-14 narration + rough-filter fix + illustration pass:** wrote the narration package to
+`planning/narration/m5-deepdive-narration.md` (8 videos: talking-head intro, §1–§6 as one explainer
+each — §6 folds in the §7 chunking experiment — and a summary/lab-bridge; retell measured well under
+the 10%/section gate). Fixed the shared `#rough` SVG filter bug: it was still on the default
+`objectBoundingBox` region (`x="-5%" y="-5%" width="110%" height="110%"`), which makes any
+perfectly axis-aligned line invisible — switched to `filterUnits="userSpaceOnUse" x="-80" y="-80"
+width="1300" height="600"`, matching the fix already shipped on the other module decks. Added one
+new slide, **M5-DD·01b** ("Every chunking choice is a cut you can't take back"), directly after the
+title slide — a Magnific pencil-sketch illustration (`site/static/img/decks/05-deepdive/analogy-
+cutting-index-cards.jpg`, scissors mid-cut through paper with uneven resulting cards) for the
+index-card analogy that opens §1. Deliberately the ONLY illustration added: every other slide in
+this deck already carries a functional technical diagram (distance numbers, chunk-split visuals,
+token-budget arithmetic) that IS the teaching payload — adding decorative photos there would
+compete with, not support, the content. No divider-slide CSS was needed (this deck has no `.divider`
+slides). Slide count 21 → 22; the new slide's pageno (`01b`) is intentionally non-sequential rather
+than renumbering all 21 following slides — cosmetic only, not a verify-gate concern.
+
 **2026-07-25 visual rebalance:** applied the founder's deck-rebalance contract to all 21 slides.
 Every `.s` subtitle was cut from a multi-sentence paragraph (125–275 chars) to one line (≤ ~85
 chars) — the sharpest hook for that slide's idea, not a recap of the takeaway. Every SVG `viewBox`

@@ -124,3 +124,36 @@ least one slide above, and every slide in the deck maps back to a section or a d
 one (the tool map and the compose-authoring-convention slides elaborate points the lesson makes only
 in passing — kept because the old deck already covered them and the founder-approved baseline is the
 coverage floor, not a ceiling to trim). No slide teaches two ideas; none required a split.
+
+## 2026-08-14 pass — narration, rough-filter fix, illustrations
+
+**Narration:** `planning/narration/00-narration.md` (new). 4 videos via `lesson-to-video-narration`
++ `gourav-voice` (Spoken register): talking-head intro (slide 1), "The Build Ladder" explainer
+(slides 5–7), "The 16 GB Budget" explainer (slides 10, 14), and a closing bridge (slide 3, 15).
+Measured 5-gram retell overlap against `site/docs/intro.md`: **3.2%** overall (hard gate is <10%).
+
+**Rough-filter bug — present, fixed.** The deck's single shared `<filter id="rough">` used the
+default `objectBoundingBox` region (`x="-5%" y="-5%" width="110%" height="110%"`), which makes any
+perfectly horizontal/vertical line invisible. Fixed to `filterUnits="userSpaceOnUse" x="-80" y="-80"
+width="1300" height="600"` (covers this deck's largest viewBox, 1100×430, with margin).
+
+**Illustrations — 2 added (Magnific, pencil-sketch style-lock prompt).** This deck is mostly
+factual/comparison content (build-ladder table, tool map, budget bar) that reads better as a diagram
+than a photo per the style contract's "comparison slides stay static" rule — so illustration was
+scoped to the two narrative bookends rather than forced onto every slide:
+
+| Slide | File | Replaces | Scene |
+|---|---|---|---|
+| 1 (title) | `site/static/img/decks/00-introduction/title-workbench-build.jpg` | the shipping-container SVG diagram | Two hands assembling a plain wooden crate on a workbench, one panel at a time — echoes "one real system, built one step at a time" |
+| 15 (closing) | `site/static/img/decks/00-introduction/closing-crate-shipped.jpg` | the "shipped" SVG diagram | A sealed crate lifted by a dockside crane, a truck and a cargo ship both waiting — the "build it once, run it anywhere" payoff |
+
+Both images: 16:9, white-level corrected (`magick -colorspace Gray -level 0%,88%`), saved as external
+files (not base64-inlined), verified by content against their prompts before insertion. Slides 1 and
+15 are not `.divider` slides, so no order-flip CSS was needed — the image simply replaces the previous
+`<svg>` diagram in place, title/subtitle layout unchanged. Verify gate: zero external refs, tags
+balanced, file size 216 KB (well under the 800 KB cap), `#rough` filter fixed, both slides rendered
+headless and confirmed correct.
+
+**Not in scope, flagged for a separate pass:** slide 15's subtitle still uses "through-line", a word
+banned by the current `gourav-voice` skill vocabulary list — this is existing deck prose, not
+narration or illustration work, so it was left untouched here.

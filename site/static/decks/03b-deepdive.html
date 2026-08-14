@@ -119,7 +119,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- shared SVG defs: hand-drawn wobble filter + arrowheads (required, keep as-is) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+    <filter id="rough" filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600">
       <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
       <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
@@ -168,7 +168,16 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M3B-DD·01</div>
 </section>
 
-<!-- ============ SLIDE 2 — SCENE: rank = notepad width ============ -->
+<!-- ============ SLIDE 2 — ILLUSTRATION: notepad clipped to frozen textbook ============ -->
+<section>
+  <h2 class="t">A notepad clipped to a frozen textbook</h2>
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A thick closed textbook on a desk with two spiral notepads clipped to its cover side by side, one narrow with a few blank ruled lines and one much wider with many blank ruled lines">
+    <image href="../img/decks/03b-deepdive/analogy-rank-notepad-width.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <div class="pageno">M3B-DD·02</div>
+</section>
+
+<!-- ============ SLIDE 3 — SCENE: rank = notepad width ============ -->
 <section>
   <h2 class="t">`r` is how wide the correction notepad is</h2>
   <p class="s">Rank is the notepad's width — more lines, more correction capacity.</p>
@@ -227,7 +236,7 @@ footer, header, hgroup, main, menu, nav, section {
       <path d="M700,160 L680,150 L700,140"/>
     </g>
   </svg>
-  <div class="pageno">M3B-DD·02</div>
+  <div class="pageno">M3B-DD·03</div>
 </section>
 
 <!-- ============ SLIDE 3 — matrix mechanics, 2 fragments ============ -->
@@ -273,7 +282,7 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="905" y="202" text-anchor="middle" class="lbl-g">r=4 → r=64 is a 16x jump</text>
     </g>
   </svg>
-  <div class="pageno">M3B-DD·03</div>
+  <div class="pageno">M3B-DD·04</div>
 </section>
 
 <!-- ============ SLIDE 4 — alpha/r ratio ============ -->
@@ -301,7 +310,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="550" y="290" text-anchor="middle" class="lbl-g">same effective step size</text>
   </svg>
-  <div class="pageno">M3B-DD·04</div>
+  <div class="pageno">M3B-DD·05</div>
 </section>
 
 <!-- ============ SLIDE 5 — target_modules anatomy ============ -->
@@ -349,7 +358,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="175" y="255" text-anchor="middle" class="lbl-g">what the model attends to</text>
     <text x="405" y="255" text-anchor="middle" class="lbl-g">what it retrieves</text>
   </svg>
-  <div class="pageno">M3B-DD·05</div>
+  <div class="pageno">M3B-DD·06</div>
 </section>
 
 <!-- ============ SLIDE 6 — dropout, 2 fragments ============ -->
@@ -393,7 +402,7 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="930" y="155" text-anchor="middle" class="lbl-b">adapter out</text>
     </g>
   </svg>
-  <div class="pageno">M3B-DD·06</div>
+  <div class="pageno">M3B-DD·07</div>
 </section>
 
 <!-- ============ SLIDE 7 — SCENE: NF4 warehouse buckets ============ -->
@@ -451,7 +460,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="530" y="310" text-anchor="middle" class="lbl-g">parts (weights) cluster where the buckets are dense</text>
   </svg>
-  <div class="pageno">M3B-DD·07</div>
+  <div class="pageno">M3B-DD·08</div>
 </section>
 
 <!-- ============ SLIDE 8 — double quantization, 2 fragments ============ -->
@@ -481,7 +490,7 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="755" y="150" text-anchor="middle" class="lbl-g">second pass: quantize the constants to 8-bit</text>
     </g>
   </svg>
-  <div class="pageno">M3B-DD·08</div>
+  <div class="pageno">M3B-DD·09</div>
 </section>
 
 <!-- ============ SLIDE 9 — storage vs compute dtype ============ -->
@@ -515,7 +524,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="955" y="152" text-anchor="middle" class="lbl-g">A, B</text>
     <text x="955" y="174" text-anchor="middle" class="lbl-g">stays fp16 always</text>
   </svg>
-  <div class="pageno">M3B-DD·09</div>
+  <div class="pageno">M3B-DD·10</div>
 </section>
 
 <!-- ============ SLIDE 10 — learning rate staircase ============ -->
@@ -549,7 +558,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="880" y="70" text-anchor="middle" class="lbl-b">lr too high</text>
     <text x="880" y="300" text-anchor="middle" class="lbl-g" fill="#c62828">oscillates past the floor</text>
   </svg>
-  <div class="pageno">M3B-DD·10</div>
+  <div class="pageno">M3B-DD·11</div>
 </section>
 
 <!-- ============ SLIDE 11 — overfitting signature comparison ============ -->
@@ -581,7 +590,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="820" y="265" text-anchor="middle" class="lbl-g" fill="#c62828">val stalls while train keeps falling</text>
   </svg>
-  <div class="pageno">M3B-DD·11</div>
+  <div class="pageno">M3B-DD·12</div>
 </section>
 
 <!-- ============ SLIDE 12 — batch vs grad accum comparison ============ -->
@@ -622,7 +631,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="820" y="262" text-anchor="middle" class="lbl-g" fill="#2e7d32">memory stays flat</text>
   </svg>
-  <div class="pageno">M3B-DD·12</div>
+  <div class="pageno">M3B-DD·13</div>
 </section>
 
 <!-- ============ SLIDE 13 — SCENE: chat template mismatch ============ -->
@@ -664,7 +673,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="930" y="185" text-anchor="middle" class="lbl-g">training "succeeds"</text>
     <text x="930" y="210" text-anchor="middle" class="lbl-sm">no error, no warning</text>
   </svg>
-  <div class="pageno">M3B-DD·13</div>
+  <div class="pageno">M3B-DD·14</div>
 </section>
 
 <!-- ============ SLIDE 14 — evaluation methodology fan-out ============ -->
@@ -708,7 +717,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="940" y="145" text-anchor="middle" class="lbl-b">compare</text>
     <text x="940" y="170" text-anchor="middle" class="lbl-g">same prompts, every run</text>
   </svg>
-  <div class="pageno">M3B-DD·14</div>
+  <div class="pageno">M3B-DD·15</div>
 </section>
 
 <!-- ============ SLIDE 15 — decision tree ============ -->
@@ -757,7 +766,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="970" y="303" text-anchor="middle" class="lbl-b">fine-tune</text>
   </svg>
-  <div class="pageno">M3B-DD·15</div>
+  <div class="pageno">M3B-DD·16</div>
 </section>
 
 <!-- ============ SLIDE 16 — experiment setup branching ============ -->
@@ -795,7 +804,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="910" y="240" text-anchor="middle" class="lbl-b">variant B</text>
     <text x="910" y="263" text-anchor="middle" class="lbl-g">rank 8, lr 1e-4</text>
   </svg>
-  <div class="pageno">M3B-DD·16</div>
+  <div class="pageno">M3B-DD·17</div>
 </section>
 
 <!-- ============ SLIDE 17 — result A comparison ============ -->
@@ -823,7 +832,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="640" y="105" class="lbl-g">3.721</text>
     <text x="960" y="248" text-anchor="end" class="lbl-b" fill="#c62828">0.449 (val 0.374)</text>
   </svg>
-  <div class="pageno">M3B-DD·17</div>
+  <div class="pageno">M3B-DD·18</div>
 </section>
 
 <!-- ============ SLIDE 18 — result B comparison ============ -->
@@ -847,7 +856,7 @@ footer, header, hgroup, main, menu, nav, section {
 
     <text x="550" y="270" text-anchor="middle" class="lbl-g">instability needs a harder, noisier dataset to show up</text>
   </svg>
-  <div class="pageno">M3B-DD·18</div>
+  <div class="pageno">M3B-DD·19</div>
 </section>
 
 <!-- ============ SLIDE 19 — closing numbered rows ============ -->
@@ -876,7 +885,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
   </svg>
   <p class="credit">Next: apply these knobs to your own corporate-docs adapter. &nbsp;·&nbsp; <b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI</p>
-  <div class="pageno">M3B-DD·19</div>
+  <div class="pageno">M3B-DD·20</div>
 </section>
 </div></div>
 

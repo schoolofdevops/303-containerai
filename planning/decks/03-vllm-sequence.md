@@ -201,3 +201,42 @@ least one content-slide anchor, and the roadmap intro / closing lab hand-off are
 covered by slides 1–19 and is not a separate slide anchor. One caveat carried forward explicitly
 (not silently dropped): §6's `--max-model-len`/`--max-num-seqs`/"first run is slow" facts have no
 dedicated on-slide visual in this 20-slide deck — see the regen note's "COVERAGE CAVEAT" above.
+
+<!-- 2026-08-14 narration + rough-filter fix + illustration pass:
+
+     NARRATION: full 6-video voiceover package written to planning/narration/03-narration.md
+     via the lesson-to-video-narration skill (talking-head intro, "batching+PagedAttention"
+     explainer, "/v1 contract swap" explainer, "CPU track/NUMA" explainer, "GPU track +
+     quantization" explainer, summary/lab-bridge). No lesson section dropped — see that file's
+     own coverage map. Slide beats suggested per-video are noted inline in the narration file.
+
+     ROUGH-FILTER BUG FIX: the shared `#rough` SVG wobble filter was still on the default
+     `objectBoundingBox` region (`x="-5%" y="-5%" width="110%" height="110%"`), which renders
+     any perfectly horizontal/vertical line invisible (zero-height/width bounding box). Fixed
+     to `filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600"`, matching the
+     fix already applied across the rest of the course's decks.
+
+     ILLUSTRATIONS: 3 Magnific pencil-sketch scenes added, narration-driven, kept deliberately
+     modest (this deck's content slides are mostly labeled diagrams/tables that should stay as
+     SVG per the style contract — photos can't carry text):
+       - Slide 1 (title) — replaced the old plain SVG icon-diagram with a fuller scene: small
+         home espresso machine + one waiting customer vs. a busy multi-barista café counter.
+         `site/static/img/decks/03-vllm/title-espresso-vs-cafe.jpg`
+       - Slide 3 (§1 divider, "one cup at a time to a busy café") — busy café counter from the
+         customer's POV, everyone in motion, nobody idle. Divider now uses image-on-top/
+         text-below via the new `.divider.illustrated` CSS (order-flip + taller autofit
+         ceiling), added to this deck for the first time.
+         `site/static/img/decks/03-vllm/divider1-busy-cafe.jpg`
+       - Slide 10 (§3 divider, "the CPU track") — hotel guest standing in a single room, door
+         open to a hallway, rest of the building only implied — the NUMA "container can't see
+         the host's full memory map" analogy.
+         `site/static/img/decks/03-vllm/divider3-hotel-room.jpg`
+
+     NOT USED: a 4th image (wall-socket + plug, for the closing "Same socket. Bigger engine."
+     slide) was generated and verified but deliberately not inserted — that slide's existing SVG
+     (Build → Serve → Point-client pipeline with real labels) carries information a text-free
+     photo can't reproduce; replacing it would have deleted content, not added to it. Kept as-is.
+
+     All fixes verified: DOCTYPE at position 0, 20/20 section tags balanced, zero external refs,
+     `display: 'flex'` present, rendered headless (title + illustrated divider) — image-on-top
+     layout confirmed correct. -->

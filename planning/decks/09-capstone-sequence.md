@@ -63,7 +63,42 @@ the presenter narrates whole, not a suspenseful reveal. No slide uses fragments.
 
 Static slides (all of 1–15): every slide shows its full picture at once — this is a review/synthesis
 deck (comparison, anatomy, and pipeline-as-summary read better whole than built up hop by hop).
-Divider slides (2, 5, 11, 13) carry no visual at all — title only, per style guide §3a.
+
+## Narration mapping (2026-08-14 pass)
+
+Narration package: `planning/narration/09-narration.md` (5 videos, 6.6% measured retell overlap
+against the lesson — well under the 10% gate).
+
+| Video | Slides |
+|---|---|
+| 1 · Capstone — Bringing Eight Modules Together (talking head) | 1 (title) |
+| 2 · The Acme AI Platform, One Piece at a Time | 2–4 (divider 1 + slides 3–4) |
+| 3 · Running the Platform End to End | 5–10 (divider 2 + slides 6–10) |
+| 4 · Why Nothing Changes When You Swap the Runtime | 11–12 (divider 3 + slide 12) |
+| 5 · What You Built, and Where You Can Take It | 13–15 (divider 4 + slide 14 + closing) |
+
+## Illustrations (Magnific pencil-sketch pass, 2026-08-14)
+
+Divider slides (2, 5, 11, 13) previously carried no visual (title only, per the pre-illustration-pipeline
+style guide §3a). All four now carry a full-bleed pencil-sketch scene, image-on-top/text-below via the
+`.divider` order-flip CSS, matching the 305-llmops reference deck style. Style-lock prompt: black-and-white
+pencil sketch, hand-drawn line art, light cross-hatching, pure white background, no text, 16:9.
+
+| Slide | File | Scene |
+|---|---|---|
+| 2 · The Platform at a Glance | `site/static/img/decks/09-capstone/divider1-dispatch-desk.jpg` | A dispatch operator at a switchboard desk, several phone lines converging on one headset, filing cabinets and a locked cabinet behind — the module's dispatch-centre analogy from the narration |
+| 5 · Run It End-to-End | `site/static/img/decks/09-capstone/title-shipping-out.jpg` | A fully loaded cargo ship at a busy port, a crane lowering the last container into place — "running the whole platform, start to finish" |
+| 11 · Portability Proof | `site/static/img/decks/09-capstone/divider3-any-runtime.jpg` | One identical shipping box on a crane hook above a ship, a truck, and a train — the same box lands on any of the three, echoing the M1 shipping-container analogy |
+| 13 · What You Built | `site/static/img/decks/09-capstone/divider4-top-of-ladder.jpg` | A person at the top of a tall ladder looking out over a city skyline at sunrise — having climbed all eight rungs |
+
+Slides 1 (title) and 15 (closing) were left as their existing custom SVG diagrams — both already carry
+module-specific information (the eight-block-to-platform diagram, the sealed-container-rolling-to-any-runtime
+diagram) that a generic photo would have displaced, not added to. Content slides 3, 4, 6–10, 12, 14 stayed
+diagram-only per style guide §5b (procedure/comparison/pipeline slides are not AI-photo targets).
+
+`#rough` filter bug fixed in the same pass: was the default `objectBoundingBox` region
+(`x="-5%" y="-5%" width="110%" height="110%"`), which makes any perfectly axis-aligned line invisible;
+now `filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600"`.
 
 ## Coverage check (HARD GATE — §0)
 

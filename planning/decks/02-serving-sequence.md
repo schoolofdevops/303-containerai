@@ -149,3 +149,29 @@ the JPEG analogy and sizing rule and the model-selection table, and the two wiri
 both a divider and a content slide. No slide lacks a lesson anchor. The 12 content-bearing slides
 of the prior deck map 1:1 onto this deck (one moved position, none dropped, none re-taught); 5
 divider slides were added, for 17 slides total (12 original + 5 dividers).
+
+## Update 2026-08-14 — narration, rough-filter fix, illustration pass
+
+- **Narration:** `planning/narration/02-narration.md` (new) — 6 videos via `lesson-to-video-narration`
+  + `gourav-voice`, 5-gram retell overlap vs the lesson measured at 7.8% overall (hard gate <10%).
+  Video-to-slide mapping: Video 1 (intro) → slides 1-2, Video 2 (engines) → slides 3-7 (dividers
+  1-2 + content), Video 3 (contract) → slides 8-11 (divider 3 + content), Video 4 (GGUF/sizing) →
+  slides 12-14 (divider 4 + content), Video 5 (wiring patterns) → slides 15-16 (divider 5 + content),
+  Video 6 (summary) → slide 17 (closing).
+- **Rough-filter bug fixed:** the deck's single `<filter id="rough">` used the default
+  `objectBoundingBox` region (`x="-5%" y="-5%" width="110%" height="110%"`), which makes any
+  perfectly axis-aligned line/rect in that filter group invisible. Changed to
+  `filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600"` (covers this deck's
+  largest viewBox, 1100×400, with margin).
+- **Illustration pass:** added a Magnific pencil-sketch scene image to all 5 divider slides only
+  (M2·03, M2·05, M2·08, M2·12, M2·15) — scoped decision: the title slide and the three
+  "analogy" content slides (M2·06 open-engines/cup, M2·10 universal-contract/socket, M2·13
+  GGUF/JPEG) already carry hand-drawn diagrams with load-bearing text labels (engine names,
+  endpoint paths, the sizing formula); an AI photo illustration cannot carry readable text, so
+  replacing those would drop facts. Dividers carry only a title and had no such content to lose.
+  Added `.reveal .slides section.divider svg{ order:1 }` / `h2.t{ order:2; font-size:1.1em;
+  max-width:76% }` CSS (didn't exist before — dividers were title-only) and bumped the autofit
+  ceiling to 80% for dividers. Images live at `site/static/img/decks/02-serving/*.jpg`
+  (white-level corrected, external file refs, no base64). Verify gate: zero external refs, tags
+  balanced (17 open/17 close), `display:'flex'` present, DOCTYPE at position 0. Rendered divider 1
+  via headless Chrome to confirm layout.

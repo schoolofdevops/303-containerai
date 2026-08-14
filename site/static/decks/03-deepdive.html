@@ -101,6 +101,8 @@ footer, header, hgroup, main, menu, nav, section {
   .reveal .credit{ order:4; font-size:.85em; color:var(--gray); margin-top:16px; }
   .reveal .credit b{ color:var(--ink); font-weight:700; }
   .reveal .pageno{ position:absolute; bottom:14px; right:22px; font-size:.6em; color:#bdbdbd; }
+  .reveal .slides section.divider h2.t{ order:2; font-size:1.1em; max-width:76%; }
+  .reveal .slides section.divider svg{ order:1; }
   .reveal .slide-number{ font-family:'Patrick Hand',cursive; }
   .reveal code{ font-family:'Patrick Hand',cursive; color:var(--ink); }
   .reveal em{ font-style:italic; }
@@ -119,7 +121,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- shared SVG defs: hand-drawn wobble filter + arrowheads (required, keep as-is) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+    <filter id="rough" filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600">
       <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
       <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
@@ -165,6 +167,15 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M3-DD·01</div>
 </section>
 
+<!-- ============ DIVIDER — PagedAttention section opener (Magnific illustration) ============ -->
+<section class="divider">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A hotel front desk split in two: one clerk reserves a whole empty floor for a single suitcase, the other clerk hands over one room key at a time from a pegboard of keys">
+    <image href="../img/decks/03-deepdive/pagedattention-hotel-one-room-at-a-time.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t">PagedAttention: one room at a time, not a whole floor</h2>
+  <div class="pageno">M3-DD·02</div>
+</section>
+
 <!-- ============ SLIDE 2 — SCENE: naive hotel books the whole floor ============ -->
 <section>
   <h2 class="t">A naive server books the whole floor for a maybe</h2>
@@ -207,7 +218,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="395" y="150" text-anchor="middle" class="lbl-g">locked to this guest alone</text>
   </svg>
-  <div class="pageno">M3-DD·02</div>
+  <div class="pageno">M3-DD·03</div>
 </section>
 
 <!-- ============ SLIDE 3 — SCENE: PagedAttention hands out rooms on demand ============ -->
@@ -246,7 +257,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="290" y="185" text-anchor="middle" class="lbl-g">one room at a time</text>
   </svg>
-  <div class="pageno">M3-DD·03</div>
+  <div class="pageno">M3-DD·04</div>
 </section>
 
 <!-- ============ SLIDE 4 — block table mapping diagram ============ -->
@@ -298,7 +309,7 @@ footer, header, hgroup, main, menu, nav, section {
       <path d="M610,175 C700,175 700,155 755,155" marker-end="url(#ah)"/>
     </g>
   </svg>
-  <div class="pageno">M3-DD·04</div>
+  <div class="pageno">M3-DD·05</div>
 </section>
 
 <!-- ============ SLIDE 5 — 98% reserved, unused ============ -->
@@ -326,7 +337,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="235" y="300" text-anchor="middle" class="lbl-g">used: 20 tokens</text>
   </svg>
-  <div class="pageno">M3-DD·05</div>
+  <div class="pageno">M3-DD·06</div>
 </section>
 
 <!-- ============ SLIDE 6 — fragmentation ============ -->
@@ -357,7 +368,16 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="865" y="270" text-anchor="middle" style="fill:#c62828" class="lbl-b">blocked</text>
   </svg>
-  <div class="pageno">M3-DD·06</div>
+  <div class="pageno">M3-DD·07</div>
+</section>
+
+<!-- ============ DIVIDER — Continuous batching section opener (Magnific illustration) ============ -->
+<section class="divider">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A restaurant split into two views: a lone guest finishes dessert while people wait outside a closed room on empty chairs, and a waiter clears a plate the instant a new guest sits down at another table">
+    <image href="../img/decks/03-deepdive/continuous-batching-restaurant-instant-reseat.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t">Continuous batching: reseat the second a chair opens</h2>
+  <div class="pageno">M3-DD·08</div>
 </section>
 
 <!-- ============ SLIDE 7 — SCENE: static-batch restaurant stalls ============ -->
@@ -402,7 +422,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="870" y="255" text-anchor="middle" class="lbl-g">new customers, waiting</text>
   </svg>
-  <div class="pageno">M3-DD·07</div>
+  <div class="pageno">M3-DD·09</div>
 </section>
 
 <!-- ============ SLIDE 8 — SCENE: vLLM reseats immediately ============ -->
@@ -449,7 +469,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="620" y="253" text-anchor="middle" class="lbl-sm" style="fill:#2e7d32">OPEN</text>
   </svg>
-  <div class="pageno">M3-DD·08</div>
+  <div class="pageno">M3-DD·10</div>
 </section>
 
 <!-- ============ SLIDE 9 — scheduler mechanics, 2 fragments ============ -->
@@ -494,7 +514,7 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="390" y="135" text-anchor="middle" class="lbl-g">same slot, same step</text>
     </g>
   </svg>
-  <div class="pageno">M3-DD·09</div>
+  <div class="pageno">M3-DD·11</div>
 </section>
 
 <!-- ============ SLIDE 10 — throughput vs tail-latency, two-panel ============ -->
@@ -534,7 +554,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="810" y="260" text-anchor="middle" class="lbl-g">the instant it's done</text>
     <text x="810" y="295" text-anchor="middle" class="lbl-b" style="fill:#2e7d32">no idle slots, ever</text>
   </svg>
-  <div class="pageno">M3-DD·10</div>
+  <div class="pageno">M3-DD·12</div>
 </section>
 
 <!-- ============ SLIDE 11 — hub-and-spoke: paging enables batching ============ -->
@@ -561,7 +581,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="550" y="100" text-anchor="middle" class="lbl-g">makes admission cheap enough</text>
     <text x="550" y="220" text-anchor="middle" class="lbl-g">to do every scheduling iteration</text>
   </svg>
-  <div class="pageno">M3-DD·11</div>
+  <div class="pageno">M3-DD·13</div>
 </section>
 
 <!-- ============ SLIDE 12 — dtype + max-model-len anatomy ============ -->
@@ -596,7 +616,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="800" y="180" text-anchor="middle" class="lbl-g">this lab's default (1024) was worked</text>
     <text x="800" y="205" text-anchor="middle" class="lbl-g">backward from the 5 GB container cap</text>
   </svg>
-  <div class="pageno">M3-DD·12</div>
+  <div class="pageno">M3-DD·14</div>
 </section>
 
 <!-- ============ SLIDE 13 — swap-space inert on CPU, two-panel ============ -->
@@ -644,7 +664,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="820" y="222" text-anchor="middle" class="lbl-g">source: cpu_worker.py zeroes it</text>
     <text x="820" y="255" text-anchor="middle" class="lbl-b" style="fill:#c62828">dead weight, not a budget line</text>
   </svg>
-  <div class="pageno">M3-DD·13</div>
+  <div class="pageno">M3-DD·15</div>
 </section>
 
 <!-- ============ SLIDE 14 — real startup arithmetic, numbered rows ============ -->
@@ -673,7 +693,7 @@ footer, header, hgroup, main, menu, nav, section {
       <path d="M70,190 C70,210 70,230 70,235" marker-end="url(#ahg)"/>
     </g>
   </svg>
-  <div class="pageno">M3-DD·14</div>
+  <div class="pageno">M3-DD·16</div>
 </section>
 
 <!-- ============ SLIDE 15 — /metrics three gauges anatomy ============ -->
@@ -703,7 +723,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="830" y="290" text-anchor="middle" class="lbl-g">waiting up, cache ~100%</text>
     <text x="830" y="310" text-anchor="middle" class="lbl-b" style="fill:#c62828">→ raise the KV cache budget</text>
   </svg>
-  <div class="pageno">M3-DD·15</div>
+  <div class="pageno">M3-DD·17</div>
 </section>
 
 <!-- ============ SLIDE 16 — decision tree: vLLM vs Ollama ============ -->
@@ -736,7 +756,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="860" y="252" text-anchor="middle" class="lbl-g">paging + continuous batching</text>
     <text x="860" y="272" text-anchor="middle" class="lbl-g">only earn their cost with overlap</text>
   </svg>
-  <div class="pageno">M3-DD·16</div>
+  <div class="pageno">M3-DD·18</div>
 </section>
 
 <!-- ============ SLIDE 17 — the experiment: absolute vs scaling, two-panel ============ -->
@@ -772,7 +792,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="1005" y="195" text-anchor="middle" class="lbl-b">1.10x</text>
     <text x="815" y="320" text-anchor="middle" class="lbl-b" style="fill:#2e7d32">vLLM-CPU wins here</text>
   </svg>
-  <div class="pageno">M3-DD·17</div>
+  <div class="pageno">M3-DD·19</div>
 </section>
 
 <!-- ============ SLIDE 18 — closing takeaways ============ -->
@@ -801,7 +821,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
   </svg>
   <p class="credit">Next: apply these levers to a real concurrent deployment. &nbsp;·&nbsp; <b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI</p>
-  <div class="pageno">M3-DD·18</div>
+  <div class="pageno">M3-DD·20</div>
 </section>
 </div></div>
 
@@ -839,7 +859,7 @@ footer, header, hgroup, main, menu, nav, section {
       if(!sec) return;
       var svg = sec.querySelector('svg');
       if(!svg) return;
-      var mh = 58;
+      var mh = sec.classList.contains('divider') ? 80 : 58;
       svg.style.maxHeight = mh + '%';
       var guard = 0;
       while (sec.scrollHeight > sec.clientHeight + 2 && mh > 18 && guard++ < 20){

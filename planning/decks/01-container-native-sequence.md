@@ -185,3 +185,30 @@ during this pass: two-word titles ("Meet Acme — two connected tools" and "The 
 step per module") had their em dashes swapped for commas per the gourav-voice pass (em-dash
 drama is a flagged AI-tell); the wall-socket subtitle switched from "power station" to "engine"
 to match the lesson's own repeated word for the swappable inference backend.
+
+## 2026-08-14 pass — narration, rough-filter fix, illustrations
+
+- **Narration**: `planning/narration/01-narration.md` written via `lesson-to-video-narration`,
+  7 videos (talking-head intro + 5 explainers + summary/lab-bridge). 5-gram retell overlap
+  vs the lesson: 8.3% overall (gate is <10%).
+- **`#rough` filter bug fixed**: was the default `objectBoundingBox` region
+  (`x="-5%" y="-5%" width="110%" height="110%"`), which silently drops axis-aligned
+  horizontal/vertical lines. Now `filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300"
+  height="600"`.
+- **Illustrations added to all 6 divider slides** (Magnific, black-and-white pencil-sketch
+  style, white-level corrected, saved to `site/static/img/decks/01-container-native/`):
+  divider 1 → `divider-1-carriers.jpg` (dockworker + steel container + lined-up trucks),
+  divider 2 → `divider-2-crates.jpg` (four sealed crates stencilled gear/plug/lock, forklift),
+  divider 3 → `divider-3-guestrooms.jpg` (hotel corridor, unplugged appliances, maintenance
+  worker puzzled at the junction box), divider 4 → `divider-4-forkinroad.jpg` (hiker at a fork,
+  short simple path vs long gated path), divider 5 → `divider-5-paperladder.jpg` (desk buried
+  in paper and binders, ladder leaning against the pile), divider 6 →
+  `divider-6-wallsocket.jpg` (one wall socket, several different plugs converging into it).
+  Added the divider image-on-top/title-below CSS (`section.divider svg{order:1}` /
+  `h2.t{order:2; font-size:1.1em; max-width:76%}`) and a taller autofit ceiling for dividers
+  (80% vs 58%) — `display:'flex'` was already present in `Reveal.initialize`, so the order
+  CSS takes effect. Title slide's own SVG (shipping-container-to-4-carriers) was left as-is,
+  no photo illustration added there — it already carries the analogy.
+- Verify gates re-run: 0 external refs, 19/19 section tags balanced, DOCTYPE at position 0,
+  `display: 'flex'` present, file size 216KB. Two dividers rendered headless (Chrome) to
+  confirm image-on-top layout — both correct.

@@ -115,7 +115,8 @@ footer, header, hgroup, main, menu, nav, section {
 
   /* Section divider slides (style guide §3a) */
   .reveal .slides section.divider{ justify-content:center; align-items:center; }
-  .reveal .slides section.divider h2.t{ order:0; font-size:2.2em; max-width:88%; }
+  .reveal .slides section.divider h2.t{ order:2; font-size:1.1em; max-width:76%; }
+  .reveal .slides section.divider svg{ order:1; }
 </style>
 </head>
 <body>
@@ -123,7 +124,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- shared SVG defs: hand-drawn wobble filter + arrowheads (required, keep as-is) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+    <filter id="rough" filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600">
       <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
       <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
@@ -206,7 +207,10 @@ footer, header, hgroup, main, menu, nav, section {
 
 <!-- ============ DIVIDER 1 · Demo First: Docker Model Runner ============ -->
 <section class="divider">
-  <h2 class="t" style="font-size:2.2em">1 &middot; Demo First: Docker Model Runner</h2>
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A hand pressing one large button on a simple panel, with a box sliding out of a slot below">
+    <image href="../img/decks/02-serving/divider-1-docker-model-runner.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t" style="font-size:1.1em">1 &middot; Demo First: Docker Model Runner</h2>
   <div class="pageno">M2·03</div>
 </section>
 
@@ -242,7 +246,10 @@ footer, header, hgroup, main, menu, nav, section {
 
 <!-- ============ DIVIDER 2 · The Open Engines: Ollama, llama.cpp, LocalAI ============ -->
 <section class="divider">
-  <h2 class="t" style="font-size:2.2em">2 &middot; The Open Engines: Ollama, llama.cpp, LocalAI</h2>
+  <svg viewBox="0 0 1600 900" role="img" aria-label="Three different espresso machines each pouring coffee into identical cups, standing for three engines behind one shared interface">
+    <image href="../img/decks/02-serving/divider-2-open-engines.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t" style="font-size:1.1em">2 &middot; The Open Engines: Ollama, llama.cpp, LocalAI</h2>
   <div class="pageno">M2·05</div>
 </section>
 
@@ -314,7 +321,10 @@ footer, header, hgroup, main, menu, nav, section {
 
 <!-- ============ DIVIDER 3 · The OpenAI-Compatible Endpoint: The Universal Contract ============ -->
 <section class="divider">
-  <h2 class="t" style="font-size:2.2em">3 &middot; The OpenAI-Compatible Endpoint: The Universal Contract</h2>
+  <svg viewBox="0 0 1600 900" role="img" aria-label="Three very different power sources, a coal plant, a hydro dam, and wind turbines, all converging into one wall socket powering a lamp">
+    <image href="../img/decks/02-serving/divider-3-openai-contract.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t" style="font-size:1.1em">3 &middot; The OpenAI-Compatible Endpoint: The Universal Contract</h2>
   <div class="pageno">M2·08</div>
 </section>
 
@@ -445,7 +455,10 @@ footer, header, hgroup, main, menu, nav, section {
 
 <!-- ============ DIVIDER 4 · GGUF and Model Selection for Laptops ============ -->
 <section class="divider">
-  <h2 class="t" style="font-size:2.2em">4 &middot; GGUF and Model Selection for Laptops</h2>
+  <svg viewBox="0 0 1600 900" role="img" aria-label="Two identical photographs side by side, a huge oversized print and a small compact print of the same picture">
+    <image href="../img/decks/02-serving/divider-4-gguf-model-selection.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t" style="font-size:1.1em">4 &middot; GGUF and Model Selection for Laptops</h2>
   <div class="pageno">M2·12</div>
 </section>
 
@@ -527,7 +540,10 @@ footer, header, hgroup, main, menu, nav, section {
 
 <!-- ============ DIVIDER 5 · Two Wiring Patterns, One App ============ -->
 <section class="divider">
-  <h2 class="t" style="font-size:2.2em">5 &middot; Two Wiring Patterns, One App</h2>
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A single pipe splitting into a Y-fork, one branch leading to a laptop, the other to a server rack">
+    <image href="../img/decks/02-serving/divider-5-wiring-patterns.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t" style="font-size:1.1em">5 &middot; Two Wiring Patterns, One App</h2>
   <div class="pageno">M2·15</div>
 </section>
 
@@ -651,7 +667,7 @@ footer, header, hgroup, main, menu, nav, section {
       if(!sec) return;
       var svg = sec.querySelector('svg');
       if(!svg) return;
-      var mh = 58;
+      var mh = sec.classList.contains('divider') ? 80 : 58;
       svg.style.maxHeight = mh + '%';
       var guard = 0;
       while (sec.scrollHeight > sec.clientHeight + 2 && mh > 18 && guard++ < 20){

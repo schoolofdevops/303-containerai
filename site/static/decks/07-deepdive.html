@@ -119,7 +119,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- shared SVG defs: hand-drawn wobble filter + arrowheads (required, keep as-is) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+    <filter id="rough" filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600">
       <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
       <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
@@ -137,6 +137,16 @@ footer, header, hgroup, main, menu, nav, section {
   <p class="kicker">MODULE 7 DEEP DIVE &nbsp;·&nbsp; CONTAINERS FOR GENAI &amp; AGENTIC AI</p>
   <h2 class="t" style="font-size:2.3em">The four knobs nobody explained</h2>
   <p class="s" style="font-size:1.2em">crew.py ran end to end in the lab — this deck opens it up and asks why</p>
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A hand opening the hinged front panel of a case to reveal four round dials with pointer needles mounted in a row inside">
+    <image href="../img/decks/07-deepdive/title-four-knobs-panel.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI &nbsp;·&nbsp; Deep Dive (Part 2)</p>
+  <div class="pageno">M7-DD·01</div>
+</section>
+
+<section>
+  <h2 class="t">Four themes, one file — crew.py opened up</h2>
+  <p class="s">Temperature, iteration, delegation, and gates — all four live in the same run() function.</p>
   <svg viewBox="0 0 1100 360" role="img" aria-label="Four theme boxes — temperature per agent not per crew, iteration with no loop or retry, delegation as a plain string baton, and gates as code not a prompt — all feeding into one box asking what crew.py actually does">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
       <rect x="20" y="50" width="250" height="110" rx="12"/>
@@ -163,8 +173,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="550" y="316" text-anchor="middle" class="lbl-b">what crew.py actually does</text>
   </svg>
-  <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI &nbsp;·&nbsp; Deep Dive (Part 2)</p>
-  <div class="pageno">M7-DD·01</div>
+  <div class="pageno">M7-DD·02</div>
 </section>
 
 <section>
@@ -205,7 +214,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="907" y="345" text-anchor="middle" class="lbl-b">temp = 0.9</text>
     <text x="907" y="368" text-anchor="middle" class="lbl-g">improvises, notes scatter</text>
   </svg>
-  <div class="pageno">M7-DD·02</div>
+  <div class="pageno">M7-DD·03</div>
 </section>
 
 <section>
@@ -231,7 +240,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="115" y="250" text-anchor="start" class="lbl-b">Reviewer &#8212; temp 0</text>
     <text x="115" y="270" text-anchor="start" class="lbl-g">APPROVED/REJECTED is binary; the code branches on it directly</text>
   </svg>
-  <div class="pageno">M7-DD·03</div>
+  <div class="pageno">M7-DD·04</div>
 </section>
 
 <section>
@@ -262,7 +271,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="240" y="45" text-anchor="start" class="lbl-g">raise this to 0.9 &#8594; &#167;6 measures it</text>
   </svg>
-  <div class="pageno">M7-DD·04</div>
+  <div class="pageno">M7-DD·05</div>
 </section>
 
 <section>
@@ -290,7 +299,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="740" y="297" text-anchor="middle" class="lbl-sm" transform="rotate(5 740 293)">"checkout down fix"</text>
     <text x="700" y="355" text-anchor="middle" class="lbl-g">discarded attempts, no stopping rule</text>
   </svg>
-  <div class="pageno">M7-DD·05</div>
+  <div class="pageno">M7-DD·06</div>
 </section>
 
 <section>
@@ -331,7 +340,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="920" y="78" text-anchor="middle" class="lbl-sm">iteration cap</text>
     <text x="920" y="96" text-anchor="middle" class="lbl-sm">(if none: runs until timeout)</text>
   </svg>
-  <div class="pageno">M7-DD·06</div>
+  <div class="pageno">M7-DD·07</div>
 </section>
 
 <section>
@@ -367,7 +376,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="550" y="238" text-anchor="middle" class="lbl-b">predictable p99 cost &amp; latency</text>
     <text x="550" y="258" text-anchor="middle" class="lbl-g">no code path runs 10&#215; instead of 1&#215;</text>
   </svg>
-  <div class="pageno">M7-DD·07</div>
+  <div class="pageno">M7-DD·08</div>
 </section>
 
 <section>
@@ -413,7 +422,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="710" y="140" text-anchor="middle" class="lbl-g">baton = one string</text>
   </svg>
-  <div class="pageno">M7-DD·08</div>
+  <div class="pageno">M7-DD·09</div>
 </section>
 
 <section>
@@ -444,7 +453,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="920" y="65" text-anchor="middle" class="lbl-g">console output for a human</text>
     <text x="920" y="255" text-anchor="middle" class="lbl-g" fill="#2e7d32">the actual query</text>
   </svg>
-  <div class="pageno">M7-DD·09</div>
+  <div class="pageno">M7-DD·10</div>
 </section>
 
 <section>
@@ -479,7 +488,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="820" y="230" text-anchor="middle" class="lbl-sm">early mistake gets smoothed over</text>
     <text x="820" y="253" text-anchor="middle" class="lbl-g" fill="#c62828">invisible to everything downstream</text>
   </svg>
-  <div class="pageno">M7-DD·10</div>
+  <div class="pageno">M7-DD·11</div>
 </section>
 
 <section>
@@ -501,7 +510,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="820" y="180" text-anchor="middle" class="lbl-g">on the Reviewer's verdict</text>
     <text x="820" y="205" text-anchor="middle" class="lbl-g" fill="#2e7d32">deterministic — not a 2nd model call</text>
   </svg>
-  <div class="pageno">M7-DD·11</div>
+  <div class="pageno">M7-DD·12</div>
 </section>
 
 <section>
@@ -544,7 +553,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="185" y="253" text-anchor="middle" class="lbl-sm">gate 3: before a tool call</text>
     <text x="185" y="272" text-anchor="middle" class="lbl-g">not needed — query is never LLM-chosen</text>
   </svg>
-  <div class="pageno">M7-DD·12</div>
+  <div class="pageno">M7-DD·13</div>
 </section>
 
 <section>
@@ -566,7 +575,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="115" y="210" text-anchor="start" class="lbl-b">profile + f-string = the complete prompt</text>
     <text x="115" y="230" text-anchor="start" class="lbl-g">nothing else gets concatenated in — no hidden step</text>
   </svg>
-  <div class="pageno">M7-DD·13</div>
+  <div class="pageno">M7-DD·14</div>
 </section>
 
 <section>
@@ -588,7 +597,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="115" y="210" text-anchor="start" class="lbl-b">Variant B — relevance gate bypassed</text>
     <text x="115" y="230" text-anchor="start" class="lbl-g">sequential, never parallel</text>
   </svg>
-  <div class="pageno">M7-DD·14</div>
+  <div class="pageno">M7-DD·15</div>
 </section>
 
 <section>
@@ -617,7 +626,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="555" y="268" text-anchor="middle" class="lbl-b">OUTCOME: APPROVED — all 3 runs</text>
   </svg>
-  <div class="pageno">M7-DD·15</div>
+  <div class="pageno">M7-DD·16</div>
 </section>
 
 <section>
@@ -646,7 +655,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="900" y="280" text-anchor="middle" class="lbl-g" fill="#c62828">fabricated command,</text>
     <text x="900" y="303" text-anchor="middle" class="lbl-g" fill="#c62828">approved anyway</text>
   </svg>
-  <div class="pageno">M7-DD·16</div>
+  <div class="pageno">M7-DD·17</div>
 </section>
 
 <section>
@@ -668,7 +677,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="115" y="210" text-anchor="start" class="lbl-b">Variant B — gate removed, wrong runbook every run</text>
     <text x="115" y="230" text-anchor="start" class="lbl-g" fill="#c62828">but OUTCOME itself flips run to run — not stable</text>
   </svg>
-  <div class="pageno">M7-DD·17</div>
+  <div class="pageno">M7-DD·18</div>
 </section>
 
 <section>
@@ -696,7 +705,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
   </svg>
   <p class="credit">Next: apply these levers to a real crew. &nbsp;·&nbsp; <b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI</p>
-  <div class="pageno">M7-DD·18</div>
+  <div class="pageno">M7-DD·19</div>
 </section>
 
 </div></div>

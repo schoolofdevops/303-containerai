@@ -148,3 +148,39 @@ out-of-order dividers as a real defect — this revision does not repeat it). Al
 otherwise unchanged from the prior baseline; only structure (dividers + the one reorder), subtitle
 length (rewritten to ≤10 words / ≤60 chars, §0), and on-slide wording (em dashes stripped from every
 non-divider title/subtitle, run through `gourav-voice`) were touched.
+
+---
+
+## 2026-08-14 pass — narration + rough-filter fix + illustrations
+
+1. **Narration**: `planning/narration/06-narration.md` (new) — 7-video package via `lesson-to-video-narration`
+   (talking-head intro + 5 explainers + summary/lab-bridge), voiced through `gourav-voice` spoken register.
+
+2. **Rough-filter bug fix**: the shared `#rough` SVG wobble filter used the default `objectBoundingBox`
+   region (`x="-5%" y="-5%" width="110%" height="110%"`), which silently makes any perfectly
+   horizontal/vertical line/rect invisible (zero-height/width bounding box breaks the filter region).
+   Fixed to `filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600"`.
+
+3. **Magnific illustrations** (5 added, all on dividers — the genuine narrative/analogy beats; the
+   §1/§3/§8 dividers and all 14 content slides were left as diagram-only, since their existing SVGs
+   carry labeled information a text-free photo can't reproduce):
+
+   | Divider | Slide | Image |
+   |---|---|---|
+   | §2 The analogy: a job description and a rulebook | M6·05 | `analogy-onboarding-handoff.jpg` — manager handing folders to a new hire |
+   | §4 Agentic RAG versus naive RAG | M6·10 | `analogy-fork-in-road.jpg` — person deciding at a signposted fork |
+   | §5 MCP tools via ToolHive | M6·13 | `analogy-toolhive-glasscase.jpg` — single tool isolated in a glass case |
+   | §6 Guardrails | M6·16 | `analogy-guardrail-checkpoint.jpg` — guard stopping entry at a turnstile |
+   | §7 Memory | M6·18 | `analogy-librarian-memory.jpg` — librarian shelving by meaning, echoing M5's own librarian analogy |
+
+   Added `.divider.illustrated` CSS (image-on-top via `order`, title drops to `1.1em`/76% width) and a
+   taller autofit ceiling for dividers (`mh = 80` vs `58` for content slides) — neither existed in this
+   deck before. All 5 images content-verified against their prompts before insertion (Read tool), no
+   gendered-pronoun conflicts (no figure in these divider titles carries a pronoun). White-level corrected
+   (`magick -colorspace Gray -level 0%,88% -resize 1600x900 -quality 78`), saved external (not
+   base64-inlined) to `site/static/img/decks/06-declarative-agent/`.
+
+   Verify gate: DOCTYPE at position 0, 22/22 section tags balanced, zero external refs, `display:'flex'`
+   present, 5/5 image tags placed, headless-Chrome render of divider 2 confirmed correct layout.
+
+No git commit made.

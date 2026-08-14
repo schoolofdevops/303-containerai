@@ -185,3 +185,40 @@ facts/diagrams/scenes are otherwise unchanged from the pre-divider baseline; onl
 (9 dividers), subtitle length (rewritten to ≤10 words / ≤60 chars, longest now 55 chars), and
 on-slide wording (em dashes stripped from every non-divider title/subtitle/label, run through
 `gourav-voice`) were touched.
+
+## 2026-08-14 — narration, rough-filter fix, illustrations
+
+**Narration:** `planning/narration/08-narration.md` (new) — 6 videos via `lesson-to-video-narration`
++ `gourav-voice` (talking-head intro, SBOM/scan explainer, Cosign signing explainer, sandbox+hardening
+explainer, guardrails/eval/governance explainer, summary/lab-bridge). Measured 5-gram retell-overlap
+against `site/docs/m8-security/lesson.md`: 5.6% (gate is <10%; first draft measured 11.7% and was
+rewritten in the flagged sections to bring it under gate).
+
+**Rough-filter bug:** the deck's single shared `<filter id="rough">` was on the buggy default
+(`x="-5%" y="-5%" width="110%" height="110%"`, objectBoundingBox — invisible on any perfectly
+axis-aligned line). Fixed to `filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600"`,
+matching the fix already shipped in the other migrated decks course-wide.
+
+**Illustrations:** 4 Magnific pencil-sketch images added to 4 of the 9 divider slides — the ones with
+a genuine narrative/analogy beat; the other 5 dividers (pipeline mechanics, SBOM mechanics, scanning
+triage, hardening checklist, guardrails/eval) stayed diagram-only per the "skip pure procedure slides"
+guidance. Added the divider image-on-top/text-below CSS (`section.divider svg{order:1}` /
+`section.divider h2.t{order:2; font-size:1.1em; max-width:76%}`, scoped with `:not(:has(svg))` so the
+5 non-illustrated dividers keep their original large-centered-title layout unchanged) and bumped the
+`fit()` autofit ceiling to 80% for `.divider` sections. Existing title-slide and closing-slide SVG
+diagrams were left as-is (already strong, illustration would have been redundant).
+
+| Divider | Slide | Image |
+|---|---|---|
+| §1 — the food-factory analogy | 4 | `title-supply-chain-checks.jpg` — sealed box on a conveyor passing under checklist / magnifying-glass / wax-stamp checkpoints |
+| §5 — signing, the tamper-evident seal | 11 | `signing-wax-seal-crate.jpg` — hand pressing a wax seal onto a ribboned crate |
+| §6 — sandboxing | 13 | `sandbox-locked-crate.jpg` — small windowless padlocked crate, isolated on a factory floor |
+| §9 — governance without a vendor | 20 | `governance-four-locks-ledger.jpg` — four padlocks on a gate with an open ledger book, no branding |
+
+All 4 verified by content (Read tool) against their prompts before insertion, white-level corrected
+(`magick -colorspace Gray -level 0%,88% -resize 1600x900 -quality 78`), saved external at
+`site/static/img/decks/08-security/` (never base64-inlined). No gendered pronouns appear in any of
+the 4 slides' text, so no gender-consistency check was needed. Verify gate: 0 external refs, 22/22
+section tags balanced, DOCTYPE at position 0, 4 `<image>` tags present, headless-Chrome render of
+divider 1 confirmed correct layout (image on top, title below, pastel-free pencil sketch reads clean
+on white). Not committed.

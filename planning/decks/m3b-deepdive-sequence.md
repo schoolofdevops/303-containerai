@@ -5,6 +5,14 @@
      purpose + visual + takeaway. NO slide-count cap (§0): one idea per slide, every
      deep-dive.md section gets a slide — the coverage table below is a hard gate. -->
 
+> **2026-08-14 update:** deck is now 20 slides (was 19). Added slide 2, a Magnific pencil-sketch
+> illustration ("A notepad clipped to a frozen textbook" — `site/static/img/decks/03b-deepdive/analogy-rank-notepad-width.jpg`)
+> ahead of the existing rank/notepad-width diagram slide (now slide 3); all pagenos M3B-DD·02→19
+> renumbered to ·03→20. Fixed the shared `#rough` filter (was default objectBoundingBox, now
+> `filterUnits="userSpaceOnUse"` — axis-aligned lines were invisible). Narration script for this
+> deep-dive: `planning/narration/m3b-deepdive-narration.md`. No other slides changed; the rest of
+> this doc (below) describes the original 19-slide sequence and is otherwise still accurate.
+
 This companion doc maps the 19-slide explainer deck (`site/static/decks/03b-deepdive.html`) to the
 Module 3B deep-dive page (`site/docs/m3b-finetuning/deep-dive.md`). Unlike a short framing-only
 deep-dive deck, this page's material is dense mechanics the learner needs to actually reason about

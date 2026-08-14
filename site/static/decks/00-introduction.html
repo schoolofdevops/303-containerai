@@ -119,7 +119,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- shared SVG defs: hand-drawn wobble filter + arrowheads (required, keep as-is) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+    <filter id="rough" filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600">
       <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
       <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
@@ -139,27 +139,8 @@ footer, header, hgroup, main, menu, nav, section {
   <p class="kicker">SCHOOL OF DEVOPS &amp; AI &nbsp;·&nbsp; MLOps / LLMOps</p>
   <h2 class="t" style="font-size:2.3em">Containers for GenAI &amp; Agentic AI</h2>
   <p class="s" style="font-size:1.2em">The Open-Source Way</p>
-  <svg viewBox="0 0 1100 380" role="img" aria-label="A shipping container holding AI, loading onto any runtime">
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
-      <!-- container body -->
-      <rect x="360" y="120" width="380" height="180" rx="10"/>
-      <!-- corrugations -->
-      <line x1="410" y1="130" x2="410" y2="290"/>
-      <line x1="460" y1="130" x2="460" y2="290"/>
-      <line x1="510" y1="130" x2="510" y2="290"/>
-      <line x1="590" y1="130" x2="590" y2="290"/>
-      <line x1="640" y1="130" x2="640" y2="290"/>
-      <line x1="690" y1="130" x2="690" y2="290"/>
-      <!-- label plate -->
-      <rect x="512" y="185" width="76" height="50" rx="6"/>
-      <!-- ground line -->
-      <line x1="230" y1="320" x2="870" y2="320"/>
-      <!-- wheels of the "any runtime" truck feel -->
-      <circle cx="430" cy="345" r="20"/>
-      <circle cx="670" cy="345" r="20"/>
-    </g>
-    <text x="550" y="218" text-anchor="middle" class="lbl-b">AI</text>
-    <text x="550" y="360" text-anchor="middle" class="lbl-g">runs identically on any OCI runtime</text>
+  <svg viewBox="0 0 1600 900" role="img" aria-label="Two hands assembling a plain wooden crate on a workbench, one panel at a time, tools laid out beside it">
+    <image href="../img/decks/00-introduction/title-workbench-build.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
   </svg>
   <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; 2 Full Days &nbsp;·&nbsp; Intermediate → Advanced &nbsp;·&nbsp; Hands-on</p>
   <div class="pageno">01</div>
@@ -608,21 +589,8 @@ footer, header, hgroup, main, menu, nav, section {
   <p class="kicker">LET'S BUILD</p>
   <h2 class="t" style="font-size:2.4em">Build it once. Run it anywhere.</h2>
   <p class="s" style="font-size:1.15em">Container-native, not Docker-native — the open standard is the through-line.</p>
-  <svg viewBox="0 0 1100 320" role="img" aria-label="A container carrying AI rolling forward toward a shipped platform">
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
-      <rect x="360" y="90" width="300" height="140" rx="10"/>
-      <line x1="420" y1="100" x2="420" y2="220"/>
-      <line x1="480" y1="100" x2="480" y2="220"/>
-      <line x1="540" y1="100" x2="540" y2="220"/>
-      <line x1="600" y1="100" x2="600" y2="220"/>
-      <circle cx="420" cy="255" r="18"/>
-      <circle cx="600" cy="255" r="18"/>
-      <path d="M690,160 L860,160" marker-end="url(#ah)"/>
-      <rect x="875" y="120" width="170" height="80" rx="10"/>
-    </g>
-    <text x="510" y="70" text-anchor="middle" class="lbl-g">Colima · Rancher · OrbStack · Podman</text>
-    <text x="510" y="175" text-anchor="middle" class="lbl-b">AI</text>
-    <text x="960" y="167" text-anchor="middle" class="lbl">Shipped</text>
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A sealed crate lifted by a dockside crane, with a delivery truck and a cargo ship both waiting to carry it onward">
+    <image href="../img/decks/00-introduction/closing-crate-shipped.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
   </svg>
   <p class="credit">Start with <b>Setup → Prerequisites</b>, then Module 1. &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
   <div class="pageno">15</div>

@@ -103,6 +103,9 @@ footer, header, hgroup, main, menu, nav, section {
   .reveal .pageno{ position:absolute; bottom:14px; right:22px; font-size:.6em; color:#bdbdbd; }
   .reveal .slides section.divider{ justify-content:center; align-items:center; }
   .reveal .slides section.divider h2.t{ order:0; font-size:2.2em; max-width:88%; }
+  .reveal .slides section.divider.illustrated{ justify-content:center; }
+  .reveal .slides section.divider.illustrated h2.t{ order:2; max-width:76%; }
+  .reveal .slides section.divider.illustrated svg{ order:1; }
   .reveal .slide-number{ font-family:'Patrick Hand',cursive; }
   .reveal code{ font-family:'Patrick Hand',cursive; color:var(--ink); }
   .reveal em{ font-style:italic; }
@@ -121,7 +124,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- shared SVG defs: hand-drawn wobble filter + arrowheads (required, keep as-is) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+    <filter id="rough" filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600">
       <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
       <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
@@ -229,8 +232,11 @@ footer, header, hgroup, main, menu, nav, section {
 </section>
 
 <!-- ============ DIVIDER — SECTION 2 ============ -->
-<section class="divider">
-  <h2 class="t" style="font-size:2.2em">2 &middot; The analogy: a job description and a rulebook</h2>
+<section class="divider illustrated">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A manager handing a stack of folders to a new employee across a desk, an onboarding handoff">
+    <image href="../img/decks/06-declarative-agent/analogy-onboarding-handoff.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t" style="font-size:1.1em">2 &middot; The analogy: a job description and a rulebook</h2>
   <div class="pageno">M6·05</div>
 </section>
 
@@ -353,8 +359,11 @@ footer, header, hgroup, main, menu, nav, section {
 </section>
 
 <!-- ============ DIVIDER — SECTION 4 ============ -->
-<section class="divider">
-  <h2 class="t" style="font-size:2.2em">4 &middot; Agentic RAG versus naive RAG</h2>
+<section class="divider illustrated">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A person standing at a fork in a country path beside a signpost, deciding which way to go">
+    <image href="../img/decks/06-declarative-agent/analogy-fork-in-road.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t" style="font-size:1.1em">4 &middot; Agentic RAG versus naive RAG</h2>
   <div class="pageno">M6·10</div>
 </section>
 
@@ -430,8 +439,11 @@ footer, header, hgroup, main, menu, nav, section {
 </section>
 
 <!-- ============ DIVIDER — SECTION 5 ============ -->
-<section class="divider">
-  <h2 class="t" style="font-size:2.2em">5 &middot; MCP tools via ToolHive</h2>
+<section class="divider illustrated">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A single tool resting isolated inside a glass display case mounted on a workshop wall, reachable only through its own door">
+    <image href="../img/decks/06-declarative-agent/analogy-toolhive-glasscase.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t" style="font-size:1.1em">5 &middot; MCP tools via ToolHive</h2>
   <div class="pageno">M6·13</div>
 </section>
 
@@ -507,8 +519,11 @@ footer, header, hgroup, main, menu, nav, section {
 </section>
 
 <!-- ============ DIVIDER — SECTION 6 ============ -->
-<section class="divider">
-  <h2 class="t" style="font-size:2.2em">6 &middot; Guardrails</h2>
+<section class="divider illustrated">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A security guard at a turnstile checkpoint holding up a hand to stop entry before a doorway, checking before anyone is let through">
+    <image href="../img/decks/06-declarative-agent/analogy-guardrail-checkpoint.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t" style="font-size:1.1em">6 &middot; Guardrails</h2>
   <div class="pageno">M6·16</div>
 </section>
 
@@ -545,8 +560,11 @@ footer, header, hgroup, main, menu, nav, section {
 </section>
 
 <!-- ============ DIVIDER — SECTION 7 ============ -->
-<section class="divider">
-  <h2 class="t" style="font-size:2.2em">7 &middot; Memory</h2>
+<section class="divider illustrated">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A librarian carefully shelving a book among tall bookshelves, grouped by topic rather than alphabetically">
+    <image href="../img/decks/06-declarative-agent/analogy-librarian-memory.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t" style="font-size:1.1em">7 &middot; Memory</h2>
   <div class="pageno">M6·18</div>
 </section>
 
@@ -700,7 +718,7 @@ footer, header, hgroup, main, menu, nav, section {
       if(!sec) return;
       var svg = sec.querySelector('svg');
       if(!svg) return;
-      var mh = 58;
+      var mh = sec.classList.contains('divider') ? 80 : 58;
       svg.style.maxHeight = mh + '%';
       var guard = 0;
       while (sec.scrollHeight > sec.clientHeight + 2 && mh > 18 && guard++ < 20){

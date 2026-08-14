@@ -84,6 +84,8 @@ footer, header, hgroup, main, menu, nav, section {
   .reveal .slides > section.present{ display:flex; }
   .reveal .slides section.divider{ justify-content:center; align-items:center; }
   .reveal .slides section.divider h2.t{ order:0; font-size:2.2em; max-width:88%; }
+  .reveal .slides section.divider.divider-img h2.t{ order:2; font-size:1.1em; max-width:76%; }
+  .reveal .slides section.divider.divider-img svg{ order:1; }
 
   .reveal h1,.reveal h2,.reveal h3{
     font-family:'Patrick Hand', cursive;
@@ -121,7 +123,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- shared SVG defs: hand-drawn wobble filter + arrowheads (required, keep as-is) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+    <filter id="rough" filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600">
       <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
       <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
@@ -187,8 +189,11 @@ footer, header, hgroup, main, menu, nav, section {
 </section>
 
 <!-- ============ SLIDE 3 — DIVIDER 1: THE ANALOGY ============ -->
-<section class="divider">
-  <h2 class="t" style="font-size:2.2em">1 &middot; The analogy: a hospital, not a superhero</h2>
+<section class="divider divider-img">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A hospital scene: a triage nurse with a clipboard, a doctor examining a patient with a stethoscope, a pharmacist preparing medicine, and a senior attending physician reviewing a chart, each doing one focused job">
+    <image href="../img/decks/07-multi-agent/hospital-crew-four-roles.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t">1 &middot; The analogy: a hospital, not a superhero</h2>
   <div class="pageno">M7·03</div>
 </section>
 
@@ -556,8 +561,11 @@ footer, header, hgroup, main, menu, nav, section {
 </section>
 
 <!-- ============ SLIDE 17 — DIVIDER 6: THE REVIEWER ============ -->
-<section class="divider">
-  <h2 class="t" style="font-size:2.2em">6 &middot; The Reviewer as human-in-the-loop proxy</h2>
+<section class="divider divider-img">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A senior physician carefully reviewing and signing a colleague's prescription note before it reaches the patient, with an approve or reject stamp tray on the desk">
+    <image href="../img/decks/07-multi-agent/reviewer-human-in-loop-signoff.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <h2 class="t">6 &middot; The Reviewer as human-in-the-loop proxy</h2>
   <div class="pageno">M7·17</div>
 </section>
 
@@ -660,7 +668,7 @@ footer, header, hgroup, main, menu, nav, section {
       if(!sec) return;
       var svg = sec.querySelector('svg');
       if(!svg) return;
-      var mh = 58;
+      var mh = sec.classList.contains('divider-img') ? 80 : 58;
       svg.style.maxHeight = mh + '%';
       var guard = 0;
       while (sec.scrollHeight > sec.clientHeight + 2 && mh > 18 && guard++ < 20){

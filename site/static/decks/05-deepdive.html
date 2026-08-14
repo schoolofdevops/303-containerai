@@ -119,7 +119,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- shared SVG defs: hand-drawn wobble filter + arrowheads (required, keep as-is) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+    <filter id="rough" filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600">
       <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
       <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
@@ -171,6 +171,16 @@ footer, header, hgroup, main, menu, nav, section {
   </svg>
   <p class="credit"><b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI &nbsp;·&nbsp; Deep Dive (Part 2)</p>
   <div class="pageno">M5-DD·01</div>
+</section>
+
+<!-- ============ SLIDE 1b — SCENE: cutting index cards (illustration) ============ -->
+<section>
+  <h2 class="t">Every chunking choice is a cut you can't take back</h2>
+  <p class="s">Cut too small, a fact loses its command. Cut too large, four facts blur into one.</p>
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A pair of scissors mid-cut through a long strip of paper, with a messy pile of resulting cards in uneven sizes scattered on a desk">
+    <image href="../img/decks/05-deepdive/analogy-cutting-index-cards.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </svg>
+  <div class="pageno">M5-DD·01b</div>
 </section>
 
 <!-- ============ SLIDE 2 — SCENE: index card too small ============ -->

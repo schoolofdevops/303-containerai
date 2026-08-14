@@ -18,6 +18,22 @@
      headers contain an em dash, so no exception was actually needed). Slide count:
      13 → 20 (13 original content slides + 7 new dividers). -->
 
+> **2026-08-14 narration + illustration pass:** narration written to
+> `planning/narration/05-narration.md` (7 videos: talking-head intro + 6 concept
+> explainers). Fixed the shared `#rough` filter's objectBoundingBox bug (axis-aligned
+> lines went invisible) — switched to `filterUnits="userSpaceOnUse"` with an explicit
+> bbox. Added a Magnific pencil-sketch illustration to all 7 divider slides (title slide
+> kept its existing functional diagram, not replaced): divider 1 → empty-handed shrug at
+> a bare desk (the ungrounded-answer problem), divider 2 → four interlocking gears (GenAI
+> app anatomy), divider 3 → librarian shelving books by theme (the librarian analogy),
+> divider 4 → conveyor belt feeding loose pages in, a bound booklet out (the pipeline),
+> divider 5 → a person carrying a small toolbox past a heavy rolling filing cabinet
+> (ChromaDB's lightness), divider 6 → a person watching machinery through an observation
+> window (Learning Mode), divider 7 → a stack of books toppling, pages scattering (where
+> naive RAG breaks). Images at `site/static/img/decks/05-naive-rag/*.jpg`. Dividers use a
+> new `.has-illo` modifier class (image-on-top, title 1.1em below) rather than a blanket
+> `.divider` override, since not every deck's dividers necessarily get an illustration.
+
 This companion doc maps the 20-slide explainer deck (`site/static/decks/05-naive-rag.html`) to the Module 5 lesson (`site/docs/m5-naive-rag/lesson.md`). The deck teaches **concepts**, not commands — it turns each of the lesson's analogies into a hand-drawn whiteboard visual a learner walks through before opening the lab. The visual language follows the CourseSmith whiteboard style contract (`coursesmith/templates/deck/whiteboard-style-guide.md`): Patrick Hand cursive, `#1e1e1e` primary / `#757575` secondary strokes on white paper with the five semantic pastel fills (§1), the `#rough` wobble filter on shapes only, and the shared `#ah`/`#ahg` arrowhead markers. The arc moves vocabulary forward — a raw LLM answers your ops questions confidently and wrongly → RAG hands it a cheat sheet at query time → the four-part anatomy of every GenAI app → the vector DB as a librarian shelving by meaning → embeddings as coordinates → the two-phase naive-RAG pipeline sharing one embedding step → where each piece runs on Apple Silicon → ChromaDB as the lightest store → env-var wiring in Compose → Learning Mode making the pipeline visible → the five predictable failure modes that motivate M6 → hand-off to the lab. Seven divider slides now mark each lesson section boundary, in lesson order, so the learner (and the deck) can navigate section by section.
 
 ## Slide table

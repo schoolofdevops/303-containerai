@@ -171,3 +171,54 @@ covered. The Summary table at the end of the lesson is a recap of concepts alrea
   all 20 `.pageno` values (`M4·01`–`M4·20`) present and sequential in the rendered DOM.
 - **Kicker check:** `.kicker` present only on slide 1 (title) and slide 20 (closing); zero content or
   divider slides carry it.
+
+<!-- 2026-08-14 narration + rough-filter fix + Magnific illustration pass (this pass):
+
+     NARRATION: `planning/narration/04-narration.md` authored via the `lesson-to-video-narration`
+     skill (new file — no narration existed for any module before this pass). 6 videos: talking-head
+     intro, 4 explainers walking lesson §1–8 (grouped OCI-fit / KitOps+Kitfile / selective-pull+
+     portability / ModelKit-vs-plain-image), talking-head summary+lab-bridge. Measured 5-gram
+     retell-overlap against the lesson: 10.0% overall (N=2792 5-grams, 279 overlapping) — at the
+     skill's ~10%-per-section target; the overlap is concentrated in verbatim commands, YAML field
+     names, and registry-table rows that must stay identical by design (`kit unpack --filter=model`,
+     `manifestVersion`/`package`/`model`/`code`, GHCR/Docker Hub/Quay/Harbor targets), not compressed
+     prose.
+
+     ROUGH-FILTER BUG FIX: the single `<filter id="rough">` definition used the old default
+     `x="-5%" y="-5%" width="110%" height="110%"` (objectBoundingBox region) — under this mode, any
+     perfectly horizontal/vertical line or rect has a zero-height or zero-width bounding box, which
+     collapses the filter region to nothing and makes the wobble (and the stroke itself) invisible.
+     Fixed to `filterUnits="userSpaceOnUse" x="-80" y="-80" width="1300" height="600"`, a fixed
+     region in the SVG's own coordinate space that covers every diagram's viewBox in this deck
+     regardless of individual shapes' bounding boxes.
+
+     MAGNIFIC ILLUSTRATION PASS: 3 pencil-sketch scene images generated (`mcp__magnific__images_generate`,
+     style-locked B&W hand-drawn prompt, verified by content before use, white-level corrected via
+     `magick -colorspace Gray -level 0%,88%`, saved external at `site/static/img/decks/04-packaging/`,
+     zero base64-inlining) and added to 3 of the 8 divider slides — the ones with a genuine narrative/
+     analogy beat, not a procedure walkthrough:
+       - Divider 1 (M4·03, "The problem with loose model files") — `loose-files-vs-sealed-crate.jpg`,
+         a split scene: scattered files/drive on a table vs. the same items sealed in one tagged crate.
+       - Divider 4 (M4·10, "The Kitfile: your shipping manifest") — `title-sealing-package.jpg`, two
+         hands wrapping and wax-sealing a parcel — the shipping-manifest/signing analogy in one frame.
+       - Divider 6 (M4·14, "Selective pull: the KitOps payoff") — `selective-pull-one-book.jpg`, a hand
+         pulling one book from a long warehouse shelf row, the rest undisturbed — the lesson's own
+         "warehouse stores books by chapter" analogy, drawn literally.
+     Dividers 2, 3, 5, 7, 8 were left text-only: §2 (OCI-artifact-mechanism), §3 (KitOps/ORAS naming),
+     §5 (Kitfile→registry→node pipeline), §7 (multi-registry table), and §8 (ModelKit vs plain image
+     checklist) are procedure/definition/comparison beats, not narrative scenes — no image generated
+     for them, consistent with deck-author §5a's "not an AI-photo target" guidance.
+     New CSS: `.reveal .slides section.divider.has-image h2.t{ order:2; font-size:1.1em; max-width:76%; }`
+     / `section.divider.has-image svg{ order:1; }` (image-on-top, title-below, scoped to `.has-image`
+     so the other 5 text-only dividers keep their original large centered title untouched). Autofit
+     ceiling bumped for illustrated dividers only: `var mh = sec.classList.contains('has-image') ? 80 : 58;`.
+     Title slide (M4·01) and its existing hand-drawn ModelKit-crate SVG diagram were left as-is — that
+     diagram already carries real informational content (labelled weights/adapter/config/prompts
+     compartments) that a generic photo illustration would have downgraded, not upgraded.
+
+     VERIFY GATE (this pass): zero external refs, 20/20 section tags balanced, DOCTYPE at byte 0,
+     `display: 'flex'` present, 3 `has-image` sections rendered headless (title-below layout, wobble
+     visible on the surrounding SVG chrome, images load from the local `../img/decks/04-packaging/`
+     path with no network request). Not re-run: full `npm run build` (other module forks were
+     concurrently editing sibling files under `site/` during this pass; a shared build would not be
+     attributable to this deck alone). -->
