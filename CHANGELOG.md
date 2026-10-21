@@ -42,7 +42,7 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 - The concept decks and narration were not updated for the new M2 section 6 or the M6 MCP-2026 paragraph. A later deck-author pass will cover them.
 - The Hermes bonus module is on hold.
-<!-- B-gaps -->
+- The M5 deep-dive deck (slide 14) shows the prompt-truncation case without naming the model; the page and narration scope it to the llama.cpp-served qwen3:4b.
 
 ## [1.8.0] - 2026-10-21
 
