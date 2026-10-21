@@ -32,17 +32,19 @@ curl -s http://localhost:11434/v1/models | python3 -m json.tool
 {
     "object": "list",
     "data": [
+        ...
         {
             "id": "qwen3.5:2b",
             "object": "model",
-            "created": 1783237329,
+            "created": 1792567034,
             "owned_by": "library"
-        }
+        },
+        ...
     ]
 }
 ```
 
-> The `created` value is an epoch timestamp set when Ollama loaded the model; it will differ on your machine. If you've pulled other models on this machine (from other courses or projects), `data` will list every one of them — only the `qwen3.5:2b` entry matters here.
+> The `created` value is an epoch timestamp set when the model was pulled; it will differ on your machine. The `...` lines stand for any other models you've pulled (from other courses or projects) — `data` lists every one of them, and only the `qwen3.5:2b` entry matters here.
 
 This is the standard OpenAI `GET /v1/models` response shape. Any tool, SDK, or framework that
 expects OpenAI will accept this.
@@ -54,6 +56,7 @@ curl -s http://localhost:11434/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
     "model": "qwen3.5:2b",
+    "reasoning_effort": "none",
     "messages": [{"role": "user", "content": "Explain containers in one sentence."}]
   }' | python3 -m json.tool
 ```
@@ -61,9 +64,9 @@ curl -s http://localhost:11434/v1/chat/completions \
 **Expected output:**
 ```json
 {
-    "id": "chatcmpl-184",
+    "id": "chatcmpl-449",
     "object": "chat.completion",
-    "created": 1783249846,
+    "created": 1792570687,
     "model": "qwen3.5:2b",
     "system_fingerprint": "fp_ollama",
     "choices": [
@@ -71,20 +74,28 @@ curl -s http://localhost:11434/v1/chat/completions \
             "index": 0,
             "message": {
                 "role": "assistant",
-                "content": "Containers are lightweight, portable executable packages that include all necessary components (code and dependencies) to run software independently."
+                "content": "Containers are standardized, self-contained environments for executing software that facilitate deployment, scaling, and management of applications by isolating them from the host system."
             },
             "finish_reason": "stop"
         }
     ],
     "usage": {
-        "prompt_tokens": 36,
-        "completion_tokens": 23,
-        "total_tokens": 59
+        "prompt_tokens": 19,
+        "prompt_tokens_details": {
+            "cached_tokens": 13
+        },
+        "completion_tokens": 29,
+        "total_tokens": 48
     }
 }
 ```
 
-> The `id` suffix is a counter that increments with each request; `created` is a live epoch timestamp. The `system_fingerprint` field (`"fp_ollama"`) is always present in Ollama's `/v1` responses. The model's reply wording varies — what matters is the shape of the response.
+> The `id` suffix is a counter that increments with each request; `created` is a live epoch timestamp. The `system_fingerprint` field (`"fp_ollama"`) is always present in Ollama's `/v1` responses, and `usage` may carry a `prompt_tokens_details` block showing how much of the prompt was served from cache. The model's reply wording varies — what matters is the shape of the response.
+
+:::warning[Why `"reasoning_effort": "none"`?]
+
+`qwen3.5:2b` thinks by default. On the `/v1` endpoint the reasoning tokens count against the completion budget, so without the switch-off a short question can burn the whole token allowance on hidden reasoning and come back with an empty `content`. `/v1/chat/completions` spells the switch-off `"reasoning_effort": "none"`; in M1 you used `"think": false` on the native endpoint. Same idea, different spelling per endpoint.
+:::
 
 Compare this to M1's `/api/generate` response. The `/api/generate` format is Ollama-specific — a
 flat JSON object with a `"response"` string. The `/v1/chat/completions` format is the OpenAI
@@ -103,19 +114,19 @@ docker run --rm curlimages/curl:latest -s \
 
 **Expected output:**
 ```json
-{"object":"list","data":[{"id":"qwen3.5:2b","object":"model","created":1783237329,"owned_by":"library"}]}
+{"object":"list","data":[...,{"id":"qwen3.5:2b","object":"model","created":1792567034,"owned_by":"library"},...]}
 ```
 
 ```bash
 docker run --rm curlimages/curl:latest -s \
   http://host.docker.internal:11434/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -d '{"model":"qwen3.5:2b","messages":[{"role":"user","content":"Say hi in 5 words."}]}'
+  -d '{"model":"qwen3.5:2b","reasoning_effort":"none","messages":[{"role":"user","content":"Say hi in 5 words."}]}'
 ```
 
 **Expected output:**
 ```json
-{"id":"chatcmpl-460","object":"chat.completion","created":1783249856,"model":"qwen3.5:2b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"Hello there! Ready to chat now."},"finish_reason":"stop"}],"usage":{"prompt_tokens":36,"completion_tokens":9,"total_tokens":45}}
+{"id":"chatcmpl-65","object":"chat.completion","created":1792570689,"model":"qwen3.5:2b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"Hello there! Welcome in 5 words."},"finish_reason":"stop"}],"usage":{"prompt_tokens":19,"prompt_tokens_details":{"cached_tokens":16},"completion_tokens":9,"total_tokens":28}}
 ```
 
 > The `id`, `created`, and reply text all vary per request. `system_fingerprint` will always be `"fp_ollama"`.
@@ -142,6 +153,7 @@ prompt = sys.argv[1] if len(sys.argv) > 1 else "Explain containers in one senten
 
 resp = client.chat.completions.create(
     model=os.environ.get("MODEL", "qwen3.5:2b"),
+    reasoning_effort="none",
     messages=[{"role": "user", "content": prompt}])
 print(resp.choices[0].message.content)
 ```
@@ -179,38 +191,37 @@ docker build -t m2-client labs/m2/
 
 **Expected output:**
 ```
-#0 building with "rancher-desktop" instance using docker driver
+#0 building with "rancher" instance using docker driver
 
 #1 [internal] load build definition from Dockerfile
-#1 DONE 0.0s
+#1 transferring dockerfile: 155B 0.0s done
+#1 DONE 0.1s
 
 #2 [internal] load metadata for docker.io/library/python:3.12-slim
-#2 DONE 2.7s
+#2 DONE 0.1s
 
-#5 [1/4] FROM docker.io/library/python:3.12-slim@sha256:423ed6ab...
-#5 DONE 10.3s
+#5 [1/4] FROM docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1
 
 #6 [2/4] RUN pip install --no-cache-dir openai
-#6 0.780 Collecting openai
-#6 0.851   Downloading openai-2.44.0-py3-none-any.whl.metadata (34 kB)
+#6 4.044 Collecting openai
+#6 4.158   Downloading openai-3.35.1-py3-none-any.whl.metadata (44 kB)
 #6 ...
-#6 3.757 Successfully installed ... openai-2.44.0 ...
-#6 DONE 4.0s
+#6 12.86 Successfully installed annotated-types-0.8.0 anyio-4.15.1 h11-0.16.0 httpcore2-2.16.0 httpx2-2.16.0 idna-3.20 jiter-0.17.0 openai-3.35.1 pydantic-2.14.1 pydantic-core-2.50.1 sniffio-1.3.1 truststore-0.10.5 typing-extensions-4.16.0 typing-inspection-0.4.4
+#6 DONE 14.3s
 
 #7 [3/4] WORKDIR /app
-#7 DONE 0.0s
+#7 DONE 0.2s
 
 #8 [4/4] COPY client.py .
 #8 DONE 0.0s
 
-#9 exporting to image
 #9 naming to docker.io/library/m2-client:latest done
-#9 DONE 0.9s
+#9 DONE 7.1s
 ```
 
 > Docker uses BuildKit's `#N` step notation. The build has **4 steps** (FROM, RUN, WORKDIR, COPY).
 > The first build pulls `python:3.12-slim` (~50 MB compressed) and installs `openai` (~2 MB) plus
-> its dependencies. Expect ~10–30 seconds on a typical connection (cached layers make reruns
+> its dependencies; the exact `openai` version pip picks will differ from the one shown. Expect ~10–30 seconds on a typical connection (cached layers make reruns
 > near-instant). Subsequent builds use the layer cache and finish in under a second.
 
 Run it directly to verify the wiring before we add Compose:
@@ -221,7 +232,7 @@ docker run --rm m2-client
 
 **Expected output:**
 ```
-Containers are lightweight, portable executable packages that include everything needed to run software independently.
+Containers are lightweight, portable units that wrap a full set of files and the environments needed to run them, allowing development teams to bundle applications with their dependencies into self-contained packages regardless of where they are deployed.
 ```
 
 The model's exact wording will vary — what matters is that a sentence comes back, not an error.
@@ -269,10 +280,14 @@ docker compose -f labs/m2/compose.yaml run --rm client
 
 **Expected output:**
 ```
-Containers are lightweight virtualizations that allow applications to run isolated from each other on a single machine.
+Network m2_default Creating 
+ Network m2_default Created 
+ Container m2-client-run-7deda3a03f73 Creating 
+ Container m2-client-run-7deda3a03f73 Created 
+Containers are isolated, reusable software units that package code and dependencies together to ensure consistency across different environments while providing a lightweight abstraction for deployment scenarios like container orchestration.
 ```
 
-> On first run you will also see two lines like `Network m2_default Created` before the model reply — Compose creates the default network. These disappear on subsequent runs.
+> On first run you will also see Compose's network and container creation lines (shown above) before the model reply — Compose creates the default network. These disappear on subsequent runs.
 
 `docker compose run --rm client` builds the image if needed, starts the container, prints the
 model's reply, and removes the container. No ports are mapped, no long-running daemon — the
@@ -399,8 +414,8 @@ docker compose down
 
 **Expected output:**
 ```
-[+] Running 1/1
- ✔ Network m2_default  Removed
+Network m2_default Removing 
+ Network m2_default Removed 
 ```
 
 The model keeps running natively on your host — that's fine, it's shared by every module. This

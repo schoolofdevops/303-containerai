@@ -20,4 +20,4 @@ PROMPT="${1:-Explain what a container is in one sentence.}"
 
 docker run --rm curlimages/curl:latest -s \
   http://host.docker.internal:11434/api/generate \
-  -d "{\"model\":\"$MODEL\",\"prompt\":\"$PROMPT\",\"stream\":false}"
+  -d "{\"model\":\"$MODEL\",\"prompt\":\"$PROMPT\",\"stream\":false,\"think\":false}"

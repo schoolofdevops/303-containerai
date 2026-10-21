@@ -40,7 +40,7 @@ def embed(text):
 
 
 def llm(prompt, system=None, temperature=0.2):
-    payload = {"model": LLM, "prompt": prompt, "stream": False, "options": {"temperature": temperature}}
+    payload = {"model": LLM, "prompt": prompt, "stream": False, "think": False, "options": {"temperature": temperature}}
     if system:
         payload["system"] = system
     return _post(f"{OLLAMA}/api/generate", payload)["response"].strip()

@@ -25,7 +25,7 @@ def _post(url, payload, timeout=120):
 
 def llm(prompt, system, temperature=0.2):
     return _post(f"{OLLAMA}/api/generate",
-                 {"model": LLM, "prompt": prompt, "system": system, "stream": False,
+                 {"model": LLM, "prompt": prompt, "system": system, "stream": False, "think": False,
                   "options": {"temperature": temperature}})["response"].strip()
 
 

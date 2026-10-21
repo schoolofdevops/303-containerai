@@ -10,5 +10,6 @@ prompt = sys.argv[1] if len(sys.argv) > 1 else "Explain containers in one senten
 
 resp = client.chat.completions.create(
     model=os.environ.get("MODEL", "qwen3.5:2b"),
+    reasoning_effort="none",
     messages=[{"role": "user", "content": prompt}])
 print(resp.choices[0].message.content)
