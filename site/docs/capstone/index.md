@@ -75,7 +75,7 @@ Expected output:
   ✔ docker CLI + engine reachable
 == 2. Model serving (native Ollama, OpenAI-compatible) ==
   ✔ Ollama serving on :11434
-  ✔ chat model present (qwen3.5)
+  ✔ chat model present (qwen3.5:2b)
   ✔ embedding model present (nomic-embed-text)
 == 3. Container → native model wiring ==
   ✔ containers reach the model via host.docker.internal

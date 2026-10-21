@@ -264,7 +264,7 @@ services:
   agents:
     environment:
       - OPENAI_BASE_URL=http://host.docker.internal:11434/v1
-      - OPENAI_MODEL_NAME=qwen3.5
+      - OPENAI_MODEL_NAME=qwen3.5:2b
 ```
 
 Ollama's `/v1` endpoint is OpenAI-compatible, so CrewAI's `openai` client talks to it without modification.
