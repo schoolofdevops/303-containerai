@@ -47,7 +47,7 @@ By the end of this module, you will know which engine to reach for and why, you 
 
 ### Narration script
 
-Let's say you want to serve a model with the least possible setup. If you already have Docker 4.40 or newer, there is a genuinely one-command way to do that. You would just run `docker model run`, followed by the model name, something like `ai/gpt-oss`, and Docker downloads the quantized weights, serves them, and exposes the standard `/v1` API. No Ollama, no separate process, nothing extra to install on the host. It's fully open source and it comes free with Docker CE.
+Let's say you want to serve a model with the least possible setup. If you already have Docker 4.40 or newer, there is a genuinely one-command way to do that. You would just run `docker model run`, followed by the model name, something like `ai/gpt-oss`, and Docker downloads the quantized weights, serves them, and exposes the standard `/v1` API. No Ollama, no separate process, nothing extra to install on the host. It's fully open source, and it runs on Docker Desktop and on Docker CE on Linux. Underneath, it uses llama.cpp by default, vLLM on NVIDIA GPUs, and a vllm-metal backend on Apple Silicon.
 
 Now, one word of caution here. `ai/gpt-oss` is a twenty billion parameter model, so you would only want to run that particular one on a machine with plenty of RAM. On our sixteen gigabyte reference laptop, you'd stick with the smaller models we'll get to in a few minutes.
 
@@ -55,7 +55,7 @@ So if Docker Model Runner is this easy, why does this course spend the rest of i
 
 Let's now look at those three engines, and think of them as different brands of espresso machine. There's La Marzocco, there's Breville, there's DeLonghi. Each one is built completely differently on the inside, one uses a thermoblock, another uses a boiler, and each has its own pressure profile and its own control system. But here's the thing, they all pour into the same standard cup. And that cup, in our world, is the OpenAI API. You can swap the machine sitting under the counter, and no barista needs to be retrained.
 
-The first one is Ollama, and this is the engine you already have running from Module 1. It's serving `qwen3.5:2b` on Metal, on port eleven four three four, and it's the de-facto standard for local development. It runs in a container too, though on Mac there are some caveats we covered last module.
+The first one is Ollama, and this is the engine you already have running from Module 1. It's serving `qwen3.5:2b` on Metal, on port eleven four three four, and it's the de-facto standard for local development. On a Mac, since Ollama zero point forty, it runs the model on the MLX engine by default, and you can see that in the runner column of `ollama ps`. Everywhere else it uses llama.cpp. It runs in a container too, though on Mac there are some caveats we covered last module.
 
 Second is llama.cpp, and here's an interesting thing about it: it's actually the inference engine that lives inside Ollama. It handles GGUF-format models, quantization, and hardware acceleration under the hood. You would reach for llama.cpp directly when you need something lighter than the full Ollama stack, and you can run it in its own container.
 

@@ -25,7 +25,7 @@ Docker 4.40+ ships a built-in model runner. One command and you have a served mo
 docker model run ai/gpt-oss
 ```
 
-Docker downloads the quantized weights, serves them, and exposes the standard `/v1` API. You don't need Ollama, you don't need a separate process, and there is nothing extra to install on the host. It's fully open source and comes free with Docker CE. For a quick demo, or for a team that already lives inside Docker's toolchain, this is the easiest way in. (`ai/gpt-oss` is a 20B model, so run it only on a machine with plenty of RAM. On our 16 GB reference laptop, stick with the smaller models from Section 4.)
+Docker downloads the quantized weights, serves them, and exposes the standard `/v1` API. You don't need Ollama, you don't need a separate process, and there is nothing extra to install on the host. Docker Model Runner works on Docker Desktop and on Docker CE on Linux. It is fully open source. It picks the engine for you: llama.cpp by default, vLLM on NVIDIA GPUs (Linux and Windows with WSL2), and a vllm-metal backend on Apple Silicon. Compose can use it too. The top-level `models:` element is part of the Compose Specification, so it is not a Docker Desktop trick. For a quick demo, or for a team that already lives inside Docker's toolchain, this is the easiest way in. (`ai/gpt-oss` is a 20B model, so run it only on a machine with plenty of RAM. On our 16 GB reference laptop, stick with the smaller models from Section 4.)
 
 This course takes a different path. We focus on *runtime-agnostic* open engines, that is, engines that don't care which container tool you use. Docker Model Runner is good to know, but the patterns ahead work the same way on Docker, Rancher Desktop, Podman, bare Linux, and Windows with WSL2. You don't need any Docker-specific tooling for them. The same principles apply to Docker Model Runner too. The engines below are the ones you'll actually wire up in the labs.
 
@@ -39,13 +39,15 @@ The three engines you'll encounter in this course:
 
 | Engine | Best for | Container-ready? | Notes |
 |--------|----------|-----------------|-------|
-| **Ollama** | Local dev, one-command setup | Yes (with caveats on Mac) | The de-facto dev standard; Metal-accelerated natively on Apple Silicon |
+| **Ollama** | Local dev, one-command setup | Yes (with caveats on Mac) | The de-facto dev standard; on Apple Silicon it runs supported models on the MLX engine (Metal), elsewhere on llama.cpp |
 | **llama.cpp** | Minimal footprint, CPU or Metal | Yes | The inference core inside Ollama; use directly for maximum control |
 | **LocalAI** | Multi-backend OpenAI hub | Yes | One container routing to multiple backends: llama.cpp, Whisper, Stable Diffusion |
 
 **Ollama** is the engine you already have running from M1. It's serving `qwen3.5:2b` on Metal at `:11434`. The lab builds a containerized client that calls it.
 
-**llama.cpp** is the inference engine *inside* Ollama. It handles GGUF-format models, quantization, and hardware acceleration. You can run llama.cpp in its own container when you need something lighter than the full Ollama stack.
+There is one detail worth knowing. Since Ollama 0.40, a Mac with Apple Silicon runs supported models on the **MLX** engine by default, and falls back to llama.cpp when a model is not supported. Everywhere else, Ollama uses llama.cpp. You can see which one is in use: load a model, then run `ollama ps` and look at the `RUNNER` column. On our reference laptop it shows `mlx` for `qwen3.5:2b`. (`ollama show` does not print the engine.) You need **Ollama 0.40 or newer** for this course. The reasoning switch-off in Section 6 also works on older releases.
+
+**llama.cpp** is the inference engine *inside* Ollama, and the fallback when MLX is not available. It handles GGUF-format models, quantization, and hardware acceleration. You can run llama.cpp in its own container when you need something lighter than the full Ollama stack.
 
 **LocalAI** is the right choice when you need *one* container that looks like OpenAI to every caller, and routes to whatever backend or hardware is available underneath. It's popular on Linux servers that run mixed hardware.
 
@@ -103,7 +105,7 @@ This is the one idea that makes the rest of the course click. The Acme Docs Assi
 
 ## 4. GGUF and Model Selection for Laptops
 
-**Analogy:** Quantization is like compressing a photo. A camera RAW file is huge, and mathematically it's perfect. A JPEG at 80% quality is a fraction of the size. You can barely tell the difference for most purposes, and it loads instantly. GGUF is the JPEG for LLM weights: a compact, quantized format that llama.cpp (and therefore Ollama) loads and runs well on CPU and Metal, without needing CUDA.
+**Analogy:** Quantization is like compressing a photo. A camera RAW file is huge, and mathematically it's perfect. A JPEG at 80% quality is a fraction of the size. You can barely tell the difference for most purposes, and it loads instantly. GGUF is the JPEG for LLM weights: a compact, quantized format that llama.cpp (and therefore Ollama) loads and runs well on CPU and Metal, without needing CUDA. On Apple Silicon, Ollama can also use MLX-format weights for the same job.
 
 When you run `ollama pull qwen3.5:2b`, Ollama fetches a GGUF file at roughly `Q4_K_M` quantization, not the original float16 weights. The `2b` part is the parameter count. The quantization level is the compression setting.
 
@@ -156,15 +158,45 @@ This portability is the real payoff of that universal contract. The app treats t
 
 ---
 
+## 6. Reasoning Models and the Universal Contract
+
+**Analogy:** Imagine a student who works the problem on scratch paper before writing the answer on the exam sheet. A **reasoning model** (also called a thinking model) does the same: it reasons first and answers after. The scratch work is real thinking, but the exam gives only a fixed number of lines. If the student fills every line with scratch work, the answer box stays empty.
+
+That is exactly what happens with `qwen3.5:2b`. It thinks by default. If you ask Ollama's `/api/show` endpoint, you would find `thinking: {values: [false, true], default: true}` in the response. The reasoning tokens count against `max_tokens`, which is the limit on how long the reply can be. We called `/v1/chat/completions` without a switch-off and got `content: ""` back, with `completion_tokens: 4080`. The model spent the whole 4,096 budget on reasoning and never reached the answer. With `"reasoning_effort": "none"` the same question came back in 11 tokens.
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant V as /v1 contract
+    participant E as Engine (Ollama)
+    C->>V: chat/completions + reasoning_effort "none"
+    V->>E: thinking off
+    E-->>V: answer only
+    V-->>C: choices[0].message.content
+```
+
+There are three switch-offs, one per layer:
+
+- **Native Ollama APIs** (`/api/generate`, `/api/chat`): pass `"think": false`.
+- **The `/v1` endpoint:** pass `"reasoning_effort": "none"`. For models that only have on and off, any other effort value means on.
+- **langchain-ollama:** set `reasoning=False`.
+
+Now here is an interesting thing. Two other options do **not** work on this model. Adding `/no_think` to the prompt still produces a `thinking` field and an empty answer. A Modelfile cannot set it either, because `PARAMETER think` is an unknown parameter.
+
+Every lab in this course switches thinking off. The model is small, we want the same kind of output on every run, and we want the token budget to be spent on the answer. Leave it on when the task is hard, such as multi-step planning or debugging, and give it a generous `max_tokens`.
+
+---
+
 ## Summary
 
 | Concept | The short version |
 |---------|-----------------|
-| Docker Model Runner | Docker-native OSS option (`docker model run`); same `/v1` API underneath |
-| Open engines | Ollama (dev standard), llama.cpp (core, minimal), LocalAI (multi-backend hub) |
+| Docker Model Runner | Docker-native OSS option (`docker model run`) on Desktop and Docker CE; llama.cpp, vLLM or vllm-metal underneath; same `/v1` API |
+| Open engines | Ollama (dev standard; MLX on Apple Silicon, llama.cpp elsewhere), llama.cpp (core, minimal), LocalAI (multi-backend hub) |
 | The `/v1` contract | Two endpoints, one URL, swap engines by changing an env var, never code |
 | GGUF + quantization | Compressed weights that fit laptop RAM; Q4 ≈ 0.6 × parameter count in GB |
 | Model selection | `qwen3.5:2b` for labs; Qwen3, Llama 3.x, Mistral 7B for heavier tasks |
+| Reasoning models | Thinking tokens eat `max_tokens`; switch off with `reasoning_effort: "none"` on `/v1`, `think: false` on native APIs |
 | Two wiring patterns | Mac → native model via `host.docker.internal`; Windows/Linux → model container via Compose hostname |
 
 ---
