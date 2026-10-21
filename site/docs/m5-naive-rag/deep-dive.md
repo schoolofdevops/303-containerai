@@ -264,41 +264,28 @@ line.
 List what's actually in the collection the lab's app writes to:
 
 ```bash
-curl -s http://localhost:${M5_CHROMA_PORT:-8000}/api/v1/collections | python3 -m json.tool
+curl -s http://localhost:${M5_CHROMA_PORT:-8000}/api/v2/tenants/default_tenant/databases/default_database/collections | python3 -c "
+import json, sys
+for c in json.load(sys.stdin):
+    print(json.dumps({k: c[k] for k in ('name', 'dimension')} | {'space': c['configuration_json']['hnsw']['space']}, indent=2))
+"
 ```
+
+Chroma 1.x serves its HTTP API under `/api/v2`, scoped by tenant and database
+(`default_tenant` / `default_database` out of the box). The raw response is a long JSON document
+per collection, so the one-liner prints only the three fields that matter here.
 
 **Expected output**
 
 ```text
-[
-    {
-        "id": "9212c584-0f8e-4bb0-a261-995553f28640",
-        "name": "documents",
-        "configuration_json": {
-            "hnsw_configuration": {
-                "space": "l2",
-                "ef_construction": 100,
-                "ef_search": 10,
-                "num_threads": 5,
-                "M": 16,
-                "resize_factor": 1.2,
-                "batch_size": 100,
-                "sync_threshold": 1000,
-                "_type": "HNSWConfigurationInternal"
-            },
-            "_type": "CollectionConfigurationInternal"
-        },
-        "metadata": null,
-        "dimension": 768,
-        "tenant": "default_tenant",
-        "database": "default_database",
-        "version": 0,
-        "log_position": 0
-    }
-]
+{
+  "name": "documents",
+  "dimension": 768,
+  "space": "l2"
+}
 ```
 
-`"space": "l2"` in `hnsw_configuration` is ChromaDB confirming, straight from its own API, the
+`"space": "l2"` (read from the collection's `hnsw` configuration) is ChromaDB confirming, straight from its own API, the
 default index metric claimed above — no override was ever set, so the collection came up on L2.
 `"dimension": 768` confirms `nomic-embed-text`'s embedding size.
 
@@ -372,7 +359,7 @@ for doc, score in vs.similarity_search_with_score('How do I restart the payments
 
 ```text
 0.6956 Acme Platform Runbooks  Payments service  To restart the Acme payments service,
-1.0968 Checkout 503 errors  If the checkout page returns HTTP 503, the web tier is satu
+1.0966 Checkout 503 errors  If the checkout page returns HTTP 503, the web tier is satu
 ```
 
 Only two lines print even though `k=3` was requested — this collection has exactly 2 chunks
@@ -407,13 +394,13 @@ for i, v in enumerate(vecs):
 
 ```text
 vector 0: dim=768 L2norm=1.000000
-vector 1: dim=768 L2norm=1.000001
+vector 1: dim=768 L2norm=1.000000
 vector 2: dim=768 L2norm=1.000000
 ```
 
 Confirmed, not assumed: three arbitrary sentences through `langchain-ollama`'s `OllamaEmbeddings`
-all land at L2 norm ≈ 1.000000 (the 1.000001 on vector 1 is float rounding noise, not a real
-deviation). The L2≈cosine claim in §3 holds for this exact app code path — not a general Ollama
+all land at L2 norm ≈ 1.000000 (a last-digit wobble such as 1.000001 would be float rounding
+noise, not a real deviation). The L2≈cosine claim in §3 holds for this exact app code path — not a general Ollama
 guarantee, but true here, measured.
 
 ---
@@ -449,9 +436,9 @@ docker exec genai-app ls -la /tmp/deepdive-docs/
 
 ```text
 total 12
-drwxr-xr-x 2 root root    4096 Jul 22 17:26 .
-drwxrwxrwt 1 root root    4096 Jul 22 17:24 ..
--rw-r--r-- 1  501 dialout  823 Jul 22 06:29 acme-runbooks.md
+drwxr-xr-x 2 root root    4096 Oct 21 10:49 .
+drwxrwxrwt 1 root root    4096 Oct 21 10:49 ..
+-rw-r--r-- 1  501 dialout  823 Jul  6 02:38 acme-runbooks.md
 ```
 
 Write the ingest-and-compare script. The question set is embedded directly in the script (not a
@@ -494,7 +481,7 @@ VARIANTS = {
 # possible. The live Streamlit app keeps 0.7 for more natural answers — expect its UI answers to
 # vary more, run to run, than what this script prints.
 emb = OllamaEmbeddings(model="nomic-embed-text", base_url=OLLAMA)
-llm = OllamaLLM(model="qwen3.5:2b", base_url=OLLAMA, temperature=0, num_ctx=4096)
+llm = OllamaLLM(model="qwen3.5:2b", base_url=OLLAMA, temperature=0, num_ctx=4096, reasoning=False)
 client = chromadb.HttpClient(host=CHROMA_HOST, port=CHROMA_PORT)
 
 for name, params in VARIANTS.items():
@@ -529,77 +516,68 @@ real artifact you can grep, diff, or fold into the table below.
 
 **Expected output**
 
-````text
+```text
 COLLECTION: deepdive-baseline
 === baseline (chunk_size=500, overlap=50) -> 2 chunks ===
   Q: How do I restart the payments service?
     top distance: 0.6956  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
-    answer: To restart the Acme payments service, run:
+    answer: To restart the Acme payments service, run the following command in your terminal:
 
-```bash
-kubectl rollout restart deploy/payments -n prod
-```
-
-This command wi
+`kubectl rollout restart deploy/payme
   Q: What happens if checkout is overloaded?
-    top distance: 0.7755  chunk: 'Checkout 503 errors\n\nIf the checkout page returns HTTP 503, the web ti'
-    answer: If the checkout page returns HTTP 503, it indicates that the web tier is saturated. To scale up and address this issue,
+    top distance: 0.7753  chunk: 'Checkout 503 errors\n\nIf the checkout page returns HTTP 503, the web ti'
+    answer: Based on the context provided, if the checkout page returns an HTTP 503 error (indicating saturation), the recommended a
   Q: How long are database backups retained?
-    top distance: 0.7746  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
-    answer: The database backups are retained for 30 days.
+    top distance: 0.7744  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
+    answer: Based on the context provided, database backups are retained for **30 days**.
   Q: Who do I page for an unacknowledged incident?
-    top distance: 0.9238  chunk: 'Checkout 503 errors\n\nIf the checkout page returns HTTP 503, the web ti'
-    answer: The on-call engineer is paged for an unacknowledged incident.
+    top distance: 0.9237  chunk: 'Checkout 503 errors\n\nIf the checkout page returns HTTP 503, the web ti'
+    answer: Based on the context provided under the section "On-call escalation," if the on-call engineer is unacknowledged for 15 m
 COLLECTION: deepdive-variant-a
 === variant-a (chunk_size=150, overlap=0) -> 11 chunks ===
   Q: How do I restart the payments service?
-    top distance: 0.5146  chunk: 'To restart the Acme payments service, run: kubectl rollout restart dep'
-    answer: To restart the Payments service, you should run the following command:
+    top distance: 0.5145  chunk: 'To restart the Acme payments service, run: kubectl rollout restart dep'
+    answer: To restart the payments service, run the following command:
 
-```bash
-kubectl rollout restart deploy/payments
+`kubectl rollout restart deploy/payments -n prod`
   Q: What happens if checkout is overloaded?
-    top distance: 0.7244  chunk: 'If the checkout page returns HTTP 503, the web tier is saturated. Scal'
-    answer: If the checkout page returns HTTP 503, it indicates that the web tier is saturated and needs to be scaled up. The comman
+    top distance: 0.7243  chunk: 'If the checkout page returns HTTP 503, the web tier is saturated. Scal'
+    answer: If the checkout page returns HTTP 503 errors, it indicates that the web tier is saturated. To resolve this, you should s
   Q: How long are database backups retained?
     top distance: 0.3700  chunk: 'Database backups'
-    answer: The database backups are retained for 30 days.
+    answer: Based on the context provided, database backups are retained for **30 days**.
   Q: Who do I page for an unacknowledged incident?
-    top distance: 0.7124  chunk: 'Page the on-call engineer via the #acme-oncall Slack channel. If unack'
-    answer: The on-call engineer via the #acme-oncall Slack channel. If unacknowledged for 15 minutes, the incident auto-escalates t
+    top distance: 0.7125  chunk: 'Page the on-call engineer via the #acme-oncall Slack channel. If unack'
+    answer: Based on the context provided, you should page the **on-call engineer** via the **#acme-oncall Slack channel**. The text
 COLLECTION: deepdive-variant-b
 === variant-b (chunk_size=1200, overlap=200) -> 1 chunks ===
   Q: How do I restart the payments service?
-    top distance: 0.7515  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
-    answer: To restart the Acme payments service, run:
+    top distance: 0.7514  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
+    answer: To restart the Acme payments service, run the following command in your terminal:
 
-```bash
-kubectl rollout restart deploy/payments -n prod
-```
-
-This command wi
+`kubectl rollout restart deploy/payme
   Q: What happens if checkout is overloaded?
-    top distance: 0.9773  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
-    answer: If the checkout page returns HTTP 503 (Service Unavailable), it indicates that the web tier is saturated and needs scali
+    top distance: 0.9770  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
+    answer: If the checkout page returns HTTP 503 errors, it indicates that the web tier is saturated. In response, you should scale
   Q: How long are database backups retained?
-    top distance: 0.8759  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
-    answer: The database backups are retained for 30 days.
+    top distance: 0.8756  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
+    answer: Based on the context provided, database backups are retained for **30 days**.
   Q: Who do I page for an unacknowledged incident?
     top distance: 1.0830  chunk: 'Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments'
-    answer: The on-call engineer is paged for an unacknowledged incident via the #acme-oncall Slack channel. If unacknowledged for 1
-````
+    answer: Based on the context provided under the "On-call escalation" section, if an incident is not acknowledged within 15 minut
+```
 
 Fold the three variants' results into a comparison table (variant, chunk count, retrieved-chunk
 snippet, whether the retrieved context actually contained the answer, model's answer):
 
 | Variant | Chunk size / overlap | Chunk count | Retrieved top chunk (payments Q) | Contains the answer? | Model's answer |
 |---|---|---|---|---|---|
-| baseline | 500 / 50 | 2 | dist 0.6956 — `"Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments…"` | Yes | "To restart the Acme payments service, run: `kubectl rollout restart deploy/payments -n prod`…" |
-| variant-a | 150 / 0 | 11 | dist 0.5146 — `"To restart the Acme payments service, run: kubectl rollout restart dep…"` | Yes | "To restart the Payments service, you should run the following command: `kubectl rollout restart deploy/payments`…" |
-| variant-b | 1200 / 200 | 1 | dist 0.7515 — `"Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments…"` (the whole corpus is one chunk) | Yes | "To restart the Acme payments service, run: `kubectl rollout restart deploy/payments -n prod`…" |
+| baseline | 500 / 50 | 2 | dist 0.6956 — `"Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments…"` | Yes | "To restart the Acme payments service, run the following command in your terminal: `kubectl rollout restart deploy/payme…" |
+| variant-a | 150 / 0 | 11 | dist 0.5145 — `"To restart the Acme payments service, run: kubectl rollout restart dep…"` | Yes | "To restart the payments service, run the following command: `kubectl rollout restart deploy/payments -n prod`" |
+| variant-b | 1200 / 200 | 1 | dist 0.7514 — `"Acme Platform Runbooks\n\nPayments service\n\nTo restart the Acme payments…"` (the whole corpus is one chunk) | Yes | "To restart the Acme payments service, run the following command in your terminal: `kubectl rollout restart deploy/payme…" |
 
 The three variants tell three different stories about the *same* corpus. **variant-a** (150 chars,
-no overlap) produces the tightest, lowest-distance match on the payments question (0.5146, the
+no overlap) produces the tightest, lowest-distance match on the payments question (0.5145, the
 best of all three) because its 11 tiny chunks let one chunk be *purely* about the restart command
 — nothing else diluting the vector. It also isolates "Database backups" into its own chunk,
 dropping that question's distance to 0.3700, the single best match across the whole experiment —

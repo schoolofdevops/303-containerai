@@ -35,7 +35,7 @@ Every production GenAI application has four parts:
 |---|---|---|
 | **LLM endpoint** | Text generation | `qwen3.5:2b` via native Ollama :11434 |
 | **Embedding model** | Convert text ↔ vectors | `nomic-embed-text` (768-dim) via Ollama |
-| **Vector database** | Store and search by semantic similarity | ChromaDB 0.5.20 in a container |
+| **Vector database** | Store and search by semantic similarity | ChromaDB 1.5.9 in a container |
 | **Application** | Run the pipeline, serve the UI, handle state | Streamlit app in a container |
 
 You already built the first two in Modules 2 and 3. This module adds the vector database and the application layer, so your `compose.yaml` grows by two services.
@@ -117,7 +117,7 @@ M5 uses **ChromaDB** as the vector database because it is the easiest choice to 
 - **Persistent:** a Docker volume keeps your vectors across restarts
 - **Memory-efficient:** the stack runs within 2 GB total (768 MB for ChromaDB, 1 GB for the app)
 
-ChromaDB is pinned to version `0.5.20` in the `compose.yaml`, and here is why that matters: `langchain-chroma` ships a client built for the `0.5.x` HTTP API. Run ChromaDB `0.6.x` instead, and the client's version handshake will fail. Pinning the version removes that ambiguity.
+ChromaDB is pinned to version `1.5.9` in the `compose.yaml`, and here is why that matters: the app talks to the server through the `chromadb` Python client (version `1.5.9`, used via `langchain-chroma`), and client and server must share a major version. Chroma 1.0 replaced the `/api/v1` HTTP routes with `/api/v2`, so an older 0.x server or a future major behind a `latest` tag is not a supported pair. Pinning the server to the same release as the client removes that ambiguity.
 
 **When to scale up:**
 

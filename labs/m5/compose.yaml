@@ -6,14 +6,14 @@
 #
 # Prereqs on the host:  ollama pull qwen3.5:2b  &&  ollama pull nomic-embed-text
 services:
-  # Vector database — pinned to 0.5.x to match the langchain-chroma client version.
+  # Vector database — pinned to 1.x: client (chromadb==1.5.9) and server must share a major.
   chromadb:
-    image: chromadb/chroma:0.5.20
+    image: chromadb/chroma:1.5.9
     container_name: chromadb
     ports:
       - "8000:8000"
     volumes:
-      - chroma_data:/chroma/chroma
+      - chroma_data:/data
     environment:
       - IS_PERSISTENT=TRUE
       - ANONYMIZED_TELEMETRY=FALSE

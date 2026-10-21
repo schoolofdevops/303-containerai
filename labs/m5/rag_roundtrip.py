@@ -35,23 +35,23 @@ def embed(text):
 
 def generate(prompt):
     return _post(f"{OLLAMA}/api/generate",
-                 {"model": LLM, "prompt": prompt, "stream": False,
+                 {"model": LLM, "prompt": prompt, "stream": False, "think": False,
                   "options": {"temperature": 0}})["response"].strip()
 
 
 def ingest():
-    col = _post(f"{CHROMA}/api/v1/collections", {"name": COLLECTION, "get_or_create": True})
+    col = _post(f"{CHROMA}/api/v2/tenants/default_tenant/databases/default_database/collections", {"name": COLLECTION, "get_or_create": True})
     cid = col["id"]
     text = open(DOCS_PATH).read()
     chunks = [c.strip() for c in re.split(r"\n(?=## )", text) if len(c.strip()) > 20]
     ids = [f"chunk-{i}" for i in range(len(chunks))]
-    _post(f"{CHROMA}/api/v1/collections/{cid}/add",
+    _post(f"{CHROMA}/api/v2/tenants/default_tenant/databases/default_database/collections/{cid}/add",
           {"ids": ids, "embeddings": [embed(c) for c in chunks], "documents": chunks})
     return cid
 
 
 def retrieve(cid, query, k=1):
-    res = _post(f"{CHROMA}/api/v1/collections/{cid}/query",
+    res = _post(f"{CHROMA}/api/v2/tenants/default_tenant/databases/default_database/collections/{cid}/query",
                 {"query_embeddings": [embed(query)], "n_results": k,
                  "include": ["documents"]})
     return res["documents"][0][0] if res["documents"][0] else ""

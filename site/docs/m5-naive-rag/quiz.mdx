@@ -42,25 +42,25 @@ Test your understanding of the four-part GenAI application anatomy, the naive-RA
     ],
   },
   {
-    prompt: 'Why does the compose.yaml pin ChromaDB to version 0.5.20 instead of using the latest tag?',
+    prompt: 'Why does the compose.yaml pin ChromaDB to version 1.5.9 instead of using the latest tag?',
     options: [
       {
-        text: 'Version 0.5.20 is the only version that supports Docker volumes for persistence.',
+        text: 'Version 1.5.9 is the only version that supports Docker volumes for persistence.',
         correct: false,
-        explanation: 'All recent ChromaDB versions support persistent storage. The pin is about API compatibility with the langchain-chroma client, not volume support.',
+        explanation: 'All recent ChromaDB versions support persistent storage. The pin is about client/server compatibility, not volume support.',
       },
       {
-        text: 'langchain-chroma ships a client that targets the 0.5.x HTTP API. Running ChromaDB 0.6.x causes a version handshake failure, so the server is pinned to match the client.',
+        text: 'The app talks to Chroma through the chromadb 1.5.9 Python client, and client and server must share a major version. Chroma 1.0 replaced the /api/v1 HTTP routes with /api/v2, so the server is pinned to the same release as the client.',
         correct: true,
-        explanation: 'Correct. This is a common pattern with fast-moving OSS stacks: the client library and server must agree on the API version. Pinning the server image removes that ambiguity. Never use latest for a version-sensitive component.',
+        explanation: 'Correct. This is a common pattern with fast-moving OSS stacks: the client library and server must agree on the API version (here 1.x with 1.x). Pinning the server image removes that ambiguity. Never use latest for a version-sensitive component.',
       },
       {
-        text: 'ChromaDB 0.6.x removed the HTTP server mode; 0.5.20 is the last version that exposes :8000.',
+        text: 'ChromaDB 1.x removed the HTTP server mode; 0.5.20 is the last version that exposes :8000.',
         correct: false,
-        explanation: 'ChromaDB 0.6.x still exposes an HTTP server. The pin is an API compatibility constraint between the langchain-chroma Python client and the ChromaDB server, not a feature removal.',
+        explanation: 'ChromaDB 1.x still exposes an HTTP server on :8000. The pin is an API compatibility constraint between the chromadb Python client and the server, not a feature removal.',
       },
       {
-        text: 'Version 0.5.20 uses less memory than later versions, which is important for the 16 GB laptop constraint.',
+        text: 'Version 1.5.9 uses less memory than other versions, which is important for the 16 GB laptop constraint.',
         correct: false,
         explanation: 'Memory usage is not the reason for the pin. The compose.yaml already sets an explicit memory limit of 768M for the chromadb service. The pin is purely about client/server API version compatibility.',
       },
