@@ -57,7 +57,7 @@ Retrieval-Augmented Generation fixes this by changing what the model sees before
 
 Now, this module is the first step in what we're calling the Docs Assistant use case, and by the end of it, you'll have a containerized application that retrieves the right Acme runbook chunk and generates a grounded answer, with the exact `kubectl` command in it.
 
-But before we can build that, we need to understand the shape of a GenAI application in general, because a Docs Assistant is really just four pieces wired together. One, an LLM endpoint, which does the actual text generation — you already have this, it's `qwen3.5:2b` running on native Ollama. Two, an embedding model, which converts text into vectors, and here that's `nomic-embed-text`, also on Ollama. Three, a vector database, which stores those vectors and searches through them by meaning, and for this course that's ChromaDB, running in a container. And four, the application itself, which runs the whole pipeline and serves the UI — a Streamlit app, also in a container.
+But before we can build that, we need to understand the structure of a GenAI application in general, because a Docs Assistant is really just four pieces wired together. One, an LLM endpoint, which does the actual text generation — you already have this, it's `qwen3.5:2b` running on native Ollama. Two, an embedding model, which converts text into vectors, and here that's `nomic-embed-text`, also on Ollama. Three, a vector database, which stores those vectors and searches through them by meaning, and for this course that's ChromaDB, running in a container. And four, the application itself, which runs the whole pipeline and serves the UI — a Streamlit app, also in a container.
 
 You already built the first two pieces back in Module 2 and Module 3. This module adds the other two, the vector database and the application layer, so your `compose.yaml` grows by exactly two services.
 
@@ -117,9 +117,11 @@ The second phase is query, and this one runs every single time a user asks a que
 
 Now here's something worth pointing out about where all of this actually runs. The chunking, the vector storage, the retrieval, and the prompt-building — all of that happens inside Docker containers. But the embedding model and the LLM itself both run natively on the host, on Ollama, so they get Metal acceleration on Apple Silicon. And the containers reach that native Ollama server through `host.docker.internal`. This is the same pattern you set up back in Module 2 — model servers stay native, everything else runs containerized and talks to the host across that bridge.
 
-So why ChromaDB, specifically, for this course? A few reasons. It's zero-config — one Docker service, no cluster to stand up, no configuration files to write. It's Python-native, so `langchain-chroma` wires in with under ten lines of code. It's persistent, meaning a Docker volume keeps your vectors across restarts. And it's memory-efficient — the whole stack runs comfortably within 2 gigabytes, with roughly 768 megabytes for ChromaDB and about a gigabyte for the app. One detail worth remembering: we pin the ChromaDB server image and the Python client to the same version, 1.5.9. The old version one routes are gone in the 1.x line, so a mismatched pair gets an HTTP 405 or 410 back. Pinning both to 1.5.9 removes that ambiguity entirely.
+So why ChromaDB, specifically, for this course? A few reasons. It's zero-config — one Docker service, no cluster to stand up, no configuration files to write. It's Python-native, so `langchain-chroma` wires in with under ten lines of code. It's persistent, meaning a Docker volume keeps your vectors across restarts. And it's memory-efficient — the whole stack runs comfortably within 2 gigabytes, with roughly 768 megabytes for ChromaDB and about a gigabyte for the app. One detail worth remembering: we pin the ChromaDB server image and the Python client to the same version, 1.5.9. The old version one API routes are gone in the 1.x line, so a raw call to one of them returns an HTTP 405. Client and server must be a supported pair, and pinning both to 1.5.9 removes that ambiguity entirely.
 
 Now, ChromaDB won't be the right choice forever. Once you outgrow a laptop-sized setup, you'd reach for something like Qdrant if you need multi-tenant search across millions of vectors, or pgvector if you're already running PostgreSQL and don't want a new service at all. The good news is that the API you're learning here — things like `add_documents` and `similarity_search` — stays almost identical across all of these. You'd swap out the `Chroma` constructor, and the rest of your code barely changes.
+
+The app finds ChromaDB and Ollama through environment variables in the compose file. `OLLAMA_BASE_URL` points at `host.docker.internal` on port 11434. `CHROMA_HOST` is the service name, `chromadb`, and `CHROMA_PORT` is 8000. `LLM_MODEL` and `EMBEDDING_MODEL` name the two models. To change a model or a host, you edit one value and the code stays the same.
 
 One more thing before the lab: the app you're about to build ships with something called Learning Mode, and it's turned on by default. As you type a question, it shows you each pipeline step happening live — how long the query embedding took, how many chunks were searched and how many came back, the actual retrieved text from ChromaDB, and the generation time. This makes every invisible part of RAG visible to you, so when a grounded answer shows up, you can trace it back to the exact sentence, in the exact document, that produced it.
 
@@ -128,8 +130,10 @@ One more thing before the lab: the app you're about to build ships with somethin
 1. Divider: "The naive-RAG pipeline"
 2. Pipeline diagram with numbered steps 1-8, container boundary drawn around chunk/store/retrieve/augment, native-Ollama box around embed/generate
 3. "Why ChromaDB" checklist: zero-config, Python-native, persistent, memory-efficient
-4. Learning Mode screenshot/mock: four live steps shown as the user types
-5. Takeaway: ingest and query share the embedding step; native model servers, containerized pipeline
+4. "Wired via environment variables": the compose file with model, embeddings, ChromaDB and app blocks, each with its variable
+5. Divider: "Learning Mode: watching the pipeline run"
+6. Learning Mode screenshot/mock: four live steps shown as the user types
+7. Takeaway: ingest and query share the embedding step; native model servers, containerized pipeline
 
 ---
 
@@ -184,8 +188,7 @@ Let's go build it.
 
 ### Suggested visuals / slide beats
 
-1. Recap slide: four callbacks (RAG's fix, four-part anatomy, librarian analogy, pipeline)
-2. Lab bridge slide: "Next — ingest Acme's runbooks, ask a real question"
+1. Closing slide: "Retrieve, then generate. Stay grounded." with the hand-off to the lab (ingest Acme's runbooks, ask a real question)
 
 ---
 
@@ -214,5 +217,6 @@ Let's go build it.
 
 ## Verification flags
 
+- The ChromaDB data volume mounts at `/data` in the Chroma 1.x image. Re-check this path if the pinned image changes.
 - ChromaDB version pin (1.5.9, server and client together) and the v1-routes-gone claim are software-version-dependent — re-verify if the lab's compose.yaml pins a different version at recording time.
 - Memory figures (ChromaDB, app, and total budget) depend on the actual container resource limits set in the lab's compose.yaml — re-verify against the current file before recording exact numbers.

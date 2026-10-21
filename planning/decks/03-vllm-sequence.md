@@ -5,7 +5,7 @@
      purpose + visual + takeaway. NO slide-count cap (§0): one idea per slide, every
      lesson concept gets a slide — the coverage table below is a hard gate. -->
 
-<!-- 2026-07-25 round-3 skeleton regen (ADDENDUM for original decks, .superpowers/sdd/deck-regen-contract.md):
+<!-- 2026-07-25 round-3 skeleton regen (ADDENDUM for original decks, sdd/deck-regen-contract.md):
      this deck was authored pre-coursesmith (03-vllm.html loaded reveal.js 4.6.1 + Patrick Hand
      from CDNs) and had NO sequence spec — this file is the first one, authored from the shipped
      deck as the approved coverage baseline. All 14 old slides carried real hand-drawn SVGs already
@@ -82,7 +82,7 @@ learner walks through before opening the lab. The visual language follows the Co
 whiteboard style contract (`templates/deck/whiteboard-style-guide.md`): Patrick Hand cursive,
 `#1e1e1e` primary / `#757575` secondary strokes on white paper with the five semantic pastel fills
 (§1: green good · red bad/full · blue data · orange caution · purple meta — this deck uses the
-neutral ink/gray palette throughout, no pastel fills), the `#rough` wobble filter on shapes only,
+neutral ink/gray palette throughout, no pastel fills), the `#rough` wobble filter on non-flat elements only,
 and the shared `#ah`/`#ahg` arrowhead markers. The arc moves — **the crowd problem with single-shot
 serving (Ollama) → the two engine tricks that fix it (continuous batching, PagedAttention) → the
 throughput payoff → the unchanged client contract → how to run it on this laptop (CPU track + the
@@ -100,7 +100,7 @@ learner can map deck ↔ lesson section at a glance.
 | 4 | Ollama is great — until the crowd arrives | The motivating problem: a single-slot server queues requests one at a time while slots could be idle | fan-out: a queue of waiting requests (R1–R4) feeding one single-slot server box, a clock signaling stalled throughput | Perfect for a developer at a laptop. Under concurrent load, finished slots sit idle and the queue backs up |
 | 5 | Continuous batching — never let a head sit idle | The core fix: token-level scheduling refills a finished slot mid-flight instead of waiting for the whole batch | two-panel comparison: static batch (idle slot, waits for laggard) vs continuous batch (mid-flight refill, no idle slots) | As soon as a sequence emits its final token and leaves, a waiting request takes its place — the single biggest reason vLLM wins under load |
 | 6 | PagedAttention — virtual memory for the KV cache | The memory trick that makes continuous batching affordable: page the KV cache like an OS pages RAM | two-panel comparison: naive reserved-contiguous-slab (60–80% wasted) vs paged on-demand allocation with a lookup table (<4% waste) | Near-zero memory waste means far more concurrent sequences fit — which is exactly what feeds continuous batching enough work to stay busy |
-| 7 | The payoff: roughly three times the throughput | Quantify the combined effect of both tricks on the same hardware | bar chart: naive server (1×) vs vLLM (3×) | Continuous batching + PagedAttention together give roughly three times the throughput of a naive server on the same hardware |
+| 7 | The payoff: roughly three times the throughput | Quantify the combined effect of both tricks on the same hardware; the three times shows up on a GPU, not on the CPU track the lab runs | bar chart: naive server (1×) vs vLLM (3×) | Continuous batching + PagedAttention together give roughly three times the throughput of a naive server on the same hardware |
 | 8 | **§2 divider** — Same contract, bigger engine | Opens lesson §2 | — (divider) | — |
 | 9 | Same contract, bigger engine | The M2 payoff: the client speaks to the `/v1` contract, not the engine — swapping engines is a config change | hub-and-spoke: one client → `/v1` contract socket → branches to Ollama (:11434, dev) and vLLM (:8009, production) | Swapping Ollama for vLLM is a one-line change — point OPENAI_BASE_URL at the new address. No code, no SDK, no image change |
 | 10 | **§3 divider** — The CPU track (what you'll run) | Opens lesson §3 | — (divider) | — |
@@ -109,15 +109,17 @@ learner can map deck ↔ lesson section at a glance.
 | 13 | CPU tuning knobs that keep the laptop usable | The environment dials that keep the machine usable: thread caps, KV cache size, single-threaded BLAS | big-box anatomy: four boxes — `OMP_NUM_THREADS`, `VLLM_CPU_KVCACHE_SPACE`, `OPENBLAS/MKL=1`, "why leave cores free" | Multi-threaded BLAS and multi-threaded OpenMP thrash the cache and slow everything down — keep BLAS at one thread |
 | 14 | **§4 divider** — The GPU track (throughput — documented, not run here) | Opens lesson §4 | — (divider) | — |
 | 15 | CPU track vs GPU track | Compare the two tracks side by side across image, hardware, GPU enablement, shared memory, and goal — mirrors lesson §4's own 5-row table | two-panel comparison table: CPU track (this module) vs GPU track (production) | Both speak the identical /v1 contract — your M2 client wouldn't change moving from CPU to GPU |
-| 16 | **§5 divider** — Quantization in practice | Opens lesson §5 | — (divider) | — |
-| 17 | Quantization — trade a little precision for a lot of room | Compare the three quantization formats by bits, best use, and trade-off, using the JPEG-compression analogy | big-box anatomy: three format boxes — AWQ 4-bit, GPTQ 4-bit, FP8 8-bit, each with best-for + trade-off | Rule of thumb: 4-bit AWQ roughly quarters VRAM vs FP16 for a small accuracy cost — often how a 7B model fits a consumer 8 GB card |
-| 18 | **§6 divider** — Operational gotchas | Opens lesson §6 | — (divider) | — |
-| 19 | GPU operational gotchas | Name the two flags and one sizing rule that separate a working GPU server from cryptic crashes — the deck's closest anchor to lesson §6's gotcha recap (see coverage caveat above) | big-box anatomy: three boxes — `--gpus all` (NVIDIA Container Toolkit), `--ipc=host` (shared memory), VRAM sizing (7B model ≈14GB + headroom) | --max-model-len and --max-num-seqs cap KV-cache size and concurrency — the usual dials to fit memory (narration-only; not drawn on this slide, see coverage caveat) |
-| 20 | Same socket. Bigger engine. (closing) | Hand off to the lab: build the patched image, serve SmolLM2, point the unchanged M2 client at it | pipeline: Build → Serve → Point client, three boxes with arrows | credit + lab hand-off: Next — Lab: Serve SmolLM2 on CPU vLLM · Gourav Shah · School of DevOps & AI |
+| 16 | A GPU launch is one docker run | Show the one representative GPU launch command from lesson §4, read-only in the lab | code-in-a-box: the `docker run --gpus all --ipc=host -p 8000:8000 vllm/vllm-openai:latest --model mistralai/Mistral-7B-Instruct-v0.3` command with three gray captions (GPU, shared memory, port) | The GPU launch is one command, and the M2 client talks to it unchanged |
+| 17 | **§5 divider** — Quantization in practice | Opens lesson §5 | — (divider) | — |
+| 18 | Quantization — trade a little precision for a lot of room | Compare the three quantization formats by bits, best use, and trade-off, using the JPEG-compression analogy | big-box anatomy: three format boxes — AWQ 4-bit, GPTQ 4-bit, FP8 8-bit, each with best-for + trade-off | Rule of thumb: 4-bit AWQ roughly quarters VRAM vs FP16 for a small accuracy cost — often how a 7B model fits a consumer 8 GB card |
+| 19 | **§6 divider** — Operational gotchas | Opens lesson §6 | — (divider) | — |
+| 20 | GPU gotchas: toolkit, ipc, VRAM | Name the two flags and one sizing rule that separate a working GPU server from cryptic crashes — the GPU half of lesson §6 (the CPU half is slide 21) | big-box anatomy: three boxes — `--gpus all` (NVIDIA Container Toolkit), `--ipc=host` (shared memory), VRAM sizing (7B model ≈14GB + headroom) | The GPU needs three things: the toolkit, shared memory, and enough VRAM |
+| 21 | CPU gotchas: two flags, a patch, a wait | Cover lesson §6 bullets on `--max-model-len`, `--max-num-seqs` (OOM fix: drop one), the NUMA patch that is not optional, and the slow first run | big-box anatomy: four boxes, one per gotcha, each with a gray fix line | Most CPU failures are memory sizing or the missing patch, and a slow first run is not a hang |
+| 22 | Same socket. Bigger engine. (closing) | Hand off to the lab: build the patched image, serve SmolLM2, point the unchanged M2 client at it | pipeline: Build → Serve → Point client, three boxes with arrows | credit + lab hand-off: Next — Lab: Serve SmolLM2 on CPU vLLM · Gourav Shah · School of DevOps & AI |
 
-<!-- Visual pattern vocabulary used: title scene (1) · numbered rows (2) · dividers (3, 8, 10, 14, 16, 18)
+<!-- Visual pattern vocabulary used: title scene (1) · numbered rows (2) · dividers (3, 8, 10, 14, 17, 19)
      · fan-out (4) · two-panel comparison (5, 6, 12, 15) · bar chart (7) · hub-and-spoke (9) ·
-     big-box anatomy (11, 13, 17, 19) · pipeline (20). -->
+     big-box anatomy (11, 13, 18, 20, 21) · code-in-a-box (16) · pipeline (22). -->
 
 ## Subtitle table (≤10 words / ≤60 chars, short anchoring phrase — style-guide §0)
 
@@ -128,23 +130,25 @@ learner can map deck ↔ lesson section at a glance.
 | 4 | One espresso shot at a time | 6 | 27 |
 | 5 | A finished slot refills mid-flight | 5 | 34 |
 | 6 | Paging the KV cache like your OS pages RAM | 9 | 42 |
-| 7 | Same hardware, heads never idle | 5 | 31 |
+| 7 | On a GPU: same hardware, heads never idle | 8 | 41 |
 | 9 | The wall socket idea from M2, again | 7 | 35 |
 | 11 | No GPU passthrough — slow on purpose | 7 | 36 |
 | 12 | The container can't see the floor plan | 7 | 38 |
 | 13 | A few dials, not all your cores | 7 | 31 |
 | 15 | Learn here, scale on an NVIDIA box | 7 | 34 |
-| 17 | Like a JPEG, but for model weights | 7 | 34 |
-| 19 | Two flags, one sizing rule | 5 | 26 |
-| 20 | Serve SmolLM2 on CPU vLLM, same /v1 API | 8 | 39 |
+| 16 | Read-only here: the command for a Linux GPU box | 10 | 48 |
+| 18 | Like a JPEG, but for model weights | 7 | 34 |
+| 20 | Two flags, one sizing rule | 5 | 26 |
+| 21 | What goes wrong on a laptop, and the fix | 9 | 40 |
+| 22 | Serve SmolLM2 on CPU vLLM, same /v1 API | 8 | 39 |
 
-Dividers (3, 8, 10, 14, 16, 18) carry no subtitle by design (style-guide §3a: title-only, no
-subtitle/kicker/svg). All 14 content-slide subtitles pass the ≤60-char target with margin; none
+Dividers (3, 8, 10, 14, 17, 19) carry no subtitle by design (style-guide §3a: title-only, no
+subtitle/kicker/svg). All 16 content-slide subtitles pass the ≤60-char target with margin; none
 approach the 80-char hard fail.
 
 ## Recommended presentation order
 
-Present strictly 1 → 20; each slide's vocabulary is used by the next. Open on slide 1 to set the
+Present strictly 1 → 22; each slide's vocabulary is used by the next. Open on slide 1 to set the
 café framing, move through 2 (the roadmap), then the §1 divider opens the throughput story proper.
 Don't over-explain slide 4's queue picture, it's intuitive. **Slides 5 and 6 are the conceptual
 hinge of the whole deck** — continuous batching and PagedAttention are the two mechanisms
@@ -153,10 +157,10 @@ moving on; slide 7's payoff bar chart is the fast reward right after. The §2 di
 (same contract) is a callback to M2 — say it plainly, it should feel obvious once shown. The §3
 divider opens one continuous CPU-track build-up across slides 11–13 (why CPU → the NUMA crash →
 the tuning knobs) — keep momentum across the three, with slide 12 (the NUMA patch) as the single
-most memorable teaching point in the module; don't rush it. The §4 divider + slide 15 is a quick
-GPU-track comparison beat before the §5 divider + slide 17 covers quantization at a similar brisk
-pace (documented, not run). The §6 divider + slide 19 closes the "documented, not run" arc with the
-gotchas recap before handing off to the lab on slide 20. Under time pressure, compress 15/17/19 to
+most memorable teaching point in the module; don't rush it. The §4 divider + slides 15 and 16 are a quick
+GPU-track comparison and launch-command beat before the §5 divider + slide 18 covers quantization at a similar brisk
+pace (documented, not run). The §6 divider + slides 20 and 21 close with the gotchas (GPU half, then the CPU half the
+lab hits) before handing off to the lab on slide 22. Under time pressure, compress 15/16/18/20 to
 a single pass each — never compress 5, 6, or 12.
 
 ## Fragment map
@@ -165,8 +169,8 @@ This deck has no hop-by-hop build-ups — every content slide is a static compar
 fan-out, or pipeline diagram that reads better whole, and divider slides are title-only (nothing to
 fragment). No fragments are used.
 
-Static slides (1, 2, 4, 5, 6, 7, 9, 11, 12, 13, 15, 17, 19, 20) show the full picture at once.
-Divider slides (3, 8, 10, 14, 16, 18) are title-only by definition.
+Static slides (1, 2, 4, 5, 6, 7, 9, 11, 12, 13, 15, 16, 18, 20, 21, 22) show the full picture at once.
+Divider slides (3, 8, 10, 14, 17, 19) are title-only by definition.
 
 ## Coverage check (HARD GATE — §0)
 
@@ -188,19 +192,20 @@ Every lesson section/concept maps to a slide, IN LESSON ORDER. No orphans.
 | §3 — why containers report 0 NUMA nodes, division-by-zero crash, the sed patch | 12 | Two-panel: host NUMA floor plan vs container apartment, arrow to patch |
 | §3 — CPU tuning knobs: OMP_NUM_THREADS, VLLM_CPU_KVCACHE_SPACE, single-threaded BLAS | 13 | Big-box anatomy: four env-var boxes |
 | **§4 divider** | 14 | Title-only, verbatim lesson header |
-| §4 — GPU track: image, hardware, NVIDIA Container Toolkit, --ipc=host, VRAM sizing | 15 | Comparison table mirrors lesson §4's own 5-row table exactly (reordered from the original deck to sit as §4's sole, self-sufficient anchor — see regen note above) |
-| **§5 divider** | 16 | Title-only, verbatim lesson header |
-| §5 — quantization: AWQ, GPTQ, FP8 — bits, best-for, trade-off | 17 | Big-box anatomy: three format boxes (moved earlier, ahead of the gotchas slide, to match lesson order) |
-| **§6 divider** | 18 | Title-only, verbatim lesson header |
-| §6 — operational gotchas: --ipc=host (GPU), VRAM/RAM sizing | 19 | Folded via shared facts with slide 15/§4 (see coverage caveat in the regen note above: `--max-model-len`, `--max-num-seqs`, "first run is slow" are lesson-only, not drawn on any slide — pre-existing gap, not introduced by this pass) |
-| Lab hand-off — build patched image, serve SmolLM2, point client | 20 | Pipeline: Build → Serve → Point client |
+| §4 — GPU track: image, hardware, NVIDIA Container Toolkit, --ipc=host, VRAM sizing | 15, 16 | Comparison table mirrors lesson §4's own 5-row table exactly (reordered from the original deck to sit as §4's sole, self-sufficient anchor — see regen note above) |
+| **§5 divider** | 17 | Title-only, verbatim lesson header |
+| §5 — quantization: AWQ, GPTQ, FP8 — bits, best-for, trade-off | 18 | Big-box anatomy: three format boxes (moved earlier, ahead of the gotchas slide, to match lesson order) |
+| **§6 divider** | 19 | Title-only, verbatim lesson header |
+| §6 — operational gotchas: --ipc=host (GPU), VRAM/RAM sizing | 20 | GPU half of §6, shares facts with slide 15 |
+| §6 — operational gotchas: --max-model-len, --max-num-seqs, OOM fix, NUMA patch not optional, slow first run | 21 | Four-box slide, one per gotcha. Added 2026-10-21 (closes the old coverage caveat) |
+| Lab hand-off — build patched image, serve SmolLM2, point client | 22 | Pipeline: Build → Serve → Point client |
 
 **No orphans.** Every lesson section (§1–§6) has its own divider (in lesson order 1→6) plus at
 least one content-slide anchor, and the roadmap intro / closing lab hand-off are covered by slides
-2 and 20 respectively. The Summary table at the end of the lesson is a recap of concepts already
-covered by slides 1–19 and is not a separate slide anchor. One caveat carried forward explicitly
-(not silently dropped): §6's `--max-model-len`/`--max-num-seqs`/"first run is slow" facts have no
-dedicated on-slide visual in this 20-slide deck — see the regen note's "COVERAGE CAVEAT" above.
+2 and 22 respectively. The Summary table at the end of the lesson is a recap of concepts already
+covered by slides 1–21 and is narration-only (Video 6), not a separate slide anchor. The 2026-10-21
+fix pass added slide 16 (GPU launch command, lesson §4) and slide 21 (CPU gotchas, lesson §6), which
+closes the old coverage caveat.
 
 <!-- 2026-08-14 narration + rough-filter fix + illustration pass:
 

@@ -9,7 +9,8 @@
 | 3 | The OpenAI-Compatible Contract — One URL, Any Engine | Slides + voiceover | 5 min | Two endpoints are the entire contract every engine speaks |
 | 4 | GGUF and Model Sizing — Picking a Model That Fits Your Laptop | Slides + voiceover | 4 min | Quantization and a simple RAM budgeting rule |
 | 5 | Two Wiring Patterns — Native Model vs Model in a Container | Slides + voiceover | 5 min | Same app code, one environment variable, Mac vs GPU host |
-| 6 | Module 2 Summary — Into the Lab | Talking head / Slides | 2 min | What you now know, and what the lab proves |
+| 6 | Reasoning Models — Why Thinking Eats Your Token Budget | Slides + voiceover | 2 min | Thinking tokens count against `max_tokens`; switch thinking off per API |
+| 7 | Module 2 Summary — Into the Lab | Talking head / Slides | 2 min | What you now know, and what the lab proves |
 
 ---
 
@@ -27,15 +28,13 @@ Now here's the question this module answers. What happens when you want to chang
 
 Well, the answer is no, and that's the whole point of this module. You're going to meet four open-source ways to serve a model, Docker Model Runner, Ollama, llama.cpp, and LocalAI, and you'll see that every single one of them, no matter how different on the inside, exposes the exact same interface to the outside. That is what we call the OpenAI-compatible contract, and it's the one idea that makes the rest of this course click. The Docs Assistant you build in Module 5, the Support Agent in Module 6, and the Incident Crew in Module 7 all talk to that same contract, never to a specific engine.
 
-By the end of this module, you will know which engine to reach for and why, you will understand the two endpoints that make up that contract, and you will know how to size a model to your own laptop's memory. Then in the lab, you'll containerize a client that speaks this contract for real. Let's get started.
+By the end of this module, you will know which engine to reach for and why, you will understand the two endpoints that make up that contract, and you will know how to size a model to your own laptop's memory. You will also learn how to switch off a reasoning model's thinking, so the token budget goes to the answer. Then in the lab, you'll containerize a client that speaks this contract for real. Let's get started.
 
 ### Suggested visuals / slide beats
 
-1. Title slide: Module 2, "Serving Local Models"
-2. Recap beat: M1's container talking to a native model over HTTP
-3. The four-engine lineup (Docker Model Runner, Ollama, llama.cpp, LocalAI) as silhouettes behind one shared plug/socket icon
-4. Preview of what M5/M6/M7 build on top of this contract
-5. Closing: "What you'll be able to do" capability line
+1. Title slide: Ollama, llama.cpp, and LocalAI feed one `/v1` socket, and the app plugs in (slide 1)
+2. What you'll learn: six numbered objectives, the last one is switching thinking off (slide 2)
+3. The M1 recap and the M5/M6/M7 preview are spoken only
 
 ---
 
@@ -51,9 +50,9 @@ Let's say you want to serve a model with the least possible setup. If you alread
 
 Now, one word of caution here. `ai/gpt-oss` is a twenty billion parameter model, so you would only want to run that particular one on a machine with plenty of RAM. On our sixteen gigabyte reference laptop, you'd stick with the smaller models we'll get to in a few minutes.
 
-So if Docker Model Runner is this easy, why does this course spend the rest of its time on other engines? Here's the reason. This course is built to be runtime-agnostic, meaning the patterns you learn should work the same way whether you're on Docker, Rancher Desktop, Podman, bare Linux, or Windows with WSL2. Docker Model Runner is good to know and worth using if your team already lives inside Docker's toolchain, but it ties you to one specific tool. The three engines we'll actually wire up in the labs don't have that limitation.
+So if Docker Model Runner is this easy, why does this course spend the rest of its time on other engines? Here's the reason. This course is built to be runtime-agnostic, meaning the patterns you learn should work the same way whether you're on Docker, Rancher Desktop, Podman, bare Linux, or Windows with WSL2. Docker Model Runner is good to know and worth using if your team already lives inside Docker's toolchain. It is open source, but it runs only on Docker Desktop and Docker CE. The three engines we'll actually wire up in the labs don't have that limitation.
 
-Let's now look at those three engines, and think of them as different brands of espresso machine. There's La Marzocco, there's Breville, there's DeLonghi. Each one is built completely differently on the inside, one uses a thermoblock, another uses a boiler, and each has its own pressure profile and its own control system. But here's the thing, they all pour into the same standard cup. And that cup, in our world, is the OpenAI API. You can swap the machine sitting under the counter, and no barista needs to be retrained.
+Let's now look at those three engines, and think of them as different brands of espresso machine. There's La Marzocco, there's Breville, there's DeLonghi. Each one is built completely differently on the inside, one uses a thermoblock, another uses a boiler, and each has its own pressure profile and its own control system. But they all pour into the same standard cup. And that cup, in our world, is the OpenAI API. You can swap the machine sitting under the counter, and no barista needs to be retrained.
 
 The first one is Ollama, and this is the engine you already have running from Module 1. It's serving `qwen3.5:2b` on Metal, on port eleven four three four, and it's the de-facto standard for local development. On a Mac, since Ollama zero point forty, it runs the model on the MLX engine by default, and you can see that in the runner column of `ollama ps`. Everywhere else it uses llama.cpp. It runs in a container too, though on Mac there are some caveats we covered last module.
 
@@ -65,14 +64,12 @@ There's a fourth engine coming in Module 3, called vLLM, and that one is built f
 
 ### Suggested visuals / slide beats
 
-1. Divider: "Four ways to serve a model"
-2. Docker Model Runner: one-command demo, `docker model run ai/gpt-oss`, RAM-size warning callout
-3. Espresso-machine analogy diagram: three machines, one shared cup labeled "OpenAI API"
-4. Engine comparison table: Ollama / llama.cpp / LocalAI — best-for, container-ready, notes
-5. Ollama highlighted as "already running from M1", pointing at `:11434`
-6. Fan-out diagram: llama.cpp as the engine inside Ollama
-7. LocalAI as a hub routing to multiple backends
-8. Preview strip: vLLM arriving in Module 3
+1. Divider 1: a hand pressing one big button, a box sliding out of a slot (slide 3)
+2. Docker Model Runner: `docker model run` with "ai/gpt-oss · 20B, too big for 16 GB", three result boxes: pulls weights, serves locally, same `/v1` API (slide 4)
+3. Divider 2: three espresso machines pouring into identical cups (slide 5)
+4. Espresso-machine analogy diagram: Ollama ("dev standard, MLX on Mac"), llama.cpp, LocalAI, one shared cup labeled "OpenAI API" (slide 6)
+5. Engine table: Ollama / llama.cpp / LocalAI with best-fit job; Ollama row notes the MLX engine on Apple Silicon from 0.40 (slide 7)
+6. llama.cpp inside Ollama, LocalAI's backends, and the vLLM preview are spoken only
 
 ---
 
@@ -84,7 +81,9 @@ There's a fourth engine coming in Module 3, called vLLM, and that one is built f
 
 ### Narration script
 
-Let's extend an analogy from Module 1. Different countries wire their power plants completely differently, some burn coal, some run on hydro, some on nuclear, but a standard wall socket always delivers power the same way. You plug in your charger, and the charger doesn't know or care what's generating the electricity behind that wall.
+First, the problem. Without a shared contract, your app would have to know every engine. Engine A has its own SDK and its own URL. Engine B has another SDK and another URL. Engine C has yet another one. That is custom glue for each engine, and three different ways for your app to break.
+
+So let's extend an analogy from Module 1. Different countries wire their power plants completely differently, some burn coal, some run on hydro, some on nuclear, but a standard wall socket always delivers power the same way. You plug in your charger, and the charger doesn't know or care what's generating the electricity behind that wall.
 
 You already saw in Module 1 that Ollama exposes an endpoint called `/v1/chat/completions`. And here's what makes this genuinely useful: every single engine in that table we just walked through, Docker Model Runner, Ollama, llama.cpp, and LocalAI, exposes that exact same interface.
 
@@ -94,15 +93,15 @@ Now here's the part that matters most for how you build. Your application code c
 
 Picture the diagram this way: your app, whether that's Python, curl, or LangChain, talks to the contract, and the contract is the only thing your app knows about. Behind that contract, Ollama, vLLM, LocalAI, and llama.cpp all sit as interchangeable options. Which one actually answers the call is a deployment decision, not a code decision.
 
-And this is genuinely the one idea that makes the rest of this course click. The Acme Docs Assistant you'll build in Module 5, the Support Agent in Module 6, and the Incident Crew in Module 7 all speak this exact same contract. So when your team decides to move from a small one-and-a-half billion parameter model used for development to a much larger thirteen billion parameter model in production, the application code does not change at all. Not one line.
+And this is genuinely the one idea that makes the rest of this course click. The Acme Docs Assistant you'll build in Module 5, the Support Agent in Module 6, and the Incident Crew in Module 7 all speak this exact same contract. So when your team decides to move from a small two billion parameter model used for development to a much larger thirteen billion parameter model in production, the application code does not change at all. Not one line.
 
 ### Suggested visuals / slide beats
 
-1. Wall-socket analogy diagram: different power plants, one standard socket
-2. Two-endpoint card: `POST /v1/chat/completions` and `GET /v1/models`
-3. Environment-variable swap, three rows: dev (Ollama/host.docker.internal), staging (LocalAI/Compose), production (vLLM/GPU VM)
-4. The mermaid-style fan diagram: App → Contract → {Ollama, vLLM, LocalAI, llama.cpp}
-5. Payoff callout: "2B dev model → 13B prod model, zero code change"
+1. Divider 3: a coal plant, a dam, and wind turbines feeding one wall socket (slide 8)
+2. The problem: your app wired by dashed custom glue to Engine A, B, and C, each with its own SDK and URL (slide 9)
+3. Wall socket: Ollama, vLLM, LocalAI behind one `/v1` socket, labeled `POST /chat/completions` and `GET /models`, app code never changes (slide 10)
+4. One variable: `OPENAI_BASE_URL` fans out to DEV (Ollama, native Mac), STAGING (LocalAI, Compose), PRODUCTION (vLLM, GPU VM) (slide 11)
+5. The 2B to 13B payoff is spoken only
 
 ---
 
@@ -120,18 +119,16 @@ Most Ollama tags are GGUF files at roughly what's called Q4_K_M quantization, an
 
 Now, here's a practical rule that saves you a lot of guessing. For a Q4 GGUF model, take the parameter count and multiply it into zero point six, and that gives you roughly the RAM usage. The rule does not apply to MLX builds like `qwen3.5:2b`. So a seven billion parameter model would cost you roughly four gigabytes. If you're on sixteen gigabytes of unified memory, and you reserve about eight gigabytes for the OS and your app containers, you're left with somewhere around four to five gigabytes for the model itself.
 
-So what actually fits in that budget? `qwen3.5:2b` costs about three gigabytes, and that's what we've already pulled for the labs, it keeps iteration fast and the machine responsive. `qwen3:4b` costs about two and a half gigabytes and gives you better reasoning while still staying fast, that's a reasonable optional upgrade. Beyond the labs, Qwen3 in the four to eight billion range, Llama 3.2 at three billion, or Mistral 7B are all worth knowing, they're strong, general-purpose choices once you have the RAM to spare. And that twenty billion parameter `gpt-oss` model from the Docker Model Runner demo, that one is simply too big for sixteen gigabytes, it's really a demo-only model on this machine.
+So what actually fits in that budget? `qwen3.5:2b` costs about three gigabytes, and that's what we've already pulled for the labs, it keeps iteration fast and the machine responsive. `qwen3:4b` costs about two and a half gigabytes, and it is optional, not a drop-in swap. The build we tested ignores think false and prints its reasoning inline, and that breaks the labs that expect a short answer. Beyond the labs, Qwen3 in the four to eight billion range, Llama 3.2 at three billion, or Mistral 7B are all worth knowing, they're strong, general-purpose choices once you have the RAM to spare. And that twenty billion parameter `gpt-oss` model from the Docker Model Runner demo, that one is simply too big for sixteen gigabytes, it's really a demo-only model on this machine.
 
 For every lab in this course, you'll stay with `qwen3.5:2b`. The model-selection decision gets a lot more interesting in Module 3, once you're serving a model with vLLM and actually have to weigh throughput against model size.
 
 ### Suggested visuals / slide beats
 
-1. RAW vs JPEG compression analogy, side by side
-2. GGUF definition card: compact, quantized format for llama.cpp/Ollama, no CUDA needed
-3. Sizing formula: parameters × 0.6 ≈ RAM at Q4, worked example at 7B → ~4GB
-4. 16GB laptop budget bar: 8GB OS/containers, 4-5GB model
-5. Model options table: qwen3.5:2b, qwen3:4b, Qwen3, Llama 3.2, Mistral 7B, gpt-oss (too big, crossed out for this machine)
-6. Callout: "qwen3.5:2b for every lab in this course"
+1. Divider 4: a huge print and a compact print of the same photo (slide 12)
+2. GGUF pipeline: float16 RAW box, "quantize Q4_K_M" arrow, small GGUF box, and the sizing-rule box "params × 0.6 ≈ GB of RAM, 7B ≈ 4 GB at Q4"; footnote: `qwen3.5:2b` on a Mac is an MLX mxfp8 build, 3.1 GB, so the rule does not apply (slide 13)
+3. Model table, six rows: `qwen3.5:2b` (green, labs default), `qwen3:4b` (optional, not a drop-in), Qwen3 4B-8B, Llama 3.2 3B, Mistral 7B, gpt-oss 20B (red, too big for 16 GB) (slide 14)
+4. The 16 GB budget split (8 GB for the OS and containers, 4 to 5 GB for the model) is spoken only
 
 ---
 
@@ -155,14 +152,37 @@ And that's really the payoff of this whole universal contract we've been buildin
 
 ### Suggested visuals / slide beats
 
-1. Pattern A diagram: Ollama (native, Metal) ← host.docker.internal ← App container, labeled "Mac"
-2. Pattern B diagram: Ollama (container, NVIDIA passthrough) ← Compose network (`ollama`) ← App container, labeled "Windows/Linux"
-3. Side-by-side: identical app code, one `OPENAI_BASE_URL` value swapped
-4. "Build once, drop onto a GPU VM" closing visual
+1. Divider 5: one pipe splitting into a Y-fork, one branch to a laptop, the other to a server rack (slide 15)
+2. Two panels on one slide: Pattern A · Mac (app container to native Ollama on the Metal GPU over `host.docker.internal:11434`) and Pattern B · GPU host (app container to an Ollama container on an NVIDIA GPU over `ollama:11434` on the Compose network) (slide 16)
+3. The `OPENAI_BASE_URL` values and "build once" are spoken only
 
 ---
 
-## Video 6: Module 2 Summary — Into the Lab
+## Video 6: Reasoning Models — Why Thinking Eats Your Token Budget
+
+**Format:** Slides + voiceover
+**Estimated duration:** 2 minutes
+**Learning objective:** By the end, learners can explain why a reasoning model can return an empty answer, and can switch its thinking off on each API the course uses.
+
+### Narration script
+
+Our model, `qwen3.5:2b`, is a reasoning model, so it writes hidden thinking tokens before it answers. Those tokens count against `max_tokens`, the limit on how long the reply can be. With a budget of four thousand ninety-six tokens, the model spent four thousand and eighty on thinking, and the content came back empty. With `reasoning_effort` set to none, the same question came back in just eleven tokens.
+
+Think of a student who works the problem on scratch paper that is never handed in, but the answer sheet has only so many lines. If the scratch work fills every line, the answer box stays empty.
+
+The switch depends on the API: `think` set to false on Ollama's native APIs, `reasoning_effort` set to none on the `/v1` endpoint, and `reasoning` set to False in langchain-ollama. Two other options look right but fail on this model: `/no_think` in the prompt, and `PARAMETER think` in a Modelfile.
+
+Every lab in this course switches thinking off, so the token budget goes to the answer. For really hard tasks, like multi-step planning or debugging, leave thinking on and give it a generous `max_tokens`.
+
+### Suggested visuals / slide beats
+
+1. Thinking tokens: the same request with a 4,096-token budget; the default lane fills with "thinking: 4,080 tokens" and returns `content: ""`, the `"reasoning_effort": "none"` lane returns a short answer in 11 tokens (slide 17)
+2. Analogy: two exam answer sheets; thinking on, scratch work fills every line and the answer box is empty; thinking off, the scratch paper stays on the desk and the answer is written (slide 18)
+3. Switch per API: native `"think": false`, `/v1` `"reasoning_effort": "none"`, langchain-ollama `reasoning=False`, plus two crossed-out boxes that fail: `/no_think` and Modelfile `PARAMETER think` (slide 19)
+
+---
+
+## Video 7: Module 2 Summary — Into the Lab
 
 **Format:** Talking head / Slides
 **Estimated duration:** 2 minutes
@@ -170,7 +190,7 @@ And that's really the payoff of this whole universal contract we've been buildin
 
 ### Narration script
 
-So let's bring this together. You now know four ways to serve a model, Docker Model Runner for the fastest possible demo, and Ollama, llama.cpp, and LocalAI as the runtime-agnostic engines this course actually builds on. You know that every one of them speaks the same two-endpoint contract, `/v1/chat/completions` and `/v1/models`, and that swapping engines is a one-variable change, never a code change. You know what GGUF and quantization actually are, and you have a simple rule, parameters into zero point six, for sizing a model to your own machine. And you know the two wiring patterns, native model on a Mac, containerized model on Windows or Linux, with `OPENAI_BASE_URL` as the one thing that ever changes between them.
+So let's bring this together. You now know four ways to serve a model, Docker Model Runner for the fastest possible demo, and Ollama, llama.cpp, and LocalAI as the runtime-agnostic engines this course actually builds on. You know that every one of them speaks the same two-endpoint contract, `/v1/chat/completions` and `/v1/models`, and that swapping engines is a one-variable change, never a code change. You know what GGUF and quantization actually are, and you have a simple rule, parameters into zero point six, for sizing a model to your own machine. And you know the two wiring patterns, native model on a Mac, containerized model on Windows or Linux, with `OPENAI_BASE_URL` as the one thing that ever changes between them. Finally, you know that `qwen3.5:2b` thinks by default, so every lab switches thinking off, with `reasoning_effort` set to none on the `/v1` endpoint.
 
 In the lab that follows, you're going to containerize a client that speaks this exact contract, and you'll prove for yourself that the same client code works whether it's calling a native Ollama process or, later on, a fully containerized engine. That's the hands-on proof behind everything we just covered.
 
@@ -178,9 +198,8 @@ I'll see you in the lab.
 
 ### Suggested visuals / slide beats
 
-1. Recap grid: the four engines, the two-endpoint contract, the sizing rule, the two wiring patterns
-2. "OPENAI_BASE_URL is the only thing that changes" closing callout
-3. Lab bridge: "Next up — Lab: containerize a client for the /v1 contract"
+1. Closing slide: "The engine is a deployment choice, not a code choice"; any engine and any hardware plug into the `/v1` contract, and the app is plugged in once, never rewired; credit line hands off to the Serving lab (slide 20)
+2. The recap itself is spoken only; the deck has no recap grid
 
 ---
 
@@ -207,8 +226,14 @@ I'll see you in the lab.
 | `host.docker.internal` vs `ollama` Compose hostname | Video 5 | Explained |
 | `OPENAI_BASE_URL` as the single switch | Video 5 | Explained |
 | Build-once-deploy-anywhere payoff | Video 5 | Explained |
-| Summary table (all six rows) | Video 6 | Recapped |
-| Lab bridge: containerize a client for the contract | Video 1, Video 6 | Explained |
+| Reasoning models: thinking tokens count against `max_tokens` (4,080 tokens, empty content) | Video 6 | Explained |
+| Scratch-paper analogy | Video 6 | Explained |
+| Switch-off per API: `think: false`, `reasoning_effort: "none"`, `reasoning=False` | Video 6 | Explained |
+| What does not work: `/no_think`, Modelfile `PARAMETER think` | Video 6 | Explained |
+| Ollama runs the MLX engine on Apple Silicon (0.40+) | Video 2 | Explained |
+| The problem: one custom SDK per engine (deck slide 9) | Video 3 | Explained |
+| Summary table (all seven rows) | Video 7 | Recapped |
+| Lab bridge: containerize a client for the contract | Video 1, Video 7 | Explained |
 
 ## Verification flags
 

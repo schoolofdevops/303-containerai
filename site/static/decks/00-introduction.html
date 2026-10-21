@@ -177,12 +177,12 @@ footer, header, hgroup, main, menu, nav, section {
 <section>
   <h2 class="t">Container-native, not Docker-native</h2>
   <p class="s">Docker Desktop now costs money for large orgs — we use the open standard.</p>
-  <svg viewBox="0 0 1100 400" role="img" aria-label="Docker-proprietary tools on the left replaced by open-source universal tools on the right">
-    <!-- left: proprietary (dashed = the thing we leave behind) -->
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Docker-specific tools on the left replaced by open-source universal tools on the right">
+    <!-- left: Docker-specific (dashed = the thing we leave behind) -->
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4" stroke-dasharray="9 7" stroke-linecap="round">
       <rect x="60" y="60" width="360" height="300" rx="12"/>
     </g>
-    <text x="240" y="95" text-anchor="middle" class="lbl-g" style="font-size:19px">Docker-proprietary (2025)</text>
+    <text x="240" y="95" text-anchor="middle" class="lbl-g" style="font-size:19px">Docker-specific (2025)</text>
     <g fill="var(--gray)" font-size="18px" text-anchor="start">
       <text x="95" y="145">Docker Desktop (paid)</text>
       <text x="95" y="190">Docker Model Runner</text>
@@ -191,7 +191,7 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="95" y="325">Docker Offload (GPU)</text>
     </g>
 
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
       <path d="M445,210 L640,210" marker-end="url(#ah)"/>
     </g>
     <text x="542" y="196" text-anchor="middle" class="lbl-g">swap for</text>
@@ -298,7 +298,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- ============ SLIDE 7 — THE BUILD LADDER ============ -->
 <section>
   <h2 class="t">The build ladder — one step per module</h2>
-  <p class="s">Each module adds exactly one rung to the same growing system.</p>
+  <p class="s">Each module adds one step to the same growing system.</p>
   <svg viewBox="0 0 1100 430" role="img" aria-label="Modules M1 through M8 and a capstone, each building one step">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
       <rect x="60"  y="40"  width="470" height="46" rx="8"/>
@@ -324,14 +324,14 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="550" y="303" text-anchor="middle" class="lbl-b">Capstone · The platform shipped end-to-end</text>
     <text x="285" y="360" text-anchor="middle" class="lbl-g">← DAY 1 · Serve &amp; Package</text>
     <text x="805" y="360" text-anchor="middle" class="lbl-g">DAY 2 · RAG → Agentic → Ship →</text>
-    <text x="550" y="400" text-anchor="middle" class="lbl-g">M3B (optional) · LoRA/QLoRA fine-tuning — a bonus rung</text>
+    <text x="550" y="400" text-anchor="middle" class="lbl-g">M3B (optional) · LoRA/QLoRA fine-tuning — a bonus step</text>
   </svg>
   <div class="pageno">07</div>
 </section>
 
 <!-- ============ SLIDE 8 — THE GPU CONSTRAINT ============ -->
 <section>
-  <h2 class="t">The one constraint that shapes every lab</h2>
+  <h2 class="t">The one constraint behind every lab</h2>
   <p class="s">Apple Silicon can't pass its GPU into a container — so we wire around it.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="On Mac the model server runs native while the app, agent, tools and vector DB run in a container connecting over host.docker.internal">
     <!-- host machine boundary -->
@@ -366,7 +366,7 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="915" y="286">Vector DB</text>
     </g>
 
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
       <path d="M615,225 L425,225" marker-end="url(#ah)"/>
     </g>
     <text x="520" y="210" text-anchor="middle" class="lbl-g">host.docker.internal</text>
@@ -438,7 +438,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <g class="lbl-sm" text-anchor="middle">
       <text x="225" y="215" class="lbl">Small models</text>
-      <text x="225" y="250">1B–4B, Q4 quantized</text>
+      <text x="225" y="250">1B–4B, quantized</text>
       <text x="225" y="280">discussed big,</text>
       <text x="225" y="305">required small</text>
 
@@ -588,7 +588,7 @@ footer, header, hgroup, main, menu, nav, section {
 <section>
   <p class="kicker">LET'S BUILD</p>
   <h2 class="t" style="font-size:2.4em">Build it once. Run it anywhere.</h2>
-  <p class="s" style="font-size:1.15em">Container-native, not Docker-native — the open standard is the through-line.</p>
+  <p class="s" style="font-size:1.15em">Container-native, not Docker-native — built on open standards.</p>
   <svg viewBox="0 0 1600 900" role="img" aria-label="A sealed crate lifted by a dockside crane, with a delivery truck and a cargo ship both waiting to carry it onward">
     <image href="../img/decks/00-introduction/closing-crate-shipped.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
   </svg>

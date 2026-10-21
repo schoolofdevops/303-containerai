@@ -8,7 +8,7 @@
 <!-- ============================================================
      CourseSmith whiteboard deck — Module 3B Deep Dive
      (self-contained; generated from templates/deck/deck-skeleton.html.tmpl,
-     round-3 skeleton, regenerated per .superpowers/sdd/deck-regen-contract.md)
+     round-3 skeleton, regenerated per sdd/deck-regen-contract.md)
      Style contract: templates/deck/whiteboard-style-guide.md
      Zero external requests: reveal.js 5.x runtime + Patrick Hand
      woff2 are inlined below. Keep it that way.
@@ -363,7 +363,7 @@ footer, header, hgroup, main, menu, nav, section {
 
 <!-- ============ SLIDE 6 — dropout, 2 fragments ============ -->
 <section>
-  <h2 class="t">Dropout stops the notepad memorizing example order</h2>
+  <h2 class="t">Dropout stops the notepad leaning on one path</h2>
   <p class="s">Dropout zeroes a random adapter path each step.</p>
   <svg viewBox="0 0 1100 300" role="img" aria-label="An adapter with three parallel paths, one path lights up as active then gets randomly crossed out by dropout on the next step">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
@@ -393,7 +393,7 @@ footer, header, hgroup, main, menu, nav, section {
         <path d="M565,60 L395,120"/>
       </g>
       <text x="480" y="40" text-anchor="middle" class="lbl-g" fill="#c62828">zeroed this step</text>
-      <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <g fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
         <path d="M580,150 C700,150 750,150 830,150" marker-end="url(#ah)"/>
       </g>
       <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
@@ -505,7 +505,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="225" y="145" text-anchor="middle" class="lbl-g">frozen base weights</text>
     <text x="225" y="170" text-anchor="middle" class="lbl-g">this is the memory saving</text>
 
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
       <path d="M395,145 C430,145 460,145 490,145" marker-end="url(#ah)"/>
     </g>
     <text x="440" y="128" text-anchor="middle" class="lbl-g">dequant</text>
@@ -523,6 +523,8 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="955" y="130" text-anchor="middle" class="lbl-b">adapter</text>
     <text x="955" y="152" text-anchor="middle" class="lbl-g">A, B</text>
     <text x="955" y="174" text-anchor="middle" class="lbl-g">stays fp16 always</text>
+    <text x="450" y="270" text-anchor="middle" class="lbl-g">NF4 is the Track B (Axolotl) path.</text>
+    <text x="450" y="295" text-anchor="middle" class="lbl-g">The MLX-LM lab uses Apple's own quantization.</text>
   </svg>
   <div class="pageno">M3B-DD·10</div>
 </section>
@@ -532,7 +534,7 @@ footer, header, hgroup, main, menu, nav, section {
   <h2 class="t">The learning rate is the optimizer's step size</h2>
   <p class="s">Learning rate is the optimizer's step size toward the loss floor.</p>
   <svg viewBox="0 0 1100 320" role="img" aria-label="A staircase toward a loss minimum floor with three step sizes, tiny steps that stall short, right sized steps that land, and huge steps that overshoot past the floor">
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.6">
       <line x1="60" y1="260" x2="1040" y2="260"/>
     </g>
     <text x="80" y="290" class="lbl-g">loss floor (minimum)</text>
@@ -636,7 +638,7 @@ footer, header, hgroup, main, menu, nav, section {
 
 <!-- ============ SLIDE 13 — SCENE: chat template mismatch ============ -->
 <section>
-  <h2 class="t">Same JSON shape, wrong token boundaries — and it still trains</h2>
+  <h2 class="t">Same JSON layout, wrong token boundaries — and it still trains</h2>
   <p class="s">A chat-template mismatch trains silently — no error, no warning.</p>
   <svg viewBox="0 0 1100 340" role="img" aria-label="A training data page being fed through a translator stamped with the wrong template icon, coming out mismatched on the other side with no error or warning sign anywhere">
     <g filter="url(#rough)" fill="var(--p-blue)" stroke="#1e1e1e" stroke-width="2.6">
@@ -644,9 +646,9 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="170" y="160" text-anchor="middle" class="lbl-b">train.jsonl</text>
     <text x="170" y="185" text-anchor="middle" class="lbl-g">messages: [...]</text>
-    <text x="170" y="210" text-anchor="middle" class="lbl-g">your shape</text>
+    <text x="170" y="210" text-anchor="middle" class="lbl-g">your format</text>
 
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
       <path d="M290,190 C350,190 370,190 420,190" marker-end="url(#ah)"/>
     </g>
 
@@ -655,14 +657,14 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="550" y="140" text-anchor="middle" class="lbl-b">tokenizer template</text>
     <text x="550" y="165" text-anchor="middle" class="lbl-g">expects &lt;|im_start|&gt;</text>
-    <text x="550" y="188" text-anchor="middle" class="lbl-g">your shape ≠ this</text>
+    <text x="550" y="188" text-anchor="middle" class="lbl-g">your format ≠ this</text>
     <g filter="url(#rough)" fill="none" stroke="#c62828" stroke-width="2.6">
       <line x1="470" y1="225" x2="630" y2="255"/>
       <line x1="630" y1="225" x2="470" y2="255"/>
     </g>
     <text x="550" y="270" text-anchor="middle" class="lbl-g" fill="#c62828">mismatch</text>
 
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
       <path d="M680,190 C740,190 760,190 810,190" marker-end="url(#ah)"/>
     </g>
 
@@ -769,6 +771,36 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M3B-DD·16</div>
 </section>
 
+<section>
+  <h2 class="t">mlx-lm: rank and scale live in YAML</h2>
+  <p class="s">The most common porting trap</p>
+  <svg viewBox="0 0 1100 320" role="img" aria-label="In mlx-lm there is no lora-rank flag. Rank and scale live in lora_parameters in a YAML config. Scale is already the alpha over r multiplier, so copying the raw number to PEFT as alpha gives a different effective scale">
+    <g filter="url(#rough)" fill="var(--p-red)" stroke="#1e1e1e" stroke-width="2.4" stroke-dasharray="9 7">
+      <rect x="40" y="50" width="300" height="110" rx="12"/>
+    </g>
+    <text x="190" y="95" text-anchor="middle" class="lbl-b">--lora-rank</text>
+    <text x="190" y="130" text-anchor="middle" class="lbl-g">does not exist (mlx-lm 0.31.3)</text>
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M345,105 L415,105" marker-end="url(#ah)"/>
+      <path d="M755,105 L825,105" marker-end="url(#ah)"/>
+    </g>
+    <g filter="url(#rough)" fill="var(--p-blue)" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="420" y="50" width="330" height="110" rx="12"/>
+    </g>
+    <text x="585" y="88" text-anchor="middle" class="lbl-b">YAML lora_parameters</text>
+    <text x="585" y="118" text-anchor="middle" class="lbl-sm">rank: 8 · dropout: 0.0</text>
+    <text x="585" y="143" text-anchor="middle" class="lbl-sm">scale: 20.0</text>
+    <g filter="url(#rough)" fill="var(--p-orange)" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="830" y="50" width="240" height="110" rx="12"/>
+    </g>
+    <text x="950" y="95" text-anchor="middle" class="lbl-b">scale = alpha/r</text>
+    <text x="950" y="130" text-anchor="middle" class="lbl-g">already the composite</text>
+    <text x="550" y="230" text-anchor="middle" class="lbl-g">porting rank 4, scale 20 to PEFT as alpha=20 gives a 4x different scale</text>
+    <text x="550" y="265" text-anchor="middle" class="lbl-b" style="fill:#c62828">carry the effective multiplier, not the raw number</text>
+  </svg>
+  <div class="pageno">M3B-DD·17</div>
+</section>
+
 <!-- ============ SLIDE 16 — experiment setup branching ============ -->
 <section>
   <h2 class="t">Same lab, three adapters, one comparison table</h2>
@@ -804,7 +836,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="910" y="240" text-anchor="middle" class="lbl-b">variant B</text>
     <text x="910" y="263" text-anchor="middle" class="lbl-g">rank 8, lr 1e-4</text>
   </svg>
-  <div class="pageno">M3B-DD·17</div>
+  <div class="pageno">M3B-DD·18</div>
 </section>
 
 <!-- ============ SLIDE 17 — result A comparison ============ -->
@@ -832,7 +864,28 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="640" y="105" class="lbl-g">3.721</text>
     <text x="960" y="248" text-anchor="end" class="lbl-b" fill="#c62828">0.449 (val 0.374)</text>
   </svg>
-  <div class="pageno">M3B-DD·18</div>
+  <div class="pageno">M3B-DD·19</div>
+</section>
+
+<section>
+  <h2 class="t">Half the rank, half the trainable parameters</h2>
+  <p class="s">Parameters scale linearly with rank</p>
+  <svg viewBox="0 0 1100 300" role="img" aria-label="Rank 8 trains 0.733 million of 494.033 million parameters, 0.148 percent. Rank 4 trains 0.367 million, 0.074 percent. Peak memory stays near 1.29 gigabytes for both">
+    <g filter="url(#rough)" fill="var(--p-green)" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60" y="50" width="440" height="140" rx="12"/>
+    </g>
+    <text x="280" y="95" text-anchor="middle" class="lbl-b">rank 8</text>
+    <text x="280" y="130" text-anchor="middle" class="lbl-sm">0.733M of 494.033M</text>
+    <text x="280" y="160" text-anchor="middle" class="lbl-g">0.148% trainable</text>
+    <g filter="url(#rough)" fill="var(--p-orange)" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="600" y="50" width="440" height="140" rx="12"/>
+    </g>
+    <text x="820" y="95" text-anchor="middle" class="lbl-b">rank 4</text>
+    <text x="820" y="130" text-anchor="middle" class="lbl-sm">0.367M of 494.033M</text>
+    <text x="820" y="160" text-anchor="middle" class="lbl-g">0.074% trainable</text>
+    <text x="550" y="250" text-anchor="middle" class="lbl-g">peak memory about 1.29 GB for both</text>
+  </svg>
+  <div class="pageno">M3B-DD·20</div>
 </section>
 
 <!-- ============ SLIDE 18 — result B comparison ============ -->
@@ -856,7 +909,30 @@ footer, header, hgroup, main, menu, nav, section {
 
     <text x="550" y="270" text-anchor="middle" class="lbl-g">instability needs a harder, noisier dataset to show up</text>
   </svg>
-  <div class="pageno">M3B-DD·19</div>
+  <div class="pageno">M3B-DD·21</div>
+</section>
+
+<section>
+  <h2 class="t">A held-out prompt is the real test</h2>
+  <p class="s">Same output for all three adapters on the training prompt</p>
+  <svg viewBox="0 0 1100 300" role="img" aria-label="On the training prompt all three adapters give the same JSON, which only proves memorization. A prompt none of them saw is the real test of generalization">
+    <g filter="url(#rough)" fill="var(--p-blue)" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60" y="50" width="440" height="150" rx="12"/>
+    </g>
+    <text x="280" y="95" text-anchor="middle" class="lbl-b">training prompt</text>
+    <text x="280" y="130" text-anchor="middle" class="lbl-sm">all three give the same JSON</text>
+    <text x="280" y="165" text-anchor="middle" class="lbl-g">proves memorization only</text>
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M505,125 L595,125" marker-end="url(#ah)"/>
+    </g>
+    <g filter="url(#rough)" fill="var(--p-green)" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="600" y="50" width="440" height="150" rx="12"/>
+    </g>
+    <text x="820" y="95" text-anchor="middle" class="lbl-b">held-out prompt</text>
+    <text x="820" y="130" text-anchor="middle" class="lbl-sm">none of the adapters saw it</text>
+    <text x="820" y="165" text-anchor="middle" class="lbl-g">the real test</text>
+  </svg>
+  <div class="pageno">M3B-DD·22</div>
 </section>
 
 <!-- ============ SLIDE 19 — closing numbered rows ============ -->
@@ -885,7 +961,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
   </svg>
   <p class="credit">Next: apply these knobs to your own corporate-docs adapter. &nbsp;·&nbsp; <b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI</p>
-  <div class="pageno">M3B-DD·20</div>
+  <div class="pageno">M3B-DD·23</div>
 </section>
 </div></div>
 

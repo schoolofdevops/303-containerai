@@ -146,7 +146,7 @@ footer, header, hgroup, main, menu, nav, section {
 
 <section>
   <h2 class="t">Four themes, one file — crew.py opened up</h2>
-  <p class="s">Temperature, iteration, delegation, and gates — all four live in the same run() function.</p>
+  <p class="s">Temperature, iteration, delegation, gates: all four live in run().</p>
   <svg viewBox="0 0 1100 360" role="img" aria-label="Four theme boxes — temperature per agent not per crew, iteration with no loop or retry, delegation as a plain string baton, and gates as code not a prompt — all feeding into one box asking what crew.py actually does">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
       <rect x="20" y="50" width="250" height="110" rx="12"/>
@@ -261,7 +261,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="680" y="152" text-anchor="middle" class="lbl-g">temp=0.2 (default)</text>
     <text x="950" y="128" text-anchor="middle" class="lbl-b">Reviewer</text>
     <text x="950" y="152" text-anchor="middle" class="lbl-g">temp=0</text>
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.2">
       <path d="M250,135 L298,135" marker-end="url(#ah)"/>
       <path d="M520,135 L568,135" marker-end="url(#ah)"/>
       <path d="M790,135 L838,135" marker-end="url(#ah)"/>
@@ -319,7 +319,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="900" y="170" text-anchor="middle" class="lbl-sm">good enough</text>
     <text x="900" y="188" text-anchor="middle" class="lbl-sm">to answer?</text>
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.2">
       <path d="M220,175 L288,175" marker-end="url(#ah)"/>
       <path d="M470,175 L538,175" marker-end="url(#ah)"/>
       <path d="M720,175 L833,175" marker-end="url(#ah)"/>
@@ -364,7 +364,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="410" y="130" text-anchor="middle" class="lbl-sm">relevance gate</text>
     <text x="580" y="130" text-anchor="middle" class="lbl-sm">Fixer (0/1)</text>
     <text x="750" y="130" text-anchor="middle" class="lbl-sm">Reviewer (0/1)</text>
-    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-dasharray="4 6">
+    <g fill="none" stroke="#757575" stroke-width="2" stroke-dasharray="4 6">
       <path d="M90,90 L220,90" marker-end="url(#ahg)"/>
       <path d="M260,90 L390,90" marker-end="url(#ahg)"/>
       <path d="M430,90 L560,90" marker-end="url(#ahg)"/>
@@ -383,7 +383,7 @@ footer, header, hgroup, main, menu, nav, section {
   <h2 class="t">A relay race passes the baton, not the runner's whole race so far</h2>
   <p class="s">Each runner gets only the baton — not the whole race behind them</p>
   <svg viewBox="0 0 1100 340" role="img" aria-label="Three runners in a relay race positioned left to right along a track, a baton passing hand to hand between them, each runner drawn only holding what is directly in front of them, not looking back at the runner behind">
-    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="1.6" stroke-dasharray="9 9">
+    <g fill="none" stroke="#757575" stroke-width="1.6" stroke-dasharray="9 9">
       <line x1="40" y1="290" x2="1060" y2="290"/>
     </g>
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
@@ -469,7 +469,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="280" y="135" text-anchor="middle" class="lbl-sm">growing shared history</text>
     <text x="280" y="155" text-anchor="middle" class="lbl-sm">(most of it irrelevant to this agent)</text>
-    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-dasharray="4 6">
+    <g fill="none" stroke="#757575" stroke-width="2" stroke-dasharray="4 6">
       <path d="M280,170 L280,205" marker-end="url(#ahg)"/>
     </g>
     <text x="280" y="235" text-anchor="middle" class="lbl-sm">agent spends attention parsing it</text>
@@ -482,11 +482,12 @@ footer, header, hgroup, main, menu, nav, section {
       <rect x="620" y="110" width="400" height="55" rx="8"/>
     </g>
     <text x="820" y="140" text-anchor="middle" class="lbl-sm">manager re-summarizes a finding</text>
-    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-dasharray="4 6">
+    <g fill="none" stroke="#757575" stroke-width="2" stroke-dasharray="4 6">
       <path d="M820,165 L820,200" marker-end="url(#ahg)"/>
     </g>
     <text x="820" y="230" text-anchor="middle" class="lbl-sm">early mistake gets smoothed over</text>
     <text x="820" y="253" text-anchor="middle" class="lbl-g" fill="#c62828">invisible to everything downstream</text>
+    <text x="550" y="310" text-anchor="middle" class="lbl-sm">every hop is another LLM call: 5 per run here, dynamic routing adds more</text>
   </svg>
   <div class="pageno">M7-DD·11</div>
 </section>
@@ -509,6 +510,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="820" y="135" text-anchor="middle" class="lbl-sm">.upper().startswith("APPROVED")</text>
     <text x="820" y="180" text-anchor="middle" class="lbl-g">on the Reviewer's verdict</text>
     <text x="820" y="205" text-anchor="middle" class="lbl-g" fill="#2e7d32">deterministic — not a 2nd model call</text>
+    <text x="550" y="272" text-anchor="middle" class="lbl-sm">a model that ignores think:false prints reasoning first and breaks startswith("YES")</text>
   </svg>
   <div class="pageno">M7-DD·12</div>
 </section>
@@ -539,7 +541,7 @@ footer, header, hgroup, main, menu, nav, section {
       <rect x="900" y="110" width="170" height="70" rx="8" fill="var(--p-green)"/>
     </g>
     <text x="985" y="150" text-anchor="middle" class="lbl-sm">OUTCOME</text>
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.2">
       <path d="M190,145 L288,145" marker-end="url(#ah)"/>
       <path d="M430,145 L478,145" marker-end="url(#ah)"/>
       <path d="M630,145 L698,145" marker-end="url(#ah)"/>
@@ -552,6 +554,8 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="185" y="253" text-anchor="middle" class="lbl-sm">gate 3: before a tool call</text>
     <text x="185" y="272" text-anchor="middle" class="lbl-g">not needed — query is never LLM-chosen</text>
+    <text x="720" y="253" text-anchor="middle" class="lbl-sm">next layers: input validation before Triage,</text>
+    <text x="720" y="276" text-anchor="middle" class="lbl-sm">an output schema for the Reviewer's verdict</text>
   </svg>
   <div class="pageno">M7-DD·13</div>
 </section>
@@ -601,26 +605,26 @@ footer, header, hgroup, main, menu, nav, section {
 </section>
 
 <section>
-  <h2 class="t">The outcome held at 0.9 — the prose didn't</h2>
-  <p class="s">Three real repeats at temp 0.9 — the outcome held, the prose didn't</p>
-  <svg viewBox="0 0 1100 320" role="img" aria-label="Three columns showing run one terse and on profile, run two a run-on sentence, run three unrequested numbered sections, all three sharing one green banner underneath reading outcome approved all three runs">
+  <h2 class="t">At 0.9 the outcome held, the label drifted</h2>
+  <p class="s">Three repeats at temp 0.9: same format, different severity</p>
+  <svg viewBox="0 0 1100 320" role="img" aria-label="Three columns for Variant A at temperature 0.9. Run one kept the terse AREA and SEV line but said SEV2 where the baseline said SEV1. Run two said SEV1 and invented a payment gateway outage the incident never mentioned. Run three kept the format and said SEV2. All three share one green banner underneath reading outcome approved, all three runs.">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
-      <rect x="30" y="40" width="320" height="150" rx="10" fill="var(--p-blue)"/>
-      <rect x="390" y="40" width="320" height="150" rx="10" fill="var(--p-orange)"/>
-      <rect x="750" y="40" width="320" height="150" rx="10" fill="var(--p-red)"/>
+      <rect x="30" y="40" width="320" height="150" rx="10" fill="var(--p-orange)"/>
+      <rect x="390" y="40" width="320" height="150" rx="10" fill="var(--p-red)"/>
+      <rect x="750" y="40" width="320" height="150" rx="10" fill="var(--p-orange)"/>
     </g>
     <text x="190" y="75" text-anchor="middle" class="lbl-b">run 1</text>
-    <text x="190" y="105" text-anchor="middle" class="lbl-sm">terse</text>
-    <text x="190" y="128" text-anchor="middle" class="lbl-g">stayed on the profile's</text>
-    <text x="190" y="148" text-anchor="middle" class="lbl-g">"be terse" instruction</text>
+    <text x="190" y="105" text-anchor="middle" class="lbl-sm">SEV2</text>
+    <text x="190" y="128" text-anchor="middle" class="lbl-g">terse AREA | SEV line</text>
+    <text x="190" y="148" text-anchor="middle" class="lbl-g">baseline said SEV1</text>
     <text x="550" y="75" text-anchor="middle" class="lbl-b">run 2</text>
-    <text x="550" y="105" text-anchor="middle" class="lbl-sm">run-on sentence</text>
-    <text x="550" y="128" text-anchor="middle" class="lbl-g">drifted from the</text>
-    <text x="550" y="148" text-anchor="middle" class="lbl-g">expected terse shape</text>
+    <text x="550" y="105" text-anchor="middle" class="lbl-sm">SEV1 + an invented cause</text>
+    <text x="550" y="128" text-anchor="middle" class="lbl-g">"Payment gateway outage"</text>
+    <text x="550" y="148" text-anchor="middle" class="lbl-g">never in the incident</text>
     <text x="910" y="75" text-anchor="middle" class="lbl-b">run 3</text>
-    <text x="910" y="105" text-anchor="middle" class="lbl-sm">unrequested ### sections</text>
-    <text x="910" y="128" text-anchor="middle" class="lbl-g">broke the profile's</text>
-    <text x="910" y="148" text-anchor="middle" class="lbl-g">format entirely</text>
+    <text x="910" y="105" text-anchor="middle" class="lbl-sm">SEV2</text>
+    <text x="910" y="128" text-anchor="middle" class="lbl-g">terse AREA | SEV line</text>
+    <text x="910" y="148" text-anchor="middle" class="lbl-g">same format, new label</text>
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
       <rect x="230" y="230" width="650" height="60" rx="10" fill="var(--p-green)"/>
     </g>
@@ -661,7 +665,7 @@ footer, header, hgroup, main, menu, nav, section {
 <section>
   <h2 class="t">The gate decides — remove it and APPROVED certifies a mismatch</h2>
   <p class="s">Wrong runbook, APPROVED every run — the gate, not temperature, decides</p>
-  <svg viewBox="0 0 1100 300" role="img" aria-label="Three numbered rows summarizing baseline approved with five calls, variant A approved across three runs with drifting prose, variant B retrieving the wrong runbook and approving it in six of six runs because the gate that would have stopped it is gone">
+  <svg viewBox="0 0 1100 300" role="img" aria-label="Three numbered rows summarizing baseline approved with five calls, variant A approved across three runs while Triage severity and cause drifted, variant B retrieving the wrong runbook and approving it in six of six runs because the gate that would have stopped it is gone">
     <g class="lbl-b" text-anchor="middle" fill="#1e1e1e">
       <circle cx="70" cy="45" r="22" fill="var(--p-blue)" stroke="#1e1e1e" stroke-width="2"/>
       <text x="70" y="53" class="num">1</text>
@@ -672,8 +676,8 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="115" y="40" text-anchor="start" class="lbl-b">baseline — APPROVED, 5 calls</text>
     <text x="115" y="60" text-anchor="start" class="lbl-g">the reference run, nothing changed</text>
-    <text x="115" y="125" text-anchor="start" class="lbl-b">Variant A — APPROVED &#215;3, prose drifted</text>
-    <text x="115" y="145" text-anchor="start" class="lbl-g">structural outcome stable; wording is not</text>
+    <text x="115" y="125" text-anchor="start" class="lbl-b">Variant A — APPROVED &#215;3</text>
+    <text x="115" y="145" text-anchor="start" class="lbl-g">Triage severity and cause drifted; outcome did not</text>
     <text x="115" y="210" text-anchor="start" class="lbl-b">Variant B — gate removed, wrong runbook every run</text>
     <text x="115" y="230" text-anchor="start" class="lbl-g" fill="#c62828">but Reviewer APPROVED it 6 of 6 runs — confidently wrong</text>
   </svg>
@@ -697,7 +701,7 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="60" y="257" class="num">4</text>
     </g>
     <g class="lbl" text-anchor="start">
-      <text x="105" y="37" fill="#c62828">small-model variance: low temperature stabilizes the outcome marker faster than the prose</text>
+      <text x="105" y="37" fill="#c62828">small-model variance: the label drifts at high temperature; the gate pins the outcome</text>
       <text x="105" y="92">temperature is a per-agent-role decision — pin classification and safety gates at 0</text>
       <text x="105" y="147">a bounded pipeline trades self-correction for a predictable cost and latency SLO</text>
       <text x="105" y="202">delegation is only as safe as what crosses each hop — check what's really passed</text>

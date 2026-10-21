@@ -14,14 +14,14 @@
      below). All facts/diagrams kept 1:1 with the prior deck — no re-teaching, no
      dropped coverage. -->
 
-This companion doc maps the 17-slide explainer deck (`site/static/decks/02-serving.html`) to the
+This companion doc maps the 20-slide explainer deck (`site/static/decks/02-serving.html`) to the
 Module 2 lesson (`site/docs/m2-serving/lesson.md`). The deck teaches **concepts**, not commands — it
 turns the lesson's espresso-machine and wall-socket analogies, plus the JPEG/GGUF analogy, into
 hand-drawn whiteboard visuals a learner walks through before opening the lab. The visual language
 follows the CourseSmith whiteboard style contract (`templates/deck/whiteboard-style-guide.md`):
 Patrick Hand cursive, `#1e1e1e` primary / `#757575` secondary strokes on white paper with the five
 semantic pastel fills (§1: green good · red bad/full · blue data · orange caution · purple meta), the
-`#rough` wobble filter on shapes only, and the shared `#ah`/`#ahg` arrowhead markers. The arc moves
+`#rough` wobble filter on drawn outlines only, and the shared `#ah`/`#ahg` arrowhead markers. The arc moves
 vocabulary forward — **many engines, one contract → pick an engine → size a model → wire the app two
 ways**, now walked section-by-section behind five numbered dividers that mirror the lesson's `##`
 headers verbatim.
@@ -59,22 +59,25 @@ final HTML (verified — see gates below). No out-of-order dividers shipped.
 | # | Slide | Purpose | Visual | Takeaway |
 |---|-------|---------|--------|----------|
 | 1 | Serving Local Models (title) | Module framing: several engines, one socket, one app plugs in | Title sketch: fan-out (3 engine boxes → `/v1` socket → app box) | credit line: Gourav Shah · School of DevOps & AI · Hands-on |
-| 2 | What you'll learn | Module framing: the five things this deck + lab lock in | Numbered rows (5 circles) | One app, many backends — the serving engine becomes a deployment choice, never a code change |
+| 2 | What you'll learn | Module framing: the six things this deck + lab lock in | Numbered rows (6 circles; row 6 = switch thinking off) | One app, many backends — the serving engine becomes a deployment choice, never a code change |
 | 3 | **DIVIDER 1 · Demo First: Docker Model Runner** | Opens lesson §1 | — (divider) | Presenter: "First, the one-command path." |
-| 4 | The quick demo: Docker Model Runner | Docker's built-in one-command server, and why the course goes further | Pipeline: command box → arrow → 3-step result stack | Slickest on-ramp inside Docker — but this course goes runtime-agnostic so patterns run anywhere |
+| 4 | The quick demo: Docker Model Runner | Docker's built-in one-command server, and why the course goes further | Pipeline: command box ("ai/gpt-oss · 20B, too big for 16 GB") → arrow → 3-step result stack | Open source, but only on Docker Desktop and Docker CE — but this course goes runtime-agnostic so patterns run anywhere |
 | 5 | **DIVIDER 2 · The Open Engines: Ollama, llama.cpp, LocalAI** | Opens lesson §2 | — (divider) | Presenter: "Now the real engines you'll actually wire up." |
 | 6 | Open engines: different machines, same cup | The espresso analogy — engines differ inside, all pour into one API | Scene: 3 machines fan into one cup | Swap the machine under the counter — no barista, and no app, needs retraining |
-| 7 | Which engine, when | Match Ollama / llama.cpp / LocalAI to their best-fit job | Big-box anatomy: 3-row comparison table | For development, Ollama is the standard; M3 adds vLLM for high-throughput GPU serving |
+| 7 | Which engine, when | Match Ollama / llama.cpp / LocalAI to their best-fit job | Big-box anatomy: 3-row comparison table; Ollama row notes the MLX engine on Apple Silicon (Ollama 0.40+) | For development, Ollama is the standard; M3 adds vLLM for high-throughput GPU serving |
 | 8 | **DIVIDER 3 · The OpenAI-Compatible Endpoint: The Universal Contract** | Opens lesson §3 | — (divider) | Presenter: "Here's the idea that makes the rest of the course click." |
 | 9 | The problem: every engine speaks differently? *(moved from old #3 — see ordering decision above)* | Motivate the contract by showing the pain it removes | Fan-out, dashed/tangled: app → 3 engines, each with its own SDK/URL | Three custom integrations is three ways to break — the fix is one shared contract |
 | 10 | The universal contract: the /v1 endpoint | The wall-socket analogy — the contract itself, made concrete | Fan-out: 3 engines → socket → app plug | Two endpoints — chat/completions and models. The app talks to the contract, not the engine |
 | 11 | Swap engines by changing one variable | `OPENAI_BASE_URL` is the single switch across dev/staging/prod | Fan-out: one variable box → 3 environment boxes | Move a 2B dev model to a 13B production model — the application does not notice |
 | 12 | **DIVIDER 4 · GGUF and Model Selection for Laptops** | Opens lesson §4 | — (divider) | Presenter: "Now let's size a model to your machine." |
-| 13 | GGUF: the JPEG of model weights | The quantization analogy — compact format that fits laptop RAM | Pipeline: big RAW box → quantize arrow → small GGUF box → rule box | Ollama pulls GGUF, not float16 — so laptop CPU and Metal run it without CUDA |
-| 14 | Picking a model for a 16 GB laptop | Concrete model-size table sized to the reference laptop | Big-box anatomy: 5-row model/size/use table | Stay on qwen3.5:2b for every lab; gpt-oss 20B is demo-only |
+| 13 | GGUF: the JPEG of model weights | The quantization analogy — compact format that fits laptop RAM | Pipeline: big RAW box → quantize arrow → small GGUF box → rule box, plus a gray footnote: `qwen3.5:2b` on a Mac is an MLX mxfp8 build, 3.1 GB, the rule does not apply | Most Ollama tags are GGUF, not float16 — so laptop CPU and Metal run it without CUDA |
+| 14 | Picking a model for a 16 GB laptop | Concrete model-size table sized to the reference laptop | Big-box anatomy: 6-row model/size/use table (gpt-oss 20B row in red; `qwen3:4b` "Optional, not a drop-in") | Stay on qwen3.5:2b for every lab; gpt-oss 20B is demo-only |
 | 15 | **DIVIDER 5 · Two Wiring Patterns, One App** | Opens lesson §5 | — (divider) | Presenter: "Last idea: how the app actually reaches the model." |
 | 16 | Two wiring patterns, one app | Mac-native vs GPU-host-container wiring, same app code | Two-panel comparison: Pattern A (dashed boundary) vs Pattern B (dashed boundary) | Build once on your laptop; the same image drops onto a Linux GPU VM with one config change |
-| 17 | The engine is a deployment choice, not a code choice (closing) | Big-idea recap + hand-off to the lab | Closing sketch: fan-out (engine/hardware → contract socket → app, "plugged in once") | credit + lab hand-off: continue to the Serving lab |
+| 17 | Reasoning models: thinking tokens first | Mechanism (lesson §6): a reasoning model writes hidden thinking tokens before the answer, and they count against `max_tokens` | Two lanes from one request (`qwen3.5:2b`, max_tokens 4,096): default lane, orange bar "thinking: 4,080 tokens" → red `content: ""`; `"reasoning_effort": "none"` lane, small green bar "answer: 11 tokens" → green "short answer" | Thinking can spend the whole budget before the answer starts |
+| 18 | Analogy — scratch paper never handed in | The lesson's scratch-paper analogy | Two exam answer sheets: left, scratch work fills every line and the answer box is empty (red); right, the scratch paper stays on the desk and the answer box is filled (green); legend maps lines = max_tokens, scratch work = thinking tokens, answer box = content | Leave room on the sheet for the answer |
+| 19 | Switching thinking off, per API | The three working switch-offs and the two that fail | Green 3-row table (native `"think": false`, `/v1` `"reasoning_effort": "none"`, langchain-ollama `reasoning=False`) above two red struck-through boxes (`/no_think`, Modelfile `PARAMETER think`) | Every lab switches thinking off; leave it on only for hard tasks with a generous `max_tokens` |
+| 20 | The engine is a deployment choice, not a code choice (closing) | Big-idea recap + hand-off to the lab | Closing sketch: fan-out (engine/hardware → contract socket → app, "plugged in once") | credit + lab hand-off: continue to the Serving lab |
 
 <!-- Visual pattern vocabulary (reuse before inventing):
      fan-out · two-panel comparison · big-box anatomy · numbered rows ·
@@ -86,8 +89,8 @@ final HTML (verified — see gates below). No out-of-order dividers shipped.
 | # | Slide | Subtitle | Chars | Words |
 |---|-------|----------|-------|-------|
 | 1 | Serving Local Models (title) | Open engines behind one universal endpoint | 42 | 6 |
-| 2 | What you'll learn | Five ideas that make model serving portable and boring. | 55 | 9 |
-| 4 | The quick demo: Docker Model Runner | One command, but locked to Docker's toolchain. | 46 | 7 |
+| 2 | What you'll learn | Six ideas that make model serving portable and boring. | 54 | 9 |
+| 4 | The quick demo: Docker Model Runner | Open source, but it needs Docker Desktop or CE. | 47 | 9 |
 | 6 | Open engines: different machines, same cup | Different machines, same standard cup. | 38 | 5 |
 | 7 | Which engine, when | Match the engine to the job. | 28 | 6 |
 | 9 | The problem: every engine speaks differently? | Three engines, three ways to break. | 35 | 6 |
@@ -96,7 +99,10 @@ final HTML (verified — see gates below). No out-of-order dividers shipped.
 | 13 | GGUF: the JPEG of model weights | RAW is huge, JPEG loads instantly. | 34 | 6 |
 | 14 | Picking a model for a 16 GB laptop | Small models for the labs, big ones for later. | 46 | 9 |
 | 16 | Two wiring patterns, one app | Same app code, one variable changes. | 36 | 6 |
-| 17 | The engine is a deployment choice, not a code choice (closing) | Next: containerize a client that speaks this contract. | 54 | 8 |
+| 17 | Reasoning models: thinking tokens first | Thinking tokens count against max_tokens. | 41 | 6 |
+| 18 | Analogy — scratch paper never handed in | Fill every line with scratch work, no answer. | 45 | 8 |
+| 19 | Switching thinking off, per API | Three switches work; two look right but fail. | 45 | 8 |
+| 20 | The engine is a deployment choice, not a code choice (closing) | Next: containerize a client that speaks this contract. | 54 | 8 |
 
 Divider slides (3, 5, 8, 12, 15) carry no subtitle by contract (§3a).
 
@@ -107,7 +113,7 @@ orientation — don't linger. Slide 2 is a fast warm-up: state the five objectiv
 **Divider 1**, which tells the learner exactly which lesson section they're entering. Slide 4
 (Docker Model Runner) is a one-breath aside — it exists so learners who already know Docker aren't
 surprised it's not the course's path; do not let it become the main event. **Divider 2 → slides 6–7
-→ Divider 3 → slides 9–11 are the conceptual spine and deserve the most air**: slide 6 (espresso
+→ Divider 3 → slides 9–11 are the core of the module and deserve the most air**: slide 6 (espresso
 analogy) is the hinge worth lingering on — once the cup lands, slide 7 (engine picker) moves
 quickly because the mental model is already installed. Divider 3 hands off cleanly into slide 9
 (the pain point, freshly relevant since it now sits right before the fix) and slide 10 (the wall
@@ -140,7 +146,8 @@ explicit "no orphans" statement.
 | §3 The OpenAI-Compatible Endpoint: The Universal Contract (wall-socket analogy, two endpoints, motivating "problem" slide, `OPENAI_BASE_URL` swap) | 8 (divider), 9, 10, 11 | 9 = the problem/motivation (moved here from old position — see ordering decision); 10 = wall-socket scene carrying the `/v1` socket image + "two endpoints" fact as SVG labels; 11 = fan-out from one variable to three named environments, each environment's hostname kept as an SVG label |
 | §4 GGUF and Model Selection for Laptops (quantization, JPEG analogy, sizing rule, model table) | 12 (divider), 13, 14 | 13 = pipeline RAW → quantize → GGUF, sizing rule boxed alongside; 14 = big-box table ported verbatim (model / size / course use) |
 | §5 Two Wiring Patterns, One App (Mac native vs GPU-host container) | 15 (divider), 16 | Two-panel comparison, each pattern's env var + hostname kept as SVG labels |
-| Big idea / summary / hand-off to lab | 17 | Closing fan-out restates "deployment choice, not code choice"; credit line hands off to the Serving lab |
+| §6 Reasoning Models and the Universal Contract (thinking tokens vs `max_tokens`, scratch-paper analogy, three switch-offs, two that fail) | 17, 18, 19 | 17 = mechanism with the lesson's real numbers (4,080 tokens, empty content, 11 tokens); 18 = scratch-paper analogy; 19 = switch per API plus the struck-through failures. No divider: divider slides carry an illustration image, and this pass was capped at 3 new slides |
+| Big idea / summary / hand-off to lab | 20 | Closing fan-out restates "deployment choice, not code choice"; credit line hands off to the Serving lab |
 
 **No orphans.** Every numbered `##` section of `site/docs/m2-serving/lesson.md` (Docker Model
 Runner, the three open engines + espresso analogy, the OpenAI-compatible universal-contract
@@ -175,3 +182,21 @@ divider slides were added, for 17 slides total (12 original + 5 dividers).
   (white-level corrected, external file refs, no base64). Verify gate: zero external refs, tags
   balanced (17 open/17 close), `display:'flex'` present, DOCTYPE at position 0. Rendered divider 1
   via headless Chrome to confirm layout.
+
+## Update 2026-10-21 — deck audit fixes (g1), +3 slides (17 → 20)
+
+- **New chapter for lesson §6 (slides 17–19):** mechanism → analogy → switch per API, inserted after
+  the wiring-patterns slide and before the closing slide, which is now M2·20. Order follows the
+  Chapter Contract (mechanism → analogy → numbers); the lesson opens §6 with the analogy, but the
+  slide-17 numbers make the analogy land. Narration: new Video 6 "Reasoning Models — Why Thinking
+  Eats Your Token Budget"; the summary is now Video 7. A §6 divider still needs an illustration
+  image; flagged for the next illustration pass.
+- Slide 2: six objectives (new row 6: switch thinking off).
+- Slide 4: subtitle "Open source, but it needs Docker Desktop or CE."; command label carries the
+  20B size warning.
+- Slides 6–7: Ollama runs the MLX engine on Apple Silicon (Ollama 0.40+), llama.cpp elsewhere.
+- Slide 13: footnote on the `qwen3.5:2b` MLX mxfp8 exception to the 0.6 sizing rule.
+- Slide 14: six rows (gpt-oss 20B added in red); `qwen3:4b` is "Optional, not a drop-in"; the
+  aria-label says "sizes on disk", not "Q4 sizes".
+- Video-to-slide mapping is now: Video 1 → 1–2, Video 2 → 3–7, Video 3 → 8–11, Video 4 → 12–14,
+  Video 5 → 15–16, Video 6 → 17–19, Video 7 → 20.

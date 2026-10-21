@@ -267,7 +267,7 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="695" y="212">procedures</text>
       <text x="695" y="270">= SKILL.md</text>
     </g>
-    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+    <g fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
       <path d="M815,195 L875,195" marker-end="url(#ahg)"/>
     </g>
     <text x="965" y="190" text-anchor="middle" class="lbl-b">model</text>
@@ -292,7 +292,7 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="90" y="280">fragile · opaque</text>
       <text x="90" y="325">edit tone = touch code</text>
     </g>
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
       <path d="M455,210 L640,210" marker-end="url(#ah)"/>
     </g>
     <text x="547" y="196" text-anchor="middle" class="lbl-g">declare instead</text>
@@ -409,30 +409,32 @@ footer, header, hgroup, main, menu, nav, section {
 <section>
   <h2 class="t">A 2B model can route reliably</h2>
   <p class="s">Two classes, temperature 0, simple for a small model.</p>
-  <svg viewBox="0 0 1100 380" role="img" aria-label="A table of four example queries each labelled YES retrieve or NO answer directly">
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A table of four example queries: restart payments and database backups route YES retrieve, 2+2 and the weather in Paris route NO answer directly">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
-      <rect x="80" y="60" width="940" height="280" rx="10"/>
+      <rect x="80" y="50" width="940" height="300" rx="10"/>
     </g>
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="1.6">
-      <line x1="100" y1="120" x2="1000" y2="120"/>
-      <line x1="100" y1="180" x2="1000" y2="180"/>
-      <line x1="100" y1="240" x2="1000" y2="240"/>
-      <line x1="100" y1="300" x2="1000" y2="300"/>
-      <line x1="720" y1="80"  x2="720" y2="320"/>
+      <line x1="100" y1="110" x2="1000" y2="110"/>
+      <line x1="100" y1="170" x2="1000" y2="170"/>
+      <line x1="100" y1="230" x2="1000" y2="230"/>
+      <line x1="100" y1="290" x2="1000" y2="290"/>
+      <line x1="720" y1="65"  x2="720" y2="335"/>
     </g>
     <g class="lbl-g" text-anchor="start" style="font-size:17px">
-      <text x="110" y="105">QUERY</text>
-      <text x="750" y="105">ROUTE</text>
+      <text x="110" y="92">QUERY</text>
+      <text x="750" y="92">ROUTE</text>
     </g>
     <g class="lbl" text-anchor="start">
-      <text x="110" y="158">"How do I restart the payments service?"</text>
-      <text x="110" y="218">"Where are database backups stored?"</text>
-      <text x="110" y="278">"What is 2+2?"</text>
+      <text x="110" y="148">"How do I restart the payments service?"</text>
+      <text x="110" y="208">"Where are database backups stored?"</text>
+      <text x="110" y="268">"What is 2+2?"</text>
+      <text x="110" y="328">"What is the weather in Paris today?"</text>
     </g>
     <g class="lbl-b" text-anchor="start">
-      <text x="750" y="158">YES — retrieve</text>
-      <text x="750" y="218">YES — retrieve</text>
-      <text x="750" y="278">NO — direct</text>
+      <text x="750" y="148">YES — retrieve</text>
+      <text x="750" y="208">YES — retrieve</text>
+      <text x="750" y="268">NO — direct</text>
+      <text x="750" y="328">NO — direct</text>
     </g>
   </svg>
   <div class="pageno">M6·12</div>
@@ -510,12 +512,135 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="915" y="175" text-anchor="middle" class="lbl">public internet</text>
     <text x="915" y="205" text-anchor="middle" class="lbl-g">reachable</text>
-    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="6 5" stroke-linecap="round">
+    <g fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="6 5" stroke-linecap="round">
       <path d="M350,335 L350,362"/>
     </g>
     <text x="580" y="360" text-anchor="middle" class="lbl-g">✕ cannot touch host filesystem or other containers</text>
   </svg>
   <div class="pageno">M6·15</div>
+</section>
+
+<!-- ============ SLIDE 10a — MCP 2026: STATELESS STREAMABLE HTTP ============ -->
+<section>
+  <h2 class="t">Stateless MCP: every request stands alone</h2>
+  <p class="s">MCP 2026-07-28 drops the session ID and the handshake.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Two panels. Before: the client sends an initialize handshake, gets back an Mcp-Session-Id, and repeats that header on every call, so a gateway must pin the client to one replica. Now: every call carries the protocol version and capabilities in _meta, so any of three replicas behind ToolHive can answer it.">
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4" stroke-dasharray="9 7">
+      <rect x="40" y="40" width="490" height="300" rx="12" fill="var(--p-orange)"/>
+    </g>
+    <text x="285" y="75" text-anchor="middle" class="lbl-b">Before: a session to remember</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="65" y="100" width="105" height="170" rx="10" fill="#ffffff"/>
+      <rect x="400" y="100" width="105" height="170" rx="10" fill="#ffffff"/>
+    </g>
+    <text x="117" y="190" text-anchor="middle" class="lbl">client</text>
+    <text x="452" y="180" text-anchor="middle" class="lbl">server</text>
+    <text x="452" y="205" text-anchor="middle" class="lbl-g">remembers</text>
+    <g fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round">
+      <path d="M175,130 L393,130" marker-end="url(#ah)"/>
+      <path d="M395,170 L177,170" marker-end="url(#ah)"/>
+      <path d="M175,210 L393,210" marker-end="url(#ah)"/>
+      <path d="M175,250 L393,250" marker-end="url(#ah)"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle" style="font-size:16px">
+      <text x="285" y="122">1 · initialize handshake</text>
+      <text x="285" y="162">Mcp-Session-Id: abc</text>
+      <text x="285" y="202">2 · call + Mcp-Session-Id</text>
+      <text x="285" y="242">3 · call + Mcp-Session-Id</text>
+    </g>
+    <text x="285" y="315" text-anchor="middle" class="lbl-g">gateway must pin you to one replica</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="570" y="40" width="490" height="300" rx="12" fill="var(--p-green)"/>
+    </g>
+    <text x="815" y="75" text-anchor="middle" class="lbl-b">Now: every request stands alone</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="595" y="100" width="105" height="170" rx="10" fill="#ffffff"/>
+      <rect x="925" y="100" width="115" height="46" rx="8" fill="#ffffff"/>
+      <rect x="925" y="162" width="115" height="46" rx="8" fill="#ffffff"/>
+      <rect x="925" y="224" width="115" height="46" rx="8" fill="#ffffff"/>
+    </g>
+    <text x="647" y="190" text-anchor="middle" class="lbl">client</text>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="982" y="129">replica 1</text>
+      <text x="982" y="191">replica 2</text>
+      <text x="982" y="253">replica 3</text>
+    </g>
+    <g fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round">
+      <path d="M705,123 L918,123" marker-end="url(#ah)"/>
+      <path d="M705,185 L918,185" marker-end="url(#ah)"/>
+      <path d="M705,247 L918,247" marker-end="url(#ah)"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle" style="font-size:16px">
+      <text x="812" y="115">call + _meta</text>
+      <text x="812" y="177">call + _meta</text>
+      <text x="812" y="239">call + _meta</text>
+    </g>
+    <text x="815" y="300" text-anchor="middle" class="lbl-g">_meta = protocol version + capabilities</text>
+    <text x="815" y="325" text-anchor="middle" class="lbl-sm">ToolHive: any replica answers, nothing to pin</text>
+  </svg>
+  <div class="pageno">M6·16</div>
+</section>
+
+<!-- ============ SLIDE 10b — ANALOGY: TICKET COUNTER ============ -->
+<section>
+  <h2 class="t">Analogy — a ticket counter, not a tab</h2>
+  <p class="s">Bring the whole ticket and any clerk can serve you.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Two hand-drawn counters. On the left one clerk keeps a running tab for a customer, so only that clerk can serve them. On the right three clerks stand behind one counter and each customer holds a complete ticket, so any clerk can serve anyone. The ticket stands for the _meta carried on every MCP request.">
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4" stroke-dasharray="9 7">
+      <rect x="40" y="40" width="380" height="300" rx="12"/>
+    </g>
+    <text x="230" y="75" text-anchor="middle" class="lbl-g" style="font-size:19px">Running tab</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4" stroke-linecap="round">
+      <rect x="70" y="200" width="320" height="24" rx="4"/>
+      <circle cx="140" cy="150" r="16"/>
+      <path d="M114,198 Q140,168 166,198"/>
+      <circle cx="320" cy="255" r="14"/>
+      <path d="M320,269 L320,305 M302,282 L338,282 M320,305 L306,330 M320,305 L334,330"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="195" y="140" width="80" height="50" rx="6" fill="var(--p-red)"/>
+    </g>
+    <text x="235" y="172" text-anchor="middle" class="lbl-sm">your tab</text>
+    <text x="230" y="368" text-anchor="middle" class="lbl-g">only this clerk remembers you</text>
+
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="470" y="40" width="590" height="300" rx="12" fill="var(--p-green)"/>
+    </g>
+    <text x="765" y="75" text-anchor="middle" class="lbl-b">Ticket counter</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <rect x="490" y="200" width="550" height="24" rx="4" fill="#ffffff"/>
+      <circle cx="580" cy="150" r="16"/>
+      <path d="M554,198 Q580,168 606,198"/>
+      <circle cx="765" cy="150" r="16"/>
+      <path d="M739,198 Q765,168 791,198"/>
+      <circle cx="950" cy="150" r="16"/>
+      <path d="M924,198 Q950,168 976,198"/>
+      <circle cx="560" cy="255" r="14"/>
+      <path d="M560,269 L560,305 M542,282 L578,282 M560,305 L546,330 M560,305 L574,330"/>
+      <circle cx="745" cy="255" r="14"/>
+      <path d="M745,269 L745,305 M727,282 L763,282 M745,305 L731,330 M745,305 L759,330"/>
+      <circle cx="930" cy="255" r="14"/>
+      <path d="M930,269 L930,305 M912,282 L948,282 M930,305 L916,330 M930,305 L944,330"/>
+    </g>
+    <g class="lbl-g" text-anchor="middle">
+      <text x="580" y="120">clerk</text>
+      <text x="765" y="120">clerk</text>
+      <text x="950" y="120">clerk</text>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2">
+      <rect x="580" y="266" width="66" height="32" rx="4" fill="#ffffff"/>
+      <rect x="765" y="266" width="66" height="32" rx="4" fill="#ffffff"/>
+      <rect x="950" y="266" width="66" height="32" rx="4" fill="#ffffff"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle" style="font-size:16px">
+      <text x="613" y="288">ticket</text>
+      <text x="798" y="288">ticket</text>
+      <text x="983" y="288">ticket</text>
+    </g>
+    <text x="765" y="368" text-anchor="middle" class="lbl-g">each ticket says who, what and which version = _meta</text>
+  </svg>
+  <div class="pageno">M6·17</div>
 </section>
 
 <!-- ============ DIVIDER — SECTION 6 ============ -->
@@ -524,7 +649,7 @@ footer, header, hgroup, main, menu, nav, section {
     <image href="../img/decks/06-declarative-agent/analogy-guardrail-checkpoint.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
   </svg>
   <h2 class="t" style="font-size:1.1em">6 &middot; Guardrails</h2>
-  <div class="pageno">M6·16</div>
+  <div class="pageno">M6·18</div>
 </section>
 
 <!-- ============ SLIDE 11 — GUARDRAILS ============ -->
@@ -556,7 +681,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="915" y="268" text-anchor="middle" class="lbl-b">→ to the model</text>
     <text x="915" y="292" text-anchor="middle" class="lbl-g">route → answer</text>
   </svg>
-  <div class="pageno">M6·17</div>
+  <div class="pageno">M6·19</div>
 </section>
 
 <!-- ============ DIVIDER — SECTION 7 ============ -->
@@ -565,7 +690,7 @@ footer, header, hgroup, main, menu, nav, section {
     <image href="../img/decks/06-declarative-agent/analogy-librarian-memory.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
   </svg>
   <h2 class="t" style="font-size:1.1em">7 &middot; Memory</h2>
-  <div class="pageno">M6·18</div>
+  <div class="pageno">M6·20</div>
 </section>
 
 <!-- ============ SLIDE 12 — MEMORY ============ -->
@@ -593,7 +718,7 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="415" y="223">on-call escalation</text>
       <text x="415" y="273">deploy · rollback</text>
     </g>
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
       <path d="M255,185 L395,185" marker-end="url(#ah)"/>
       <path d="M705,185 L765,185" marker-end="url(#ah)"/>
     </g>
@@ -601,13 +726,45 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="890" y="180" text-anchor="middle" class="lbl-b">grounded</text>
     <text x="890" y="208" text-anchor="middle" class="lbl-b">answer</text>
   </svg>
-  <div class="pageno">M6·19</div>
+  <div class="pageno">M6·21</div>
 </section>
 
 <!-- ============ DIVIDER — SECTION 8 ============ -->
 <section class="divider">
   <h2 class="t" style="font-size:2.2em">8 &middot; Declarative versus framework</h2>
-  <div class="pageno">M6·20</div>
+  <div class="pageno">M6·22</div>
+</section>
+
+<!-- ============ SLIDE 12a — WHEN DECLARATIVE IS ENOUGH ============ -->
+<section>
+  <h2 class="t">When a declarative agent is enough</h2>
+  <p class="s">All three hold → Markdown. One breaks → a framework.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Left box: declarative is enough when there is one agent with clear routing rules, single-step skills, and standard MCP tools with no stateful chains. Right box: reach for a framework for multiple specialised agents, shared state, complex tool chains, or retries across agent boundaries, which is where Module 7 picks up.">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="40" y="40" width="440" height="270" rx="12" fill="var(--p-green)"/>
+      <rect x="610" y="40" width="450" height="270" rx="12" fill="var(--p-orange)"/>
+    </g>
+    <text x="260" y="80" text-anchor="middle" class="lbl-b">Declarative is enough</text>
+    <g class="lbl" text-anchor="start">
+      <text x="68" y="140">✓ one agent, one use case, clear rules</text>
+      <text x="68" y="195">✓ single-step skills</text>
+      <text x="68" y="250">✓ standard MCP tools, no stateful chains</text>
+    </g>
+    <text x="835" y="80" text-anchor="middle" class="lbl-b">Reach for a framework</text>
+    <g class="lbl" text-anchor="start">
+      <text x="640" y="130">multiple specialised agents</text>
+      <text x="640" y="172">shared state across agents</text>
+      <text x="640" y="214">complex tool chains</text>
+      <text x="640" y="256">retries across agent boundaries</text>
+    </g>
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M488,175 L600,175" marker-end="url(#ah)"/>
+    </g>
+    <text x="545" y="160" text-anchor="middle" class="lbl-g">one breaks</text>
+    <text x="260" y="350" text-anchor="middle" class="lbl-g">Aria passes all three</text>
+    <text x="835" y="350" text-anchor="middle" class="lbl-g">Module 7: grow Aria into a crew of four</text>
+  </svg>
+  <div class="pageno">M6·23</div>
 </section>
 
 <!-- ============ SLIDE 13 — CONTAINER STORY ============ -->
@@ -652,7 +809,7 @@ footer, header, hgroup, main, menu, nav, section {
       <path d="M485,245 L735,290" marker-end="url(#ahg)"/>
     </g>
   </svg>
-  <div class="pageno">M6·21</div>
+  <div class="pageno">M6·24</div>
 </section>
 
 <!-- ============ SLIDE 14 — CLOSING / LAB LEAD-IN ============ -->
@@ -679,7 +836,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
   </svg>
   <p class="credit">Next: <b>Module 6 Lab</b>, then M7 — the crew. &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
-  <div class="pageno">M6·22</div>
+  <div class="pageno">M6·25</div>
 </section>
 
 </div></div>

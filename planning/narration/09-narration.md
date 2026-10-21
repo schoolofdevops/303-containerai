@@ -27,8 +27,8 @@ So by the end of this module, you will have run the full Acme platform end to en
 ### Suggested visuals / slide beats
 
 1. Title slide: the Acme AI Support Platform, course logo, "Module 9 — Capstone"
-2. A simple ladder graphic, M1 through M8, each rung lighting up as it is named
-3. Closing beat: the eight rungs merging into one platform box
+2. A simple ladder graphic, M1 through M8, each step lighting up as it is named
+3. Closing beat: the eight steps merging into one platform box
 
 ---
 
@@ -44,11 +44,13 @@ In the last video, I talked about snapping eight modules together into one platf
 
 Let's say you are picturing a well-run emergency dispatch centre. There is one dispatcher sitting at the desk, and that dispatcher is our native Ollama model. Every team in the building has its own job and its own phone line into that desk, the Docs Assistant on one line, the Support Agent on another, the Incident Crew on a third, but all three lines ring the same dispatcher. The dispatcher itself never moves from that desk. Behind the dispatcher are filing cabinets, and that is ChromaDB, our semantic memory, organized by meaning rather than by alphabetical order. Next to the desk is a locked key cabinet, and that is ToolHive. Any agent that needs to reach an external tool has to sign out a key from that cabinet first, so no rogue process reaches into a tool unsupervised. And when a release is finally ready to go out, it gets sealed into a tamper-evident courier box, checked by a set of supply chain tools, and shipped out. That box is the ModelKit.
 
-Now here's the important part, and this is the one rule the entire course has been building toward: the model stays native, and everything else runs in a container. Let's walk through why that rule holds the whole platform together.
+On the slide after that, you see how the eight modules connect. Each one maps to exactly one capability of this platform, and nothing you built was thrown away.
+
+Now the important part. This is the one rule the entire course has been building toward: the model stays native, and everything else runs in a container. Let's walk through why that rule holds the whole platform together.
 
 On the host machine, running natively, you have Ollama on port 11434, serving qwen3.5:2b for chat and nomic-embed-text for embeddings. Everything else, the Docs Assistant, the Support Agent, the Incident Crew, ChromaDB, and ToolHive, runs inside containers, on whatever OCI runtime you have chosen. Each of those three apps reaches the native model the exact same way, at the address `host.docker.internal:11434`. That single address is what makes the whole wiring work, and it is not a Docker-specific trick. It resolves on Colima, it resolves on Rancher Desktop, it resolves on OrbStack, and it resolves on Podman, because it is part of the OCI runtime contract, not something one vendor invented.
 
-On the packaging side, a separate flow runs alongside the live platform. The model gets sealed into a ModelKit, that is weights, config, and prompts in one signed artifact from Module 4. That artifact then goes through an SBOM, a vulnerability scan, and a signing step using Syft, Trivy, Grype, and Cosign from Module 8. And GitHub Actions is what runs that whole build, scan, and sign sequence automatically, every time you push.
+On the packaging side, a separate flow runs alongside the live platform. The model gets sealed into a ModelKit, that is weights, config, and prompts in one signed artifact from Module 4. Separately, the crew image goes through an SBOM, a vulnerability scan, and a signing step, using Syft, Trivy, Grype, and Cosign from Module 8. And GitHub Actions is what runs that whole build, scan, and sign sequence automatically, every time you push.
 
 So to summarize, you have three containerized apps, all talking to one native model over one fixed address, all sharing one vector store, all reaching tools through one locked gateway, and one packaging pipeline sealing and shipping the model on the side. That is the Acme AI Support Platform in one picture. In the next video, we are going to actually run every piece of it, end to end, on your own machine.
 
@@ -57,7 +59,8 @@ So to summarize, you have three containerized apps, all talking to one native mo
 1. Dispatch-centre scene: dispatcher desk, three phone lines, filing cabinets, locked key cabinet, courier box
 2. The Mermaid architecture diagram: host box (Ollama) versus container box (three apps + ChromaDB + ToolHive) versus supply-chain box (ModelKit, SBOM/scan/sign, CI)
 3. Callout on `host.docker.internal:11434` with the four runtime names ticking past it
-4. Closing recap slide: the one-line rule in large text — "the model stays native, everything else runs in a container"
+4. Slide 4, "How the modules connect": eight modules converging into one platform box
+5. Closing recap: the one-line rule in large text — "the model stays native, everything else runs in a container"
 
 ---
 
@@ -75,7 +78,7 @@ Before touching any module, you run a readiness check, `platform-check.sh`. It g
 
 With readiness confirmed, Step 1 is serving the model, which is already running natively if you followed Module 2, so there is nothing new to start here. Step 2 brings up the persistent part of the platform, ChromaDB and the Docs Assistant, from one consolidated compose file. This matters because each module's own compose file used to bind ChromaDB to the same port, so running them one after another would fail with a "container name already in use" error. The capstone compose file solves that by starting exactly one shared ChromaDB that all three apps use from here on. Once that is up, you can open the Docs Assistant in your browser, ask it how to restart the payments service, and you get back a grounded answer with the exact `kubectl` command, pulled straight from the Acme runbook, not guessed.
 
-Step 3 runs the Support Agent, Aria, from Module 6, as a one-shot command against that same shared ChromaDB. Aria reads the question first and decides whether it actually needs to retrieve anything before answering, which is what makes this agentic RAG rather than naive RAG, the agent routes first, and only then acts. One thing worth calling out here: because the routing decision comes from a small model, `qwen3.5:2b`, the way you phrase the question actually matters. A vague question can cause it to skip retrieval and answer directly from a guess. So keep your questions close to how the runbook itself is phrased, and always check the decision marker in the output before you trust the answer.
+Step 3 runs the Support Agent, Aria, from Module 6, as a one-shot command against that same shared ChromaDB. Aria reads the question first and decides whether it actually needs to retrieve anything before answering, which is what makes this agentic RAG rather than naive RAG, the agent routes first, and only then acts. One thing worth calling out here: because the routing decision comes from a small model, `qwen3.5:2b`, the way you phrase the question actually matters. A vague question can cause it to skip retrieval and answer directly from a guess. So keep your questions close to how the runbook itself is phrased. Thinking is switched off on every call, so the model answers fast and the routing stays a plain yes or no. Always check the decision marker in the output before you trust the answer.
 
 Step 4 fires the Incident Crew from Module 7, again as a one-shot command, this time against a real incident description. Four specialized agents run one after another here: Triage classifies how serious the incident is, Investigator queries the runbook for the relevant procedure, Fixer proposes the exact command to run, and Reviewer either approves that command or escalates it to a human. And here's the part worth noticing: all four of those agents are still calling the one same native model endpoint. Specialization did not mean four separate models, it meant four separate roles talking to the same brain.
 
@@ -85,12 +88,13 @@ So that is the full run, readiness check, serve, retrieve, route, coordinate, pa
 
 ### Suggested visuals / slide beats
 
-1. `platform-check.sh` terminal output, four checks highlighted one at a time
-2. Compose-up cutaway: `docker compose up -d chromadb genai-app`, then the Docs Assistant browser screenshot with a grounded answer
-3. Aria's decision-marker output, `[decision: RETRIEVE ...]`, highlighted
-4. Incident Crew pipeline diagram: Triage → Investigator → Fixer → Reviewer, one native model icon behind all four
-5. Three-icon row for Steps 5–7: ModelKit seal, SBOM/scan/sign badges, CI pipeline arrow to GHCR
-6. Closing beat: all seven steps as a single numbered strip, "readiness → serve → retrieve → route → coordinate → package → secure → ship"
+1. Slide "Step 0: verify readiness": four checks in a row ending at PLATFORM READY, with the `platform-check.sh` terminal output as a cutaway
+2. Slide "Step 1: serve the model": Ollama and vLLM both behind the one `/v1` endpoint (no new narration, it is already running)
+3. Slide "Step 2: one shared ChromaDB": three apps reading one ChromaDB, with the `docker compose up -d chromadb genai-app` cutaway and the Docs Assistant answer
+4. Slide "Step 3: Aria decides to retrieve": the RETRIEVE and ANSWER DIRECTLY branches, with the `[decision: RETRIEVE ...]` output highlighted
+5. Slide "Step 4: run the Incident Crew": Triage → Investigator → Fixer → Reviewer, one native model behind all four
+6. Slides for Steps 5 to 7: ModelKit seal, SBOM/scan/sign on the crew image, CI pipeline arrow to GHCR
+7. Closing beat: all seven steps as a single numbered strip, "readiness → serve → retrieve → route → coordinate → package → secure → ship"
 
 ---
 
@@ -114,7 +118,7 @@ One small note if you are on Podman specifically: `host.docker.internal` works o
 
 1. Five-row table: OCI image format, Compose Spec, `host.docker.internal`, ModelKit, Cosign signatures, each with a one-line payoff
 2. Split-screen or swap animation: Rancher Desktop logo transitioning to Colima logo, same terminal output underneath, unchanged
-3. Podman callout card with the single `--add-host` flag
+3. The Podman box on the portability slide, with the single `--add-host` flag as a callout
 
 ---
 
@@ -128,7 +132,7 @@ One small note if you are on Podman specifically: `host.docker.internal` works o
 
 To summarize, you started this course with a single container making a raw call to a local model. And you are ending it with a signed, CI-shipped, multi-agent platform. Let's quickly walk the ladder you climbed to get here. Module 1 gave you the container-native pattern itself, the OCI image format, the Compose spec, and the `host.docker.internal` wiring. Module 2 gave you OpenAI-compatible serving, the wall socket that lets any app swap the model engine behind it without touching a line of code. Module 3 gave you production-grade serving on the CPU with vLLM, for machines without a GPU or Apple's Metal. Module 4 gave you the ModelKit, weights, config, and prompts sealed into one signed artifact. Module 5 gave you naive RAG, the Docs Assistant retrieving from your own runbooks. Module 6 gave you a declarative agent that adds a routing judgment and guardrails on top of that retrieval. Module 7 split that single agent into a crew, with specialization, separation of concerns, and a reviewer approval gate. And Module 8 gave you the supply chain, SBOM, vulnerability scanning, image signing, and a CI pipeline tying it all together.
 
-Notice the shape of that progression, because it tells one coherent story. The Docs Assistant always retrieves, which is useful but wastes effort on questions that already have a known answer. The Support Agent decides when to retrieve, which makes it more efficient and more reliable, because it routes before it acts. And the Incident Crew splits the problem across specialized roles entirely, which is the only approach of the three that scales to a multi-step task, where each step carries a risk that one single agent cannot catch on its own. Naive RAG, to agentic RAG, to a crew, that is the arc every one of these platforms tends to follow as it matures.
+Notice the pattern in that progression, because it tells one coherent story. The Docs Assistant always retrieves, which is useful but wastes effort on questions that already have a known answer. The Support Agent decides when to retrieve, which makes it more efficient and more reliable, because it routes before it acts. And the Incident Crew splits the problem across specialized roles entirely, which is the only approach of the three that scales to a multi-step task, where each step carries a risk that one single agent cannot catch on its own. Naive RAG, to agentic RAG, to a crew, that is the arc every one of these platforms tends to follow as it matures.
 
 And here is the part I want you to take away with you: none of this is tied to IT operations specifically. The same architecture, native Ollama, ChromaDB, a declarative agent, ToolHive as the MCP gateway, ModelKit packaging, and the Module 8 supply chain, applies to any domain that has a knowledge base and needs reliable, auditable answers. A code review assistant, a compliance checker, a customer onboarding guide, these are structurally the same platform. You would swap the Acme runbooks for your own documents, rename the agents, and adjust the guardrails, and the container wiring underneath would not change at all.
 
@@ -138,7 +142,7 @@ Now it's your turn. Open `labs/capstone`, run `platform-check.sh`, and take the 
 
 ### Suggested visuals / slide beats
 
-1. Eight-rung ladder, each rung labelled with its module and its one contribution, building up rung by rung
+1. Eight-step ladder, each step labelled with its module and its one contribution, building up step by step
 2. Three-stage arc diagram: Naive RAG → Agentic RAG → Crew, with the one-line reason for each transition
 3. "Same architecture, different domain" slide: Acme runbooks crossed out, replaced by code repo / compliance policy / onboarding doc icons
 4. Closing credit slide with the lab-bridge call to action

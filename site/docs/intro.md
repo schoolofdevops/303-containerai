@@ -54,7 +54,7 @@ The intelligence progression mirrors how teams actually adopt AI: **Naive RAG �
 
 Every lab is engineered to run on a 16 GB Apple Silicon or Windows laptop without thrashing:
 
-- **Small quantized models only** — 1B–4B parameters in Q4 (Qwen3-1.7B, Llama 3.2 3B)
+- **Small quantized models only** — 1B–4B parameters, quantized. The default is `qwen3.5:2b`, about 3.1 GB on disk, served by Ollama 0.40 or newer
 - **One shared model endpoint** — every component (RAG app, agent, crew) points at the same server; never one model per agent
 - **Compose resource caps** — explicit `mem_limit` / `cpus` per service; profiles start only what each step needs
 - **Build up, tear down** — each module starts from the previous step and stops unneeded services, so peak footprint stays flat

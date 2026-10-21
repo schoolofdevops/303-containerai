@@ -19,17 +19,17 @@
      each section's first content slide with no reshuffling. 13 content slides + 6
      dividers = 19 slides total, up from the round-3 baseline's 13. -->
 
-This companion doc maps the 19-slide explainer deck (`site/static/decks/07-multi-agent.html`) to the
+This companion doc maps the 20-slide explainer deck (`site/static/decks/07-multi-agent.html`) to the
 Module 7 lesson (`site/docs/m7-multi-agent/lesson.md`). The deck teaches **concepts**, not commands — it
 turns each of the lesson's analogies into a hand-drawn whiteboard visual a learner walks through before
 opening the lab. The visual language follows the CourseSmith whiteboard style contract
 (`coursesmith/templates/deck/whiteboard-style-guide.md`): Patrick Hand cursive, `#1e1e1e` primary /
 `#757575` secondary strokes on white paper with the five semantic pastel fills (§1: green good · red
-bad/full · blue data · orange caution · purple meta), the `#rough` wobble filter on shapes only, and the
+bad/full · blue data · orange caution · purple meta), the `#rough` wobble filter on outlined figures only, and the
 shared `#ah`/`#ahg` arrowhead markers. The arc grows the single M6 agent into a crew — one agent doing
 everything → **divider 1** → the hospital analogy → **divider 2** → the three properties a single agent
 can't replicate → the boundary where a single agent is still the right call → **divider 3** → the
-Incident Crew's sequential pipeline and its relevance gate → **divider 4** → the two ways to build a crew
+Incident Crew's sequential pipeline → why nearest is not relevant (the relevance gate) → **divider 4** → the two ways to build a crew
 (declarative vs framework) → the standard that lets you swap the orchestrator → **divider 5** → the
 shared model and its real resource cost → wiring the crew into the growing Compose file → **divider 6** →
 the Reviewer as human-in-the-loop proxy → hand-off to the lab.
@@ -48,40 +48,33 @@ the Reviewer as human-in-the-loop proxy → hand-off to the lab.
 | 8 | When is a single agent enough? | The decision boundary — multi-agent adds real overhead, don't reach for it by default | decision diagram: consequential-action question → NO/YES branches to two contract boxes | the M6 single agent is the right tool until an action needs a countersign |
 | 9 | **3 · The incident crew's pipeline** (divider) | Opens lesson §3 — the crew's sequential pipeline and relevance gate | — (divider) | — |
 | 10 | The Incident Crew pipeline | The crew's sequential flow and its relevance gate that can short-circuit | pipeline with a diamond gate: Triage → Investigate → gate? → Fixer → Reviewer → APPROVED/ESCALATE | the gate asks one yes/no question so a catastrophically wrong fix never reaches the output |
-| 11 | **4 · Two paths to multi-agent** (divider) | Opens lesson §4 — declarative vs framework, and the standards that converge | — (divider) | — |
-| 12 | Two paths to multi-agent | Declarative profiles vs an orchestration framework | two-panel comparison: declarative box vs framework (LangGraph/CrewAI) box | reach for a framework when you need deterministic, auditable control over a complex workflow |
-| 13 | Swap the orchestrator, not the tools | Three interchangeable orchestrators sit above one shared standards layer | hub/stack: 3 orchestrator boxes → one shared layer of Skills/MCP tools/Guardrails | build against the standard, swap the implementation — the same lesson as the OpenAI-compatible endpoint |
-| 14 | **5 · One model, four agents** (divider) | Opens lesson §5 — the resource budget and the Compose wiring | — (divider) | — |
-| 15 | One model, four agents | Agents are cheap Python calls; the model is the expensive, shared part | hub-and-spoke: Ollama hub center, 4 agent boxes on spokes | four separate model instances would cost 4× the memory for zero gain — all four call one endpoint |
-| 16 | Wire the crew with the Compose Spec | Each agent a lightweight service, all sharing one endpoint, tools, and memory | big-box anatomy: dashed compose.yaml boundary with crew/ToolHive/ChromaDB boxes, arrow out to native Ollama | one growing compose file gains a crew service — reusing the tools and memory you already built |
-| 17 | **6 · The Reviewer as human-in-the-loop proxy** (divider) | Opens lesson §6 — the Reviewer's role and final human authority | — (divider) | — |
-| 18 | The Reviewer, human-in-the-loop proxy | The Reviewer decides if the fix is safe to show a human, not whether to fix it | fan-out: Reviewer box → APPROVED/REJECTED outcome boxes → Human decides box | the crew produces a vetted recommendation; the human engineer retains final authority |
-| 19 | Swap the orchestrator, keep the crew (closing) | Hand off to the lab: run both incidents, watch the relevance gate work | pipeline scene: Triage → Investigate → Fix → Review, branching to 503→APPROVED and Kafka→ESCALATE | read the four profiles, run both incidents, watch the relevance gate work; credit + lab hand-off |
+| 11 | The relevance gate: nearest isn't relevant | Why the gate exists: nearest-neighbour search always returns something, so a Kafka query got the payments runbook | pipeline: Kafka incident (blue) → nearest chunk = payments runbook (orange) → gate diamond "covers this incident?" → NO → REJECTED, escalate (red); caption "without the gate, the crew proposed a payments restart for a Kafka outage" | the gate asks one YES/NO question, and a NO stops the Fixer before a wrong fix exists |
+| 12 | **4 · Two paths to multi-agent** (divider) | Opens lesson §4 — declarative vs framework, and the standards that converge | — (divider) | — |
+| 13 | Two paths to multi-agent | Declarative profiles vs an orchestration framework | two-panel comparison: declarative box (four Markdown profiles, one per agent) vs framework (LangGraph/CrewAI) box | reach for a framework when you need deterministic, auditable control over a complex workflow |
+| 14 | Swap the orchestrator, not the tools | Three interchangeable orchestrators sit above one shared standards layer | hub/stack: 3 orchestrator boxes → one shared layer of MCP tools/ChromaDB memory/Ollama model | build against the standard, swap the implementation — the same lesson as the OpenAI-compatible endpoint |
+| 15 | **5 · One model, four agents** (divider) | Opens lesson §5 — the resource budget and the Compose wiring | — (divider) | — |
+| 16 | One model, four agents | Agents are cheap Python calls; the model is the expensive, shared part | hub-and-spoke: Ollama hub center, 4 agent boxes on spokes; captions: 2B crew ≈ 4 GB total, a CrewAI crew on gemma3:4B ≈ 4.5 GB | four separate model instances would cost 4× the memory for zero gain — all four call one endpoint |
+| 17 | Wire the crew with the Compose Spec | The lab's compose.yaml has two services, the crew and ChromaDB, and the model stays native | big-box anatomy: dashed compose.yaml boundary with crew, ChromaDB 1.5.9, chroma_data volume and a one-shot `docker compose run --rm crew` box, arrow out to native Ollama | the crew is one light service next to ChromaDB; ToolHive runs outside compose and only the CrewAI variant uses it |
+| 18 | **6 · The Reviewer as human-in-the-loop proxy** (divider) | Opens lesson §6 — the Reviewer's role and final human authority | — (divider) | — |
+| 19 | The Reviewer, human-in-the-loop proxy | The Reviewer decides if the fix is safe to show a human, not whether to fix it | fan-out: Reviewer box (captioned "gets the fix + the runbook passage") → APPROVED/REJECTED outcome boxes → Human decides box | the crew produces a vetted recommendation; the human engineer retains final authority |
+| 20 | Swap the orchestrator, keep the crew (closing) | Hand off to the lab: run both incidents, watch the relevance gate work | pipeline scene: Triage → Investigate → Fix → Review, branching to 503→APPROVED and Kafka→ESCALATE | read the four profiles, run both incidents, watch the relevance gate work; credit + lab hand-off |
 
 <!-- Visual pattern vocabulary used above (reuse before inventing):
-     fan-out (4, 7, 18) · two-panel comparison (12) ·
-     big-box anatomy (5, 16) · numbered rows (2) · pipeline (1, 10, 19) ·
-     decision diagram (8) · hub-and-spoke (13, 15) · divider (3, 6, 9, 11, 14, 17) -->
+     fan-out (4, 7, 19) · two-panel comparison (13) ·
+     big-box anatomy (5, 17) · numbered rows (2) · pipeline (1, 10, 11, 20) ·
+     decision diagram (8) · hub-and-spoke (14, 16) · divider (3, 6, 9, 12, 15, 18) -->
 
 ## Recommended presentation order
 
-Present strictly 1 → 19; each slide's vocabulary is used by the next. Open on the title scene (1) and the
-four-idea preview (2) to set expectations. Divider 3 ("1 · The analogy: a hospital, not a superhero")
-hands off to slide 4, the motivating problem — linger on it, because "one agent gets unfocused" is the gap
-every later slide fills. Slides 4–5 are one continuous build-up on the analogy: slide 4 names the problem,
-slide 5 lands the hospital scene — present these two back to back, right after divider 3. Divider 6 opens
-"Why multi-agent?"; slide 7 turns the analogy into the concrete three properties (specialisation,
-separation, review loop), and slide 8 is the conceptual hinge worth slowing down on — the boundary between
-"M6 is enough" and "reach for a crew" is the decision every learner must internalize before the lab; do
-not rush it. Divider 9 opens the Incident Crew's own pipeline (slide 10) — the second hinge; walk it hop
-by hop verbally even though the slide is static, and make the "NO runbook found → escalate" short-circuit
-land explicitly. Divider 11 opens the matched pair on the two build paths (slide 12) and the standard that
-makes them interchangeable (slide 13) — present together, and be explicit at slide 13 that this is the
-same build-against-the-standard lesson as the OpenAI-compatible endpoint from earlier modules. Divider 14
-opens the mechanics pair: slide 15 (resource budget) and slide 16 (Compose wiring) — compress under time
-pressure if needed, but keep the "4× memory for zero gain" number audible. Divider 17 opens slide 18 (the
-Reviewer), an independent single-concept slide — present at normal pace. Slide 19 hands off to the lab —
-say the closing line and stop talking, let the lab do the proving.
+Present strictly 1 → 20. Open on the title scene (1) and the preview (2). Divider 3 opens the hospital
+analogy: slides 4–5 back to back. Divider 6 opens "Why multi-agent?": slide 7 (three properties) and
+slide 8 (the single-agent boundary, the decision every learner must make before the lab). Divider 9
+opens the pipeline (slide 10) and the relevance gate (slide 11): walk the Kafka-gets-payments story on
+11, it is the reason the gate exists. Divider 12 opens the two build paths (13) and the shared layer
+(14: MCP tools, ChromaDB memory, Ollama model). Divider 15 opens the cost slide (16, with the CrewAI +
+gemma3:4B comparison) and the Compose wiring (17: two services, model native, ToolHive outside
+compose). Divider 18 opens the Reviewer (19), which checks the fix against the runbook passage it is
+handed. Slide 20 hands off to the lab.
 
 ## Fragment map
 
@@ -93,8 +86,8 @@ picture rather than revealed hop-by-hop. No fragments were added in this divider
 could fragment slide 10 (Triage → Investigate → gate → Fixer/Reviewer → outcome) or slide 15 (Ollama hub →
 each agent spoke added one at a time) if a presenter wants a build.
 
-Divider slides (3, 6, 9, 11, 14, 17): title-only, read in full on entry, no visual to reveal.
-Static content slides (1, 2, 4, 5, 7, 8, 10, 12, 13, 15, 16, 18, 19): read in full on entry — no
+Divider slides (3, 6, 9, 12, 15, 18): title-only, read in full on entry, no visual to reveal.
+Static content slides (1, 2, 4, 5, 7, 8, 10, 11, 13, 14, 16, 17, 19, 20): read in full on entry — no
 reveal-in-steps behavior in this deck.
 
 ## Coverage check (HARD GATE — §0)
@@ -107,21 +100,21 @@ Every lesson section/concept maps to a slide, including its own divider. No orph
 | §1 The hospital analogy — triage nurse, doctor, pharmacist, attending physician; no single doctor does everything; one shared health record | 3 (divider), 4, 5 | divider 3 opens the section verbatim; slide 4 = the motivating "one agent gets unfocused" problem; slide 5 = big-box anatomy mapping the four hospital roles onto the four crew roles |
 | §2 Why multi-agent — specialisation, separation of concerns, review loops | 6 (divider), 7 | divider 6 opens the section verbatim; slide 7 = three-panel row, one box per property |
 | §2 When is a single agent enough — one use case end-to-end, no separate safety review, no consequential action | 8 | decision diagram: consequential-action question branching to a single-agent contract box or a reach-for-a-crew contract box |
-| §3 The incident crew's pipeline — sequential stages, the relevance gate, the Kafka/payments-runbook near-miss, the NO-runbook escalate short-circuit | 9 (divider), 10 | divider 9 opens the section verbatim; slide 10 = pipeline with a diamond gate: Triage → Investigate → gate? → Fixer → Reviewer → APPROVED/ESCALATE |
-| §4 Two paths — declarative (four Markdown profiles + one Python pipeline, stdlib only) vs framework (CrewAI role-based, LangGraph graph + checkpointing) | 11 (divider), 12 | divider 11 opens the section verbatim; slide 12 = two-panel comparison: declarative box (profiles + pipeline) vs framework box (LangGraph/CrewAI) |
-| §4 The standards converge — MCP, ChromaDB, Ollama are the same across declarative and framework crews; build against the standard, swap the implementation | 13 | hub/stack: three interchangeable orchestrator boxes sitting above one shared Skills/MCP tools/Guardrails layer |
-| §5 One model, four agents — the resource table (~3.5 GB model, ~0.3 GB embedding model, ~15 MB crew and ChromaDB containers, ~4 GB total); agents are cheap, the model is shared; four separate instances would cost 4× | 14 (divider), 15 | divider 14 opens the section verbatim; slide 15 = hub-and-spoke: Ollama hub at center (native, ~3.5 GB), four agent boxes on spokes, resource total as a caption |
-| §5 The crew wired as Compose services — reuses the tools and memory already built, model server stays native, containers reach it over host.docker.internal | 16 | big-box anatomy: dashed compose.yaml boundary holding crew/ToolHive/ChromaDB boxes, arrow out to the native Ollama model-server box across `:11434` |
-| §6 The Reviewer as human-in-the-loop proxy — decides if the fix is safe to show a human (not whether to fix); APPROVE if non-destructive + verbatim runbook, REJECT if destructive/secrets/ungrounded, when in doubt REJECT; human retains final authority | 17 (divider), 18 | divider 17 opens the section verbatim; slide 18 = fan-out: Reviewer box → APPROVED/REJECTED outcome boxes → Human-decides box |
-| Summary table — multi-agent crew, why multi-agent, when one agent is enough, declarative crew, CrewAI, LangGraph, one shared model, relevance gate, Reviewer, standards converge | 7, 8, 10, 12, 13, 15, 18 | the summary table's ten rows are each already covered by their own dedicated slide above — no separate summary slide needed, avoiding a redundant orphan-free repeat |
-| Closing hand-off — read the four profiles, run the 503 incident to APPROVED, run the Kafka incident to ESCALATE, watch the relevance gate | 19 | pipeline scene: Triage → Investigate → Fix → Review, branching to 503→APPROVED and Kafka→ESCALATE. No dedicated divider — the lesson's closing hand-off is an unheaded paragraph, not a `##` section, and this closing slide already carries the hand-off (style-guide §3a skip exception) |
+| §3 The incident crew's pipeline — sequential stages, the relevance gate, the Kafka/payments-runbook near-miss, the NO-runbook escalate short-circuit | 9 (divider), 10, 11 | divider 9 opens the section verbatim; slide 10 = pipeline with a diamond gate: Triage → Investigate → gate? → Fixer → Reviewer → APPROVED/ESCALATE; slide 11 = the gate rationale: Kafka query → nearest chunk is payments → "covers this incident?" → NO → REJECTED |
+| §4 Two paths — declarative (four Markdown profiles + one Python pipeline, stdlib only) vs framework (CrewAI role-based, LangGraph graph + checkpointing) | 12 (divider), 13 | divider 12 opens the section verbatim; slide 13 = two-panel comparison: declarative box (profiles + pipeline) vs framework box (LangGraph/CrewAI) |
+| §4 The standards converge — MCP, ChromaDB, Ollama are the same across declarative and framework crews; build against the standard, swap the implementation | 14 | hub/stack: three interchangeable orchestrator boxes sitting above one shared MCP tools/ChromaDB memory/Ollama model layer |
+| §5 One model, four agents — the resource table (~3.5 GB model, ~0.3 GB embedding model, ~15 MB crew and ChromaDB containers, ~4 GB total); agents are cheap, the model is shared; four separate instances would cost 4× | 15 (divider), 16 | divider 15 opens the section verbatim; slide 16 = hub-and-spoke: Ollama hub at center (native, ~3.5 GB), four agent boxes on spokes, resource total as a caption, plus the CrewAI + gemma3:4B ≈ 4.5 GB comparison caption |
+| §5 The crew wired as Compose services — two services (crew, ChromaDB 1.5.9 with a `/data` volume), model server stays native, containers reach it over host.docker.internal; ToolHive stays outside compose | 17 | big-box anatomy: dashed compose.yaml boundary holding crew, ChromaDB and chroma_data volume boxes, arrow out to the native Ollama model-server box across `:11434` |
+| §6 The Reviewer as human-in-the-loop proxy — decides if the fix is safe to show a human (not whether to fix); APPROVE if non-destructive + verbatim runbook, REJECT if destructive/secrets/ungrounded, when in doubt REJECT; checks the fix against the runbook passage it is handed; human retains final authority | 18 (divider), 19 | divider 18 opens the section verbatim; slide 19 = fan-out: Reviewer box → APPROVED/REJECTED outcome boxes → Human-decides box |
+| Summary table — multi-agent crew, why multi-agent, when one agent is enough, declarative crew, CrewAI, LangGraph, one shared model, relevance gate, Reviewer, standards converge | 7, 8, 10, 11, 13, 14, 16, 19 | the summary table's ten rows are each already covered by their own dedicated slide above — no separate summary slide needed, avoiding a redundant orphan-free repeat |
+| Closing hand-off — read the four profiles, run the 503 incident to APPROVED, run the Kafka incident to ESCALATE, watch the relevance gate | 20 | pipeline scene: Triage → Investigate → Fix → Review, branching to 503→APPROVED and Kafka→ESCALATE. No dedicated divider — the lesson's closing hand-off is an unheaded paragraph, not a `##` section, and this closing slide already carries the hand-off (style-guide §3a skip exception) |
 
 **No orphans.** All 13 original content slides, all six lesson `##` sections (each with its own
 divider, in lesson order, verbatim title text), and all lesson §1–§6 concepts (the hospital analogy, why
 multi-agent, the single-agent boundary, the Incident Crew's pipeline and relevance gate, the two build
 paths and their converging standards, the one-model resource budget, the Compose wiring, and the
-Reviewer's human-in-the-loop role) are covered above with an explicit slide mapping. Slide count is 19
-(13 content + 6 dividers), pagenos `M7·01`–`M7·19`, renumbered sequentially in final presentation order —
+Reviewer's human-in-the-loop role) are covered above with an explicit slide mapping. Slide count is 20
+(14 content + 6 dividers), pagenos `M7·01`–`M7·20`, renumbered sequentially in final presentation order —
 no content slide reordering was required since the existing sequence already walked the lesson's six
 sections in document order.
 
@@ -143,3 +136,17 @@ sections in document order.
   - Slide 17 (divider 6, "The Reviewer as human-in-the-loop proxy") →
     `reviewer-human-in-loop-signoff.jpg` — a senior physician reviewing and signing a colleague's note,
     approve/reject stamp tray on the desk.
+
+## 2026-10-21 deck-audit fix pass (group 4)
+
+- **+1 slide.** Slide 11 "The relevance gate: nearest isn't relevant" teaches lesson §3's gate
+  rationale (previously an orphan). Pagenos renumbered `M7·01`–`M7·20`.
+- **Stale labels fixed.** Slide 13 says "Four Markdown profiles" (the lab files are
+  `crew/profiles/*.md`, not SOUL.md). Slide 17 shows the lab's real compose.yaml: crew and ChromaDB
+  1.5.9 only, with ToolHive no longer drawn inside the compose boundary.
+- **Drift fixed.** Slide 14's shared layer reads MCP tools / ChromaDB memory / Ollama model, as in
+  lesson §4. Slide 16 adds the CrewAI + gemma3:4B ≈ 4.5 GB caption. Slide 19 says the Reviewer gets
+  the fix plus the runbook passage.
+- **Narration** (`planning/narration/07-narration.md`) now has six videos in deck order. The Reviewer
+  moved into Video 6, Video 3 says Triage's label is printed for the human and the Investigator
+  searches with the original incident text, and Video 5 narrates the Compose wiring slide.

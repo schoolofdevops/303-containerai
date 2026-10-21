@@ -24,7 +24,7 @@ In the lab, you ran the Incident Crew, and it worked. You gave it an incident, f
 
 Why does the Triage agent run at a different temperature than the Fixer? Why does this crew never retry anything, even when a result looks weak? When the Reviewer says APPROVED or REJECTED, is that coming from a careful check in the code, or is it just trusting whatever the model said? You can't answer any of that from the transcript alone. You have to open `crew.py` itself.
 
-That's what this deep dive does. We're going to read the actual function calls in `crew.py`, line by line, and connect each one back to a decision Gourav made when he wrote this crew. And near the end, we're going to run the same incident through the crew multiple times, with one knob changed each time, so you can see with your own eyes what stays stable and what doesn't.
+That's what this deep dive does. We're going to read the actual function calls in `crew.py`, line by line, and connect each one back to a decision I made when I wrote this crew. And near the end, we're going to run the same incident through the crew multiple times, with one knob changed each time, so you can see with your own eyes what stays stable and what doesn't.
 
 By the end of this deep dive, you'll be able to look at any small multi-agent pipeline and ask the right questions about it: which calls are pinned at zero temperature and why, where the safety gates actually live in the code, and what happens the day one of those gates gets quietly switched off.
 
@@ -113,7 +113,7 @@ Now, why build it this way, when a framework like CrewAI would let you route wor
 
 The first, let's call it attention getting spread too thin. When one shared conversation keeps growing and every agent reads the whole thing, an agent ends up wading through stuff that has nothing to do with its own job before it can even start. A small model doesn't have much attention to spend, so that's expensive. Here, that never happens — the Fixer's prompt never contains the Triage output, the Reviewer's prompt never contains the retrieval candidate that got thrown out. Each agent only ever sees the exact fields its own job needs.
 
-The second is what happens to a mistake once it's made. Say an early agent gets something a little wrong. In a framework where a manager agent summarizes or rewords a sub-agent's finding before passing it along, that early mistake can get smoothed over in the rewording, and by the time it reaches the next agent, it looks fine — nobody downstream ever sees the original evidence that would have let them catch it. Here, that can't happen, because every hop passes forward the previous agent's exact output. The Reviewer looks at the Fixer's literal words, not somebody's summary of them.
+The second is what happens to a mistake once it's made. Say an early agent gets something a little wrong. In a framework where a manager agent summarizes or rewords a sub-agent's finding before passing it along, that early mistake can get smoothed over in the rewording, and by the time it reaches the next agent, it looks fine — nobody downstream ever sees the original evidence that would have let them catch it. Here, that can't happen, because every hop passes forward the previous agent's exact output. The Reviewer looks at the Fixer's literal words, not somebody's summary of them. And notice the line under both panels. Every hop is another LLM call, and every call costs time and, if you pay per token, money. This crew already pays five calls per run. Dynamic re-routing adds more hops on top, and each extra hop is one more chance to drift off the incident.
 
 One last thing before we move on, since you'll want this for the next video too. `crew.py` has no debug flag, no verbose switch, nothing like that. And you don't actually need one. Between the print statements already sitting in the code and the agent's own profile file — say, `labs/m7/crew/profiles/investigator.md` — you can rebuild the exact prompt any agent saw on any run. The profile gives you the fixed part of the prompt, the f-string in `run()` gives you the part that changes per run, and together that's the whole thing.
 
@@ -137,11 +137,11 @@ One last thing before we move on, since you'll want this for the next video too.
 
 You already know from the lesson that the relevance gate matters, and that the Reviewer carries a lot of weight in this crew. What we haven't looked at yet is where, in the actual file, those two checks sit — and it turns out that placement is exactly what makes them trustworthy.
 
-Here's the thing to notice first: neither gate is a second model call asking the first model, "are you sure about that?" Both are plain Python, sitting right after the model returns its answer. `relevant = llm(...).upper().startswith("YES")` — that's the whole gate. And for the Reviewer, it's `verdict.upper().startswith('APPROVED')`. In both cases, the model's raw words get run through one deterministic check before the code lets that answer change anything.
+Notice this first: neither gate is a second model call asking the first model, "are you sure about that?" Both are plain Python, sitting right after the model returns its answer. `relevant = llm(...).upper().startswith("YES")` — that's the whole gate. And for the Reviewer, it's `verdict.upper().startswith('APPROVED')`. In both cases, the model's raw words get run through one deterministic check before the code lets that answer change anything.
 
-Let's say the model answers "Yes, I believe this passage is relevant because..." — that still passes, since the string starts with YES, whatever comes after it. Now let's say a different run comes back hedging, something like "possibly, but I'm not certain" — that fails the same check, and it fails for a reason that has nothing to do with the code understanding English. It fails because the string doesn't start with YES. Well, that's really the whole argument for doing it this way. If instead you asked the model a follow-up question like "and are you sure that's safe?", you'd just be generating more probabilistic text, which can be wrong in exactly the same way the first answer could be wrong. A plain string check on a fixed output format doesn't have that problem — there's no way to argue it into a different answer.
+Let's say the model answers "Yes, I believe this passage is relevant because..." — that still passes, since the string starts with YES, whatever comes after it. Now let's say a different run comes back hedging, something like "possibly, but I'm not certain" — that fails the same check, and it fails for a reason that has nothing to do with the code understanding English. It fails because the string doesn't start with YES. Well, that's really the whole argument for doing it this way. If instead you asked the model a follow-up question like "and are you sure that's safe?", you'd just be generating more probabilistic text, which can be wrong in exactly the same way the first answer could be wrong. A plain string check on a fixed output format doesn't have that problem. There's no way to argue it into a different answer. But it does depend on the model putting its answer first. Look at the line under the two boxes. A model that ignores think:false, like qwen3:4b on Ollama 0.40.7, prints its reasoning before the answer, so the reply no longer starts with YES and the gate breaks. Pick a model that honours that switch.
 
-So where do the two checks actually live? Picture the pipeline as a line. Gate one sits right after the ChromaDB search returns something, and before the Fixer is allowed to act on it — so a bad retrieval gets caught before anyone builds a fix out of it. Gate two sits at the very end, right before a human would see the result — so a risky-looking fix gets caught before it reaches anyone who might actually run it. There's a third spot you might expect a gate, checking arguments before a tool call happens, and it's deliberately missing here. Why? Because this crew's one tool call always takes the same thing, the raw incident text — there's no case where the model gets to invent a search query or pick its own arguments, so there's nothing to validate going in. That third kind of check earns its place once an agent starts choosing what to call and how; this one never does.
+So where do the two checks actually live? Picture the pipeline as a line. Gate one sits right after the ChromaDB search returns something, and before the Fixer is allowed to act on it — so a bad retrieval gets caught before anyone builds a fix out of it. Gate two sits at the very end, right before a human would see the result — so a risky-looking fix gets caught before it reaches anyone who might actually run it. There's a third spot you might expect a gate, checking arguments before a tool call happens, and it's deliberately missing here. Why? Because this crew's one tool call always takes the same thing, the raw incident text — there's no case where the model gets to invent a search query or pick its own arguments, so there's nothing to validate going in. That third kind of check earns its place once an agent starts choosing what to call and how. This one never does. If you want to go further, the slide names the next two layers. One is input validation, which rejects an empty or broken incident string before Triage ever runs. The other is an explicit output schema for the Reviewer's verdict. Today, a Reviewer that opens with an explanation instead of the word APPROVED fails the check and reads as REJECTED. That is the safe direction to fail in, but you should know about it before you change the Reviewer's profile.
 
 One more distinction worth keeping straight, because Module 8 leans on it heavily. Everything in this video is about behavior — does this one gate, on this one input, do the right thing, and you can verify that just by running it. Module 8 is a different question entirely: across every crew your org has deployed, can you prove, after the fact, that the gate is still there and nobody quietly removed it? This page checks one gate's correctness. Module 8 checks whether gates stay in place at all.
 
@@ -159,7 +159,7 @@ One more distinction worth keeping straight, because Module 8 leans on it heavil
 
 **Format:** Slides + voiceover (with demo transcript excerpts)
 **Estimated duration:** 6 minutes
-**Learning objective:** By the end, learners can state, with evidence from a real run, that raising temperature barely moves this crew's outcome, while removing the relevance gate makes the outcome unstable.
+**Learning objective:** By the end, learners can state, with evidence from a real run, that raising temperature barely moves this crew's outcome, while removing the relevance gate makes the crew consistently approve the wrong fix.
 
 ### Narration script
 
@@ -167,7 +167,7 @@ Everything we've said so far about temperature and gates has been a claim. Now l
 
 First, the baseline. The lab's own run: "the checkout page is returning HTTP 503 errors for all users." Triage classifies it, the Investigator retrieves the checkout runbook, the Fixer proposes the scale command from that runbook, and the Reviewer says APPROVED. Nothing unusual — that's the result you already saw in the lab.
 
-For Variant A, we raise only Triage's temperature, from zero up to 0.9, and run the exact same incident three times in a row. Investigator, Fixer, and Reviewer all stay exactly where they were. What happens? All three runs still land on OUTCOME: APPROVED. The structural decision held completely steady across that jump. But the Triage prose did not hold steady at all — run one stayed short, the way its profile asks for. Run two drifted into a long run-on sentence. And run three broke the profile's format entirely, adding an entire unrequested troubleshooting section that nobody asked it to write. So raising Triage's temperature made Triage noisier, but it didn't touch the crew's final decision, because the Investigator and Reviewer, the two agents that actually gate the outcome, never moved off zero.
+For Variant A, we raise only Triage's temperature, from zero up to 0.9, and run the exact same incident three times in a row. Investigator, Fixer, and Reviewer all stay exactly where they were. What happens? All three runs still land on OUTCOME: APPROVED. The structural decision held completely steady across that jump. But Triage's label did not hold steady. The format held. Every run printed one short AREA and SEV line, just as its profile asks. The content is what moved. The baseline called this incident SEV1. At 0.9, the three runs said SEV2, then SEV1, then SEV2. And run two invented a cause the incident never mentioned: a payment gateway outage, for what is really a checkout web-tier problem. So the label is not a stable fact at high temperature. But the crew's final decision never moved, because Triage's output is only printed, and the Investigator and the Reviewer, the two agents that actually gate the outcome, stayed at zero.
 
 Now for Variant B, and this is the one that matters most. We leave every temperature exactly where it was, and instead patch out the relevance gate itself, so it always returns true no matter what the model actually said — simulating a very real production failure mode, where a feature flag gets left in a bypass state, or a refactor accidentally sets a flag to always-true. We run this against the Kafka incident, the one the baseline crew correctly escalates, because no runbook in this course actually covers Kafka.
 
@@ -182,8 +182,8 @@ So here's the real finding of this whole experiment. It wasn't the low temperatu
 ### Suggested visuals / slide beats
 
 1. Table: Baseline vs Variant A (3 repeats) vs Variant B — knob changed, OUTCOME marker, stable or not
-2. Transcript excerpt: Variant A run 3's unrequested troubleshooting section, circled
-3. Diagram: gate bypassed → wrong runbook retrieved with full confidence → Fixer invents a command
+2. Transcript excerpt: Variant A run 2's Triage line, "SEV1 | Payment gateway outage impacting all checkout attempts", circled
+3. Diagram: gate bypassed → wrong runbook retrieved with full confidence → Fixer quotes the wrong runbook's real payments restart command
 4. Big callout: "The gate, not the agents' temperatures, was what made the outcome reproducible"
 5. Takeaway: "Don't credit low temperature for a stable outcome until you've confirmed there's still a code-level gate in the loop"
 
@@ -221,18 +221,21 @@ This deep dive closes out Module 7. From here, the course moves into Module 8, w
 | §1 Temperature per agent, all four call sites and their values | 2 | Explained |
 | §1 `llm()` default parameter as the deliberate Fixer baseline | 2 | Explained |
 | §2 No iteration cap / no retry loop in `run()` | 3 | Explained |
-| §2 ReAct-style loop as the contrasting shape | 3 | Explained |
+| §2 ReAct-style loop as the contrasting pattern | 3 | Explained |
 | §2 Fixed 5-call cost, predictable p99 latency/cost | 3 | Explained |
 | §3 Triage's output never reaches the Investigator's query | 4 | Explained |
 | §3 Plain-string handoff vs. CrewAI dynamic delegation | 4 | Explained |
 | §3 Context dilution and error cascade failure modes | 4 | Explained |
+| §3 Every hop is another LLM call (delegation depth cost) | 4 | Explained |
 | §5 No debug flag; reconstructing a prompt from profile + f-string | 4 | Explained (folded in as a coda, same "what agents receive" theme) |
 | §4 Both gates are deterministic Python string checks, not a second LLM call | 5 | Explained |
 | §4 Gate 1 position (post-tool-call) and Gate 2 position (final-answer) | 5 | Explained |
 | §4 Why no pre-tool-call gate is needed here; where that gate type would earn its keep | 5 | Explained |
 | §4 Behavior vs. governance distinction, bridge to Module 8 | 5 | Explained |
+| §4 Next layers: input validation and a Reviewer output schema; the safe failure direction | 5 | Explained |
+| §6 note: a model that ignores think:false breaks the YES/NO gate | 5 | Explained |
 | §6 Baseline run | 6 | Explained |
-| §6 Variant A — temperature raised, 3 repeats, outcome stable, prose drifts | 6 | Explained |
+| §6 Variant A — temperature raised, 3 repeats, outcome stable, format held, severity and cause drifted | 6 | Explained |
 | §6 Variant B — gate bypassed, wrong runbook, APPROVED in six of six runs | 6 | Explained |
 | §6 Comparison table takeaway: the gate, not temperature, pins the outcome | 6 | Explained |
 | Four "Where you will use this" takeaways | 7 | Explained |

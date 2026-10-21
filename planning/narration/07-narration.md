@@ -6,9 +6,10 @@
 |---|-------------|--------|--------------------|--------------|
 | 1 | Multi-Agent Incident Crew — Why One Agent Isn't Enough | Talking head | 2 min | Why the module exists, where it sits in the course |
 | 2 | Specialisation, Separation, and the Review Loop — Why Go Multi-Agent | Slides + voiceover | 5.5 min | The three reasons to split one agent into a crew, and when not to |
-| 3 | Inside the Incident Crew — Triage, Investigate, the Relevance Gate, Fix, Review | Slides + voiceover | 6 min | The pipeline, hop by hop, and why the relevance gate exists |
+| 3 | Inside the Incident Crew — Triage, Investigate, and the Relevance Gate | Slides + voiceover | 4 min | The pipeline, hop by hop, and why the relevance gate exists |
 | 4 | Declarative vs CrewAI vs LangGraph — Two Paths to Build a Crew | Slides + voiceover | 5.5 min | The three ways to build the crew, and how to choose |
-| 5 | One Model, Four Agents — Recap and Lab Bridge | Slides + voiceover | 2 min | Resource cost recap, what the lab will prove |
+| 5 | One Model, Four Agents — What a Crew Costs and How Compose Wires It | Slides + voiceover | 3 min | Resource cost, the CrewAI comparison, and the two-service compose file |
+| 6 | The Reviewer as Human-in-the-Loop Proxy — Recap and Lab Bridge | Slides + voiceover | 3 min | What the Reviewer checks, who keeps the final say, and what the lab will prove |
 
 ---
 
@@ -69,35 +70,29 @@ You'd reach for a crew instead when the task produces a consequential action, wh
 
 ---
 
-## Video 3: Inside the Incident Crew — Triage, Investigate, the Relevance Gate, Fix, Review
+## Video 3: Inside the Incident Crew — Triage, Investigate, and the Relevance Gate
 
 **Format:** Slides + voiceover
-**Estimated duration:** 6 minutes
+**Estimated duration:** 4 minutes
 **Learning objective:** By the end, learners can trace an incident through every stage of the crew's pipeline and explain why the relevance gate is not optional.
 
 ### Narration script
 
-The crew runs as a pipeline, one stage handing its output to the next, and here's the important part — the pipeline stops early if no runbook actually matches the incident.
+The crew runs as a pipeline, one stage after another. And here is the important part: the pipeline stops early if no runbook actually matches the incident.
 
-Let's say an incident report comes in. It first goes to Triage, which classifies the area and how severe it is. That classification goes to the Investigator, which does retrieval — it queries the runbook store and pulls back whatever passage looks closest to this incident.
+Let's say an incident report comes in. It first goes to Triage, which classifies the area and how severe it is. Triage prints that label for you, the human, to read. But the label does not travel on. The Investigator searches the runbook store with the original incident text, and pulls back whatever passage looks closest to this incident.
 
-Now here's where a lot of naive systems go wrong, and this is worth slowing down for. Naive vector search always returns the closest match it can find — the nearest neighbour — even when that neighbour has nothing to do with the actual incident. During validation of this exact crew, it confidently proposed the payments runbook for a Kafka outage, only because the Kafka query had no better match, and the model never stopped to question the result.
+Now this is where a lot of naive systems go wrong, so let's slow down. Look at the next slide. Vector search always returns the closest match it can find, the nearest neighbour, even when that neighbour has nothing to do with the incident. During validation of this exact crew, a Kafka outage came in. The nearest chunk was the payments runbook, only because the Kafka query had no better match. And without a check, the crew confidently proposed a payments restart for a Kafka outage.
 
-So between the Investigator and the Fixer, there's a relevance gate. And it asks the model one plain yes-or-no question: does this passage actually address this incident? If the answer is yes, and the runbook genuinely matches, the Fixer takes over and proposes the exact command to run. If the answer is no — no runbook found — the crew skips straight to REJECTED, escalate to on-call. A badly wrong fix never reaches the output.
+So between the Investigator and the Fixer, there is a relevance gate. It asks the model one plain yes-or-no question: does this passage actually address this incident? If the answer is yes, the Fixer takes over and proposes the exact command to run. If the answer is no, the crew skips straight to REJECTED and escalates to on-call. A badly wrong fix never reaches the output.
 
-Once the Fixer proposes a command, it goes to the Reviewer, and this is the most important member of the crew. The Reviewer's rules are simple. Approve if the command is non-destructive and comes word for word from the runbook. Reject if the command destroys data, touches secrets, or was never in the runbook to begin with. And when in doubt — reject.
-
-Think of the Reviewer as a stand-in for the human review that would normally happen in a real incident-response workflow. The crew never applies fixes on its own. It produces a checked recommendation and a clear outcome — APPROVED, or REJECTED and escalate — that a human engineer reads and then acts on. The automation earns its place by doing the triage, the retrieval, and that first safety check. The human keeps the final say.
-
-In the next video, let's look at the two different ways you can actually build this pipeline — writing it yourself, or reaching for a framework.
+In the next video, let's look at the two different ways you can build this pipeline: writing it yourself, or reaching for a framework.
 
 ### Suggested visuals / slide beats
 
-1. Divider — "Inside the incident crew's pipeline"
-2. Pipeline diagram, hop by hop with fragment build: Incident → Triage → Investigator → Relevance Gate → Fixer → Reviewer → APPROVED / REJECTED
-3. Callout panel — the Kafka/payments mismatch story as a concrete "this actually happened" beat
-4. Diagram — reviewer decision rule: APPROVE (non-destructive + runbook-backed) vs REJECT (destructive / ungrounded / not in runbook)
-5. Takeaway visual — human-in-the-loop: crew hands a checked recommendation to a human, human makes the call
+1. Divider 3, "The incident crew's pipeline".
+2. "The Incident Crew pipeline": Triage, Investigate, gate, Fixer, Reviewer, then APPROVED or ESCALATE.
+3. "The relevance gate: nearest isn't relevant": Kafka incident, nearest chunk is the payments runbook, the gate asks "covers this incident?", NO, REJECTED and escalate.
 
 ---
 
@@ -127,34 +122,57 @@ In the next video, let's put an actual number on what this crew costs to run, an
 
 ### Suggested visuals / slide beats
 
-1. Divider — "Two paths to multi-agent"
-2. Diagram — declarative path: four Markdown profiles feeding one Python pipeline feeding one Ollama endpoint
-3. Two-column diagram — CrewAI (agents.yaml + tasks.yaml, dynamic delegation) vs LangGraph (explicit graph, checkpointing, pause/resume)
-4. Diagram — the standards-converge idea: MCP / ChromaDB / Ollama sitting underneath all three orchestrator choices unchanged
+1. Divider 4, "Two paths to multi-agent".
+2. "Two paths to multi-agent": the declarative box (four Markdown profiles, one per agent, one Python pipeline) against the framework box (LangGraph, CrewAI).
+3. "Swap the orchestrator, not the tools": Declarative, LangGraph and CrewAI above one shared layer of MCP tools, ChromaDB memory and the Ollama model.
 
 ---
 
-## Video 5: One Model, Four Agents — Recap and Lab Bridge
+## Video 5: One Model, Four Agents — What a Crew Costs and How Compose Wires It
 
 **Format:** Slides + voiceover
-**Estimated duration:** 2 minutes
-**Learning objective:** By the end, learners know the resource cost of the crew and what they will run and observe in the lab.
+**Estimated duration:** 3 minutes
+**Learning objective:** By the end, learners know the resource cost of the crew, how it compares with a framework crew, and how the lab's compose file wires it.
 
 ### Narration script
 
-Let's do the math on what this crew actually costs to run, on a 16 gigabyte laptop running qwen3.5:2b. The model itself needs about three and a half gigabytes of memory, as Ollama reports it. The small embedding model adds about a third of a gigabyte. ChromaDB needs only around 15 megabytes. And the crew container — all four agents together — needs about 15 megabytes too. That's a total of roughly 4 gigabytes.
+Let's do the math on what this crew actually costs to run, on a 16 gigabyte laptop running qwen3.5:2b. The model itself needs about three and a half gigabytes of memory, as Ollama reports it. The small embedding model adds about a third of a gigabyte. ChromaDB needs only around 15 megabytes. And the crew container, all four agents together, needs about 15 megabytes too. That's a total of roughly 4 gigabytes.
 
-And here's the interesting part — agents themselves are cheap. A crew is really just four Python functions with four different system prompts. The model is the expensive part, and it's shared across all four. Running four separate copies of the model, one per agent, would need four times the memory for no real gain. So all four agents call the same Ollama endpoint, one after another, exactly the same idea you used back in Module 6.
+And here's the interesting part: agents themselves are cheap. A crew is really just four Python functions with four different system prompts. The model is the expensive part, and it's shared across all four. Running four separate copies of the model, one per agent, would need four times the memory for no real gain. So all four agents call the same Ollama endpoint, one after another, exactly the same idea you used back in Module 6.
 
-If you did reach for a framework crew instead — CrewAI running gemma3:4B, say — you'd need a model of about 4 gigabytes, so roughly four and a half in total. The declarative 2 billion parameter crew stays the laptop-friendly default, and you'd only reach for a bigger model when the framework's more complex coordination actually demands it.
+Look at the second line under the diagram. If you reached for a framework crew instead, say CrewAI running gemma3:4B, you'd need a model of about 4 gigabytes, so roughly four and a half in total. The declarative 2 billion parameter crew stays the laptop-friendly default. You'd only reach for a bigger model when the framework's more complex coordination actually demands it.
 
-To summarize — you've learned why a crew beats a single agent for consequential actions, how the pipeline runs with a relevance gate protecting the fixer, and the three ways to actually build one. In the lab now, you're going to read all four agent profiles yourself, run the crew against a real 503 incident and watch it get APPROVED, and then run it against a Kafka incident and watch the relevance gate catch a bad match and send it to REJECTED — escalate. I'll see you in the lab.
+Now, how does this run as containers? The lab's compose file has just two services. One is ChromaDB, version 1.5.9, with a volume for its data. The other is the crew, which you run one shot at a time with docker compose run. The model is not in the compose file at all. It stays native on the host, and the crew reaches it at host.docker.internal on port 11434. ToolHive also stays outside compose, and only the CrewAI variant in the lab uses it.
 
 ### Suggested visuals / slide beats
 
-1. Resource table — model / ChromaDB / crew container / total, laptop-friendly framing
-2. Comparison — declarative 2B crew (~4 GB) vs CrewAI + gemma3:4B (~4.5 GB)
-3. Closing/lab-bridge slide — "Now open Module 7 · Lab" with the two lab scenarios (503 → APPROVED, Kafka → REJECTED/escalate) as icons
+1. Divider 5, "One model, four agents".
+2. "One model, four agents": Ollama hub with four agent spokes, the 4 GB total, and the CrewAI on gemma3:4B ≈ 4.5 GB line.
+3. "Wire the crew with the Compose Spec": crew, ChromaDB 1.5.9 and its volume inside compose.yaml, the native model server outside.
+
+---
+
+## Video 6: The Reviewer as Human-in-the-Loop Proxy — Recap and Lab Bridge
+
+**Format:** Slides + voiceover
+**Estimated duration:** 3 minutes
+**Learning objective:** By the end, learners can explain what the Reviewer checks and why a human keeps the final say, and they know what they will run and observe in the lab.
+
+### Narration script
+
+The last member of the crew is the Reviewer, and its job is subtle. It does not decide whether to fix the incident. That is the Fixer's job. It decides whether the proposed fix is safe to show a human. To do that, it gets two things: the Fixer's proposed command, and the runbook passage that command came from. So it can check the fix against the real evidence, word for word.
+
+The Reviewer's rules are simple. Approve if the command is non-destructive and comes word for word from the runbook. Reject if the command destroys data, touches secrets, or was never in the runbook. And when in doubt, reject.
+
+Think of the Reviewer as a stand-in for the human review that would normally happen in a real incident-response workflow. The crew never applies fixes on its own. It produces a checked recommendation and a clear outcome, APPROVED, or REJECTED and escalate, that a human engineer reads and then acts on. The automation earns its place by doing the triage, the retrieval, and that first safety check. The human keeps the final say.
+
+To summarize: you've learned why a crew beats a single agent for consequential actions, how the pipeline runs with a relevance gate protecting the Fixer, the two paths to build a crew, what it costs, and how the Reviewer hands a checked result to a human. In the lab, you're going to read all four agent profiles yourself, run the crew against a real 503 incident and watch it get APPROVED, and then run it against a Kafka incident and watch the relevance gate catch a bad match and send it to REJECTED and escalate. I'll see you in the lab.
+
+### Suggested visuals / slide beats
+
+1. Divider 6 (senior physician signing off a note).
+2. "The Reviewer, human-in-the-loop proxy": Reviewer gets the fix plus the runbook passage, APPROVED or REJECTED, then the human decides.
+3. Closing/lab-bridge slide: "Swap the orchestrator, keep the crew", with 503 → APPROVED and Kafka → ESCALATE.
 
 ---
 
@@ -166,18 +184,19 @@ To summarize — you've learned why a crew beats a single agent for consequentia
 | Why single-agent overloads context | 1, 2 | Explained |
 | Specialisation (small, focused prompts per agent) | 2 | Explained |
 | Separation of concerns | 2 | Explained |
-| Review loops / reviewer as human-in-the-loop proxy | 2, 3 | Explained |
+| Review loops / reviewer as human-in-the-loop proxy | 2, 6 | Explained |
 | When a single agent is enough | 2 | Explained |
-| Pipeline stages (Triage → Investigator → Gate → Fixer → Reviewer) | 3 | Explained |
+| Pipeline stages (Triage → Investigator → Gate → Fixer → Reviewer); Triage's label is printed, not passed on | 3 | Explained |
 | Relevance gate + the Kafka/payments mismatch incident | 3 | Explained (real validation story) |
-| Reviewer's APPROVE/REJECT rules | 3 | Explained |
+| Reviewer's APPROVE/REJECT rules; it gets the fix plus the runbook passage | 6 | Explained |
 | Declarative crew (4 Markdown profiles + 1 pipeline) | 4 | Explained |
 | CrewAI (agents.yaml/tasks.yaml, delegation) | 4 | Explained |
 | LangGraph (explicit graph, checkpointing) | 4 | Explained |
 | Standards converge (MCP/ChromaDB/Ollama unchanged across orchestrators) | 4 | Explained |
 | Resource budget table (model/ChromaDB/crew container) | 5 | Explained |
 | Declarative vs CrewAI+gemma3:4B cost comparison | 5 | Explained |
-| Lab preview (503 → APPROVED, Kafka → REJECTED/escalate) | 5 | Explained (bridge only, not demonstrated on-video) |
+| Compose wiring: two services (crew, ChromaDB), model native, ToolHive outside compose | 5 | Explained |
+| Lab preview (503 → APPROVED, Kafka → REJECTED/escalate) | 6 | Explained (bridge only, not demonstrated on-video) |
 
 ## Verification flags
 

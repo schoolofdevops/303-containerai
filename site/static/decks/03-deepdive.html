@@ -8,7 +8,7 @@
 <!-- ============================================================
      CourseSmith whiteboard deck — Module 3 Deep Dive
      (self-contained; regenerated from templates/deck/deck-skeleton.html.tmpl,
-     round-3 skeleton per .superpowers/sdd/deck-regen-contract.md, 2026-07-25)
+     round-3 skeleton per sdd/deck-regen-contract.md, 2026-07-25)
      Style contract: templates/deck/whiteboard-style-guide.md
      Zero external requests: reveal.js 5.x runtime + Patrick Hand
      woff2 are inlined below. Keep it that way.
@@ -140,7 +140,7 @@ footer, header, hgroup, main, menu, nav, section {
 <section data-auto-animate>
   <p class="kicker">MODULE 3 DEEP DIVE &nbsp;·&nbsp; CONTAINERS FOR GENAI &amp; AGENTIC AI</p>
   <h2 class="t" style="font-size:2.3em">The swap that made this worth doing</h2>
-  <p class="s" style="font-size:1.2em">The lab's two-variable swap onto vLLM — this deck opens the machinery behind it.</p>
+  <p class="s" style="font-size:1.2em">The lab's two-variable swap, and the machinery behind it</p>
   <svg viewBox="0 0 1100 300" role="img" aria-label="Three theme boxes — paged memory, continuous batching, and the labs flags — all feeding into one box asking why the swap was worth it">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
       <rect x="60" y="40" width="300" height="90" rx="10"/>
@@ -445,7 +445,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="335" y="95" text-anchor="middle" class="lbl-b">table 2</text>
     <text x="335" y="118" text-anchor="middle" class="lbl-g">cleared → reseated now</text>
 
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
       <path d="M500,105 C560,105 580,105 620,105" marker-end="url(#ah)"/>
     </g>
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
@@ -613,16 +613,18 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="430" y="258" text-anchor="middle" class="lbl-b">VLLM_CPU_</text>
     <text x="430" y="280" text-anchor="middle" class="lbl-b">KVCACHE_SPACE</text>
 
-    <text x="800" y="180" text-anchor="middle" class="lbl-g">this lab's default (1024) was worked</text>
+    <text x="800" y="180" text-anchor="middle" class="lbl-g">max-model-len default (1024) was worked</text>
     <text x="800" y="205" text-anchor="middle" class="lbl-g">backward from the 5 GB container cap</text>
+    <text x="800" y="250" text-anchor="middle" class="lbl-g">more max-num-seqs, same budget:</text>
+    <text x="800" y="275" text-anchor="middle" class="lbl-g">the queue just moves to cache space</text>
   </svg>
   <div class="pageno">M3-DD·14</div>
 </section>
 
 <!-- ============ SLIDE 13 — swap-space inert on CPU, two-panel ============ -->
 <section>
-  <h2 class="t">`--swap-space` is accepted, validated, and does nothing here</h2>
-  <p class="s">`--swap-space` is accepted and validated, but contributes zero blocks here.</p>
+  <h2 class="t">--swap-space is accepted, validated, and does nothing here</h2>
+  <p class="s">--swap-space is accepted, but adds zero blocks here</p>
   <svg viewBox="0 0 1100 320" role="img" aria-label="Two panel comparison: on GPU, swap space is a real overflow tier in host RAM when VRAM KV cache runs out, but on this CPU build swap space is accepted and validated at startup yet contributes zero blocks, confirmed live on metrics">
     <g filter="url(#rough)" fill="var(--p-green)" stroke="#1e1e1e" stroke-width="2.6">
       <rect x="60" y="50" width="440" height="230" rx="10"/>
@@ -632,7 +634,7 @@ footer, header, hgroup, main, menu, nav, section {
       <rect x="100" y="90" width="150" height="60" rx="6"/>
     </g>
     <text x="175" y="115" text-anchor="middle" class="lbl-sm">VRAM full</text>
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
       <path d="M250,120 C300,120 320,120 360,120" marker-end="url(#ah)"/>
     </g>
     <g filter="url(#rough)" fill="var(--p-blue)" stroke="#1e1e1e" stroke-width="2.4">
@@ -653,7 +655,8 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="715" y="115" text-anchor="middle" class="lbl-sm">--swap-space 1</text>
     <text x="715" y="133" text-anchor="middle" class="lbl-g">accepted, validated</text>
-    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-dasharray="6 6" stroke-linecap="round">
+    <text x="715" y="172" text-anchor="middle" class="lbl-g">default 4 GiB: startup error</text>
+    <g fill="none" stroke="#757575" stroke-width="2" stroke-dasharray="6 6" stroke-linecap="round">
       <path d="M790,120 C840,120 860,120 900,120" marker-end="url(#ahg)"/>
     </g>
     <g filter="url(#rough)" fill="none" stroke="#c62828" stroke-width="2.6">
@@ -688,7 +691,7 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="130" y="255">→ "Maximum concurrency for 1024 tokens: 22.75x"</text>
       <text x="130" y="280" class="lbl-g">roughly 22 max-length sequences before the cache is full</text>
     </g>
-    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+    <g fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
       <path d="M70,90 C70,110 70,130 70,135" marker-end="url(#ahg)"/>
       <path d="M70,190 C70,210 70,230 70,235" marker-end="url(#ahg)"/>
     </g>
@@ -713,6 +716,8 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="915" y="90" text-anchor="middle" class="lbl-sm">gpu_cache_usage_perc</text>
     <text x="915" y="112" text-anchor="middle" class="lbl-g">how full the pool is</text>
     <text x="915" y="132" text-anchor="middle" class="lbl-g">(CPU pool — GPU-named metric)</text>
+    <text x="185" y="205" text-anchor="middle" class="lbl-g">snapshots, not counters:</text>
+    <text x="185" y="225" text-anchor="middle" class="lbl-g">idle 0.0 = nothing in flight</text>
 
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
       <path d="M550,190 C450,230 350,240 260,255" marker-end="url(#ah)"/>
@@ -759,22 +764,56 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M3-DD·18</div>
 </section>
 
+<section>
+  <h2 class="t">Matched test: one workload, two servers</h2>
+  <p class="s">Read the direction, not the digit</p>
+  <svg viewBox="0 0 1100 340" role="img" aria-label="Two servers, vLLM-CPU serving SmolLM2-135M and native Ollama serving qwen3.5:2b with thinking off, each run three ways: four prompts one after another, three prompts at once, and the same three one after another as the matched baseline">
+    <g filter="url(#rough)" fill="var(--p-blue)" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60" y="25" width="440" height="80" rx="10"/>
+    </g>
+    <text x="280" y="62" text-anchor="middle" class="lbl-b">vLLM-CPU</text>
+    <text x="280" y="90" text-anchor="middle" class="lbl-g">SmolLM2-135M, float32</text>
+    <g filter="url(#rough)" fill="var(--p-green)" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="600" y="25" width="440" height="80" rx="10"/>
+    </g>
+    <text x="820" y="62" text-anchor="middle" class="lbl-b">Ollama (native)</text>
+    <text x="820" y="90" text-anchor="middle" class="lbl-g">qwen3.5:2b, ~3.1 GB, thinking off</text>
+    <g filter="url(#rough)" fill="var(--p-orange)" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60" y="170" width="290" height="80" rx="10"/>
+      <rect x="405" y="170" width="290" height="80" rx="10"/>
+      <rect x="750" y="170" width="290" height="80" rx="10"/>
+    </g>
+    <text x="205" y="205" text-anchor="middle" class="lbl-b">4 prompts in a row</text>
+    <text x="205" y="233" text-anchor="middle" class="lbl-g">sequential wall time</text>
+    <text x="550" y="205" text-anchor="middle" class="lbl-b">3 prompts at once</text>
+    <text x="550" y="233" text-anchor="middle" class="lbl-g">concurrent wall time</text>
+    <text x="895" y="205" text-anchor="middle" class="lbl-b">same 3, in a row</text>
+    <text x="895" y="233" text-anchor="middle" class="lbl-g">the matched baseline</text>
+    <g fill="none" stroke="#757575" stroke-width="2.2" stroke-linecap="round">
+      <path d="M280,110 L280,160" marker-end="url(#ahg)"/>
+      <path d="M820,110 L820,160" marker-end="url(#ahg)"/>
+    </g>
+    <text x="550" y="300" text-anchor="middle" class="lbl-g">ratio = matched baseline ÷ concurrent time. Not a benchmark.</text>
+  </svg>
+  <div class="pageno">M3-DD·19</div>
+</section>
+
 <!-- ============ SLIDE 17 — the experiment: absolute vs scaling, two-panel ============ -->
 <section>
   <h2 class="t">Ollama wins the scoreboard; vLLM wins the scaling curve</h2>
-  <p class="s">Ollama wins raw tok/s here; vLLM-CPU scales 3.13x to Ollama's 1.10x.</p>
-  <svg viewBox="0 0 1100 340" role="img" aria-label="Left panel: absolute speed bar chart where Ollama is taller and faster than vLLM-CPU. Right panel: scaling factor arrows from sequential to concurrent baseline, vLLM-CPU climbing steeply at 3.13x and Ollama nearly flat at 1.10x">
+  <p class="s">Ollama wins raw tok/s; vLLM-CPU scales 3.42x to 1.17x</p>
+  <svg viewBox="0 0 1100 340" role="img" aria-label="Left panel: absolute speed bar chart where Ollama is taller and faster than vLLM-CPU. Right panel: scaling factor arrows from sequential to concurrent baseline, vLLM-CPU climbing steeply at 3.42x and Ollama close to linear at 1.17x">
     <text x="255" y="30" text-anchor="middle" class="lbl-b">absolute speed (tok/s, sequential)</text>
     <g filter="url(#rough)" fill="var(--p-blue)" stroke="#1e1e1e" stroke-width="2.4">
       <rect x="140" y="180" width="90" height="60" rx="6"/>
     </g>
     <text x="185" y="165" text-anchor="middle" class="lbl-sm">vLLM-CPU</text>
-    <text x="185" y="270" text-anchor="middle" class="lbl-g">~8.4 tok/s</text>
+    <text x="185" y="270" text-anchor="middle" class="lbl-g">~7.9 tok/s</text>
     <g filter="url(#rough)" fill="var(--p-green)" stroke="#1e1e1e" stroke-width="2.8">
-      <rect x="290" y="70" width="90" height="170" rx="6"/>
+      <rect x="290" y="120" width="90" height="120" rx="6"/>
     </g>
-    <text x="335" y="55" text-anchor="middle" class="lbl-sm">Ollama</text>
-    <text x="335" y="270" text-anchor="middle" class="lbl-g">~33.2 tok/s</text>
+    <text x="335" y="105" text-anchor="middle" class="lbl-sm">Ollama</text>
+    <text x="335" y="270" text-anchor="middle" class="lbl-g">~15.9 tok/s</text>
     <text x="260" y="300" text-anchor="middle" class="lbl-b" style="fill:#2e7d32">Ollama wins here</text>
 
     <line x1="470" y1="40" x2="470" y2="320" stroke="#bdbdbd" stroke-width="2" stroke-dasharray="4 6"/>
@@ -784,15 +823,15 @@ footer, header, hgroup, main, menu, nav, section {
       <path d="M600,260 C650,150 700,90 760,70" marker-end="url(#ah)"/>
     </g>
     <text x="620" y="290" text-anchor="middle" class="lbl-sm">vLLM-CPU</text>
-    <text x="770" y="65" text-anchor="middle" class="lbl-b" style="fill:#2e7d32">3.13x</text>
+    <text x="770" y="65" text-anchor="middle" class="lbl-b" style="fill:#2e7d32">3.42x</text>
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.4" stroke-linecap="round">
       <path d="M900,220 C930,210 960,205 990,200" marker-end="url(#ahg)"/>
     </g>
     <text x="915" y="245" text-anchor="middle" class="lbl-sm">Ollama</text>
-    <text x="1005" y="195" text-anchor="middle" class="lbl-b">1.10x</text>
+    <text x="1005" y="195" text-anchor="middle" class="lbl-b">1.17x</text>
     <text x="815" y="320" text-anchor="middle" class="lbl-b" style="fill:#2e7d32">vLLM-CPU wins here</text>
   </svg>
-  <div class="pageno">M3-DD·19</div>
+  <div class="pageno">M3-DD·20</div>
 </section>
 
 <!-- ============ SLIDE 18 — closing takeaways ============ -->
@@ -821,7 +860,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
   </svg>
   <p class="credit">Next: apply these levers to a real concurrent deployment. &nbsp;·&nbsp; <b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI</p>
-  <div class="pageno">M3-DD·20</div>
+  <div class="pageno">M3-DD·21</div>
 </section>
 </div></div>
 

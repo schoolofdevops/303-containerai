@@ -5,10 +5,10 @@
 | # | Video title | Format | Estimated duration | Central idea |
 |---|-------------|--------|--------------------|--------------|
 | 1 | Module 4 Introduction — Why Your Model Needs a Shipping Manifest | Talking head | 2 min | Why loose model files break down, and what this module fixes |
-| 2 | OCI Artifacts — Why a Container Registry Can Also Store Your Model | Slides + voiceover | 5 min | OCI is a layered blob store with a manifest; a model fits that shape |
+| 2 | OCI Artifacts — Why a Container Registry Can Also Store Your Model | Slides + voiceover | 5 min | OCI is a layered blob store with a manifest; a model fits that format |
 | 3 | KitOps, ModelKit, and the Kitfile — Your Model's Shipping Manifest | Slides + voiceover | 6 min | KitOps/CNCF/ORAS, the Kitfile format, and what `kit pack` produces |
 | 4 | Selective Pull and Multi-Registry Portability | Slides + voiceover | 5 min | `--filter` pulls only the layer you need; the same command works on any registry |
-| 5 | ModelKit vs a Plain Container Image | Slides + voiceover | 4 min | Why `COPY model.gguf /app/` breaks down at scale |
+| 5 | ModelKit vs a Plain Container Image | Slides + voiceover | 5 min | Why `COPY model.gguf /app/` breaks down at scale, and how ModelKit differs from `docker model package` |
 | 6 | Module 4 Summary and Lab Bridge | Talking head | 2 min | Recap plus what you're about to pack, push, and pull in the lab |
 
 ## Video 1: Module 4 Introduction — Why Your Model Needs a Shipping Manifest
@@ -27,10 +27,9 @@ That is exactly the problem this module solves. You're going to learn about the 
 
 ### Suggested visuals / slide beats
 
-1. Title card: "Packaging Models as OCI Artifacts"
-2. Split visual: scattered files (weights, prompt, config) with arrows going to different destinations, labeled "the old way"
-3. Same files converging into one sealed, labeled box — the ModelKit
-4. Closing card previewing the lab: pack → push → pull → selective pull
+1. Title slide: "Packaging Models as OCI Artifacts", a sealed crate with four compartments
+2. "What you'll learn" slide: the four objectives of the module
+3. "The problem with loose model files" slide: scattered files feeding one confused receiver
 
 ---
 
@@ -54,10 +53,9 @@ And here's why that layering actually pays off in practice. Because each of thes
 
 ### Suggested visuals / slide beats
 
-1. Divider: "OCI Artifacts"
-2. Diagram: layered blob store — stack of labeled blobs with a manifest document pointing at each one
-3. Side-by-side comparison table: container image layers vs ModelKit layers (base OS / weights, app / code, config / Kitfile+prompts+datasets)
-4. Diagram: two versions of a ModelKit sharing an identical weights layer, only the config layer differs
+1. Divider: "What is an OCI artifact (and why models fit perfectly)"
+2. "An OCI artifact is a layered blob store": a container image stack beside a ModelKit stack, same spec
+3. "Unchanged layers are stored once": two versions of a ModelKit sharing identical layers, only the config layer differs
 
 ---
 
@@ -83,15 +81,16 @@ Once that Kitfile is in place, you would run `kit pack . -t` followed by a refer
 
 And under the hood, `kit` isn't reinventing the registry protocol. It uses something called ORAS, or also called as OCI Registry as Storage, which is a CNCF library that lets any language push and pull typed OCI artifacts to any compliant registry. And that is exactly why a ModelKit works the same way whether you're pushing to Docker Hub, GHCR, Quay, Harbor, or even a bare `registry:2` container. They all speak the same OCI distribution API underneath.
 
-Now, you might be wondering, doesn't Docker already have something like this? And you'd be right to wonder, because Docker Desktop, from version 4.40 onward, does have a `docker model package` command that also packs a GGUF file into an OCI artifact. So what's actually different? The real difference is ecosystem scope. `docker model package` runs on Docker Desktop and on Docker CE for Linux, so it is not a licence or platform difference. It uses Docker-defined media types, targets Docker Hub primarily, and packs everything into a single model blob, with no selective pull. KitOps, on the other hand, follows the CNCF ModelPack spec, works with `kit`, which runs anywhere, targets any OCI registry, keeps model, code, datasets, and docs as separate typed layers, and supports selective pull. And it integrates with the wider CNCF ecosystem, tools like Flux, Harbor, and Argo. So if you want portability across registries and runtimes, say, pulling into Kubernetes with Flux, or distributing into an air-gapped Harbor deployment, the CNCF path is the one you'd pick.
+Now let's see the whole journey in one picture. You write the Kitfile, and `kit pack` builds the layers. Then `kit push` sends the ModelKit to a registry, which is the hub in the middle. A serving node pulls it from there, and a separate runtime loads the weights. Remember, OCI only ships the crate. It does not run it. A separate runtime opens the crate and does the running.
 
 ### Suggested visuals / slide beats
 
-1. Divider: "KitOps and the Kitfile"
-2. Diagram: ModelKit split into its four typed layers (model, code, datasets, docs)
-3. Kitfile YAML on screen, annotated field by field as narrated
-4. `kit pack` flow: workspace files → hashed layers → manifest → local kit store
-5. Comparison table: KitOps ModelKit vs `docker model package`
+1. Divider: "KitOps and ModelKit (CNCF + ORAS)"
+2. "A ModelKit is a sealed, labelled crate": the four typed layers (model, code, datasets, docs) under a Kitfile tag
+3. "KitOps, ModelKit & ORAS": the kit CLI over ORAS over the OCI distribution API
+4. Divider: "The Kitfile: your shipping manifest"
+5. "The Kitfile is your shipping manifest": YAML fields mapped to typed layers
+6. Divider: "The full flow", then "The lifecycle: pack → push → pull → run"
 
 ---
 
@@ -117,18 +116,17 @@ Now let's talk about the second payoff, which is portability. Because a ModelKit
 
 ### Suggested visuals / slide beats
 
-1. Divider: "Selective Pull"
-2. Illustration: warehouse shelving books by chapter, one chapter being pulled out while the rest stay on the shelf
-3. Three-row diagram: serving node → model only, notebook → datasets only, CI pipeline → code only
-4. Divider: "Multi-Registry Portability"
-5. Table: registry targets (GHCR, Docker Hub, Quay, Harbor, local registry) with the same `kit push`/`unpack` command pattern
+1. Divider: "Selective pull: the KitOps payoff", with the warehouse sketch of one book pulled from a shelf
+2. "Selective pull grabs only what you need": one ModelKit filtered out to a serving node, a CI pipeline and a notebook
+3. Divider: "Multi-registry portability"
+4. "One artifact, every registry": one ModelKit pushed to GHCR, Docker Hub, Quay, Harbor and a local registry
 
 ---
 
 ## Video 5: ModelKit vs a Plain Container Image
 
 **Format:** Slides + voiceover
-**Estimated duration:** 4 minutes
+**Estimated duration:** 5 minutes
 **Learning objective:** By the end, learners can list the structural problems with `COPY model.gguf /app/` and explain why a ModelKit is a distribution mechanism, not an execution mechanism.
 
 ### Narration script
@@ -137,13 +135,15 @@ Here's a question you might already be asking. A plain container image can techn
 
 Well, that approach runs into real structural problems. Let's walk through four of them. First, you can't skip layers. Docker pulls the entire image, every single time, and there's no `--filter` for an individual `COPY` layer. Second, there are no layer types. A registry treats every layer as plain bytes with no meaning attached to it, so a CI tool can't ask for "just the model" without someone writing custom logic to find it. Third, images are meant to run. An OCI image carries a container config, an entrypoint, environment variables, a user, and so on. A plain image that holds only a GGUF file wastes space on all of that metadata, and it would confuse any tooling that expects a runnable image. And fourth, deduplication happens by accident, not by design. If your model file sits in one layer and gets shared across tags, Docker would deduplicate it, sure, but only if you've arranged your Dockerfile carefully, and you're hoping nothing else changes that layer later. A ModelKit makes this explicit instead of accidental.
 
+There is one more comparison worth making. Docker also has a command, `docker model package`, that packs a GGUF file into an OCI artifact. It first shipped in Docker Desktop 4.40. So what's actually different? The real difference is scope and governance. `docker model package` runs on Docker Desktop and on Docker CE for Linux, so it is not a licence or platform difference. It uses Docker-defined media types, targets Docker Hub by default, and packs everything into a single model blob, with no selective pull. KitOps, on the other hand, follows the CNCF ModelPack spec, works with `kit`, which runs anywhere, targets any OCI registry, keeps model, code, datasets, and docs as separate typed layers, and supports selective pull. And it integrates with the wider CNCF ecosystem, tools like Flux, Harbor, and Argo. So if you want portability across registries and runtimes, say, pulling into Kubernetes with Flux, or distributing into an air-gapped Harbor deployment, the CNCF path is the one you'd pick.
+
 So here's the key part to remember. A ModelKit uses OCI to move files around, not to run them. That is, it's a distribution mechanism, not an execution mechanism. The weights themselves are never "run" as a container. They get unpacked to a directory, and then a separate runtime, `llama.cpp`, or vLLM, or Ollama, loads them from there. And that runtime is the piece that gets containerized on its own.
 
 ### Suggested visuals / slide beats
 
-1. Divider: "ModelKit vs a Plain Image"
-2. Four-row checklist: skip layers (no), layer types (no), runnable metadata (wasted), deduplication (accidental) — each crossed out for a plain image
-3. Diagram: ModelKit unpacked to a directory, a separate runtime container loading the weights from that directory
+1. Divider: "ModelKit vs a plain container image"
+2. "COPY model.gguf: four problems": no skipping layers, no layer types, runnable metadata wasted, deduplication by accident, each crossed out
+3. "ModelKit / ORAS vs docker model package": a two-column comparison on standard, CLI reach, registries, layers and selective pull
 
 ---
 
@@ -161,8 +161,7 @@ Now it's time to prove all of that yourself. In the lab, you're going to pack Sm
 
 ### Suggested visuals / slide beats
 
-1. Recap slide: the six-row summary table (Why OCI, ModelKit, Kitfile, KitOps/CNCF, Selective pull, Multi-registry)
-2. Closing card: "Lab: pack → push → pull → selective pull" with the SmolLM2-135M-Instruct filename
+1. Closing slide: "Ship your model like an image", a sealed ModelKit rolling to a registry and out to a serving node, with the hand-off to the lab (pack, push, pull, then selective pull)
 
 ---
 
@@ -180,7 +179,8 @@ Now it's time to prove all of that yourself. In the lab, you're going to pack Sm
 | Kitfile fields (manifestVersion, package, model, code) | 3 | Explained |
 | `kit pack` mechanics | 3 | Explained |
 | ORAS | 3 | Explained |
-| KitOps ModelKit vs `docker model package` comparison | 3 | Explained |
+| KitOps ModelKit vs `docker model package` comparison | 5 | Explained |
+| Full flow: pack, push, pull, run | 3 | Explained |
 | Selective pull, warehouse-by-chapter analogy | 4 | Explained |
 | `--filter` flag and filter types | 4 | Explained |
 | Selective-pull use cases (serving, notebooks, CI) | 4 | Explained |
@@ -188,10 +188,10 @@ Now it's time to prove all of that yourself. In the lab, you're going to pack Sm
 | `--plain-http` | 4 | Explained |
 | ModelKit vs plain container image (4 problems) | 5 | Explained |
 | Distribution mechanism vs execution mechanism | 5 | Explained |
-| Summary table | 6 | Explained |
+| Recap of the module | 6 | Spoken only, no recap slide |
 | Lab bridge (pack/push/pull/selective-pull SmolLM2-135M) | 6 | Explained |
 
 ## Verification flags
 
-- "Docker Desktop 4.40 and later" for `docker model package` — version-dependent, confirm still accurate against current Docker Desktop release notes before recording.
+- "Docker Desktop 4.40" as the first release with `docker model package` — version-dependent, confirm against current Docker Desktop release notes. Also confirm the Docker CE (Linux) support wording before recording.
 - Registry command syntax examples (`ghcr.io/<org>/<repo>:<tag>` etc.) — confirm unchanged against each registry's current docs.

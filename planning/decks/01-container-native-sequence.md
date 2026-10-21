@@ -31,13 +31,13 @@
      wording changed in this follow-up — pure slide reordering + pageno renumbering.
      Net: 13 slides → 19 slides (13 original + 6 dividers), now in lesson order. -->
 
-This companion doc maps the 19-slide explainer deck (`site/static/decks/01-container-native.html`) to the Module 1 lesson (`site/docs/m1-container-native/lesson.md`). The deck teaches **concepts**, not commands — it turns each of the lesson's analogies into a hand-drawn whiteboard visual a learner walks through before opening the lab. The visual language follows the CourseSmith whiteboard style contract (`coursesmith/templates/deck/whiteboard-style-guide.md`): Patrick Hand cursive, `#1e1e1e` primary / `#757575` secondary strokes on white paper with the five semantic pastel fills (§1), the `#rough` wobble filter on shapes only, and the shared `#ah`/`#ahg` arrowhead markers. The arc moves vocabulary forward, in lesson order — the Docker-pricing shock → container-native as the open standard → what containers buy an AI stack → the Apple-Silicon GPU constraint and its fix → the 2026 declarative-vs-orchestration map → the Acme use case and the build ladder → the OpenAI-compatible endpoint as the universal contract that ties it together → hand-off to the lab. A divider slide marks the deck's entry into each lesson `##` section, **in the lesson's own 1→6 order** — the deck and the lesson now walk the same sequence, so the numbered dividers work as a real map a learner can use to jump to a section.
+This companion doc maps the 19-slide explainer deck (`site/static/decks/01-container-native.html`) to the Module 1 lesson (`site/docs/m1-container-native/lesson.md`). The deck teaches **concepts**, not commands — it turns each of the lesson's analogies into a hand-drawn whiteboard visual a learner walks through before opening the lab. The visual language follows the CourseSmith whiteboard style contract (`coursesmith/templates/deck/whiteboard-style-guide.md`): Patrick Hand cursive, `#1e1e1e` primary / `#757575` secondary strokes on white paper with the five semantic pastel fills (§1), the `#rough` wobble filter on drawn outlines only, and the shared `#ah`/`#ahg` arrowhead markers. The arc moves vocabulary forward, in lesson order — the Docker-pricing shock → container-native as the open standard → what containers buy an AI stack → the Apple-Silicon GPU constraint and its fix → the 2026 declarative-vs-orchestration map → the Acme use case and the build ladder → the OpenAI-compatible endpoint as the universal contract that ties it together → hand-off to the lab. A divider slide marks the deck's entry into each lesson `##` section, **in the lesson's own 1→6 order** — the deck and the lesson now walk the same sequence, so the numbered dividers work as a real map a learner can use to jump to a section.
 
 ## Slide table
 
 | # | Slide | Purpose | Visual | Takeaway |
 |---|-------|---------|--------|----------|
-| 1 | Container-Native GenAI (title) | Module framing: the open standard, not Docker, is the through-line | title sketch: one AI-labelled shipping container fans out to four runtime carriers (Colima, Rancher, OrbStack, Podman) | credit line: Gourav Shah · School of DevOps & AI |
+| 1 | Container-Native GenAI (title) | Module framing: the open standard, not Docker, is the foundation | title sketch: one AI-labelled shipping container fans out to four runtime carriers (Colima, Rancher, OrbStack, Podman) | credit line: Gourav Shah · School of DevOps & AI |
 | 2 | Five ideas carry the rest of the course | Preview the five concepts this module locks in before every later lab | numbered rows (circles 1–5) | concepts first — the lab then proves the container-to-native-model wiring with your own hands |
 | 3 | **1 · Container-Native, Not Docker-Native** | — (divider) | — (divider) | opens lesson §1 — the Docker-pricing shock and the shipping-container analogy |
 | 4 | The assumption that just broke | Docker Desktop's licensing change (250 staff / $10M revenue) broke "container = Docker", not the standard underneath | crossed-out-old ("container = Docker Desktop") → boxed-new ("container = the open OCI standard"), pricing fact as a label on the arrow | the standard under Docker was always open — this module builds on that standard, not on any one vendor |
@@ -49,12 +49,12 @@ This companion doc maps the 19-slide explainer deck (`site/static/decks/01-conta
 | 10 | Native server, containerized everything else | The universal Mac pattern: Ollama runs natively on Metal; app, agent, and vector DB run in containers, bridged via `host.docker.internal:11434` | dashed host boundary containing a native Ollama box + a container-runtime boundary with 3 inner service boxes, arrow labelled with the bridge hostname | on Windows + WSL2 + NVIDIA the toolkit passes the GPU in, so the server *can* be containerized there |
 | 11 | **4 · The 2026 Map: Declarative Agents vs Orchestration Frameworks** | — (divider) | — (divider) | opens lesson §4 — the declarative-vs-orchestration signpost for M6/M7 |
 | 12 | The 2026 map: declarative vs orchestration | Two ways to build an agent; start with the light one, add the heavy one only when the task demands hard sequencing | two-panel comparison: declarative-agents box vs orchestration box, arrow between labelled "add only when needed" | the rule: start declarative; add orchestration only when the task has hard sequencing you can't express in tools |
-| 13 | Anatomy of a declarative agent | Four plain-file parts fully define an agent, no framework code required | big-box anatomy: outer "declarative agent" box with 4 inner boxes (identity files, SKILL.md, MCP tools, guardrails) | identity, skills, tools, guardrails — all in files you can read, diff, and version like any other code |
+| 13 | Anatomy of a declarative agent | Four plain-file parts fully define an agent, no framework code required | big-box anatomy: outer "declarative agent" box with 4 inner boxes (identity files, SKILL.md, MCP tools, agent runtime) | identity, skills, tools, and a runtime that reads them — all in files you can read, diff, and version like any other code |
 | 14 | **5 · The Acme Use Case + The Build Ladder** | — (divider) | — (divider) | opens lesson §5 — the running case study and the whole-course roadmap |
 | 15 | Meet Acme, two connected tools | Introduce the running case study: Day-1 Docs Assistant feeds Day-2 Support Agent → Incident Crew | pipeline: runbooks box → Day-1 Docs Assistant box → "used as a tool" → Day-2 Support Agent/Incident Crew box | Use Case B *uses* Use Case A as one of its tools — skills compound instead of tangling |
-| 16 | The build ladder, one step per module | Every module adds exactly one rung to the same growing `compose.yaml`, from M1's bare model call to the Capstone | staircase/ladder: 7 rising steps (M1–M7) + a tall M8/Capstone column, day-1/day-2 span labels beneath | Module 1 is step 0: a runtime and a model responding to a call — you hand-author every block from here |
+| 16 | The build ladder, one step per module | Every module adds exactly one step to the same growing `compose.yaml`, from M1's bare model call to the Capstone | staircase/ladder: 7 rising steps (M1–M7) + a tall "M8 harden · Capstone" column, day-1/day-2 span labels beneath | Module 1 is step 0: a runtime and a model responding to a call — you hand-author every block from here |
 | 17 | **6 · The OpenAI-Compatible Endpoint: the Universal Contract** | — (divider) | — (divider) | opens lesson §6 — the endpoint pattern that ties every earlier idea together |
-| 18 | One universal contract: the OpenAI-compatible endpoint | The wall-socket analogy: Ollama, vLLM, and llama.cpp all expose `/v1/chat/completions`; the app code never changes | fan-out: 3 engine boxes → one socket box labelled with the endpoint path → "your app/agent, code never changes" | the same request runs against Ollama on a laptop, vLLM on a GPU VM, or OpenAI — every lab speaks this language |
+| 18 | One universal contract: the OpenAI-compatible endpoint | The wall-socket analogy: Ollama, vLLM, LocalAI, and llama.cpp all expose `/v1/chat/completions`; the app code never changes | fan-out: 3 engine boxes (Ollama, vLLM, LocalAI · llama.cpp) → one socket box labelled with the endpoint path → "your app/agent, code never changes", plus a gray footnote: labs add `"reasoning_effort": "none"` for `qwen3.5:2b` (M2) | the same request runs against Ollama on a laptop, vLLM on a GPU VM, or OpenAI — every lab speaks this language |
 | 19 | Build it once. Run it anywhere. (closing) | Hand off to the lab: the learner will prove the container→native-model wiring themselves | scene: dashed "throwaway container" box ↔ solid "Ollama, native · Metal GPU" box, bidirectional arrows labelled with the bridge host and "a real response back" | in the lab you'll prove this wiring yourself — container calls native model, and it answers; credit + lab hand-off |
 
 <!-- Visual pattern vocabulary used above (reuse before inventing):
@@ -162,17 +162,17 @@ voice-passed) and slide numbering/order changed.
 
 | # | Slide | Old subtitle (chars/words) | New subtitle (chars/words) |
 |---|-------|------------------------------|-------------------------------|
-| 1 | Container-Native GenAI (title) | "Why the open standard — not Docker — is the through-line for AI" (63/13) | "The open standard, not Docker" (29/5) |
-| 2 | Five ideas carry the rest of the course | "Five ideas that shape every lab in the rest of the course." (58/12) | "Five ideas that carry the course" (32/6) |
+| 1 | Container-Native GenAI (title) | (historical, retired wording) (63/13) | "The open standard, not Docker" (29/5) |
+| 2 | Five ideas carry the rest of the course | (historical, retired wording) (58/12) | "Five ideas that carry the course" (32/6) |
 | 4 | The assumption that just broke | "Docker Desktop is now paid for orgs over 250 staff or $10M revenue." (67/13) | "A pricing change, not a technical one" (37/7) |
 | 5 | Container-native, not Docker-native | "An OCI image is a shipping container — the carrier is your business." (68/13) | "One compose.yaml, four runtimes, same result" (44/6) |
 | 7 | What containers buy an AI stack | "Think of each component as a hermetically sealed shipment." (58/9) | "Package, serve, isolate, ship" (29/4) |
 | 9 | Guest rooms with no power outlets | "macOS containers are like guest rooms with no power outlets." (60/10) | "No virtual GPU on macOS" (23/5) |
 | 10 | Native server, containerized everything else | "Serve the model natively; containerize the app, agent, and vector DB." (69/11) | "Bridged via host.docker.internal" (32/3) |
 | 12 | The 2026 map: declarative vs orchestration | "Two ways to build an agent — start light, add weight only when needed." (70/14) | "Start declarative, add orchestration when needed" (48/6) |
-| 13 | Anatomy of a declarative agent | "Four plain parts define an agent — no framework code required." (62/11) | "Identity, skills, tools, guardrails" (35/4) |
+| 13 | Anatomy of a declarative agent | "Four plain parts define an agent — no framework code required." (62/11) | "Identity, skills, tools, runtime" (32/4) |
 | 15 | Meet Acme, two connected tools | "One fictional company, runbooks nobody reads, two connected AI tools." (69/10) | "Runbooks nobody reads, two connected tools" (42/6) |
-| 16 | The build ladder, one step per module | "Every module adds exactly one rung to the same growing compose.yaml." (68/11) | "One module, one rung, one compose.yaml" (38/6) |
+| 16 | The build ladder, one step per module | (historical, retired wording) (68/11) | "One module, one step, one compose.yaml" (38/6) |
 | 18 | One universal contract: the OpenAI-compatible endpoint | "The API is a wall socket: swap the power station, appliance never notices." (74/13) | "Same socket, swap the engine behind it" (38/7) |
 | 19 | Build it once. Run it anywhere. (closing) | "In the lab you'll prove this wiring yourself, hands on." (55/10) | "Prove the wiring yourself, hands on" (35/6) |
 
@@ -212,3 +212,16 @@ to match the lesson's own repeated word for the swappable inference backend.
 - Verify gates re-run: 0 external refs, 19/19 section tags balanced, DOCTYPE at position 0,
   `display: 'flex'` present, file size 216KB. Two dividers rendered headless (Chrome) to
   confirm image-on-top layout — both correct.
+
+## Update 2026-10-21 — deck audit fixes (g1)
+
+- Slide 13: the fourth box is now "Agent runtime — reads the files and runs them". Lesson §4 lists
+  only the identity files, SKILL.md and MCP tool connections, plus "the runtime just executes
+  them". Guardrails had no lesson support (they arrive in M8). Subtitle "Identity, skills, tools, runtime".
+- Slide 16: subtitle "One module, one step, one compose.yaml"; the tall bar reads "M8 harden · Capstone"
+  (lesson §5: M8 = platform hardened, Capstone = platform shipped).
+- Slide 18: third engine box reads "LocalAI · llama.cpp" (lesson §6 names all four engines), and a
+  gray footnote points to M2 §6: `qwen3.5:2b` thinks first, so the labs add `"reasoning_effort": "none"`.
+  No new slide: the reasoning topic is taught in full in deck 02.
+- Lesson §3 tip "Why not just put Ollama in a container anyway?" stays lesson-only (a tip, not a concept).
+- Narration: Video 1 now covers slide 2; every visual beat names a slide that exists.

@@ -21,17 +21,20 @@
 
 Hello and welcome back. In the last module, you built a crew of agents that plan, act, and review each other's work. Now think about what happens when you actually ship that crew as a container image, out to a registry, and then down to a production host. What do you actually know about what's inside that image?
 
+Think about what that crew can do. It runs tools. It may execute code it wrote itself. It reads credentials. And it reaches the network. Every one of those four is untrusted by default, so one bad tool call can turn into access to the host.
+
 Let's say you're a food manufacturer, and you're shipping a ready meal out to thousands of supermarkets. Before it ever leaves your factory, three things happen, and they happen because the law and the customer both demand it. An ingredients label goes on every pack, so anyone can check what's inside. A health inspector checks a sample batch for contaminants, and rejects anything over the threshold. And a tamper-evident seal goes on the lid, so a broken seal tells you the product was touched after it left the factory.
 
 Now compare that to shipping an agent image with none of those three checks. Nobody knows what packages are actually inside it. Nobody has checked whether any of those packages carry a known vulnerability. And nobody can tell, once that image has travelled through a registry and landed on a production host, whether it's even the same image that was built and tested.
 
-That is exactly the gap this module closes. You're going to learn how an SBOM works as the ingredients label, how a vulnerability scan works as the health inspection, and how a cryptographic signature works as the tamper-evident seal. And beyond the image itself, you'll also learn how to sandbox any code your agent generates, harden the container it runs in, and put guardrails around what goes in and out of the model. By the end, you'll be able to look at any agent pipeline and know exactly what's checked, what's signed, and what's still exposed.
+That is exactly the gap this module closes. You're going to learn how an SBOM works as the ingredients label, how a vulnerability scan works as the health inspection, and how a cryptographic signature works as the tamper-evident seal. And beyond the image itself, you'll also learn how to sandbox any code your agent generates, harden the container it runs in, and put guardrails around what goes in and out of the model. By the end, you'll have six controls in place: a supply chain, a sandbox, a hardened image, guardrails, a lightweight eval, and a governance policy. And you'll be able to look at any agent pipeline and know exactly what's checked, what's signed, and what's still exposed.
 
 ### Suggested visuals / slide beats
 
 1. Title card: "Securing & Governing AI Workloads"
-2. Three-panel illustration: ingredients label, health inspector's clipboard, tamper-evident seal — each labeled with its AI-supply-chain counterpart (SBOM, scan, signature)
-3. Closing card previewing the lab: Syft, Trivy, Grype, Cosign against the M6 crew image
+2. Slide 2 and slide 3: the six controls, then the agent surrounded by its four exposures (tools, generated code, credentials, network)
+3. Divider, then the three-panel illustration: ingredients label, health inspector's clipboard, tamper-evident seal, each labeled with its AI-supply-chain counterpart (SBOM, scan, signature)
+4. Closing card previewing the lab: Syft, Trivy, Grype, Cosign against the M6 agent image
 
 ---
 
@@ -43,15 +46,17 @@ That is exactly the gap this module closes. You're going to learn how an SBOM wo
 
 ### Narration script
 
-Let's start with the ingredients label, which is nothing but the SBOM, or software bill of materials.
+Let's start with the whole pipeline in one picture. An image goes from source, to build, to an SBOM, to a scan, and then to a gate. If the gate says clean, the image is signed, pushed to the registry, and verified on deploy. If the gate says blocked, you fix it and rebuild. The scan always sits before the sign. Keep that picture in mind, because the rest of this video fills in the SBOM and scan boxes.
 
-A tool called Syft, from Anchore, looks inside your container image and catalogs every single package it finds. Debian debs, Python wheels, Go binaries, npm modules, all of it, into one standard format. The format you'd actually want here is SPDX-JSON, which is an open standard that any security tool downstream already knows how to read. Run it against an image and you'd get back something like ninety-six packages, listed out in SPDX 2.3 format, covering Debian debs, Python packages, and binaries all together.
+Now the ingredients label, which is nothing but the SBOM, or software bill of materials.
+
+A tool called Syft, from Anchore, looks inside your container image and catalogs every single package it finds. Debian debs, Python wheels, Go binaries, npm modules, all of it, into one standard format. The format you'd actually want here is SPDX-JSON, which is an open standard that any security tool downstream already knows how to read. Run it against an image and you'd get back ninety-five packages, listed out in SPDX 2.3 format, covering Debian debs, Python packages, and binaries all together. The file has ninety-six entries, because it also counts the image itself.
 
 Now, why bother generating this as its own separate step? A couple of reasons. One, your scanners can actually read it directly, instead of building their own catalog from scratch every time. Technically you could skip this and let each scanner regenerate that catalog internally, but pulling it out on its own means you get to park it right next to the image, in the registry, as a permanent record. And two, it becomes your audit trail, the one document that answers a question a regulator or your own security lead is bound to ask sooner or later: what is actually running inside this thing?
 
-Now here's something that trips people up the first time they see it happen. Point two different vulnerability scanners at the identical image, and you'll walk away with two different lists of findings. That's not a bug in either tool. Each scanner maintains its own advisory feed, pulled from its own vendor, and those feeds get built and matched a little differently. Trivy comes from Aqua Security, Grype comes from Anchore, and it's completely normal for one to flag a package version the other waves through clean.
+Now here's something that trips people up the first time they see it happen. Point two different vulnerability scanners at the identical image, and you'll walk away with two different lists of findings. That's not a bug in either tool. Each scanner maintains its own advisory feed, pulled from its own vendor, and those feeds get built and matched a little differently. Trivy comes from Aqua Security, Grype comes from Anchore, and it's completely normal for one to flag a package version the other waves through clean. On the lab image, both report zero Critical. Trivy reports forty-four High, and Grype reports fifty-five.
 
-So here's the working rule, learnt directly from running this against a real image, not from a textbook. You'd run more than one scanner, and then you'd sort findings by two questions: is a fix actually available, and how bad is the finding. Say a Critical shows up and the base image's own repository already carries a patched version — that's an easy call, you'd fix it immediately. Say a High shows up with nothing upstream to patch it yet — that goes on your tracking list, but it doesn't have to freeze your deployment forever, especially once you've got other controls reducing the actual risk.
+So here's the working rule, learnt directly from running this against a real image, not from a textbook. You'd run more than one scanner, and then you'd sort findings by two questions: is a fix actually available, and how bad is the finding. Say a Critical shows up and the base image's own repository already carries a patched version. That's an easy call, you'd fix it immediately. Say a High shows up with nothing upstream to patch it yet. That goes on your tracking list, but it doesn't have to freeze your deployment forever, especially once you've got other controls reducing the actual risk.
 
 Let's spell out that full decision path. Critical or High, and a fix exists: rebuild against the patched base, bump that one package, and scan again. Critical or High, and nothing to patch yet: you'd reduce the exposure some other way, say a network policy or a sandbox, and you'd write down that the risk was accepted on purpose. Medium and lower: note it in your SBOM, revisit it on a schedule, and let CI keep moving.
 
@@ -59,11 +64,11 @@ And that decision path is exactly what the scan gate automates for you. Inside t
 
 ### Suggested visuals / slide beats
 
-1. Divider: "SBOM and Vulnerability Scanning"
-2. Diagram: container image → Syft → SPDX-JSON package list (Debian/Python/Go/npm icons feeding into one document)
-3. Two-scanner diagram: same image, Trivy and Grype running in parallel, producing overlapping-but-different finding sets
-4. Triage flowchart: Critical/High+fix → rebuild; Critical/High+no-fix → mitigate+document; Medium/below → log+reschedule
-5. Scan-gate slide: pipeline stage failing red on a Critical finding, passing green once clean
+1. The supply-chain pipeline slide: source, build, SBOM, scan, gate, with the clean and blocked branches
+2. SBOM slide: agent image, Syft, one SPDX-JSON file of 95 packages, feeding the scanners and the audit trail
+3. Two-scanner slide: same image, Trivy at 44 High and Grype at 55 High, both at zero Critical
+4. Triage slide: Critical/High with a fix → rebuild; Critical/High with no fix → mitigate and document; Medium and below → log and re-scan
+5. The pipeline slide again, to show the scan gate stopping the build
 
 ---
 
@@ -116,8 +121,8 @@ Now, the sandbox takes care of code you can't fully trust. But your agent's own 
 
 1. Divider: "Sandboxing and Hardening"
 2. Illustration: a locked, windowless shipping crate on a factory floor, used once, then discarded — the ephemeral sandbox
-3. Layered isolation diagram: sandbox flags → gVisor (kernel interception) → ToolHive (per-tool container isolation)
-4. Seven-row hardening checklist table (least privilege, read-only rootfs, drop caps, no-new-privileges, resource caps, secrets, health checks)
+3. Two-panel slide: gVisor intercepting syscalls before the host kernel, and ToolHive running each MCP tool in its own container
+4. Six-row hardening checklist (least privilege, read-only rootfs, drop caps, no new privileges, resource caps, secrets out with health checks)
 
 ---
 
@@ -137,7 +142,7 @@ Output guardrails work the other way around. They screen the model's response be
 
 Now, how do you actually know your guardrails and your agent are working? That's what evaluation is for. A lightweight eval runs a small set of labeled test cases through your full pipeline, and checks three things. Does the agent refuse prompt-injection attempts? That's safety. Does it answer in-scope questions correctly? That's quality. And does it decline out-of-scope questions gracefully, instead of either answering wrongly or failing badly? That's scope control. And here's the part worth remembering: just three cases per dimension, run in CI on every single push, is enough to catch a regression before it ever reaches production.
 
-Let's close with governance, because the word itself sounds like it needs a vendor product behind it. It doesn't. Governance for an agent workload is just the documented, enforced answer to four questions. What may the agent reach? That's your network egress rules, whether that's a Kubernetes NetworkPolicy, a container `--network` flag, or a sandbox with no network at all. What credentials may it use? That's scoped service accounts and a secrets manager, never anything baked into the image. Which MCP tools are enabled? That's ToolHive's per-server isolation policy, alongside an explicit tool allowlist. And who approved this deployment? That's the signed image, the CI pipeline that ran the scan gate, and the Git commit that triggered the whole thing. Put your answers to those four questions in a YAML policy file, enforce them with open tools like OPA, Kyverno, or ToolHive, and you've built governance without buying anything. And notice what you already have sitting around from earlier in this module — the SBOM, the scan results, the signature — that's precisely the paper trail an auditor would need to answer that fourth question, without you having to build a single new record for it.
+Let's close with governance, because the word itself sounds like it needs a vendor product behind it. It doesn't. Governance for an agent workload is just the documented, enforced answer to four questions. What may the agent reach? That's your network egress rules, whether that's a Kubernetes NetworkPolicy, a container `--network` flag, or a sandbox with no network at all. What credentials may it use? That's scoped service accounts and a secrets manager, never anything baked into the image. Which MCP tools are enabled? That's ToolHive's per-server isolation policy, alongside an explicit tool allowlist. And who approved this deployment? That's the signed image, the CI pipeline that ran the scan gate, and the Git commit that triggered the whole thing. Put your answers to those four questions in a YAML policy file, enforce them with open tools like OPA, Kyverno, or ToolHive, and you've built governance without buying anything. And notice what you already have sitting around from earlier in this module: the SBOM, the scan results, the signature. That's precisely the paper trail an auditor would need to answer that fourth question, without you having to build a single new record for it.
 
 ### Suggested visuals / slide beats
 
@@ -162,7 +167,7 @@ Now it's time to run all of this yourself. In the lab, you're going to run Syft,
 
 ### Suggested visuals / slide beats
 
-1. Recap slide: the ten-row summary table (SBOM, scan, signing, scan gate, sandbox, gVisor/ToolHive, hardening, guardrails, eval, governance)
+1. Closing slide, "Trust is a pipeline, not a promise": build, scan, sign, serve, ending in a checked seal
 2. Closing card: "Lab: SBOM → scan → sign → sandbox → guardrail → eval" with the M6 agent image name
 
 ---
@@ -182,12 +187,12 @@ Now it's time to run all of this yourself. In the lab, you're going to run Syft,
 | Ephemeral locked-down sandbox (flags + verified isolation) | 4 | Explained |
 | gVisor (kernel-level isolation) | 4 | Explained |
 | ToolHive (per-MCP-tool isolation) | 4 | Explained |
-| Image hardening checklist (7 controls) | 4 | Explained |
+| Image hardening checklist (six rows on the slide) | 4 | Explained |
 | Input guardrails (M6 classification-call pattern) | 5 | Explained |
 | Output guardrails (Reviewer as example) | 5 | Explained |
-| Lightweight eval (safety/quality/scope, 3 cases each) | 5 | Explained |
+| Lightweight eval (safety/quality/scope, 3 cases each, run in CI) | 5 | Explained |
 | Governance as four documented questions | 5 | Explained |
-| Summary table | 6 | Explained |
+| Summary recap | 6 | Spoken recap over the closing slide, no separate table slide |
 | Lab bridge (Syft/Trivy/Grype/Cosign against M6 image) | 6 | Explained |
 
 ## Verification flags

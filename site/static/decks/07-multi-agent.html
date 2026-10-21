@@ -212,7 +212,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="290" y="335" text-anchor="middle" class="lbl-g">overloaded context · blurred roles · hard to audit</text>
 
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
       <path d="M430,190 L560,190" marker-end="url(#ah)"/>
     </g>
 
@@ -401,10 +401,42 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M7·10</div>
 </section>
 
+<!-- ============ SLIDE 10a — THE RELEVANCE GATE ============ -->
+<section>
+  <h2 class="t">The relevance gate: nearest isn't relevant</h2>
+  <p class="s">Vector search always returns something.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A Kafka incident goes to vector search, whose nearest chunk is the payments runbook. The relevance gate asks whether this passage addresses this incident; the answer is NO, so the crew rejects and escalates. Without the gate, the crew proposed a payments restart for a Kafka outage.">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="30"  y="140" width="200" height="90" rx="10" fill="var(--p-blue)"/>
+      <rect x="290" y="140" width="220" height="90" rx="10" fill="var(--p-orange)"/>
+      <path d="M580,185 L700,95 L820,185 L700,275 Z" fill="#ffffff"/>
+      <rect x="905" y="140" width="170" height="90" rx="10" fill="var(--p-red)"/>
+    </g>
+    <text x="130" y="180" text-anchor="middle" class="lbl">Kafka incident</text>
+    <text x="130" y="207" text-anchor="middle" class="lbl-g">stopped processing</text>
+    <text x="400" y="180" text-anchor="middle" class="lbl">payments runbook</text>
+    <text x="400" y="207" text-anchor="middle" class="lbl-g">closest, wrong topic</text>
+    <text x="700" y="178" text-anchor="middle" class="lbl-sm">covers this</text>
+    <text x="700" y="200" text-anchor="middle" class="lbl-sm">incident?</text>
+    <text x="990" y="180" text-anchor="middle" class="lbl-b">REJECTED</text>
+    <text x="990" y="207" text-anchor="middle" class="lbl-g">escalate</text>
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+      <path d="M235,185 L283,185" marker-end="url(#ah)"/>
+      <path d="M515,185 L573,185" marker-end="url(#ah)"/>
+      <path d="M825,185 L898,185" marker-end="url(#ah)"/>
+    </g>
+    <text x="260" y="122" text-anchor="middle" class="lbl-g">nearest chunk</text>
+    <text x="700" y="75" text-anchor="middle" class="lbl-g">relevance gate: one YES/NO question</text>
+    <text x="862" y="170" text-anchor="middle" class="lbl-b">NO</text>
+    <text x="550" y="335" text-anchor="middle" class="lbl-g">without the gate, the crew proposed a payments restart for a Kafka outage</text>
+  </svg>
+  <div class="pageno">M7·11</div>
+</section>
+
 <!-- ============ SLIDE 11 — DIVIDER 4: TWO PATHS ============ -->
 <section class="divider">
   <h2 class="t" style="font-size:2.2em">4 &middot; Two paths to multi-agent</h2>
-  <div class="pageno">M7·11</div>
+  <div class="pageno">M7·12</div>
 </section>
 
 <!-- ============ SLIDE 12 — TWO PATHS ============ -->
@@ -417,7 +449,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="280" y="100" text-anchor="middle" class="lbl-b">Declarative (default)</text>
     <g class="lbl-sm" text-anchor="start">
-      <text x="90" y="150">Four SOUL.md profiles + skills</text>
+      <text x="90" y="150">Four Markdown profiles, one per agent</text>
       <text x="90" y="188">One Python pipeline, stdlib only</text>
       <text x="90" y="226">Predictable sequential flow</text>
       <text x="90" y="264">Change behaviour = Markdown edit</text>
@@ -437,14 +469,14 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="630" y="330">for dynamic, non-sequential work</text>
     </g>
   </svg>
-  <div class="pageno">M7·12</div>
+  <div class="pageno">M7·13</div>
 </section>
 
 <!-- ============ SLIDE 13 — SWAP THE ORCHESTRATOR ============ -->
 <section>
   <h2 class="t">Swap the orchestrator, not the tools</h2>
   <p class="s">One shared layer under every orchestrator.</p>
-  <svg viewBox="0 0 1100 400" role="img" aria-label="Three interchangeable orchestrators sit above one shared layer of skills, MCP tools, and model">
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Three interchangeable orchestrators sit above one shared layer of MCP tools, ChromaDB memory, and the Ollama model">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
       <rect x="80"  y="50" width="270" height="70" rx="10"/>
       <rect x="415" y="50" width="270" height="70" rx="10"/>
@@ -473,25 +505,25 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="550" y="228" text-anchor="middle" class="lbl-g">the shared standards layer</text>
     <g class="lbl" text-anchor="middle">
-      <text x="280" y="298">Skills</text>
-      <text x="550" y="298">MCP tools</text>
-      <text x="820" y="298">Guardrails</text>
+      <text x="280" y="298">MCP tools</text>
+      <text x="550" y="298">ChromaDB memory</text>
+      <text x="820" y="298">Ollama model</text>
     </g>
   </svg>
-  <div class="pageno">M7·13</div>
+  <div class="pageno">M7·14</div>
 </section>
 
 <!-- ============ SLIDE 14 — DIVIDER 5: ONE MODEL, FOUR AGENTS ============ -->
 <section class="divider">
   <h2 class="t" style="font-size:2.2em">5 &middot; One model, four agents</h2>
-  <div class="pageno">M7·14</div>
+  <div class="pageno">M7·15</div>
 </section>
 
 <!-- ============ SLIDE 15 — ONE MODEL, FOUR AGENTS ============ -->
 <section>
   <h2 class="t">One model, four agents</h2>
   <p class="s">Agents are cheap, the model is shared.</p>
-  <svg viewBox="0 0 1100 400" role="img" aria-label="Four agent spokes all connect to one native Ollama model hub">
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Four agent spokes all connect to one native Ollama model hub; the declarative 2B crew totals about 4 GB, a CrewAI crew on gemma3:4B about 4.5 GB">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3">
       <circle cx="550" cy="200" r="95"/>
     </g>
@@ -518,16 +550,17 @@ footer, header, hgroup, main, menu, nav, section {
       <path d="M270,300 L465,235" marker-end="url(#ahg)"/>
       <path d="M830,300 L635,235" marker-end="url(#ahg)"/>
     </g>
-    <text x="550" y="375" text-anchor="middle" class="lbl-g">embed ~0.3 GB + crew ~15 MB + ChromaDB ~15 MB  ≈  4 GB total</text>
+    <text x="550" y="345" text-anchor="middle" class="lbl-g">embed ~0.3 GB + crew ~15 MB + ChromaDB ~15 MB  ≈  4 GB total</text>
+    <text x="550" y="380" text-anchor="middle" class="lbl-sm">a CrewAI crew on gemma3:4B instead: ≈ 4.5 GB</text>
   </svg>
-  <div class="pageno">M7·15</div>
+  <div class="pageno">M7·16</div>
 </section>
 
 <!-- ============ SLIDE 16 — COMPOSE WIRING ============ -->
 <section>
   <h2 class="t">Wire the crew with the Compose Spec</h2>
-  <p class="s">Each agent is a light service, one shared model.</p>
-  <svg viewBox="0 0 1100 400" role="img" aria-label="Crew, ToolHive and ChromaDB services in a compose file reaching a native model over host.docker.internal">
+  <p class="s">Two services: the crew and ChromaDB, one native model.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="A compose file with two services, the crew and ChromaDB 1.5.9 with its chroma_data volume, run one-shot with docker compose run, reaching the native Ollama model over host.docker.internal port 11434">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-dasharray="10 6">
       <rect x="60" y="60" width="560" height="300" rx="14"/>
     </g>
@@ -540,9 +573,9 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <g class="lbl-sm" text-anchor="middle">
       <text x="340" y="157">crew  (Triage · Investigator · Fixer · Reviewer)</text>
-      <text x="215" y="237">ToolHive (MCP)</text>
-      <text x="465" y="237">ChromaDB memory</text>
-      <text x="340" y="317">reuses the Agentic-RAG assistant as a tool</text>
+      <text x="215" y="237">ChromaDB 1.5.9</text>
+      <text x="465" y="237">chroma_data volume</text>
+      <text x="340" y="317">one-shot: docker compose run --rm crew</text>
     </g>
 
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
@@ -551,13 +584,13 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="900" y="200" text-anchor="middle" class="lbl-b">Model server</text>
     <text x="900" y="235" text-anchor="middle" class="lbl-sm">Ollama — NATIVE</text>
 
-    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
       <path d="M625,210 L755,210" marker-end="url(#ah)"/>
     </g>
     <text x="690" y="195" text-anchor="middle" class="lbl-g">:11434</text>
     <text x="690" y="245" text-anchor="middle" class="lbl-g">host.docker.internal</text>
   </svg>
-  <div class="pageno">M7·16</div>
+  <div class="pageno">M7·17</div>
 </section>
 
 <!-- ============ SLIDE 17 — DIVIDER 6: THE REVIEWER ============ -->
@@ -566,19 +599,20 @@ footer, header, hgroup, main, menu, nav, section {
     <image href="../img/decks/07-multi-agent/reviewer-human-in-loop-signoff.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
   </svg>
   <h2 class="t">6 &middot; The Reviewer as human-in-the-loop proxy</h2>
-  <div class="pageno">M7·17</div>
+  <div class="pageno">M7·18</div>
 </section>
 
 <!-- ============ SLIDE 18 — THE REVIEWER ============ -->
 <section>
   <h2 class="t">The Reviewer, human-in-the-loop proxy</h2>
   <p class="s">Decides if the fix is safe to show.</p>
-  <svg viewBox="0 0 1100 380" role="img" aria-label="The Reviewer approves runbook-backed non-destructive fixes and rejects the rest, then a human decides">
+  <svg viewBox="0 0 1100 380" role="img" aria-label="The Reviewer gets the proposed fix together with the runbook passage, approves runbook-backed non-destructive fixes and rejects the rest, then a human decides">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="70" y="140" width="240" height="110" rx="12"/>
     </g>
     <text x="190" y="185" text-anchor="middle" class="lbl-b">Reviewer</text>
     <text x="190" y="220" text-anchor="middle" class="lbl-g">when in doubt, REJECT</text>
+    <text x="190" y="122" text-anchor="middle" class="lbl-sm">gets the fix + the runbook passage</text>
 
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
       <path d="M315,175 L430,110" marker-end="url(#ah)"/>
@@ -599,7 +633,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="1000" y="200" text-anchor="middle" class="lbl-b">Human</text>
     <text x="1000" y="232" text-anchor="middle" class="lbl-g">decides</text>
   </svg>
-  <div class="pageno">M7·18</div>
+  <div class="pageno">M7·19</div>
 </section>
 
 <!-- ============ SLIDE 19 — CLOSING / LAB LEAD-IN ============ -->
@@ -629,7 +663,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="985" y="220" text-anchor="middle" class="lbl">Kafka → ESCALATE</text>
   </svg>
   <p class="credit">Then Module 8 — <b>harden &amp; ship</b>. &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
-  <div class="pageno">M7·19</div>
+  <div class="pageno">M7·20</div>
 </section>
 
 </div></div>
