@@ -24,8 +24,8 @@
     { "id": "no-hardcoded-author-path", "describe": "deep-dive page has no hardcoded author-machine absolute path (must be portable via $REPO_ROOT / relative paths)",
       "run": "grep -c '/Users/gshah' site/docs/m7-multi-agent/deep-dive.md || true",
       "assert": { "matches": "^0$" } },
-    { "id": "gate-determinism-claim-honest", "describe": "deep-dive page's Variant B section documents what the bypassed gate lets through (the gate, not temperature or the Reviewer, is what protects the outcome)",
-      "run": "grep -c 'gate.*is the finding\\|is the finding' site/docs/m7-multi-agent/deep-dive.md",
+    { "id": "gate-determinism-claim-honest", "describe": "deep-dive page's Variant B section records that the bypassed gate let the wrong runbook through (6 of 6 runs APPROVED the wrong answer) and that the gate, not the Reviewer, is the finding",
+      "run": "grep -q 'is the finding' site/docs/m7-multi-agent/deep-dive.md && grep -q 'wrong answer' site/docs/m7-multi-agent/deep-dive.md && grep -q '6 of 6' site/docs/m7-multi-agent/deep-dive.md",
       "assert": { "exit": 0 } }
   ]
 }

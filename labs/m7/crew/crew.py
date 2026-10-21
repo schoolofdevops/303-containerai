@@ -96,7 +96,7 @@ def run(incident):
     if not runbook:
         verdict = "REJECTED: no runbook-backed fix exists; escalate to a human on-call engineer."
     else:
-        verdict = llm(f"Incident: {incident}\nRunbook passage:\n{runbook}\nProposed fix:\n{fix}\n\n"
+        verdict = llm(f"Incident: {incident}\nRunbook passage:\n{runbook}\n\nProposed fix:\n{fix}\n\n"
                       f"Review it.", profile("reviewer"), temperature=0)
     print(f"\n[REVIEWER]    {verdict}")
     print(f"\n{'='*70}\nOUTCOME: {'APPROVED — ready for a human to apply' if verdict.upper().startswith('APPROVED') else 'REJECTED — escalate'}\n")

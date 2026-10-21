@@ -656,10 +656,11 @@ passage — and the command does match it. The Reviewer is doing its job and sti
 payments restart for a Kafka outage, because the thing it compares against is the wrong runbook.
 A reviewer can only be as right as the evidence handed to it. Removing the gate does not make the
 crew flaky here; it makes the crew **consistently, confidently wrong**, and the APPROVED marker
-now certifies a mismatch. **The gate, not the Reviewer, is what stopped this. That is the finding.** The Fixer's sentence of intent varied across the six runs (`Restart the payments
-deployment...`, `Run the following command to restart the affected service`), but its command
-did not, so the exact wording is the only thing that moves. This is why you test a guardrail by removing it and watching, not by assuming what the downstream
-agents will do.
+now certifies a mismatch. **The gate, not the Reviewer, is what stopped this. That is the finding.**
+
+The Fixer's opening sentence changed from run to run, but its command did not. Only the wording
+moves, never the payments restart. This is why you test a guardrail by removing it and watching,
+not by assuming what the downstream agents will do.
 
 The tracked `crew.py` itself was never touched — only the temporary `crew.py.deepdive-*` copies
 inside the build contexts (removed by the `rm crew/crew.py.deepdive-*` line right after each
@@ -703,7 +704,7 @@ benchmark to reproduce exactly.
 the tracked `acme-incident-crew:latest` image the lab itself built:
 
 ```bash
-PATH="$HOME/.rd/bin:$PATH" docker rmi acme-incident-crew:hot-triage acme-incident-crew:no-gate 2>/dev/null || true
+docker rmi acme-incident-crew:hot-triage acme-incident-crew:no-gate 2>/dev/null || true
 ```
 
 **Expected output**

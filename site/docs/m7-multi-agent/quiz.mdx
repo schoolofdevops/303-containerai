@@ -28,7 +28,7 @@ import Quiz from '@site/src/components/Quiz';
     ],
   },
   {
-    prompt: 'The four-agent crew runs on a 16 GB laptop at ~1.3 GB total. What makes that possible?',
+    prompt: 'The four-agent crew runs on a 16 GB laptop at ~4 GB total. What makes that possible?',
     options: [
       {text: 'Each agent uses a different, smaller quantised model.', correct: false, explanation: 'All four agents share one model (qwen3.5:2b) — there is only one model instance.'},
       {text: 'All four agents share one native Ollama endpoint; agents are cheap Python functions and the model is the only expensive component.', correct: true, explanation: 'The crew is four functions each making one HTTP call to the same endpoint. The model loads once and serves all four sequentially.'},
