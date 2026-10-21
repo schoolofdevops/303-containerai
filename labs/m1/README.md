@@ -40,6 +40,8 @@ MODEL=qwen3:4b ./call-ollama.sh "Explain RAG in one sentence."
 
 Expected output: a JSON object with a `"response"` field containing the model's answer.
 
+> **Note:** `qwen3:4b` is not a drop-in upgrade. The build we tested ignores `think: false` and prints its reasoning inline, so parsers that expect a short answer break. Keep `qwen3.5:2b` for the labs.
+
 ## How it works
 
 `call-ollama.sh` runs `curlimages/curl` as a throwaway container and POSTs to

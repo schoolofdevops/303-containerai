@@ -291,7 +291,7 @@ ToolHive pulls `ghcr.io/stackloklabs/gofetch/server:1.0.6` and starts the server
 
 The first `thv run` sometimes logs `ERROR failed to forward request: error="EOF"` followed by
 `WARN transport is no longer running, attempting automatic restart` — the proxy is restarting itself.
-This is normal; wait 15-20 seconds and re-check with `thv list` rather than the couple of seconds it
+This is normal; wait about 30 seconds and re-check with `thv list` rather than the couple of seconds it
 usually takes.
 
 :::
@@ -302,7 +302,7 @@ usually takes.
 thv list
 ```
 
-**Expected output** (ToolHive may take up to 15-20s after `thv run` to show the server while the proxy
+**Expected output** (ToolHive may take about 30 s after `thv run` to show the server while the proxy
 stabilizes — if you see "No MCP servers found", wait and retry rather than giving up after one check;
 the **PORT is random** on each run, and columns/image paths vary by ToolHive version):
 
@@ -331,8 +331,9 @@ Note the org is `stacklok` (not `stackloklabs`), and `fetch-ingress`/`fetch-egre
 `egress-proxy` image — there is no separate ingress-proxy image; ToolHive reuses the one proxy image
 for both directions. The `ingress` and `egress` containers are network proxies; `dns` provides
 per-server DNS resolution. The `fetch` server can reach the public internet through the egress proxy
-but is isolated from every other container. No credentials are stored on your host — the agent's
-`AGENTS.md` points at `http://127.0.0.1:42402/mcp`.
+but is isolated from every other container. No credentials are stored on your host. The agent's
+`AGENTS.md` declares the `web.fetch` tool by name only; it holds no URL. The endpoint comes from the
+URL column of `thv list`, and its port is random on each run.
 
 ### How the agent uses the ToolHive endpoint
 
@@ -343,7 +344,7 @@ In `AGENTS.md`, the `web.fetch` tool is declared as:
 current public info the runbooks don't cover. Optional; off by default.
 ```
 
-When the agent (or an IDE) connects to the MCP endpoint at `http://127.0.0.1:42402/mcp`, it discovers the `fetch` tool, its input schema (a URL), and calls it by name. The tool server fetches the URL and returns the content; the agent uses that content to ground an answer about public data.
+When the agent (or an IDE) connects to the MCP endpoint that `thv list` shows (for example `http://127.0.0.1:42402/mcp`), it discovers the `fetch` tool, its input schema (a URL), and calls it by name. The tool server fetches the URL and returns the content; the agent uses that content to ground an answer about public data.
 
 ### Connecting from VS Code (IDE path)
 
@@ -358,6 +359,8 @@ If you use VS Code with the MCP extension, add the ToolHive endpoint to your MCP
   }
 }
 ```
+
+Replace `42402` with the port from your own `thv list` output.
 
 The same endpoint serves both the containerized agent stack and your IDE — ToolHive manages the server lifecycle in both cases.
 
@@ -410,16 +413,11 @@ docker compose down -v
 
 **Symptom:** The agent routes YES for a general question and retrieves runbook chunks, or the answer is incoherent.
 
-**Cause:** `qwen3.5:2b` can occasionally misfire on the YES/NO routing prompt. Smaller quantisations are more sensitive to phrasing.
+**Cause:** `qwen3.5:2b` can occasionally misfire on the YES/NO routing prompt. Small models are sensitive to phrasing.
 
-**Fix:** Upgrade the model to `qwen3:4b`. Pull it first, then restart:
+**Fix:** Keep `qwen3.5:2b` and tighten the routing call instead. `route()` in `agent/agent.py` already runs at temperature 0, so make the prompt more specific: list the runbook topics more precisely, or add one or two example questions with their YES/NO answers. Then rebuild the image with `docker compose build agent` and ask again.
 
-```bash
-ollama pull qwen3:4b
-LLM_MODEL=qwen3:4b docker compose run --rm agent "What is 2+2?"
-```
-
-The 3b model is more reliable at temperature 0 for two-class routing.
+Do not swap in `qwen3:4b` as a quick fix. It is not a drop-in replacement here. The `qwen3:4b` build we tested ignores `think: false` and prints its reasoning inline, so its reply no longer starts with YES. `route()` checks only the first letter, so every question would go down the NO path.
 
 :::
 

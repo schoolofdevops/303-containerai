@@ -341,9 +341,11 @@ removes that gate**, and §6's Variant B section shows directly what happens to 
 marker once it's gone: it stays stable, but on the wrong answer. Judge the prose — the Triage summary sentence, the
 Reviewer's stated reason — by shape only in every variant: whether it stayed on topic and matched
 the expected disposition, not its exact wording. If you swap in a larger model
-(`qwen3:4b` or bigger) later, expect the *outcome markers* to stay just as stable at low
+later, expect the *outcome markers* to stay just as stable at low
 temperature, but expect the *prose* to vary less at a given temperature than it does here — a
-bigger model needs less determinism-by-temperature to stay on-message.
+bigger model needs less determinism-by-temperature to stay on-message. One caveat: `qwen3:4b`
+on Ollama 0.40.7 ignores `think: false` and prints its reasoning inline, which breaks the
+YES/NO gate (see the lab's Troubleshooting), so pick a model that honours the switch-off.
 
 :::
 
@@ -658,8 +660,9 @@ A reviewer can only be as right as the evidence handed to it. Removing the gate 
 crew flaky here; it makes the crew **consistently, confidently wrong**, and the APPROVED marker
 now certifies a mismatch. **The gate, not the Reviewer, is what stopped this. That is the finding.**
 
-The Fixer's opening sentence changed from run to run, but its command did not. Only the wording
-moves, never the payments restart. This is why you test a guardrail by removing it and watching,
+Across the six runs the command never changed: every run quoted the payments restart. Small
+models can still vary their wording around it, which is why you judge by the command and the
+marker, not the prose. This is why you test a guardrail by removing it and watching,
 not by assuming what the downstream agents will do.
 
 The tracked `crew.py` itself was never touched — only the temporary `crew.py.deepdive-*` copies
@@ -770,10 +773,10 @@ cd labs/m7 && bash down.sh
 - **A code-level gate, not low temperature by itself, is what pins the outcome marker run to
   run.** Variant A raised Triage's temperature and the `OUTCOME:` marker held steady — because
   the gate was still there to pin it. Variant B left every temperature untouched and removed only
-  the gate, and the marker itself started flipping between runs. **Use it when:** you're
-  evaluating whether a crew's output is reliable enough to trust — don't credit "low temperature"
-  for a stable outcome marker until you've confirmed there's still a code-level gate between the
-  model's opinion and the marker; a stable-looking pipeline with no gate is one bad retrieval away
-  from a coin flip.
+  the gate. Without the gate the marker stayed stable, APPROVED in 6 of 6 runs, but it certified
+  the wrong runbook. **Use it when:** you're evaluating whether a crew's output is reliable enough
+  to trust. Don't read a stable outcome marker as a correct one until you've confirmed there's
+  still a code-level gate between the model's opinion and the marker; a stable-looking pipeline
+  with no gate can be consistently, confidently wrong.
 
 :::

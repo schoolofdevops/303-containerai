@@ -46,10 +46,10 @@ import Quiz from '@site/src/components/Quiz';
     ],
   },
   {
-    prompt: 'To run the CrewAI reference repo anywhere (no Docker Desktop), which two components must be replaced?',
+    prompt: 'To run the CrewAI reference repo on the course stack (Rancher Desktop + native Ollama), which two components must be replaced?',
     options: [
-      {text: 'ChromaDB → a cloud vector store, and pin Python to 3.11.', correct: false, explanation: 'ChromaDB runs fine as a container anywhere. The Docker-Desktop-only pieces are DMR and supergateway.'},
-      {text: 'The Compose models:/DMR block → native Ollama (point OPENAI_BASE_URL at /v1), and supergateway → a ToolHive-managed MCP server (thv run duckduckgo).', correct: true, explanation: 'DMR is Docker-Desktop-only; supergateway wraps a stdio MCP server with SSE inside Docker. ToolHive is the portable equivalent.'},
+      {text: 'ChromaDB → a cloud vector store, and pin Python to 3.11.', correct: false, explanation: 'ChromaDB runs fine as a container anywhere. The pieces to swap are DMR (not available on Rancher Desktop, Colima or Podman) and supergateway.'},
+      {text: 'The Compose models:/DMR block → native Ollama (point OPENAI_BASE_URL at /v1), and supergateway → a ToolHive-managed MCP server (thv run duckduckgo).', correct: true, explanation: 'DMR runs on Docker Desktop and Docker CE, and Compose models: is part of the Compose Spec, but DMR is not available on Rancher Desktop, Colima or Podman, and the course standard is native Ollama. supergateway wraps a stdio MCP server with SSE inside Docker; ToolHive is the portable equivalent.'},
       {text: 'Rewrite agents.yaml as Python functions and convert tasks.yaml to Markdown.', correct: false, explanation: 'CrewAI keeps agents.yaml/tasks.yaml — that is the point of the framework. Porting changes only the infrastructure.'},
       {text: 'Downgrade gemma3:4B to qwen3.5:2b and rebuild the Dockerfile.', correct: false, explanation: 'The model change is a trade-off, not a required port. The two required swaps are DMR→Ollama and supergateway→ToolHive.'},
     ],

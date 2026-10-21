@@ -8,6 +8,22 @@
 No `up.sh`/`down.sh` — this module runs no services (Track A is native host Python; Track B is
 documented but not executable here).
 
+## Re-validation 2026-10-21 (freshness pass)
+
+No model references or Ollama calls on the M3B pages that needed changing (the only Ollama use is the optional
+`ollama create` for a TinyLlama adapter). Checks re-run on this machine; `~/mlx-lora-env` is absent so the
+venv checks take their documented SKIP-OK path.
+
+```
+$ node scripts/run-checks.mjs labs/m3b/checks.json
+3/3 checks · score 3/3
+
+$ node scripts/run-checks.mjs labs/m3b/deep-dive.checks.json
+✅ venv-mlx ✅ variant-adapters ✅ comparison-table ✅ flags-pinned-admonition
+4/4 checks · score 4/4
+```
+
+
 ---
 
 ## checks.json validation 2026-07-22

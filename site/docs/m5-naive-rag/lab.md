@@ -91,7 +91,7 @@ services:
 **Why these settings matter:**
 
 - `chromadb/chroma:1.5.9` — pinned because the app's Python client (`chromadb==1.5.9`, used through `langchain-chroma==0.2.6`) and the server must share a major version. Chroma 1.0 replaced the `/api/v1` HTTP routes with `/api/v2`, so a 0.x client and a 1.x server are not a supported pair. Pin the server to the same release as the client and the question never comes up.
-- `chroma_data` volume, mounted at `/data` — vectors survive `docker compose down` and are still there when you bring the stack back up. Chroma 1.x writes its database under `/data`; the 0.5 image used `/chroma/chroma`, so a volume mounted at the old path would silently stay empty.
+- `chroma_data` volume, mounted at `/data` — vectors survive `docker compose down` and are still there when you bring the stack back up. Chroma 1.x writes its database under `/data`; the 0.5 image used an older path under `/chroma`. A volume mounted at that old path would not capture the data: Chroma would write into the container's own filesystem, and `docker compose down` would delete it along with the container.
 - `IS_PERSISTENT=TRUE` — tells ChromaDB to write to disk, not memory-only mode.
 - `ANONYMIZED_TELEMETRY=FALSE` — suppresses outbound telemetry in a course environment.
 

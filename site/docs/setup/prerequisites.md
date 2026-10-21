@@ -98,6 +98,21 @@ section appear; the exact heading text depends on the runtime.
 brew install ollama
 ```
 
+You need Ollama 0.40 or newer, because on Apple Silicon the MLX engine that runs `qwen3.5:2b` ships from
+0.40. Check what you have:
+
+```bash
+ollama --version
+```
+
+Expected output:
+
+```
+ollama version is 0.40.7
+```
+
+Anything from 0.40 upward is fine.
+
 Start the Ollama service:
 
 ```bash
@@ -123,27 +138,50 @@ Expected output:
 Ollama is running
 ```
 
-### 3. Pull the course dev model
+### 3. Pull the course models
 
 ```bash
 ollama pull qwen3.5:2b
+ollama pull nomic-embed-text
 ```
 
-Expected output (model is ~3.1 GB; digest varies per release):
+`qwen3.5:2b` is the course's chat model. It takes about 3.1 GB on disk. `nomic-embed-text` is the small
+embedding model the RAG modules use, about 274 MB.
+
+Expected output for `qwen3.5:2b` (the progress bar updates in place; this is the final state):
 
 ```
 pulling manifest
-pulling 183715c43589: 100% ▕██████████████████▏ 3.1 GB
-pulling 66b9ea09bd5b: 100% ▕██████████████████▏   68 B
-pulling eb4402837c78: 100% ▕██████████████████▏ 1.5 KB
-pulling 832dd9e00a68: 100% ▕██████████████████▏  11 KB
-pulling 377ac4d7aeef: 100% ▕██████████████████▏  487 B
+pulling model: 100% ▕█████████████████████████▏ 3.1 GB
+writing manifest
+success
+```
+
+Expected output for `nomic-embed-text`:
+
+```
+pulling manifest
+pulling 970aa74c0a90: 100% ▕██████████████████▏ 274 MB
+pulling 31df23ea7daa: 100% ▕██████████████████▏  420 B
 verifying sha256 digest
 writing manifest
 success
 ```
 
-If the model is already pulled, you'll just see `success` — no download progress.
+Confirm both are on disk:
+
+```bash
+ollama list | grep -E "qwen3.5:2b|nomic-embed-text"
+```
+
+Expected output:
+
+```
+qwen3.5:2b                   dfaf2605162e    3.1 GB    39 minutes ago
+nomic-embed-text:latest      0a109f422b47    274 MB    6 hours ago
+```
+
+If a model is already pulled, you'll just see `success`, with no download progress.
 
 ### 4. Verify the end-to-end wiring
 
@@ -152,11 +190,19 @@ Run a quick container that calls the natively-running Ollama — this proves the
 ```bash
 docker run --rm curlimages/curl \
   curl -s http://host.docker.internal:11434/api/generate \
-  -d '{"model":"qwen3.5:2b","prompt":"Say hello in one sentence.","stream":false}' \
-  | grep -o '"response":"[^"]*"'
+  -d '{"model":"qwen3.5:2b","prompt":"Say hello in one sentence.","stream":false,"think":false}' \
+  | grep -o '"response":"[^"][^"]*"'
 ```
 
-If you see a `"response":"..."` line, your environment is ready. If the request times out, see the troubleshooting note below.
+`qwen3.5:2b` thinks before it answers by default. The `"think": false` in the request switches that off, so the reply is the answer and not an empty string.
+
+Expected output (the wording of the reply will differ):
+
+```
+"response":"Hello! How can I assist you today?"
+```
+
+If you see a non-empty `"response":"..."` line, your environment is ready. If the request times out, see the troubleshooting note below.
 
 :::tip[Troubleshooting: Ollama not reachable from container]
 

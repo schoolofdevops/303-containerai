@@ -37,7 +37,7 @@
     "tools": [
       { "name": "docker", "probe": "docker version", "min": "24", "install": { "macos": "Install Rancher Desktop (includes docker + compose)", "linux": "Install Docker Engine or Rancher Desktop" } },
       { "name": "docker compose", "probe": "docker compose version", "min": "2" },
-      { "name": "ollama", "probe": "ollama --version", "min": "0.17", "install": { "macos": "brew install ollama", "linux": "curl -fsSL https://ollama.com/install.sh | sh" } },
+      { "name": "ollama", "probe": "ollama --version", "min": "0.40", "install": { "macos": "brew install ollama", "linux": "curl -fsSL https://ollama.com/install.sh | sh" } },
       { "name": "kit", "probe": "kit version", "install": { "macos": "brew install jozu-ai/kitops/kitops", "linux": "curl -fsSL https://raw.githubusercontent.com/jozu-ai/kitops/main/install.sh | sh" } },
       { "name": "thv", "probe": "thv version", "install": { "macos": "brew install stacklok/tap/thv", "linux": "curl -fsSL https://raw.githubusercontent.com/stacklok/toolhive/main/install.sh | sh" } },
       { "name": "trivy", "probe": "trivy --version", "install": { "macos": "brew install trivy", "linux": "curl -fsSL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh" } },

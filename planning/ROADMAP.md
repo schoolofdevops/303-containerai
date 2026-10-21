@@ -65,3 +65,20 @@ Legend: ✅ done · 🔄 in progress · ⬜ pending
 | Container X-Ray live-tool (`labs/tools/container-xray`) — 3 lenses (wiring/stack/platform), 22/22 live assertions | ✅ (v1.6.0) |
 | Embed component (coursesmith) | ✅ (v1.6.0) |
 | Learner-QA — all PASS, zero findings (`planning/learner-qa/phase3-report.md`) | ✅ |
+
+## Phase 4 — 2026 freshness pass (2026-10-21)
+
+| Task | Item | Status |
+| --- | --- | --- |
+| 0 | Environment re-verified: Ollama 0.40, qwen3.5:2b, ToolHive v0.55.2 (`f46de60`, `e1420b7`) | ✅ |
+| 1 | Default model rename qwen2.5:1.5b to qwen3.5:2b, qwen3:4b upgrade path (`237d457`, `583dcfd`) | ✅ |
+| 2 | Thinking switched off on every call; M1+M2 re-validated (`7cc55c9`, `a74eb4f`, `3ad42b8`, `728f202`) | ✅ |
+| 3 | M2 MLX engine, DMR backends, new section 6 on reasoning models (`9411bd7`) | ✅ |
+| 4 | M4 Docker Model Runner claims corrected (`2ed6ea6`, `5fadaec`) | ✅ |
+| 5 | M5 Chroma 1.5.9 + v2 routes, truncation re-measured (`e7e2a7d`, `a57534d`, `aa9425b`, `984c95e`) | ✅ |
+| 6 | M6 ToolHive v0.55.2, MCP 2026-07-28 stateless transport (`f000a66`) | ✅ |
+| 7 | M7 + capstone Chroma v2, Reviewer sees runbook, memory re-measured (`b3b52f7`, `926141b`) | ✅ |
+| 8 | Prerequisites on qwen3.5:2b; M3/M3B/M8 checks green (`bd6414c`) | ✅ |
+| 9 | Whole-course gate, changelog 1.9.0, state and roadmap (this commit) | ✅ |
+
+Known gaps: concept decks and narration not updated for M2 section 6 and the M6 MCP-2026 paragraph; Hermes bonus module on hold.

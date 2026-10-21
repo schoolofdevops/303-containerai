@@ -107,22 +107,22 @@ This is the one idea that makes the rest of the course click. The Acme Docs Assi
 
 **Analogy:** Quantization is like compressing a photo. A camera RAW file is huge, and mathematically it's perfect. A JPEG at 80% quality is a fraction of the size. You can barely tell the difference for most purposes, and it loads instantly. GGUF is the JPEG for LLM weights: a compact, quantized format that llama.cpp (and therefore Ollama) loads and runs well on CPU and Metal, without needing CUDA. On Apple Silicon, Ollama can also use MLX-format weights for the same job.
 
-When you run `ollama pull qwen3.5:2b`, Ollama fetches a GGUF file at roughly `Q4_K_M` quantization, not the original float16 weights. The `2b` part is the parameter count. The quantization level is the compression setting.
+Most Ollama tags are GGUF files at roughly `Q4_K_M` quantization, not the original float16 weights. The `2b` part of a tag is the parameter count, and the quantization level is the compression setting. On Apple Silicon, `qwen3.5:2b` is the exception: Ollama pulls an MLX build in safetensors format at `mxfp8` quantization (the M1 `/api/tags` capture shows this), which is why it takes 3.1 GB on disk, more than the 2.5 GB `qwen3:4b` GGUF.
 
-**Practical sizing rule:** parameter count into 0.6 gives you roughly the RAM usage at Q4 quantization. A 7B model costs roughly 4 GB. On 16 GB unified memory, with 8 GB reserved for the OS and app containers, you have about 4 to 5 GB for the model.
+**Practical sizing rule:** for a Q4 GGUF model, parameter count into 0.6 gives you roughly the RAM usage. The rule does not apply to MLX builds such as `qwen3.5:2b`. A 7B model costs roughly 4 GB. On 16 GB unified memory, with 8 GB reserved for the OS and app containers, you have about 4 to 5 GB for the model.
 
 **Model options at that budget:**
 
-| Model | Approx size (Q4) | Strength | Course use |
+| Model | Size on disk | Strength | Course use |
 |-------|-----------------|----------|-----------|
 | `qwen3.5:2b` | ~3.1 GB | Fast iteration | Labs (already pulled) |
-| `qwen3:4b` | ~2.5 GB | Better reasoning, still fast | Optional upgrade |
+| `qwen3:4b` | ~2.5 GB | Better reasoning, still fast | Optional, not a drop-in (see below) |
 | **Qwen3** 4B-8B | 2-5 GB | Latest reasoning series, strong tool use | Recommended beyond labs |
 | **Llama 3.2** 3B | ~2 GB | Meta's compact instruction model | Good general tasks |
 | **Mistral 7B** | ~4 GB | Strong instruction following | Popular production baseline |
 | **gpt-oss** 20B | too big for 16 GB | OpenAI's open-weight release; great via Docker Model Runner on bigger machines | Demo only (Section 1) |
 
-Stay with `qwen3.5:2b` for all the labs in this course. It keeps iteration fast and the machine responsive. The model-selection decision gets more interesting in M3, when you learn to serve a model with vLLM and need to think about the trade-off between throughput and model size.
+Stay with `qwen3.5:2b` for all the labs in this course. It keeps iteration fast and the machine responsive. `qwen3:4b` is not a drop-in swap: the build we tested ignores `think: false` and prints its reasoning inline, which breaks the labs that parse a short answer. The model-selection decision gets more interesting in M3, when you learn to serve a model with vLLM and need to think about the trade-off between throughput and model size.
 
 ---
 

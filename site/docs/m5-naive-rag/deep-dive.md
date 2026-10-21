@@ -200,8 +200,8 @@ English prose is roughly 100–130 tokens (about 4 characters per token). With `
 At this lab's scale the prompt uses under 15% of the 4096-token ceiling — there's no pressure on
 this corpus. The arithmetic starts to matter the moment you scale either axis: raise `k` to 10 on
 a corpus with `chunk_size=1500`, and 10 × 1500 chars ≈ 3,750 tokens of context alone — that
-crowds out the answer entirely inside a 4096 window, and Ollama silently truncates the prompt once
-it exceeds `num_ctx`.
+crowds out the answer entirely inside a 4096 window, and Ollama truncates the prompt (and logs a
+warning) once it exceeds `num_ctx`.
 
 **Verified live, not assumed.** A deliberately oversized prompt (~30K tokens: a unique front
 marker sentence, a large filler block, a back marker, then the real question) was sent with

@@ -4,7 +4,7 @@
 > cleared, reading this + `CLAUDE.md` + `planning/ROADMAP.md` fully restores context. Keep it concise
 > and update it after every task/decision.
 
-**Last updated:** 2026-10-21 (released v1.8.0 = voice pass + dividers + narration + illustrations; next: 2026 freshness pass, see planning/plans/)
+**Last updated:** 2026-10-21 (v1.9.0 released 2026-10-21: 2026 freshness pass; next: sandboxing deep-dive + observability plan, see planning/plans/)
 **Active phase:** ✅ **COURSE COMPLETE** — M1–M8 + Capstone all live + lab-validated. Working on `main`.
 **Live site:** https://schoolofdevops.github.io/303-containerai/ (every page 200)
 **Execution mode:** subagent-driven, grouped into waves; controller reviews + live validation
@@ -200,7 +200,7 @@ enable GHCR `write:packages` for a real ModelKit/cosign push, deeper per-module 
 
 ## Next: M6 · Declarative Agent (Agentic RAG + MCP tools via ToolHive)
 
-**De-risked:** `thv` v0.33.0 installed; ran the `fetch` MCP server as an isolated container (server +
+**De-risked:** `thv` v0.55.2 installed; ran the `fetch` MCP server as an isolated container (server +
 ingress/egress proxies + DNS) — evidence in `/tmp/toolhive-evidence.txt` (fold into lab-tests/m6.md).
 Still to design: the declarative agent runtime (AGENTS.md/SOUL.md + skills + MCP + guardrails) — pick a
 concrete runnable approach (likely a small Python agent over native Ollama that reads AGENTS.md/SOUL.md
@@ -208,8 +208,8 @@ and calls ToolHive MCP tools + the M5 Docs Assistant as a retrieval tool). Agent
 whether/what to retrieve. Starts Use Case B.
 
 ## Tooling installed (this machine)
-- Rancher Desktop (VM 4 CPU/6 GB), Ollama (qwen2.5:1.5b, nomic-embed-text), vLLM CPU image, `kit` v1.15.0,
-  `thv` v0.33.0 (ToolHive), trivy/syft/grype/cosign (for M8). `kit` + `thv` at `/opt/homebrew/bin`.
+- Rancher Desktop (VM 4 CPU/6 GB), Ollama (qwen3.5:2b, nomic-embed-text), vLLM CPU image, `kit` v1.15.0,
+  `thv` v0.55.2 (ToolHive), trivy/syft/grype/cosign (for M8). `kit` at `/opt/homebrew/bin`, `thv` at `/usr/local/bin/thv`.
 - ToolHive needs `DOCKER_HOST=unix://$HOME/.rd/docker.sock` set for automated `thv` calls.
 
 ## Key decisions locked (don't re-litigate)
