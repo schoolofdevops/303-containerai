@@ -190,7 +190,7 @@ Run a quick container that calls the natively-running Ollama — this proves the
 ```bash
 docker run --rm curlimages/curl \
   curl -s http://host.docker.internal:11434/api/generate \
-  -d '{"model":"qwen3.5:2b","prompt":"Say hello in one sentence.","stream":false}' \
+  -d '{"model":"qwen3.5:2b","prompt":"Say hello in one sentence.","stream":false,"think":false}' \
   | grep -o '"response":"[^"]*"'
 ```
 

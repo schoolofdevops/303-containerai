@@ -5,6 +5,39 @@ All notable changes to this course build are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-10-21
+
+### Added
+
+- Module 2 section 6, "Reasoning Models and the Universal Contract", plus a matching quiz question.
+- Module 6 paragraph on the MCP 2026-07-28 stateless transport, plus a matching quiz question.
+- `scripts/assert-model-refs.sh`, a gate that fails when a retired model name creeps back into the course.
+- Think-off checks in the M1 and M2 labs, so a call that forgets to switch thinking off now fails.
+
+### Changed
+
+- Default model is now `qwen3.5:2b` (3.1 GB), replacing `qwen2.5:1.5b`. The upgrade path is `qwen3:4b`, replacing `qwen2.5:3b`.
+- Ollama 0.40 is the new floor. On Apple Silicon the model runs on the MLX runner.
+- Thinking is switched off on every model call: `think:false` on the native API, `reasoning_effort:"none"` on `/v1`, and `reasoning=False` in LangChain.
+- Chroma moves to 1.5.9 with the `/api/v2` routes in M5, M6, M7 and the capstone.
+- ToolHive moves to v0.55.2.
+- M4 claims about Docker Model Runner versus ModelPack are corrected: it runs on Docker CE, and the difference is scope and governance, not licence.
+- M7 Reviewer agent now receives the runbook passage, and deep-dive Variant B is rewritten to match.
+- Memory figures re-measured on the new model; M7 now needs about 4 GB in total.
+- Capstone Chroma healthcheck is now a bash `/dev/tcp` probe, because the 1.5.9 image has no Python.
+- The prerequisites page now uses `qwen3.5:2b` and states the Ollama floor.
+- All 10 labs re-validated on Ollama 0.40.7, with evidence in `planning/lab-tests/`.
+
+### Fixed
+
+- Prerequisites bridge check now passes `think:false`, so the reply is not empty on a reasoning model.
+- Concept deck 05 and its sequence spec now show the Chroma pin as 1.5.9.
+
+### Known gaps
+
+- The concept decks and narration were not updated for the new M2 section 6 or the M6 MCP-2026 paragraph. A later deck-author pass will cover them.
+- The Hermes bonus module is on hold.
+
 ## [1.8.0] - 2026-10-21
 
 ### Added
