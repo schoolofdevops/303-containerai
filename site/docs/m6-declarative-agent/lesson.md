@@ -124,6 +124,8 @@ There are two ways to connect an MCP server into your workflow:
 
 Either way, ToolHive manages the server for you. You never install the MCP tool server directly on your laptop.
 
+**What changed in MCP in 2026.** Imagine a ticket counter where every request carries its own ID slip. Any clerk can serve you, because no clerk has to remember who you are from earlier. The 2026-07-28 revision of MCP works the same way. The Streamable HTTP transport is now stateless: there is no `Mcp-Session-Id` and no `initialize` handshake, and the protocol version and client capabilities travel in `_meta` on every request. Tasks moved out of the core into an extension, sampling and roots are deprecated, and the standard is now governed under the Agentic AI Foundation. For containers, this means a stateless MCP server scales like any stateless microservice. You run replicas behind a plain load balancer, with no sticky sessions, and that is how ToolHive's gateway fronts them.
+
 ---
 
 ## 6. Guardrails
