@@ -61,7 +61,7 @@ Syft (from Anchore) looks inside a container image and catalogs every package it
 
 ```bash
 syft acme-support-agent:latest -o spdx-json > sbom.spdx.json
-# -> 96 packages, SPDX-2.3  (Debian debs + Python + binaries)
+# -> 95 packages (96 SPDX entries, including the image itself)
 ```
 
 The SBOM does two jobs for you. First, it feeds the vulnerability scanners. You don't strictly need this separate SBOM step, since the scanners can generate one themselves from the image, but exporting it on its own means you can store it alongside the image in the registry. Second, it is the audit artifact that answers the regulator's question: *"what exactly is in that image?"*

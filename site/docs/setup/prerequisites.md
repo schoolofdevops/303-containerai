@@ -177,8 +177,8 @@ ollama list | grep -E "qwen3.5:2b|nomic-embed-text"
 Expected output:
 
 ```
-qwen3.5:2b                 dfaf2605162e    3.1 GB    2 hours ago
-nomic-embed-text:latest    0a109f422b47    274 MB    5 hours ago
+qwen3.5:2b                   dfaf2605162e    3.1 GB    39 minutes ago
+nomic-embed-text:latest      0a109f422b47    274 MB    6 hours ago
 ```
 
 If a model is already pulled, you'll just see `success`, with no download progress.
@@ -191,10 +191,18 @@ Run a quick container that calls the natively-running Ollama — this proves the
 docker run --rm curlimages/curl \
   curl -s http://host.docker.internal:11434/api/generate \
   -d '{"model":"qwen3.5:2b","prompt":"Say hello in one sentence.","stream":false,"think":false}' \
-  | grep -o '"response":"[^"]*"'
+  | grep -o '"response":"[^"][^"]*"'
 ```
 
-If you see a `"response":"..."` line, your environment is ready. If the request times out, see the troubleshooting note below.
+`qwen3.5:2b` thinks before it answers by default. The `"think": false` in the request switches that off, so the reply is the answer and not an empty string.
+
+Expected output (the wording of the reply will differ):
+
+```
+"response":"Hello! How can I assist you today?"
+```
+
+If you see a non-empty `"response":"..."` line, your environment is ready. If the request times out, see the troubleshooting note below.
 
 :::tip[Troubleshooting: Ollama not reachable from container]
 

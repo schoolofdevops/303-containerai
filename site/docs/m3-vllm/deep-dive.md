@@ -520,7 +520,7 @@ Fold the wall-clock numbers into a comparison table:
 | Engine | Mode | Wall time (4 seq. / 3 concurrent) | tokens/sec (approx, aggregate) | Notes |
 |---|---|---|---|---|
 | vLLM-CPU | Sequential | 17.661s | ~7.9 tok/s | eager-mode float32 CPU path, real per-step overhead |
-| vLLM-CPU | Concurrent (3) | 6.037s | ~12.4 tok/s | matched-set sequential baseline above took 20.634s — concurrent is **3.42x faster**, strongly sub-linear |
+| vLLM-CPU | Concurrent (3) | 6.037s | ~12.4 tok/s | matched-set sequential baseline above took 20.634s — concurrent is **3.42x faster**: vLLM batches the three requests, so wall-clock barely grows |
 | Ollama (native) | Sequential | 7.065s | ~15.9 tok/s | mature optimized single-stream runtime, wins on raw throughput here (the first request also paid a ~4.7s model warm-up) |
 | Ollama (native) | Concurrent (3) | 1.664s | ~43.9 tok/s | matched-set sequential baseline above took 1.954s — concurrent is only **1.17x faster**, close to linear |
 
@@ -546,7 +546,7 @@ Matched-set sequential (same 3 prompts as concurrent run, for fair scaling compa
   Ollama   : real 1.954s   (per-req 0.457476s / 0.562951s / 0.884803s)
 
 Scaling factor (matched-set sequential -> concurrent, same 3 prompts):
-  vLLM-CPU : 20.634s / 6.037s = 3.42x   -- strongly sub-linear (batching overlap visible)
+  vLLM-CPU : 20.634s / 6.037s = 3.42x   -- three requests finished in well under the sequential time (batching overlap visible)
   Ollama   : 1.954s / 1.664s  = 1.17x   -- near-linear (little/no overlap benefit at this scale)
 
 Approx tokens/sec (completion_tokens / wall time, aggregate):
@@ -577,10 +577,9 @@ tokens/sec against Ollama — and that's the honest result, not a validation fai
 mature, optimized single-stream runtime like Ollama doesn't pay at this tiny scale. What *did*
 show up clearly, comparing the concurrent run against the matched-set sequential baseline you just
 ran: vLLM-CPU's concurrent wall time (6.037s) is **3.42x** faster than the same 3 prompts run
-sequentially (20.634s) — a strongly sub-linear scaling curve, direct evidence of continuous
-batching overlapping work instead of serializing it (run-to-run generation-length variance means
-the exact ratio is approximate — it's the direction of the effect, not the digit, that's the
-finding). Ollama's concurrent time (1.664s) is only
+sequentially (20.634s) — vLLM batches the three requests, so the wall-clock barely grows, which is
+evidence of continuous batching overlapping work instead of serializing it. The exact ratio moved
+with host load and generation length between runs, so read the direction of the effect, not the digit. Ollama's concurrent time (1.664s) is only
 **1.17x** faster than its own matched-set sequential baseline for the same 3 prompts (1.954s) —
 essentially flat, consistent with requests still being handled one at a time under the hood. That
 directional shape — not the absolute tokens/sec — is the teaching point; the

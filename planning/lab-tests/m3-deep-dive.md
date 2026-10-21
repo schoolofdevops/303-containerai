@@ -216,7 +216,7 @@ CONTAINER ID   NAME           CPU %     MEM USAGE / LIMIT   MEM %     NET I/O   
 
 Confirms both servers coexisted within the stated 4 CPU / 6 GB course budget (this machine has
 5 CPU / ~7.75 GB, comfortably above that floor) — vLLM's container stayed at ~2.4 GiB / 5 GiB cap,
-Ollama's `qwen2.5:1.5b` (~1 GB resident) ran natively alongside it the whole time.
+Ollama's chat model (at the time `qwen2.5:1.5b`, ~1 GB resident; now `qwen3.5:2b`, ~3.2 GB, see the 2026-10-21 section) ran natively alongside it the whole time.
 
 ## Step 7 — Checks
 
