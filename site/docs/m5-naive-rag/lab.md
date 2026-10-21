@@ -7,7 +7,7 @@ title: 'Lab: Docs Assistant — Naive RAG'
 
 You will hand-author a `compose.yaml` service by service, start a ChromaDB vector store and a Streamlit RAG app, ingest Acme's runbooks, and ask a real question — watching the naive-RAG pipeline retrieve the right chunk and generate a grounded answer.
 
-**What you build:** ChromaDB 0.5.20 (container) + genai-app (container) + native Ollama — the growing Day-2 `compose.yaml`.
+**What you build:** ChromaDB 1.5.9 (container) + genai-app (container) + native Ollama — the growing Day-2 `compose.yaml`.
 
 ---
 
@@ -16,7 +16,7 @@ You will hand-author a `compose.yaml` service by service, start a ChromaDB vecto
 Ollama must be running and both models must be pulled on the host before the containers start.
 
 ```bash
-ollama pull qwen2.5:1.5b
+ollama pull qwen3.5:2b
 ollama pull nomic-embed-text
 ```
 
@@ -39,7 +39,7 @@ curl -s localhost:11434/api/tags | grep -o '"name":"[^"]*"'
 **Expected output (models present):**
 
 ```
-"name":"qwen2.5:1.5b"
+"name":"qwen3.5:2b"
 "name":"nomic-embed-text:latest"
 ```
 
@@ -68,16 +68,16 @@ Create `compose.yaml` and add the opening comment and the first service:
 # only the vector DB and the app are containerized and reach Ollama via
 # host.docker.internal. On Linux/NVIDIA you could add an `ollama` service instead.
 #
-# Prereqs on the host:  ollama pull qwen2.5:1.5b  &&  ollama pull nomic-embed-text
+# Prereqs on the host:  ollama pull qwen3.5:2b  &&  ollama pull nomic-embed-text
 services:
-  # Vector database — pinned to 0.5.x to match the langchain-chroma client version.
+  # Vector database — pinned to 1.x: client (chromadb==1.5.9) and server must share a major.
   chromadb:
-    image: chromadb/chroma:0.5.20
+    image: chromadb/chroma:1.5.9
     container_name: chromadb
     ports:
       - "8000:8000"
     volumes:
-      - chroma_data:/chroma/chroma
+      - chroma_data:/data
     environment:
       - IS_PERSISTENT=TRUE
       - ANONYMIZED_TELEMETRY=FALSE
@@ -90,8 +90,8 @@ services:
 
 **Why these settings matter:**
 
-- `chromadb/chroma:0.5.20` — pinned because `langchain-chroma` ships a client that expects the `0.5.x` HTTP API. Running `0.6.x` causes a version handshake failure.
-- `chroma_data` volume — vectors survive `docker compose down` and are still there when you bring the stack back up.
+- `chromadb/chroma:1.5.9` — pinned because the app's Python client (`chromadb==1.5.9`, used through `langchain-chroma==0.2.6`) and the server must share a major version. Chroma 1.0 replaced the `/api/v1` HTTP routes with `/api/v2`, so a 0.x client and a 1.x server are not a supported pair. Pin the server to the same release as the client and the question never comes up.
+- `chroma_data` volume, mounted at `/data` — vectors survive `docker compose down` and are still there when you bring the stack back up. Chroma 1.x writes its database under `/data`; the 0.5 image used `/chroma/chroma`, so a volume mounted at the old path would silently stay empty.
 - `IS_PERSISTENT=TRUE` — tells ChromaDB to write to disk, not memory-only mode.
 - `ANONYMIZED_TELEMETRY=FALSE` — suppresses outbound telemetry in a course environment.
 
@@ -110,7 +110,7 @@ Now append the application service below the chromadb block:
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
-      - LLM_MODEL=qwen2.5:1.5b
+      - LLM_MODEL=qwen3.5:2b
       - EMBEDDING_MODEL=nomic-embed-text
     depends_on:
       - chromadb
@@ -142,7 +142,7 @@ volumes:
 docker compose up -d --build
 ```
 
-The `--build` flag rebuilds the `genai-app` image from `./app/`. On the first run this takes 60–90 seconds while pip installs the dependencies.
+The `--build` flag rebuilds the `genai-app` image from `./app/`. On the first run this takes two to four minutes while pip installs the dependencies.
 
 **Expected output:**
 
@@ -167,7 +167,7 @@ curl -s localhost:8000/api/v2/heartbeat
 **Expected output:**
 
 ```
-{"nanosecond heartbeat":1783255100...}
+{"nanosecond heartbeat":1792579530171181950}
 ```
 
 Check the HTTP status code:
@@ -262,8 +262,7 @@ Step 2: Searching for similar chunks...
    ✅ Found 2 relevant chunks (0.Xs)
 
 Step 3: Retrieved Context:
-   📄 Chunk 1 (Page ?): To restart the Acme payments service, run:
-      `kubectl rollout restart deploy/payments -n prod`...
+   📄 Chunk 1 (Page ?): Acme Platform Runbooks  Payments service  To restart the Acme payments service, run: kubectl rollout restart deploy/payments -n prod. The payments ser...
 
 Step 4: Generating response with LLM...
    ✅ Response generated (X.Xs)
@@ -272,12 +271,12 @@ Step 4: Generating response with LLM...
 The model's answer will be grounded in the retrieved context:
 
 ```
-To restart the payments service, you need to execute the following command:
-
-kubectl rollout restart deploy/payments -n prod
+To restart the payments service, run: `kubectl rollout restart deploy/payments -n prod`.
 ```
 
-This is the validated naive-RAG round-trip: the question's embedding matched the payments runbook chunk by semantic similarity, that chunk was passed to `qwen2.5:1.5b` as context, and the model answered with the correct kubectl command — not a hallucinated one.
+The wording varies from run to run (the app samples at `temperature=0.7`), but the command does not. The app also passes `reasoning=False` to the model. `qwen3.5:2b` is a thinking model, and without that switch it spends its token budget on hidden reasoning and can return an empty answer.
+
+This is the validated naive-RAG round-trip: the question's embedding matched the payments runbook chunk by semantic similarity, that chunk was passed to `qwen3.5:2b` as context, and the model answered with the correct kubectl command — not a hallucinated one.
 
 You can also expand **View Source Chunks** below the answer to see the exact text that was retrieved from ChromaDB.
 
@@ -310,11 +309,11 @@ docker compose down -v
 
 :::warning[Chroma client/server version skew]
 
-**Symptom:** `genai-app` logs show an error like `ValueError: Could not connect to a Chroma server` or `version mismatch`.
+**Symptom:** With an older `0.5.x` client against a 1.x server, the heartbeat and `list_collections()` still worked in our test. Raw HTTP calls to the retired `/api/v1` routes returned `HTTP 405 Method Not Allowed`, so the lab's scripted round-trip (`rag_roundtrip.py`) failed while the containers looked healthy.
 
-**Cause:** `langchain-chroma` pins to the `0.5.x` HTTP API. If you run `chromadb/chroma:latest` (which may be `0.6.x`), the client rejects the server.
+**Cause:** The app's `chromadb` client is `1.5.9`. A server from a different major (an old `0.5.x` image, or a future `2.x` that `latest` may point to) speaks a different HTTP API. Chroma 1.0 moved the routes from `/api/v1` to `/api/v2`, and a raw call to a retired route returns `405 Method Not Allowed`.
 
-**Fix:** Keep `chromadb/chroma:0.5.20` in your `compose.yaml`. Never use `latest` for a version-sensitive component.
+**Fix:** Keep `chromadb/chroma:1.5.9` in your `compose.yaml`, matching `chromadb==1.5.9` in `app/requirements.txt`. Never use `latest` for a version-sensitive component.
 
 :::
 

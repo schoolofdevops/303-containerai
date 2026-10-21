@@ -9,9 +9,17 @@ import json, os, re, sys, urllib.request, pathlib
 
 OLLAMA = os.getenv("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
 CHROMA = f"http://{os.getenv('CHROMA_HOST','localhost')}:{os.getenv('CHROMA_PORT','8000')}"
-LLM = os.getenv("LLM_MODEL", "qwen2.5:1.5b")
+LLM = os.getenv("LLM_MODEL", "qwen3.5:2b")
 EMB = os.getenv("EMBEDDING_MODEL", "nomic-embed-text")
 COLLECTION = "acme_runbooks"
+
+
+def chroma_v2_base(host):
+    """Chroma 1.x serves only /api/v2; collections live under a tenant and a database."""
+    return f"{host}/api/v2/tenants/default_tenant/databases/default_database"
+
+
+CHROMA_V2 = chroma_v2_base(CHROMA)
 HERE = pathlib.Path(__file__).parent
 
 
@@ -40,7 +48,7 @@ def embed(text):
 
 
 def llm(prompt, system=None, temperature=0.2):
-    payload = {"model": LLM, "prompt": prompt, "stream": False, "options": {"temperature": temperature}}
+    payload = {"model": LLM, "prompt": prompt, "stream": False, "think": False, "options": {"temperature": temperature}}
     if system:
         payload["system"] = system
     return _post(f"{OLLAMA}/api/generate", payload)["response"].strip()
@@ -48,7 +56,7 @@ def llm(prompt, system=None, temperature=0.2):
 
 # --- ingest Acme runbooks into the vector store (idempotent) ---
 def ingest():
-    col = _post(f"{CHROMA}/api/v1/collections", {"name": COLLECTION, "get_or_create": True})
+    col = _post(f"{CHROMA_V2}/collections", {"name": COLLECTION, "get_or_create": True})
     cid = col["id"]
     docs, ids = [], []
     for md in sorted((HERE.parent / "docs").glob("*.md")):
@@ -59,13 +67,13 @@ def ingest():
                 docs.append(chunk)
                 ids.append(f"{md.stem}-{i}")
     if docs:
-        _post(f"{CHROMA}/api/v1/collections/{cid}/add",
+        _post(f"{CHROMA_V2}/collections/{cid}/add",
               {"ids": ids, "embeddings": [embed(d) for d in docs], "documents": docs})
     return cid, len(docs)
 
 
 def retrieve(cid, query, k=2):
-    res = _post(f"{CHROMA}/api/v1/collections/{cid}/query",
+    res = _post(f"{CHROMA_V2}/collections/{cid}/query",
                 {"query_embeddings": [embed(query)], "n_results": k,
                  "include": ["documents", "distances"]})
     return list(zip(res["documents"][0], res["distances"][0]))

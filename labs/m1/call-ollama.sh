@@ -6,18 +6,18 @@
 # Usage:
 #   ./call-ollama.sh                              # uses default prompt
 #   ./call-ollama.sh "Your prompt here"           # custom prompt
-#   MODEL=qwen2.5:3b ./call-ollama.sh "Prompt"   # custom model
+#   MODEL=qwen3:4b ./call-ollama.sh "Prompt"   # custom model
 #
 # Prerequisites:
 #   - A container runtime on PATH (docker / nerdctl / podman)
 #   - Ollama running natively on :11434
-#   - The target model already pulled (ollama pull qwen2.5:1.5b)
+#   - The target model already pulled (ollama pull qwen3.5:2b)
 
 set -eu
 
-MODEL="${MODEL:-qwen2.5:1.5b}"
+MODEL="${MODEL:-qwen3.5:2b}"
 PROMPT="${1:-Explain what a container is in one sentence.}"
 
 docker run --rm curlimages/curl:latest -s \
   http://host.docker.internal:11434/api/generate \
-  -d "{\"model\":\"$MODEL\",\"prompt\":\"$PROMPT\",\"stream\":false}"
+  -d "{\"model\":\"$MODEL\",\"prompt\":\"$PROMPT\",\"stream\":false,\"think\":false}"

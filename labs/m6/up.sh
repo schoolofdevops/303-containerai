@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # M6 · Declarative Agent — start ChromaDB, build the agent image, and start the
-# ToolHive-managed `fetch` MCP server. Requires native Ollama (qwen2.5:1.5b + nomic-embed-text)
+# ToolHive-managed `fetch` MCP server. Requires native Ollama (qwen3.5:2b + nomic-embed-text)
 # and a container runtime for both compose and ToolHive (DOCKER_HOST pinned to Rancher Desktop's
 # socket — do not rely on a session-exported DOCKER_HOST).
 set -euo pipefail

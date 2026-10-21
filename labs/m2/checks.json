@@ -1,16 +1,52 @@
 {
   "checks": [
-    { "id": "ollama-v1-models", "describe": "native Ollama OpenAI-compatible /v1/models lists qwen2.5:1.5b",
+    {
+      "id": "ollama-v1-models",
+      "describe": "native Ollama OpenAI-compatible /v1/models lists qwen3.5:2b",
       "run": "curl -s http://localhost:11434/v1/models",
-      "assert": { "contains": "qwen2.5:1.5b" } },
-    { "id": "compose-build", "describe": "m2 compose client image builds",
+      "assert": {
+        "contains": "qwen3.5:2b"
+      }
+    },
+    {
+      "id": "think-off-v1",
+      "describe": "/v1/chat/completions with reasoning_effort=none returns non-empty content in under 200 completion tokens",
+      "run": "curl -s http://localhost:11434/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"qwen3.5:2b\",\"reasoning_effort\":\"none\",\"messages\":[{\"role\":\"user\",\"content\":\"Say OK\"}]}' | jq -r 'if (.choices[0].message.content|length) > 0 and .usage.completion_tokens < 200 then \"THINK-OFF-OK\" else \"THINK-LEAK\" end'",
+      "assert": {
+        "contains": "THINK-OFF-OK"
+      }
+    },
+    {
+      "id": "think-off-native",
+      "describe": "/api/generate with think=false returns a non-empty response in under 200 eval tokens",
+      "run": "curl -s http://localhost:11434/api/generate -d '{\"model\":\"qwen3.5:2b\",\"prompt\":\"Say OK\",\"stream\":false,\"think\":false}' | jq -r 'if (.response|length) > 0 and .eval_count < 200 then \"THINK-OFF-OK\" else \"THINK-LEAK\" end'",
+      "assert": {
+        "contains": "THINK-OFF-OK"
+      }
+    },
+    {
+      "id": "compose-build",
+      "describe": "m2 compose client image builds",
       "run": "PATH=\"$HOME/.rd/bin:$PATH\" docker compose -f labs/m2/compose.yaml build",
-      "assert": { "exit": 0 } },
-    { "id": "client-answers-via-v1", "describe": "containerized client reaches Ollama /v1 through host.docker.internal and gets a chat completion",
-      "run": "PATH=\"$HOME/.rd/bin:$PATH\" docker compose -f labs/m2/compose.yaml run --rm client",
-      "assert": { "exit": 0 } },
-    { "id": "compose-teardown", "describe": "compose down removes the m2 network cleanly (teardown-safe)",
+      "assert": {
+        "exit": 0
+      }
+    },
+    {
+      "id": "client-answers-via-v1",
+      "describe": "containerized client reaches Ollama /v1 through host.docker.internal, prints a non-empty reply in under 45s (thinking-off keeps it to seconds), and client.py carries reasoning_effort=none",
+      "run": "grep -q 'reasoning_effort=\"none\"' labs/m2/client.py && export PATH=\"$HOME/.rd/bin:$PATH\" && s=$(date +%s) && out=$(docker compose -f labs/m2/compose.yaml run --rm -T client 2>/dev/null) && e=$(date +%s) && [ -n \"$out\" ] && [ $((e-s)) -lt 45 ] && echo CLIENT-REPLY-OK",
+      "assert": {
+        "contains": "CLIENT-REPLY-OK"
+      }
+    },
+    {
+      "id": "compose-teardown",
+      "describe": "compose down removes the m2 network cleanly (teardown-safe)",
       "run": "PATH=\"$HOME/.rd/bin:$PATH\" docker compose -f labs/m2/compose.yaml down",
-      "assert": { "exit": 0 } }
+      "assert": {
+        "exit": 0
+      }
+    }
   ]
 }

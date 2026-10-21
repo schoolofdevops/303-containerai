@@ -247,7 +247,7 @@ Several labs learners already loved map directly onto this outline — we reuse 
 - **Teaching move — "Learning Mode":** visualize the pipeline live (query embedding → similarity search → context → generation, with timings) so learners *see* RAG, not just run it
 - Where naive RAG breaks down (weak queries, wrong chunks, no follow-up) — motivating the next step
 - **Compose, authored by hand:** learners **write the `compose.yaml` service by service** — model → embeddings → ChromaDB → app — understanding each block, not pasting a finished file
-- **Hands-on:** Guided by the proven **`lightweight-genai-stack`** — ingest Acme's docs and stand up the **RAG Docs Assistant** (Ollama/`tinyllama`–`qwen2.5:3b` + `nomic-embed-text` + ChromaDB + Streamlit) in **6–8 GB**, running on Colima / OrbStack / Rancher Desktop
+- **Hands-on:** Guided by the proven **`lightweight-genai-stack`** — ingest Acme's docs and stand up the **RAG Docs Assistant** (Ollama/`tinyllama`–`qwen3:4b` + `nomic-embed-text` + ChromaDB + Streamlit) in **6–8 GB**, running on Colima / OrbStack / Rancher Desktop
 
 ### Module 6: Step 5 — The Declarative Agent (Agentic RAG + Skills + Tools)
 

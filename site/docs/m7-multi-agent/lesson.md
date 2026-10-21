@@ -33,7 +33,7 @@ Your incident crew works the same way. Triage classifies the incident. The Inves
 
 The hospital analogy shows us three things a single agent cannot give you.
 
-**Specialisation.** A triage agent runs at temperature 0, that is, it is set to give the same, most predictable answer each time, and it outputs one line. An investigator agent queries a vector store and reports back exactly what it finds, word for word. A fixer agent proposes one exact command. A reviewer agent checks safety. Each prompt stays small, the context stays small, and a 1.5B laptop model can handle each task reliably. Ask one agent to do all four jobs in sequence, or worse, in a single prompt, and you overload its context, blur the roles, and make the output harder to check.
+**Specialisation.** A triage agent runs at temperature 0, that is, it is set to give the same, most predictable answer each time, and it outputs one line. An investigator agent queries a vector store and reports back exactly what it finds, word for word. A fixer agent proposes one exact command. A reviewer agent checks safety. Each prompt stays small, the context stays small, and a 2B laptop model can handle each task reliably. Ask one agent to do all four jobs in sequence, or worse, in a single prompt, and you overload its context, blur the roles, and make the output harder to check.
 
 **Separation of concerns**, that is, keeping each agent's job separate from the others. Each agent sees only what it needs. The Triage agent never sees the runbook. The Fixer never checks safety. This is not just tidier design. It directly cuts down the chance of a small model hallucinating, that is, making something up with confidence, across a task boundary it was never built for.
 
@@ -105,18 +105,19 @@ Both frameworks work with the same building blocks you already know: MCP for too
 
 ## 5. One model, four agents
 
-Let's put a number on the resource budget. On a 16 GB laptop running `qwen2.5:1.5b`:
+Let's put a number on the resource budget. On a 16 GB laptop running `qwen3.5:2b`:
 
 | Component | Resource |
 |---|---|
-| The model | ~1 GB VRAM / GPU memory |
-| ChromaDB | ~200 MB RAM |
-| One crew container (4 agents) | ~50 MB RAM |
-| **Total** | **~1.3 GB** |
+| The model (`qwen3.5:2b`, as `ollama ps` reports it) | ~3.5 GB GPU memory |
+| Embedding model (`nomic-embed-text`) | ~0.3 GB |
+| ChromaDB | ~15 MB RAM |
+| One crew container (4 agents) | ~15 MB RAM |
+| **Total** | **~4 GB** |
 
 Agents are cheap. A "crew" is just four Python functions with four system prompts. The model is the expensive part, and it is shared. Running four separate copies of the model, one per agent, would need four times the memory for no real gain. All four agents call the same Ollama endpoint, one after another. This is the same idea you used in M6. The model serves natively on the host, containers reach it over `host.docker.internal`, and the crew container costs almost nothing to run.
 
-A framework crew (CrewAI) using `gemma3:4B` needs about 4 GB. The declarative 1.5B crew is the laptop-friendly default. Reach for a bigger model only when the framework's more complex coordination actually demands it.
+A framework crew (CrewAI) using `gemma3:4B` needs a model of about 4 GB, so roughly 4.5 GB in total. The declarative 2B crew is the laptop-friendly default. Reach for a bigger model only when the framework's more complex coordination actually demands it.
 
 ---
 

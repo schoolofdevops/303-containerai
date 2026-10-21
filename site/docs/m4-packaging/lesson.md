@@ -60,12 +60,12 @@ The **Kitfile** (a YAML file, think of it as the shipping manifest) describes th
 
 Under the hood, `kit` uses **ORAS** (OCI Registry as Storage), a CNCF library that lets any language push and pull typed OCI artifacts to any compliant registry. This is why a ModelKit works the same way on Docker Hub, GHCR, Quay, Harbor, and a bare `registry:2` container. They all speak the same OCI distribution API.
 
-Compare this with **`docker model package`** (Docker Desktop 4.40 and later), which also packs a GGUF file into an OCI artifact. The real difference is ecosystem scope:
+Compare this with **`docker model package`**, which also packs a GGUF file into an OCI artifact. It works on Docker Desktop and on Docker CE for Linux, and the `docker model` CLI plugin is open source. So the difference is not licence or platform. It is scope and governance. A ModelKit carries everything around the model and is governed by the CNCF, while Docker's artifact is a GGUF model made for Docker Model Runner:
 
 | | **KitOps ModelKit** | **`docker model package`** |
 |---|---|---|
-| Standard | OCI artifact (CNCF) | OCI artifact (Docker-specific) |
-| CLI | `kit`, works anywhere | `docker model`, requires Docker Desktop |
+| Standard | OCI artifact, CNCF-governed spec (ModelPack) | OCI artifact, Docker-defined media types |
+| CLI | `kit`, any OS or runtime | `docker model`, a CLI plugin on Docker Desktop and Docker CE (Linux) |
 | Registries | Any OCI registry | Docker Hub primary |
 | Layer types | model / code / datasets / docs | Single model blob |
 | Selective pull | `--filter=model` / `--filter=code` | Not supported |
@@ -198,7 +198,7 @@ A ModelKit uses OCI to move files around, not to run them, that is, it's a distr
 | KitOps / CNCF | `kit` CLI plus ORAS; works on any OCI registry; part of the CNCF ecosystem |
 | Selective pull | `--filter=model` pulls only the weights layer, skip datasets or code |
 | Multi-registry | Same `kit push`/`unpack` syntax for GHCR, Docker Hub, Quay, Harbor, local |
-| vs `docker model package` | KitOps is CNCF-portable, multi-layer, and supports selective pull; Docker's is tied to Docker Desktop |
+| vs `docker model package` | KitOps is CNCF-portable, multi-layer, and supports selective pull; Docker's packs GGUF weights for Docker Model Runner |
 
 ---
 

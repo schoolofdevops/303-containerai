@@ -75,6 +75,7 @@ def init_llm():
         base_url=OLLAMA_BASE_URL,
         temperature=0.7,
         num_ctx=4096,
+        reasoning=False,  # qwen3.5 thinks by default; off, or the answer budget is spent on hidden reasoning
     )
 
 

@@ -7,7 +7,7 @@ title: 'Lab: Securing & Governing AI Workloads'
 
 > **What you build:** A full open-source supply chain for the M6 agent image — SBOM, two vulnerability scans, Cosign sign + verify, a locked-down sandbox that proves network isolation, a guardrail + mini eval, and a GitHub Actions pipeline that gates on security before signing.
 
-**Prerequisites:** Docker running (Rancher Desktop), the `acme-support-agent:latest` image built in M6, and Ollama serving `qwen2.5:1.5b`.
+**Prerequisites:** Docker running (Rancher Desktop), the `acme-support-agent:latest` image built in M6, and Ollama serving `qwen3.5:2b`.
 
 ---
 

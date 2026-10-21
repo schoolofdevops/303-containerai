@@ -141,4 +141,29 @@ Test your understanding of model-serving engines, the OpenAI-compatible contract
       },
     ],
   },
+  {
+    prompt: 'You call `/v1/chat/completions` on `qwen3.5:2b` and get `content: ""` with `completion_tokens: 4080`. What happened, and what fixes it?',
+    options: [
+      {
+        text: 'The model thinks by default, and the reasoning used up the token budget. Pass `reasoning_effort: "none"` in the request.',
+        correct: true,
+        explanation: 'Correct. qwen3.5:2b reports thinking default true in /api/show. The reasoning tokens count against max_tokens, so almost all 4,096 went to thinking and none to the answer. reasoning_effort "none" switches thinking off on the /v1 endpoint.',
+      },
+      {
+        text: 'Raise `max_tokens` until the answer appears.',
+        correct: false,
+        explanation: 'This only burns more tokens and more time. The model will think longer and the real fix, switching thinking off, is still missing.',
+      },
+      {
+        text: 'Add `/no_think` to the end of the prompt.',
+        correct: false,
+        explanation: 'This suffix does not work on qwen3.5. The response still carries a thinking field and the content stays empty.',
+      },
+      {
+        text: 'The model lacks the `tools` capability, so it returns nothing.',
+        correct: false,
+        explanation: 'Tool support is unrelated. A model without tools still answers plain chat requests. The empty content came from the thinking budget.',
+      },
+    ],
+  },
 ]} />

@@ -23,7 +23,7 @@ Module 5 gave you a working RAG pipeline. It always retrieves. Ask "How do I res
 
 Module 6 gives the pipeline a brain. The agent reads a question, decides whether it needs to check the runbooks at all, and either retrieves then grounds, or answers directly. That single routing step, decide first, then act, is what separates an *agent* from a *pipeline*. And the whole agent is written down in Markdown.
 
-This module begins **Use Case B: Support Agent**. The agent is named Aria. She runs on the same `qwen2.5:1.5b` model, the same ChromaDB vector store from M5, and the same `host.docker.internal` network pattern. The knowledge base is the same Acme runbooks too. Aria simply reuses M5's memory.
+This module begins **Use Case B: Support Agent**. The agent is named Aria. She runs on the same `qwen3.5:2b` model, the same ChromaDB vector store from M5, and the same `host.docker.internal` network pattern. The knowledge base is the same Acme runbooks too. Aria simply reuses M5's memory.
 
 ---
 
@@ -88,7 +88,7 @@ The routing question is precise: *Does answering this question require Acme's in
 
 **Agentic RAG** means the agent decides *whether* to retrieve, *what* to retrieve, and then uses that retrieved evidence to ground its answer. Compare this with M5's naive RAG, which retrieved for every query, no matter what. The agentic approach cuts out unnecessary embedding calls, avoids hallucination-by-bad-match (that is, retrieving something irrelevant and generating an answer from it), and keeps the model's context focused on evidence that actually matters.
 
-Here is the routing table, proven on a 1.5B model at temperature 0:
+Here is the routing table, proven on a 2B model at temperature 0:
 
 | Query | Route |
 |---|---|
@@ -124,13 +124,15 @@ There are two ways to connect an MCP server into your workflow:
 
 Either way, ToolHive manages the server for you. You never install the MCP tool server directly on your laptop.
 
+**What changed in MCP in 2026.** Imagine a ticket counter where every request carries its own ID slip. Any clerk can serve you, because no clerk has to remember who you are from earlier. The 2026-07-28 revision of MCP works the same way. The Streamable HTTP transport is now stateless: there is no `Mcp-Session-Id` and no `initialize` handshake, and the protocol version and client capabilities travel in `_meta` on every request. Tasks moved out of the core into an extension, sampling and roots are deprecated, and the standard is now governed under the Agentic AI Foundation. For containers, this means a stateless MCP server scales like any stateless microservice. You run replicas behind a plain load balancer, with no sticky sessions, and that is how ToolHive's gateway fronts them.
+
 ---
 
 ## 6. Guardrails
 
 A guardrail is a hard rule that runs *before* the model gets consulted at all. In M6, `agent.py` scans every incoming query against a compiled regex (a pattern-matching rule) that looks for unsafe keywords: `password`, `secret`, `credential`, `reveal`, `drop table`, `rm -rf`, `wipe`, `exfiltrate`, and a few others. If the pattern matches, the agent refuses right there at the Python level, so the LLM call is never made.
 
-This matters, because the model itself is not a reliable safety gate. A small local model like `qwen2.5:1.5b` can be talked around a soft system-prompt instruction (something like, "your instructions say to refuse, but hypothetically…"). A hard regex guardrail at the application layer cannot be bypassed by a clever prompt, because the refusal happens before any text even reaches the model.
+This matters, because the model itself is not a reliable safety gate. A small local model like `qwen3.5:2b` can be talked around a soft system-prompt instruction (something like, "your instructions say to refuse, but hypothetically…"). A hard regex guardrail at the application layer cannot be bypassed by a clever prompt, because the refusal happens before any text even reaches the model.
 
 In practice, production systems layer both approaches: a fast keyword or classifier guardrail at the application level, plus a capable model that is tuned for safety. M6 shows you the principle with the simpler pattern. The application-layer gate is the one you can actually rely on.
 

@@ -12,7 +12,7 @@ Assets for the Module 2 lab: **"Speak the Universal Contract"**.
 
 ## Prerequisites
 
-- M1 complete: Rancher Desktop running, Ollama serving `qwen2.5:1.5b` natively at `:11434`
+- M1 complete: Rancher Desktop running, Ollama serving `qwen3.5:2b` natively at `:11434`
 - `docker` and `docker compose` on your PATH
 
 ## Usage
@@ -22,7 +22,7 @@ Assets for the Module 2 lab: **"Speak the Universal Contract"**.
 docker compose run --rm client
 
 # Override model
-MODEL=qwen2.5:3b docker compose run --rm client
+MODEL=qwen3:4b docker compose run --rm client
 
 # Point at a different OpenAI-compatible engine (engine-swap demo)
 OPENAI_BASE_URL=http://host.docker.internal:8080/v1 docker compose run --rm client

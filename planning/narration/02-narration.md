@@ -47,7 +47,7 @@ By the end of this module, you will know which engine to reach for and why, you 
 
 ### Narration script
 
-Let's say you want to serve a model with the least possible setup. If you already have Docker 4.40 or newer, there is a genuinely one-command way to do that. You would just run `docker model run`, followed by the model name, something like `ai/gpt-oss`, and Docker downloads the quantized weights, serves them, and exposes the standard `/v1` API. No Ollama, no separate process, nothing extra to install on the host. It's fully open source and it comes free with Docker CE.
+Let's say you want to serve a model with the least possible setup. If you already have Docker 4.40 or newer, there is a genuinely one-command way to do that. You would just run `docker model run`, followed by the model name, something like `ai/gpt-oss`, and Docker downloads the quantized weights, serves them, and exposes the standard `/v1` API. No Ollama, no separate process, nothing extra to install on the host. It's fully open source, and it runs on Docker Desktop and on Docker CE on Linux. Underneath, it uses llama.cpp by default, vLLM on NVIDIA GPUs, and a vllm-metal backend on Apple Silicon.
 
 Now, one word of caution here. `ai/gpt-oss` is a twenty billion parameter model, so you would only want to run that particular one on a machine with plenty of RAM. On our sixteen gigabyte reference laptop, you'd stick with the smaller models we'll get to in a few minutes.
 
@@ -55,7 +55,7 @@ So if Docker Model Runner is this easy, why does this course spend the rest of i
 
 Let's now look at those three engines, and think of them as different brands of espresso machine. There's La Marzocco, there's Breville, there's DeLonghi. Each one is built completely differently on the inside, one uses a thermoblock, another uses a boiler, and each has its own pressure profile and its own control system. But here's the thing, they all pour into the same standard cup. And that cup, in our world, is the OpenAI API. You can swap the machine sitting under the counter, and no barista needs to be retrained.
 
-The first one is Ollama, and this is the engine you already have running from Module 1. It's serving `qwen2.5:1.5b` on Metal, on port eleven four three four, and it's the de-facto standard for local development. It runs in a container too, though on Mac there are some caveats we covered last module.
+The first one is Ollama, and this is the engine you already have running from Module 1. It's serving `qwen3.5:2b` on Metal, on port eleven four three four, and it's the de-facto standard for local development. On a Mac, since Ollama zero point forty, it runs the model on the MLX engine by default, and you can see that in the runner column of `ollama ps`. Everywhere else it uses llama.cpp. It runs in a container too, though on Mac there are some caveats we covered last module.
 
 Second is llama.cpp, and here's an interesting thing about it: it's actually the inference engine that lives inside Ollama. It handles GGUF-format models, quantization, and hardware acceleration under the hood. You would reach for llama.cpp directly when you need something lighter than the full Ollama stack, and you can run it in its own container.
 
@@ -102,7 +102,7 @@ And this is genuinely the one idea that makes the rest of this course click. The
 2. Two-endpoint card: `POST /v1/chat/completions` and `GET /v1/models`
 3. Environment-variable swap, three rows: dev (Ollama/host.docker.internal), staging (LocalAI/Compose), production (vLLM/GPU VM)
 4. The mermaid-style fan diagram: App → Contract → {Ollama, vLLM, LocalAI, llama.cpp}
-5. Payoff callout: "1.5B dev model → 13B prod model, zero code change"
+5. Payoff callout: "2B dev model → 13B prod model, zero code change"
 
 ---
 
@@ -116,13 +116,13 @@ And this is genuinely the one idea that makes the rest of this course click. The
 
 Let's think about quantization the way you'd think about compressing a photo. A camera's RAW file is huge, and mathematically it's about as perfect as it gets. A JPEG at eighty percent quality, on the other hand, is a fraction of that size. You can barely tell the difference for most everyday purposes, and it loads instantly. GGUF is, in a sense, the JPEG for a language model's weights, that is, a compact, quantized format that llama.cpp, and therefore Ollama too, can load and run well on a CPU or on Metal, without needing an NVIDIA GPU at all.
 
-So when you ran `ollama pull qwen2.5:1.5b`, what actually happened? Ollama fetched a GGUF file at roughly what's called Q4_K_M quantization, and that is not the original float16 weights, it's a compressed version of them. The "1.5b" part there tells you the parameter count. The quantization level is a separate setting, and it's the one controlling the compression.
+So when you ran `ollama pull qwen3.5:2b`, what actually happened? Ollama fetched a GGUF file at roughly what's called Q4_K_M quantization, and that is not the original float16 weights, it's a compressed version of them. The "2b" part there tells you the parameter count. The quantization level is a separate setting, and it's the one controlling the compression.
 
 Now, here's a practical rule that saves you a lot of guessing. Take the parameter count and multiply it into zero point six, and that gives you roughly the RAM usage at Q4 quantization. So a seven billion parameter model would cost you roughly four gigabytes. If you're on sixteen gigabytes of unified memory, and you reserve about eight gigabytes for the OS and your app containers, you're left with somewhere around four to five gigabytes for the model itself.
 
-So what actually fits in that budget? `qwen2.5:1.5b` costs about one gigabyte, and that's what we've already pulled for the labs, it keeps iteration fast and the machine responsive. `qwen2.5:3b` costs about two gigabytes and gives you better reasoning while still staying fast, that's a reasonable optional upgrade. Beyond the labs, Qwen3 in the four to eight billion range, Llama 3.2 at three billion, or Mistral 7B are all worth knowing, they're strong, general-purpose choices once you have the RAM to spare. And that twenty billion parameter `gpt-oss` model from the Docker Model Runner demo, that one is simply too big for sixteen gigabytes, it's really a demo-only model on this machine.
+So what actually fits in that budget? `qwen3.5:2b` costs about three gigabytes, and that's what we've already pulled for the labs, it keeps iteration fast and the machine responsive. `qwen3:4b` costs about two and a half gigabytes and gives you better reasoning while still staying fast, that's a reasonable optional upgrade. Beyond the labs, Qwen3 in the four to eight billion range, Llama 3.2 at three billion, or Mistral 7B are all worth knowing, they're strong, general-purpose choices once you have the RAM to spare. And that twenty billion parameter `gpt-oss` model from the Docker Model Runner demo, that one is simply too big for sixteen gigabytes, it's really a demo-only model on this machine.
 
-For every lab in this course, you'll stay with `qwen2.5:1.5b`. The model-selection decision gets a lot more interesting in Module 3, once you're serving a model with vLLM and actually have to weigh throughput against model size.
+For every lab in this course, you'll stay with `qwen3.5:2b`. The model-selection decision gets a lot more interesting in Module 3, once you're serving a model with vLLM and actually have to weigh throughput against model size.
 
 ### Suggested visuals / slide beats
 
@@ -130,8 +130,8 @@ For every lab in this course, you'll stay with `qwen2.5:1.5b`. The model-selecti
 2. GGUF definition card: compact, quantized format for llama.cpp/Ollama, no CUDA needed
 3. Sizing formula: parameters × 0.6 ≈ RAM at Q4, worked example at 7B → ~4GB
 4. 16GB laptop budget bar: 8GB OS/containers, 4-5GB model
-5. Model options table: qwen2.5:1.5b, qwen2.5:3b, Qwen3, Llama 3.2, Mistral 7B, gpt-oss (too big, crossed out for this machine)
-6. Callout: "qwen2.5:1.5b for every lab in this course"
+5. Model options table: qwen3.5:2b, qwen3:4b, Qwen3, Llama 3.2, Mistral 7B, gpt-oss (too big, crossed out for this machine)
+6. Callout: "qwen3.5:2b for every lab in this course"
 
 ---
 
@@ -198,11 +198,11 @@ I'll see you in the lab.
 | Two endpoints: `/v1/chat/completions`, `/v1/models` | Video 3 | Explained |
 | Env-var swap across dev/staging/production | Video 3 | Explained |
 | Mermaid diagram: App → Contract → engines | Video 3 | Explained |
-| Payoff: 1.5B → 13B model swap, zero code change | Video 3 | Explained |
+| Payoff: 2B → 13B model swap, zero code change | Video 3 | Explained |
 | GGUF / quantization, JPEG analogy | Video 4 | Explained |
 | Q4_K_M quantization on `ollama pull` | Video 4 | Explained |
 | Sizing rule: params × 0.6 ≈ RAM at Q4 | Video 4 | Explained |
-| Model options table (qwen2.5:1.5b/3b, Qwen3, Llama 3.2, Mistral 7B, gpt-oss) | Video 4 | Explained |
+| Model options table (qwen3.5:2b / qwen3:4b, Qwen3, Llama 3.2, Mistral 7B, gpt-oss) | Video 4 | Explained |
 | Two wiring patterns (Pattern A Mac, Pattern B GPU host) | Video 5 | Explained |
 | `host.docker.internal` vs `ollama` Compose hostname | Video 5 | Explained |
 | `OPENAI_BASE_URL` as the single switch | Video 5 | Explained |

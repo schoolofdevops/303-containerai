@@ -141,4 +141,29 @@ Test your understanding of the declarative agent pattern, agentic RAG versus nai
       },
     ],
   },
+  {
+    prompt: 'The 2026-07-28 MCP revision made the Streamable HTTP transport stateless. Why does that matter when you run MCP servers as containers?',
+    options: [
+      {
+        text: 'Any replica can serve any request, so you can run several containers behind a plain load balancer without sticky sessions.',
+        correct: true,
+        explanation: 'Correct. Every request now carries its protocol version and client capabilities in _meta, so no replica has to remember an earlier session. An MCP server scales like any stateless microservice, and that is how ToolHive\'s gateway can front several of them.',
+      },
+      {
+        text: 'The model produces tokens faster, because the server no longer keeps a session open.',
+        correct: false,
+        explanation: 'Statelessness changes how requests are routed to the tool server. It has nothing to do with inference speed, which depends on the model and the hardware.',
+      },
+      {
+        text: 'MCP servers no longer need authentication, because there is no session to protect.',
+        correct: false,
+        explanation: 'Removing the session id does not remove the need to authenticate callers. Access control is a separate concern from session state.',
+      },
+      {
+        text: 'Tool servers no longer need to run in containers, because they hold no state.',
+        correct: false,
+        explanation: 'Containers are still how you package, isolate, and ship a tool server. Being stateless makes replicas easy to scale, and isolation (as ToolHive does with its proxy containers) still matters.',
+      },
+    ],
+  },
 ]} />

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # M5 · Docs Assistant (naive RAG) — build + start ChromaDB and the Streamlit app,
-# poll both until ready. Requires native Ollama serving qwen2.5:1.5b + nomic-embed-text.
+# poll both until ready. Requires native Ollama serving qwen3.5:2b + nomic-embed-text.
 set -euo pipefail
 export PATH="$HOME/.rd/bin:$PATH"
 

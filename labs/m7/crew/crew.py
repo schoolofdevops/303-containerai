@@ -10,9 +10,17 @@ import json, os, re, sys, urllib.request, pathlib
 
 OLLAMA = os.getenv("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
 CHROMA = f"http://{os.getenv('CHROMA_HOST','localhost')}:{os.getenv('CHROMA_PORT','8000')}"
-LLM = os.getenv("LLM_MODEL", "qwen2.5:1.5b")
+LLM = os.getenv("LLM_MODEL", "qwen3.5:2b")
 EMB = os.getenv("EMBEDDING_MODEL", "nomic-embed-text")
 COLLECTION = "acme_runbooks"
+
+
+def chroma_v2_base(host):
+    """Chroma 1.x serves only /api/v2; collections live under a tenant and a database."""
+    return f"{host}/api/v2/tenants/default_tenant/databases/default_database"
+
+
+CHROMA_V2 = chroma_v2_base(CHROMA)
 HERE = pathlib.Path(__file__).parent
 
 
@@ -25,7 +33,7 @@ def _post(url, payload, timeout=120):
 
 def llm(prompt, system, temperature=0.2):
     return _post(f"{OLLAMA}/api/generate",
-                 {"model": LLM, "prompt": prompt, "system": system, "stream": False,
+                 {"model": LLM, "prompt": prompt, "system": system, "stream": False, "think": False,
                   "options": {"temperature": temperature}})["response"].strip()
 
 
@@ -38,7 +46,7 @@ def profile(name):
 
 
 def ingest():
-    col = _post(f"{CHROMA}/api/v1/collections", {"name": COLLECTION, "get_or_create": True})
+    col = _post(f"{CHROMA_V2}/collections", {"name": COLLECTION, "get_or_create": True})
     cid = col["id"]
     docs, ids = [], []
     for md in sorted((HERE.parent / "docs").glob("*.md")):
@@ -46,13 +54,13 @@ def ingest():
             if len(chunk.strip()) > 20:
                 docs.append(chunk.strip()); ids.append(f"{md.stem}-{i}")
     if docs:
-        _post(f"{CHROMA}/api/v1/collections/{cid}/add",
+        _post(f"{CHROMA_V2}/collections/{cid}/add",
               {"ids": ids, "embeddings": [embed(d) for d in docs], "documents": docs})
     return cid
 
 
 def retrieve(cid, query, k=1):
-    res = _post(f"{CHROMA}/api/v1/collections/{cid}/query",
+    res = _post(f"{CHROMA_V2}/collections/{cid}/query",
                 {"query_embeddings": [embed(query)], "n_results": k, "include": ["documents"]})
     return res["documents"][0][0] if res["documents"][0] else ""
 
@@ -88,8 +96,8 @@ def run(incident):
     if not runbook:
         verdict = "REJECTED: no runbook-backed fix exists; escalate to a human on-call engineer."
     else:
-        verdict = llm(f"Incident: {incident}\nProposed fix:\n{fix}\n\nReview it.", profile("reviewer"),
-                      temperature=0)
+        verdict = llm(f"Incident: {incident}\nRunbook passage:\n{runbook}\n\nProposed fix:\n{fix}\n\n"
+                      f"Review it.", profile("reviewer"), temperature=0)
     print(f"\n[REVIEWER]    {verdict}")
     print(f"\n{'='*70}\nOUTCOME: {'APPROVED — ready for a human to apply' if verdict.upper().startswith('APPROVED') else 'REJECTED — escalate'}\n")
 

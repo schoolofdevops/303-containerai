@@ -88,7 +88,7 @@ graph TB
 
 :::tip[Why not just put Ollama in a container anyway?]
 
-You can, and it will just run on CPU. For development with a 1.5B model, that slowdown is something you can live with. For anything larger, or for production throughput, running natively is the only right answer on Mac.
+You can, and it will just run on CPU. For development with a 2B model, that slowdown is something you can live with. For anything larger, or for production throughput, running natively is the only right answer on Mac.
 :::
 
 ---
@@ -137,7 +137,7 @@ You hand-author the `compose.yaml` one service block at a time, module by module
 ```json
 POST /v1/chat/completions
 {
-  "model": "qwen2.5:1.5b",
+  "model": "qwen3.5:2b",
   "messages": [{"role": "user", "content": "Summarise this runbook."}]
 }
 ```
@@ -148,7 +148,7 @@ This call works identically against:
 - `http://vllm-service:8000` (vLLM, production GPU VM)
 - `https://api.openai.com` (OpenAI, if you ever need it)
 
-This shared contract is what lets you swap from a 1.5B dev model to a production-grade engine without touching a single line of application code. Every lab in this course speaks this same language, the same request format, all the way from M1 to the Capstone.
+This shared contract is what lets you swap from a 2B dev model to a production-grade engine without touching a single line of application code. Every lab in this course speaks this same language, the same request format, all the way from M1 to the Capstone.
 
 ---
 

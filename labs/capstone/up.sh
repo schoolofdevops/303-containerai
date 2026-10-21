@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Capstone · Acme AI Support Platform — bring up the consolidated stack: shared ChromaDB +
 # Docs Assistant (persistent), and build the agent/crew one-shot images. Requires native Ollama
-# (qwen2.5:1.5b + nomic-embed-text).
+# (qwen3.5:2b + nomic-embed-text).
 set -euo pipefail
 export PATH="$HOME/.rd/bin:$PATH"
 
