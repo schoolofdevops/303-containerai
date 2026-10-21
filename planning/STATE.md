@@ -208,8 +208,8 @@ and calls ToolHive MCP tools + the M5 Docs Assistant as a retrieval tool). Agent
 whether/what to retrieve. Starts Use Case B.
 
 ## Tooling installed (this machine)
-- Rancher Desktop (VM 4 CPU/6 GB), Ollama (qwen2.5:1.5b, nomic-embed-text), vLLM CPU image, `kit` v1.15.0,
-  `thv` v0.55.2 (ToolHive), trivy/syft/grype/cosign (for M8). `kit` + `thv` at `/opt/homebrew/bin`.
+- Rancher Desktop (VM 4 CPU/6 GB), Ollama (qwen3.5:2b, nomic-embed-text), vLLM CPU image, `kit` v1.15.0,
+  `thv` v0.55.2 (ToolHive), trivy/syft/grype/cosign (for M8). `kit` at `/opt/homebrew/bin`, `thv` at `/usr/local/bin/thv`.
 - ToolHive needs `DOCKER_HOST=unix://$HOME/.rd/docker.sock` set for automated `thv` calls.
 
 ## Key decisions locked (don't re-litigate)

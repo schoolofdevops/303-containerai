@@ -29,7 +29,7 @@ cd labs/m3
 bash up.sh
 ```
 
-**Machine budget:** native Ollama (`qwen3.5:2b`, ~3.2 GB resident) and the m3 vLLM container
+**Machine budget:** native Ollama (`qwen3.5:2b`, ~3.2–3.8 GB resident, varies with context in use) and the m3 vLLM container
 (SmolLM2-135M, capped at 4 CPU / 5 GB in `compose.yaml`) **coexist on this machine**: Ollama runs
 native on the host, vLLM runs inside the 4 CPU / 6 GB VM this course targets — you do not need to
 stop one to run the other. Confirm both are reachable before the experiment in §6:

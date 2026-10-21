@@ -286,7 +286,7 @@ OUTCOME: APPROVED — ready for a human to apply
 
 The declarative crew above is the default: no dependencies, works on a 2B model, fits any laptop. When you need role-based orchestration, dynamic task delegation, or the structure that a framework provides, **CrewAI** is the go-to choice.
 
-The reference repository [`gouravshah/compose-for-agents`](https://github.com/gouravshah/compose-for-agents) — specifically its `crew-ai/` directory — shows a CrewAI crew defined in `agents.yaml` and `tasks.yaml`. This is optional external reading; nothing in this lab requires cloning it. To run it anywhere — not just on Docker Desktop with Docker Model Runner — two ports are needed.
+The reference repository [`gouravshah/compose-for-agents`](https://github.com/gouravshah/compose-for-agents) — specifically its `crew-ai/` directory — shows a CrewAI crew defined in `agents.yaml` and `tasks.yaml`. This is optional external reading; nothing in this lab requires cloning it. To run it on the course stack (Rancher Desktop plus native Ollama) instead of Docker Model Runner, two ports are needed.
 
 ### Port 1: Docker Model Runner → native Ollama
 
@@ -299,7 +299,7 @@ models:
     context_size: 8192
 ```
 
-DMR is Docker Desktop-only. To run on any machine with Ollama, delete the `models:` block entirely and set the agents' environment variables to point at native Ollama:
+DMR is not available on Rancher Desktop, Colima or Podman, and the course standard is native Ollama. To run on any machine with Ollama, delete the `models:` block entirely and set the agents' environment variables to point at native Ollama:
 
 ```yaml
 services:
@@ -309,7 +309,7 @@ services:
       - OPENAI_MODEL_NAME=qwen3.5:2b
 ```
 
-Ollama's `/v1` endpoint is OpenAI-compatible, so CrewAI's `openai` client talks to it without modification.
+Ollama's `/v1` endpoint is OpenAI-compatible, so CrewAI's `openai` client talks to it without modification. One catch: `qwen3.5:2b` thinks by default, so the crew's calls must also send `reasoning_effort: "none"` (see M2 §6), or the replies come back with empty content.
 
 ### Port 2: supergateway → ToolHive
 

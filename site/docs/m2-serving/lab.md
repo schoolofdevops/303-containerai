@@ -248,7 +248,7 @@ docker build --progress=plain -t m2-client labs/m2/
 >
 > Docker uses BuildKit's `#N` step notation. The build has **4 steps** (FROM, RUN, WORKDIR, COPY).
 > The first build pulls `python:3.12-slim` (~50 MB compressed) and installs `openai` (~2 MB) plus
-> its dependencies; the exact `openai` version pip picks will differ from the one shown. Expect ~10–30 seconds on a typical connection (cached layers make reruns
+> its dependencies; the exact `openai` version pip picks will differ from the one shown. Expect about 1–2 min on first build (cached layers make reruns
 > near-instant). Subsequent builds use the layer cache and finish in under a second.
 
 Run it directly to verify the wiring before we add Compose:
@@ -424,7 +424,7 @@ in your environment.
 :::warning[First build is slow]
 
 The first `docker compose run` (or `docker build`) pulls `python:3.12-slim` from Docker Hub and
-installs the `openai` package. Expect ~1–2 minutes on a fresh machine. Subsequent builds hit the
+installs the `openai` package. Expect about 1–2 min on first build. Subsequent builds hit the
 layer cache and finish in seconds.
 :::
 

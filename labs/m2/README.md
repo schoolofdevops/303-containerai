@@ -30,6 +30,8 @@ OPENAI_BASE_URL=http://host.docker.internal:8080/v1 docker compose run --rm clie
 
 Expected output: a single sentence from the model answering "Explain containers in one sentence."
 
+> **Note:** `qwen3:4b` is not a drop-in upgrade. The build we tested ignores `think: false` and prints its reasoning inline, so parsers that expect a short answer break. Keep `qwen3.5:2b` for the labs.
+
 ## How it works
 
 `client.py` uses the official `openai` Python SDK with `base_url` pointing at Ollama's

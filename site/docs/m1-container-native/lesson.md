@@ -150,6 +150,8 @@ This call works identically against:
 
 This shared contract is what lets you swap from a 2B dev model to a production-grade engine without touching a single line of application code. Every lab in this course speaks this same language, the same request format, all the way from M1 to the Capstone.
 
+One detail for reasoning models such as `qwen3.5:2b`: they think before they answer, so the labs add `"reasoning_effort": "none"` to this request to get a short, direct reply. M2 §6 explains that switch.
+
 ---
 
 ## Summary

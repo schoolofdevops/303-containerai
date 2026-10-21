@@ -10,7 +10,7 @@ $ ollama --version
 ollama version is 0.40.7
 ```
 
-Page states "Ollama 0.40 or newer" (MLX engine on Apple Silicon; the thinking switch-off depends on it).
+Page states "Ollama 0.40 or newer" (the MLX engine on Apple Silicon ships from 0.40; the thinking switch-off also works on older releases).
 
 ## Model pulls (real output, fresh pull into an empty scratch model directory on a second Ollama server)
 

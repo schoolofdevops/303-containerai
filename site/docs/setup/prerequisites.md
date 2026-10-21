@@ -98,8 +98,8 @@ section appear; the exact heading text depends on the runtime.
 brew install ollama
 ```
 
-You need Ollama 0.40 or newer. On Apple Silicon the MLX engine that runs `qwen3.5:2b` ships from 0.40, and
-the switch that turns off the model's thinking mode depends on it. Check what you have:
+You need Ollama 0.40 or newer, because on Apple Silicon the MLX engine that runs `qwen3.5:2b` ships from
+0.40. Check what you have:
 
 ```bash
 ollama --version

@@ -1,5 +1,8 @@
 # Lab-test evidence — M5 Deep Dive: RAG Parameters Under the Hood
 
+> **Superseded:** this file records the 2026-07 runs. The 2026-10-21 re-validation on `qwen3.5:2b` lives in `planning/lab-tests/m5.md`.
+> Where the two disagree, `m5.md` wins.
+
 **Machine:** Apple Silicon (arm64), 16 GB RAM
 **Runtime:** Docker via `PATH="$HOME/.rd/bin:$PATH"` (Rancher Desktop, docker 29.5.2/dockerd-moby)
 **Date:** 2026-07-22

@@ -66,7 +66,7 @@ Compare this with **`docker model package`**, which also packs a GGUF file into 
 |---|---|---|
 | Standard | OCI artifact, CNCF-governed spec (ModelPack) | OCI artifact, Docker-defined media types |
 | CLI | `kit`, any OS or runtime | `docker model`, a CLI plugin on Docker Desktop and Docker CE (Linux) |
-| Registries | Any OCI registry | Docker Hub primary |
+| Registries | Any OCI registry | Docker Hub by default |
 | Layer types | model / code / datasets / docs | Single model blob |
 | Selective pull | `--filter=model` / `--filter=code` | Not supported |
 | CNCF ecosystem | Integrates with Flux, Harbor, Argo | No |

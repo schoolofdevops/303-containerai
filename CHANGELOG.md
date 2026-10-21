@@ -12,31 +12,37 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - Module 2 section 6, "Reasoning Models and the Universal Contract", plus a matching quiz question.
 - Module 6 paragraph on the MCP 2026-07-28 stateless transport, plus a matching quiz question.
 - `scripts/assert-model-refs.sh`, a gate that fails when a retired model name creeps back into the course.
-- Think-off checks in the M1 and M2 labs, so a call that forgets to switch thinking off now fails.
+- Think-off checks in the M1 and M2 labs, so a call that forgets to switch thinking off now fails. The M1 container-to-host check now requires a non-empty `response` value.
 
 ### Changed
 
-- Default model is now `qwen3.5:2b` (3.1 GB), replacing `qwen2.5:1.5b`. The upgrade path is `qwen3:4b`, replacing `qwen2.5:3b`.
+- Default model is now `qwen3.5:2b` (3.1 GB), replacing `qwen2.5:1.5b`. The optional larger model is `qwen3:4b`, replacing `qwen2.5:3b`. It is not a drop-in swap: the build we tested ignores `think:false` and prints its reasoning inline, and the M1, M2, M6 and M7 pages now say so.
 - Ollama 0.40 is the new floor. On Apple Silicon the model runs on the MLX runner.
 - Thinking is switched off on every model call: `think:false` on the native API, `reasoning_effort:"none"` on `/v1`, and `reasoning=False` in LangChain.
 - Chroma moves to 1.5.9 with the `/api/v2` routes in M5, M6, M7 and the capstone.
+- The Chroma volume now mounts at `/data`, where Chroma 1.x keeps its database, in M5, M6, M7 and the capstone. Persistence across `docker compose down` and `up` was re-checked on M6.
+- M5 Python pins: `langchain` 0.3.30, `langchain-chroma` 0.2.6, `langchain-ollama` 0.3.10, `langchain-community` 0.3.31 and `requests` 2.32.5.
 - ToolHive moves to v0.55.2.
 - M4 claims about Docker Model Runner versus ModelPack are corrected: it runs on Docker CE, and the difference is scope and governance, not licence.
 - M7 Reviewer agent now receives the runbook passage, and deep-dive Variant B is rewritten to match.
 - Memory figures re-measured on the new model; M7 now needs about 4 GB in total.
 - Capstone Chroma healthcheck is now a bash `/dev/tcp` probe, because the 1.5.9 image has no Python.
 - The prerequisites page now uses `qwen3.5:2b` and states the Ollama floor.
-- All 10 labs re-validated on Ollama 0.40.7, with evidence in `planning/lab-tests/`.
+- Labs re-validated on Ollama 0.40.7, with evidence in `planning/lab-tests/`. M4 ran its checks only, and its evidence file is unchanged. Capstone Steps 5 (kit push to GHCR) and 7 (CI) were not run, because they need credentials and publish externally.
 
 ### Fixed
 
 - Prerequisites bridge check now passes `think:false`, so the reply is not empty on a reasoning model.
 - Concept deck 05 and its sequence spec now show the Chroma pin as 1.5.9.
+- M7 no longer says Docker Model Runner is Docker Desktop-only. It is not available on Rancher Desktop, Colima or Podman, and the course standard is native Ollama.
+- M7 deep-dive close now matches its Variant B result: without the gate the marker is stable but certifies the wrong runbook.
+- M2 section 4 now explains that `qwen3.5:2b` on Apple Silicon is an MLX `mxfp8` safetensors build, which is why it is 3.1 GB on disk.
 
 ### Known gaps
 
 - The concept decks and narration were not updated for the new M2 section 6 or the M6 MCP-2026 paragraph. A later deck-author pass will cover them.
 - The Hermes bonus module is on hold.
+<!-- B-gaps -->
 
 ## [1.8.0] - 2026-10-21
 
