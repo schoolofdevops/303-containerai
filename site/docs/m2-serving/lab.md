@@ -186,8 +186,10 @@ CMD ["python", "client.py"]
 Build it:
 
 ```bash
-docker build -t m2-client labs/m2/
+docker build --no-cache --progress=plain -t m2-client labs/m2/
 ```
+
+`--no-cache` forces a clean first build and `--progress=plain` prints the full step log, so your output matches the block below. Plain `docker build -t m2-client labs/m2/` works too; it just shows less.
 
 **Expected output:**
 ```
@@ -195,30 +197,55 @@ docker build -t m2-client labs/m2/
 
 #1 [internal] load build definition from Dockerfile
 #1 transferring dockerfile: 155B 0.0s done
-#1 DONE 0.1s
+#1 DONE 0.0s
 
 #2 [internal] load metadata for docker.io/library/python:3.12-slim
-#2 DONE 0.1s
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [internal] load build context
+#4 transferring context: 31B done
+#4 DONE 0.0s
 
 #5 [1/4] FROM docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1
+#5 resolve docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1 0.0s done
+#5 CACHED
 
 #6 [2/4] RUN pip install --no-cache-dir openai
-#6 4.044 Collecting openai
-#6 4.158   Downloading openai-3.35.1-py3-none-any.whl.metadata (44 kB)
+#6 3.474 Collecting openai
+#6 3.666   Downloading openai-3.35.1-py3-none-any.whl.metadata (44 kB)
 #6 ...
-#6 12.86 Successfully installed annotated-types-0.8.0 anyio-4.15.1 h11-0.16.0 httpcore2-2.16.0 httpx2-2.16.0 idna-3.20 jiter-0.17.0 openai-3.35.1 pydantic-2.14.1 pydantic-core-2.50.1 sniffio-1.3.1 truststore-0.10.5 typing-extensions-4.16.0 typing-inspection-0.4.4
-#6 DONE 14.3s
+#6 10.56 Successfully installed annotated-types-0.8.0 anyio-4.15.1 h11-0.16.0 httpcore2-2.16.0 httpx2-2.16.0 idna-3.20 jiter-0.17.0 openai-3.35.1 pydantic-2.14.1 pydantic-core-2.50.1 sniffio-1.3.1 truststore-0.10.5 typing-extensions-4.16.0 typing-inspection-0.4.4
+#6 10.56 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#6 10.76 
+#6 10.76 [notice] A new release of pip is available: 25.0.1 -> 26.2.2
+#6 10.76 [notice] To update, run: pip install --upgrade pip
+#6 DONE 11.2s
 
 #7 [3/4] WORKDIR /app
-#7 DONE 0.2s
+#7 DONE 0.1s
 
 #8 [4/4] COPY client.py .
-#8 DONE 0.0s
+#8 DONE 0.1s
 
+#9 exporting to image
+#9 exporting layers
+#9 exporting layers 2.7s done
+#9 exporting manifest sha256:867f6c5579a9ca675c93a9eab02524bbfbcd88c5cac8a1396bf0f284a3c79c1e 0.0s done
+#9 exporting config sha256:cf6c20796062ada0397456fd23ede9a69bffd3ac6454ecfb7f1fd3ac5503e3e7 0.0s done
+#9 exporting attestation manifest sha256:8fc51bf1d735daba6d5a824245517c2df2d8bad83aa5848f40c5dd5ee725795c 0.0s done
+#9 exporting manifest list sha256:7533a53d655bc318579f367f188f2512e6224bbe80c18cc8d21e256ba92ab1de 0.0s done
 #9 naming to docker.io/library/m2-client:latest done
-#9 DONE 7.1s
+#9 unpacking to docker.io/library/m2-client:latest
+#9 unpacking to docker.io/library/m2-client:latest 1.2s done
+#9 DONE 4.0s
 ```
 
+> Lines marked `...` are whole pip log lines left out for length; everything else is verbatim.
+>
 > Docker uses BuildKit's `#N` step notation. The build has **4 steps** (FROM, RUN, WORKDIR, COPY).
 > The first build pulls `python:3.12-slim` (~50 MB compressed) and installs `openai` (~2 MB) plus
 > its dependencies; the exact `openai` version pip picks will differ from the one shown. Expect ~10–30 seconds on a typical connection (cached layers make reruns
@@ -232,7 +259,7 @@ docker run --rm m2-client
 
 **Expected output:**
 ```
-Containers are lightweight, portable units that wrap a full set of files and the environments needed to run them, allowing development teams to bundle applications with their dependencies into self-contained packages regardless of where they are deployed.
+Containers are lightweight, standardized virtual machine environments that encapsulate an operating system, kernel, shell, and user application into a single reusable unit for efficient deployment and isolation across different systems.
 ```
 
 The model's exact wording will vary — what matters is that a sentence comes back, not an error.
@@ -280,11 +307,11 @@ docker compose -f labs/m2/compose.yaml run --rm client
 
 **Expected output:**
 ```
-Network m2_default Creating 
+ Network m2_default Creating 
  Network m2_default Created 
- Container m2-client-run-7deda3a03f73 Creating 
- Container m2-client-run-7deda3a03f73 Created 
-Containers are isolated, reusable software units that package code and dependencies together to ensure consistency across different environments while providing a lightweight abstraction for deployment scenarios like container orchestration.
+ Container m2-client-run-185db55d72e0 Creating 
+ Container m2-client-run-185db55d72e0 Created 
+Containers are discrete, lightweight units of storage that allow you to encapsulate software applications and their data in a portable way without needing to know the underlying operating system details.
 ```
 
 > On first run you will also see Compose's network and container creation lines (shown above) before the model reply — Compose creates the default network. These disappear on subsequent runs.
@@ -414,7 +441,7 @@ docker compose down
 
 **Expected output:**
 ```
-Network m2_default Removing 
+ Network m2_default Removing 
  Network m2_default Removed 
 ```
 

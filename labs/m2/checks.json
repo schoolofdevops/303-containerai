@@ -34,10 +34,10 @@
     },
     {
       "id": "client-answers-via-v1",
-      "describe": "containerized client reaches Ollama /v1 through host.docker.internal and gets a chat completion",
-      "run": "PATH=\"$HOME/.rd/bin:$PATH\" docker compose -f labs/m2/compose.yaml run --rm client",
+      "describe": "containerized client reaches Ollama /v1 through host.docker.internal, prints a non-empty reply in under 45s (thinking-off keeps it to seconds), and client.py carries reasoning_effort=none",
+      "run": "grep -q 'reasoning_effort=\"none\"' labs/m2/client.py && export PATH=\"$HOME/.rd/bin:$PATH\" && s=$(date +%s) && out=$(docker compose -f labs/m2/compose.yaml run --rm -T client 2>/dev/null) && e=$(date +%s) && [ -n \"$out\" ] && [ $((e-s)) -lt 45 ] && echo CLIENT-REPLY-OK",
       "assert": {
-        "exit": 0
+        "contains": "CLIENT-REPLY-OK"
       }
     },
     {
