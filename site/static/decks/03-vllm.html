@@ -165,7 +165,7 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="120" y="258">3</text><text x="120" y="348">4</text>
     </g>
     <g class="lbl" text-anchor="start">
-      <text x="170" y="78">Continuous batching + PagedAttention: roughly three times the throughput</text>
+      <text x="170" y="78">Continuous batching + PagedAttention: roughly three times the throughput on a GPU</text>
       <text x="170" y="168">Serve vLLM behind the same OpenAI-compatible /v1 as Ollama</text>
       <text x="170" y="258">Run the CPU track on any laptop — NUMA patch, thread tuning</text>
       <text x="170" y="348">The GPU track + quantization: AWQ · GPTQ · FP8 trade-offs</text>
@@ -312,8 +312,8 @@ footer, header, hgroup, main, menu, nav, section {
 
 <section>
   <h2 class="t">The payoff: roughly three times the throughput</h2>
-  <p class="s">Same hardware, heads never idle</p>
-  <svg viewBox="0 0 1100 360" role="img" aria-label="A bar chart comparing naive server throughput to vLLM at roughly three times">
+  <p class="s">On a GPU: same hardware, heads never idle</p>
+  <svg viewBox="0 0 1100 360" role="img" aria-label="A bar chart comparing naive server throughput to vLLM at roughly three times on a GPU">
     <!-- axis -->
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
       <path d="M180,300 L980,300"/>
@@ -331,7 +331,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <rect x="642" y="92" width="146" height="206" fill="#f5f5f5"/>
     <text x="715" y="200" text-anchor="middle" class="lbl-b">3&times;</text>
-    <text x="715" y="330" text-anchor="middle" class="lbl">vLLM</text>
+    <text x="715" y="330" text-anchor="middle" class="lbl">vLLM (GPU)</text>
     <text x="120" y="185" text-anchor="middle" class="lbl-g" transform="rotate(-90 120 185)">throughput</text>
   </svg>
   <div class="pageno">M3·07</div>
@@ -382,7 +382,7 @@ footer, header, hgroup, main, menu, nav, section {
 </section>
 
 <section class="divider illustrated">
-  <svg viewBox="0 0 1600 900" role="img" aria-label="A hotel guest standing in a single small room, doorway open to a hallway, unable to see the rest of the building's floor plan">
+  <svg viewBox="0 0 1600 900" role="img" aria-label="A resident standing in one furnished apartment, doorway open to a hallway, unable to see the rest of the building's floor plan">
     <image href="../img/decks/03-vllm/divider3-hotel-room.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
   </svg>
   <h2 class="t" style="font-size:2.2em">3 &middot; The CPU track (what you'll run)</h2>
@@ -407,7 +407,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="380" y="163" text-anchor="middle" class="lbl">openeuler/vllm-cpu:0.9.1</text>
     <text x="380" y="188" text-anchor="middle" class="lbl-g">multi-arch · runs native on arm64</text>
     <text x="240" y="255" text-anchor="middle" class="lbl">SmolLM2</text>
-    <text x="240" y="283" text-anchor="middle" class="lbl-g">135M / 360M / 1.7B</text>
+    <text x="240" y="283" text-anchor="middle" class="lbl-g">135M in the lab</text>
     <text x="520" y="255" text-anchor="middle" class="lbl">/v1 server</text>
     <text x="520" y="283" text-anchor="middle" class="lbl-g">same OpenAI API</text>
     <!-- arrow out -->
@@ -533,9 +533,25 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M3·15</div>
 </section>
 
+<section>
+  <h2 class="t">A GPU launch is one docker run</h2>
+  <p class="s">Read-only here: the command for a Linux GPU box</p>
+  <svg viewBox="0 0 1100 340" role="img" aria-label="The GPU launch command: docker run with gpus all and ipc host, publishing port 8000, running the vllm-openai image with a Mistral 7B model">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="60" y="100" width="980" height="120" rx="12"/>
+    </g>
+    <text x="90" y="145" text-anchor="start" class="lbl-b">docker run --gpus all --ipc=host -p 8000:8000 \</text>
+    <text x="90" y="190" text-anchor="start" class="lbl-b">  vllm/vllm-openai:latest --model mistralai/Mistral-7B-Instruct-v0.3</text>
+    <text x="215" y="260" text-anchor="middle" class="lbl-g">GPU passes through</text>
+    <text x="550" y="260" text-anchor="middle" class="lbl-g">shared memory for attention</text>
+    <text x="885" y="260" text-anchor="middle" class="lbl-g">same /v1 API on :8000</text>
+  </svg>
+  <div class="pageno">M3·16</div>
+</section>
+
 <section class="divider">
   <h2 class="t" style="font-size:2.2em">5 &middot; Quantization in practice</h2>
-  <div class="pageno">M3·16</div>
+  <div class="pageno">M3·17</div>
 </section>
 
 <section>
@@ -572,16 +588,16 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="885" y="290" fill="#757575">chosen for large deployments</text>
     </g>
   </svg>
-  <div class="pageno">M3·17</div>
+  <div class="pageno">M3·18</div>
 </section>
 
 <section class="divider">
   <h2 class="t" style="font-size:2.2em">6 &middot; Operational gotchas</h2>
-  <div class="pageno">M3·18</div>
+  <div class="pageno">M3·19</div>
 </section>
 
 <section>
-  <h2 class="t">GPU operational gotchas</h2>
+  <h2 class="t">GPU gotchas: toolkit, ipc, VRAM</h2>
   <p class="s">Two flags, one sizing rule</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="NVIDIA Container Toolkit exposes the GPU, ipc host shares shared memory, and VRAM sizing needs headroom">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
@@ -608,7 +624,40 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="885" y="222" text-anchor="middle" class="lbl-sm">+ KV-cache headroom</text>
     <text x="885" y="290" text-anchor="middle" class="lbl-g">24 GB card, or quantize</text>
   </svg>
-  <div class="pageno">M3·19</div>
+  <div class="pageno">M3·20</div>
+</section>
+
+<section>
+  <h2 class="t">CPU gotchas: two flags, a patch, a wait</h2>
+  <p class="s">What goes wrong on a laptop, and the fix</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Four CPU gotchas: max-model-len caps context, max-num-seqs sets batch width, the NUMA patch is not optional, and the first run is slow but not hung">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="40"  y="70" width="240" height="240" rx="12"/>
+      <rect x="305" y="70" width="240" height="240" rx="12"/>
+      <rect x="570" y="70" width="240" height="240" rx="12"/>
+      <rect x="835" y="70" width="240" height="240" rx="12"/>
+    </g>
+    <text x="160" y="110" text-anchor="middle" class="lbl-b">max-model-len</text>
+    <text x="160" y="155" text-anchor="middle" class="lbl-sm">caps the context</text>
+    <text x="160" y="185" text-anchor="middle" class="lbl-sm">and the KV cache</text>
+    <text x="160" y="270" text-anchor="middle" class="lbl-g">too big: OOM kill</text>
+
+    <text x="425" y="110" text-anchor="middle" class="lbl-b">max-num-seqs</text>
+    <text x="425" y="155" text-anchor="middle" class="lbl-sm">sequences batched</text>
+    <text x="425" y="185" text-anchor="middle" class="lbl-sm">at once</text>
+    <text x="425" y="270" text-anchor="middle" class="lbl-g">drop one of the two</text>
+
+    <text x="690" y="110" text-anchor="middle" class="lbl-b">NUMA patch</text>
+    <text x="690" y="155" text-anchor="middle" class="lbl-sm">divide by zero</text>
+    <text x="690" y="185" text-anchor="middle" class="lbl-sm">at startup</text>
+    <text x="690" y="270" text-anchor="middle" class="lbl-g">not optional</text>
+
+    <text x="955" y="110" text-anchor="middle" class="lbl-b">First run</text>
+    <text x="955" y="155" text-anchor="middle" class="lbl-sm">image + model</text>
+    <text x="955" y="185" text-anchor="middle" class="lbl-sm">download, then cached</text>
+    <text x="955" y="270" text-anchor="middle" class="lbl-g">slow, not hung</text>
+  </svg>
+  <div class="pageno">M3·21</div>
 </section>
 
 <section>
@@ -634,7 +683,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="550" y="270" text-anchor="middle" class="lbl-g">the M2 client, unchanged, talks to the vLLM server you build</text>
   </svg>
   <p class="credit">Next: <b>Lab — Serve SmolLM2 on CPU vLLM</b> &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
-  <div class="pageno">M3·20</div>
+  <div class="pageno">M3·22</div>
 </section>
 </div></div>
 

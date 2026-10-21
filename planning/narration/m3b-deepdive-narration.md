@@ -36,9 +36,8 @@ By the end of this deep dive, you will be able to look at somebody else's LoRA c
 
 ### Suggested visuals / slide beats
 
-1. Title card: the four blind spots (rank/alpha, QLoRA, loss curve, data format) as a short numbered list.
-2. Quick recall shot of the lab's loss number falling — sets up "you saw this, but not why."
-3. Transition to Video 2.
+1. Slide 1, "The flags you didn't touch": the flags `mlx_lm.lora` ran, and what each one controls.
+2. Transition to Video 2.
 
 ---
 
@@ -54,20 +53,23 @@ The lesson already told you that LoRA freezes the base model's weights and train
 
 Let's say the base model is a printed textbook, and you're not allowed to touch a single word inside it — that page stays frozen, permanently. What LoRA gives you instead is a notepad clipped onto the side of each page, and that notepad is where you're allowed to write your corrections. Now here's the important part: the rank, that is the `r` in your config, is nothing but how wide that notepad is. If `r` is four, you get four lines to write a correction in. If `r` is sixty-four, you get sixty-four lines. A wider notepad lets you write a more complex, more varied correction, but it's also more paper to carry — more parameters to train, a bigger adapter file, and more room for the adapter to just memorize your examples instead of learning the general pattern from them. A narrow notepad forces you to write a shorter, more general correction, whether you like it or not.
 
-Now let's put a number on this. LoRA replaces a full weight update to a matrix `W`, which has a `d by d` shape, with two much smaller matrices, `A` and `B`. And because of that, the number of trainable parameters scales with `r`, not with `d` squared. So going from `r` equals four up to `r` equals sixty-four is a sixteen times increase in that layer's trainable parameters. This is exactly why rank is the main memory and capacity dial on a LoRA adapter, not some minor tuning knob you can ignore.
+Now let's put a number on this. LoRA replaces a full weight update to a matrix `W`, which has a `d by d` size, with two much smaller matrices, `A` and `B`. And because of that, the number of trainable parameters scales with `r`, not with `d` squared. So going from `r` equals four up to `r` equals sixty-four is a sixteen times increase in that layer's trainable parameters. This is exactly why rank is the main memory and capacity dial on a LoRA adapter, not some minor tuning knob you can ignore.
 
 `alpha` is a separate number, and it's a scaling factor on top of that. The adapter's actual contribution to the model isn't just `A` multiplied by `B` — it's `alpha` divided by `r`, multiplied by `A` times `B`. And here's the part that trips people up: `alpha` and `r` are not independent of each other. What actually matters is the ratio between them. So if you double both `r` and `alpha` together, that scaling roughly cancels out. When you see two example configs, say `r` equals eight with `alpha` equals sixteen, and `r` equals sixteen with `alpha` equals thirty-two, those are the exact same `alpha` over `r` ratio of two, just carried at two different notepad widths. So if you only change `r` without also touching `alpha`, you are quietly changing the effective step size of every adapted layer as well — and that's a common reason people report "I bumped up the rank and now training became unstable."
 
-There's one more setting worth knowing: `target_modules`, which decides which weight matrices even get a notepad in the first place. A transformer layer has several candidates — the query, value, and key projections, the output projection, and the feed-forward layers. Most published LoRA configs start with the query and value projections, `q_proj` and `v_proj`, because those have the most direct effect on what the model pays attention to and pulls from — which is where behavior, style, and format tend to live. Adding more target modules increases both capacity and cost, with diminishing returns for most tasks that are about shaping behavior rather than teaching new facts. You would reach for those extra modules only after `q_proj` and `v_proj` alone stop improving things.
+There's one more setting worth knowing: `target_modules`, which decides which weight matrices even get a notepad in the first place. A transformer layer has several candidates — the query, value, and key projections, the output projection, and the feed-forward layers. Most published LoRA configs start with the query and value projections, `q_proj` and `v_proj`, because those have the most direct effect on what the model pays attention to and pulls from — which is where behavior, style, and format tend to live. Adding more target modules increases both capacity and cost, with diminishing returns for most tasks that are about steering behavior rather than teaching new facts. You would reach for those extra modules only after `q_proj` and `v_proj` alone stop improving things.
+
+One last setting is dropout. On each training step, dropout randomly zeroes part of the adapter's activations, so the adapter cannot lean on any single path. It matters more on a real dataset than on the lab's eight rows. The default in the lab is zero point zero, which means it is switched off.
 
 And that's what makes rank the dial you should reach for first, and alpha the number you should never touch alone.
 
 ### Suggested visuals / slide beats
 
-1. Textbook + clipped notepad diagram (frozen `W`, trainable `A`/`B`).
-2. Notepad width comparison: `r=4` vs `r=64`, four lines vs sixty-four lines.
-3. The `(alpha/r) × (A×B)` formula, shown once, with a worked `r=8,alpha=16` vs `r=16,alpha=32` side-by-side (same ratio).
-4. Transformer layer anatomy highlighting `q_proj`/`v_proj` as the default target modules.
+1. Slide 2, divider: a notepad clipped to a frozen textbook. Slide 3, "`r` is how wide the correction notepad is": more lines, more correction capacity.
+2. Slide 4, "Two thin matrices instead of one fat one": `A` and `B` replace one full update, and the parameters scale with `r`.
+3. Slide 5, "`alpha/r` is a ratio, not two knobs".
+4. Slide 6, "Not every layer gets a notepad": `target_modules`, with `q_proj` and `v_proj` as the default.
+5. Slide 7, "Dropout stops the notepad leaning on one path": three adapter paths, one zeroed each step.
 
 ---
 
@@ -83,7 +85,7 @@ The lesson mentioned that QLoRA quantizes the frozen base model down to four bit
 
 Let's say you're running a warehouse, and every part in it is sorted by exact size. Now somebody tells you: replace every exact measurement with one of only sixteen fixed size buckets. If your parts were spread evenly from tiny to huge, sixteen buckets would lose you a lot of precision, and that would be a real problem. But if almost all of your parts cluster around just a handful of common sizes, with only a long, thin tail of rare sizes on either side, then you could place your sixteen buckets exactly where the parts actually sit — dense in the middle, sparse at the edges — and you would barely lose anything, because you never wasted a bucket on a size nobody actually has.
 
-Now here's the part that answers the question. Neural network weights, when you actually measure them, turn out to be normally distributed — that is, clustered close to zero, with thin tails on either side, the same bell-curve shape you'd expect from something like height or exam scores. NF4, which stands for four-bit NormalFloat, is a quantization scheme whose sixteen representable values are deliberately placed to match that bell-curve shape, instead of being spread out evenly across the full range the way a naive integer quantizer would do it. And that is exactly why four-bit quantization survives here, in a place where you'd normally expect catastrophic precision loss — the bucket placement matches where the weights actually live.
+Now here's the part that answers the question. Neural network weights, when you actually measure them, turn out to be normally distributed — that is, clustered close to zero, with thin tails on either side, the same bell curve you'd expect from something like height or exam scores. NF4, which stands for four-bit NormalFloat, is a quantization scheme whose sixteen representable values are deliberately placed to match that bell curve, instead of being spread out evenly across the full range the way a naive integer quantizer would do it. And that is exactly why four-bit quantization survives here, in a place where you'd normally expect catastrophic precision loss — the bucket placement matches where the weights actually live.
 
 Double quantization takes this one step further. Quantization itself needs small scaling numbers for every block of weights, so it can map that block correctly into its four-bit buckets, and those scaling numbers add up to real memory across an entire model. Double quantization quantizes those scaling numbers too, down to eight bits, and that squeezes out roughly another zero point four bits per parameter. It sounds tiny per weight, but at seven billion parameters and up, it genuinely adds up.
 
@@ -93,10 +95,9 @@ One thing worth flagging if you're on Apple Silicon, which is what the lab used:
 
 ### Suggested visuals / slide beats
 
-1. Warehouse-with-buckets diagram: evenly spread parts (bad fit) vs bell-curve-clustered parts (good fit for 16 buckets).
-2. Normal distribution curve of real model weights with NF4's 16 buckets overlaid, dense in the middle.
-3. Double quantization: small callout showing the per-block scaling constants also getting quantized.
-4. Storage vs compute dtype flow diagram: 4-bit NF4 at rest → dequantize → bf16/fp16 compute → higher-precision result; adapter `A`/`B` shown staying in fp16 throughout.
+1. Slide 8, "16 buckets, placed where the weights actually live": a warehouse shelf, buckets dense in the middle and sparse at the edges.
+2. Slide 9, "Double quantization": the scaling constants are quantized too.
+3. Slide 10, "Storage in 4-bit, math in 16-bit": NF4 at rest, dequantize, bf16 or fp16 compute, with the adapter staying fp16. A caption says NF4 is the Track B path and the MLX-LM lab uses Apple's own quantization.
 
 ---
 
@@ -118,9 +119,9 @@ Batch size versus gradient accumulation is the memory trade-off you'll run into 
 
 ### Suggested visuals / slide beats
 
-1. Two loss curves side by side: healthy (train + val both falling) vs memorization signature (train falling, val stalling/rising).
-2. Learning rate too-high (oscillating) vs too-low (flat) vs well-tuned (smooth cosine decay) — three small curve sketches.
-3. Batch size vs gradient accumulation diagram: one big batch (high memory) vs several micro-batches accumulated (same statistical effect, lower memory).
+1. Slide 11, "The learning rate is the optimizer's step size": too high, too low, well tuned.
+2. Slide 12, "Falling train loss can still mean the adapter is memorizing": train falling while val stalls.
+3. Slide 13, "Bigger batch costs memory; more accumulation steps don't".
 
 ---
 
@@ -132,11 +133,11 @@ Batch size versus gradient accumulation is the memory trade-off you'll run into 
 
 ### Narration script
 
-The lab's `train.jsonl` used a specific chat format — a `messages` array with a role and a content field on each turn — and you copied that shape without being told why it mattered. Here's why it does, and it's the number one reason a fine-tune quietly fails.
+The lab's `train.jsonl` used a specific chat format — a `messages` array with a role and a content field on each turn — and you copied that format without being told why it mattered. Here's why it does, and it's the number one reason a fine-tune quietly fails.
 
-Every instruct-tuned model has what's called a chat template baked into its tokenizer configuration. That's the exact sequence of special tokens the model was trained to expect around each turn of a conversation. When you fine-tune with `mlx_lm.lora --data`, the trainer applies the model's own chat template to your `messages` array before it even tokenizes anything. Now, let's say your training data uses a different shape instead — plain prompt and completion strings, a different set of role names, or some hand-rolled template that doesn't match what the base model's tokenizer actually expects at inference time. Training would still run. Loss would still fall. And that's exactly the trap: a format mismatch doesn't throw an error, it silently trains the adapter on the wrong signal. The adapter learns to associate your content with token boundaries that don't match how you'll actually prompt it later, so it looks like it worked during training, and then it underperforms or behaves strangely once it's in the field.
+Every instruct-tuned model has what's called a chat template baked into its tokenizer configuration. That's the exact sequence of special tokens the model was trained to expect around each turn of a conversation. When you fine-tune with `mlx_lm.lora --data`, the trainer applies the model's own chat template to your `messages` array before it even tokenizes anything. Now, let's say your training data uses a different format instead — plain prompt and completion strings, a different set of role names, or some hand-rolled template that doesn't match what the base model's tokenizer actually expects at inference time. Training would still run. Loss would still fall. And that's exactly the trap: a format mismatch doesn't throw an error, it silently trains the adapter on the wrong signal. The adapter learns to associate your content with token boundaries that don't match how you'll actually prompt it later, so it looks like it worked during training, and then it underperforms or behaves strangely once it's in the field.
 
-This is the single biggest reason a fine-tune "doesn't seem to have learned anything" even though the loss curve looked clean. So always verify by doing exactly what the lab's evaluation step does — generate from the adapter using the same prompting shape you actually intend to use in production. Don't just eyeball the loss number and call it done.
+This is the single biggest reason a fine-tune "doesn't seem to have learned anything" even though the loss curve looked clean. So always verify by doing exactly what the lab's evaluation step does — generate from the adapter using the same prompt format you actually intend to use in production. Don't just eyeball the loss number and call it done.
 
 Now let's talk about how you'd actually evaluate an adapter once you trust the data format is right. The lab's before-and-after comparison, base model against adapter, same prompt, is really the whole evaluation method worth remembering: a fixed set of held-out prompts, run side by side, every single time you change a knob. Not a vibe check on one output — a small, fixed prompt set that you reuse across every variant you try, because generation is stochastic, so one good-looking output on its own proves nothing about the adapter.
 
@@ -146,10 +147,9 @@ And here's the column you now have that you didn't have before this page: the co
 
 ### Suggested visuals / slide beats
 
-1. Chat template mismatch diagram: training data shape vs tokenizer's expected shape, diverging silently while loss still falls.
-2. Fixed held-out prompt set, reused across three adapter variants, shown side by side.
-3. Decision flow: wrong answer → missing knowledge (RAG) vs missing behavior → can prompting fix it? → yes (prompting) / no (fine-tune).
-4. "Cost of being wrong" comparison: prompt edit vs fine-tune re-run, as a simple two-column callout.
+1. Slide 14, "Same JSON layout, wrong token boundaries": training data format against the tokenizer's expected template, with loss still falling.
+2. Slide 15, "One fixed prompt set, reused every time you change a knob".
+3. Slide 16, "Missing knowledge or missing behavior": knowledge gap leads to RAG, behavior gap leads to prompt, then fine-tune. The cost of being wrong is spoken only.
 
 ---
 
@@ -163,22 +163,28 @@ And here's the column you now have that you didn't have before this page: the co
 
 Now let's stop talking about these knobs in the abstract and actually turn them, on the same lab you already ran, and look at the real numbers that come back.
 
-We're going to run the lab's training loop three times, each time writing to its own separate adapter folder so we can compare them afterward instead of overwriting one adapter with the next. The baseline is just the lab's own Step A-3 run, unchanged — rank eight, the default learning rate, fifty iterations. It finished in about seven and a half seconds of wall clock time, training zero point seven three three million parameters out of the model's four hundred ninety-four million — that's the notepad next to a four-hundred-ninety-four-million-parameter textbook. Training loss at iteration fifty landed at zero point two hundred, with a validation loss of zero point one four eight, and the curve fell smoothly and monotonically the whole way down.
+One porting trap first. In mlx-lm version zero point thirty-one point three there is no lora-rank flag. Rank and scale live in a YAML file, under lora_parameters. And mlx-lm's scale is not raw alpha. It already is the alpha over r multiplier. So if you port rank four, scale twenty, to PEFT as alpha twenty, you get a four times different scale. Carry the effective multiplier across frameworks, not the raw number.
 
-Variant A drops the rank down to four — a narrower notepad, fewer trainable parameters per layer. And the very first thing you'd notice is that trainable parameters dropped from zero point seven three three million down to exactly half, zero point three six seven million, which directly confirms the sixteen-times-per-rank-jump scaling we talked about earlier — parameter count scales in a straight line with rank. The loss result confirms the capacity story too: training loss at iteration fifty came in at zero point four four nine, and validation at zero point three seven four, both measurably higher than the baseline's zero point two hundred and zero point one four eight. The narrower notepad genuinely has less capacity, and you can see it even on this trivial eight-example dataset.
+We're going to run the lab's training loop three times, each time writing to its own separate adapter folder so we can compare them afterward instead of overwriting one adapter with the next. The baseline is just the lab's own Step A-3 run, unchanged — rank eight, the default learning rate, fifty iterations. It finished in about seven and a half seconds of wall clock time, training zero point seven three three million parameters out of the model's four hundred ninety-four million. That is the notepad next to a four-hundred-ninety-four-million-parameter textbook. Training loss at iteration fifty landed at zero point two hundred, with a validation loss of zero point one four eight, and the curve fell smoothly and monotonically the whole way down.
+
+Variant A drops the rank down to four, a narrower notepad. Training loss at iteration fifty came in at zero point four four nine, and validation at zero point three seven four. Both are measurably higher than the baseline's zero point two hundred and zero point one four eight. The narrower notepad genuinely has less capacity, and you can see it even on this trivial eight-example dataset.
+
+The parameters tell the same story. Trainable parameters dropped from zero point seven three three million to exactly half, zero point three six seven million. That confirms parameter count scales in a straight line with rank, the same rule behind the sixteen times figure from rank four to rank sixty-four. Peak memory stayed near one point two nine gigabytes for both.
 
 Variant B keeps rank at the default eight, but pushes the learning rate ten times higher, up to one times ten to the minus four, specifically to try to surface the oscillation and instability signature we talked about. And here's where the real result complicates the naive prediction: on this eight-example toy dataset, ten times the learning rate converged faster and lower than the baseline — training loss at iteration fifty came in at zero point zero five four, well below the baseline's zero point two hundred — and the validation loss dropped smoothly and monotonically from three point seven two one straight down to zero point zero two eight, with no visible oscillation at all.
 
 Now, read that result correctly. It does not mean you should always crank the learning rate up. It means that eight examples over fifty iterations is too small, and too easy a problem, to expose any instability. The loss surface here is smooth enough that a bigger step still points in the right direction every single time. The instability signature from earlier is real, but you'd need a harder, larger, noisier real dataset to actually see it show up — and that's exactly why the evaluation method insists on held-out prompts, not just a loss number. A suspiciously good loss curve on a trivial dataset tells you about how easy the dataset was, not about whether that learning rate is safe at production scale.
 
-One more check worth doing: generate from all three adapters against the same held-out prompt, one the model never trained on. All three variants generalized correctly — the right JSON shape, the right field values, inferred correctly for a metric, host, and duration combination none of them ever saw during training. At this toy scale, every rank and both learning rates cleared the bar. The differences that actually matter show up in the loss numbers, not in this one generation — which is exactly why you don't stop at "it generated something reasonable" and call the comparison done.
+One more check worth doing: generate from all three adapters. On the training prompt, all three give the same JSON. That only proves memorization. The real test is a held-out prompt none of them ever saw. All three variants generalized correctly: the right JSON structure, the right field values, inferred correctly for a metric, host, and duration combination none of them ever saw during training. At this toy scale, every rank and both learning rates cleared the bar. The differences that actually matter show up in the loss numbers, not in this one generation — which is exactly why you don't stop at "it generated something reasonable" and call the comparison done.
 
 ### Suggested visuals / slide beats
 
-1. Three-column comparison table: Baseline (r=8, lr default) vs Variant A (r=4) vs Variant B (lr=1e-4), showing trainable params, final train/val loss, loss trajectory shape.
-2. Bar chart: trainable parameters, baseline vs Variant A, showing the exact half-and-half split.
-3. Two overlaid loss curves: baseline vs Variant B, both falling smoothly, Variant B visibly lower and faster — no oscillation shown despite the 10x LR.
-4. Held-out generation output shown for all three adapters side by side, same correct JSON shape.
+1. Slide 17, "mlx-lm: rank and scale live in YAML": no lora-rank flag, `lora_parameters` in YAML, scale is already alpha over r.
+2. Slide 18, "Same lab, three adapters, one comparison table": one shared dataset, baseline rank 8, variant A rank 4, variant B 10x learning rate.
+3. Slide 19, "Cutting rank in half measurably raises the floor": loss 0.449 against 0.200.
+4. Slide 20, "Half the rank, half the trainable parameters": 0.733M against 0.367M, peak memory about 1.29 GB.
+5. Slide 21, "10x the learning rate, and no instability shows up": 0.054 against 0.200.
+6. Slide 22, "A held-out prompt is the real test": same output on the training prompt, then a prompt none of the adapters saw.
 
 ---
 
@@ -206,8 +212,7 @@ You've now opened every flag the lab asked you to copy blindly, and you've seen 
 
 ### Suggested visuals / slide beats
 
-1. Five-item numbered recap list, one line each, matching the five rules above.
-2. Closing card pointing back to the lab's teardown/next-steps section.
+1. Slide 23, "What to carry into a real adapter": five numbered takeaways, matching the five rules above.
 
 ---
 
@@ -218,7 +223,7 @@ You've now opened every flag the lab asked you to copy blindly, and you've seen 
 | Rank `r` = notepad width, parameter scaling with `r` not `d²`, 16x from r=4→64 | Video 2 | Explained |
 | `alpha`/`r` ratio, effective step size, worked r=8/alpha=16 vs r=16/alpha=32 example | Video 2 | Explained |
 | `target_modules` — why q_proj/v_proj are the default | Video 2 | Explained |
-| `dropout` role, more relevant at real-dataset scale than the 8-example toy set | Video 2 | Explained (brief) |
+| `dropout` role, more relevant at real-dataset scale than the 8-example toy set | Video 2 | Explained (brief, slide 7) |
 | NF4 quantization matches normal weight distribution | Video 3 | Explained |
 | Double quantization of scaling constants (~0.4 bits/param) | Video 3 | Explained |
 | Storage dtype (4-bit) vs compute dtype (bf16/fp16), adapter never quantized | Video 3 | Explained |
@@ -233,6 +238,9 @@ You've now opened every flag the lab asked you to copy blindly, and you've seen 
 | Variant A — smaller rank (real numbers: 0.367M params, loss 0.449/0.374) | Video 6 | Demonstrated |
 | Variant B — higher LR (real numbers: loss 0.054/0.028, no oscillation) | Video 6 | Demonstrated |
 | Held-out generation check across all three variants | Video 6 | Demonstrated |
+| mlx-lm rank and scale live in YAML; scale is the alpha/r composite | Video 6 | Explained (slide 17) |
+| Trainable parameters and peak memory, rank 8 vs rank 4 | Video 6 | Demonstrated (slide 20) |
+| Learning rate default 1e-5 vs production 1e-4 to 3e-4 | Video 4 | Explained, spoken only |
 | "Where you will use this" — five practical rules | Video 7 | Explained (recap) |
 
 ## Verification flags

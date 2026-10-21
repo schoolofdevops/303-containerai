@@ -29,9 +29,9 @@ By the end of this module, you'll know when fine-tuning actually beats prompting
 
 ### Suggested visuals / slide beats
 
-1. Title card: "Module 3B — Customizing Models with LoRA/QLoRA"
-2. Divider: the fork — Track A (Apple Silicon, MLX-LM, native) vs Track B (NVIDIA, Axolotl, QLoRA)
-3. Closing takeaway card: "The container is what you reproduce"
+1. Slide 1, title: a frozen base model with a small clip-on adapter.
+2. Slide 2, "What you'll learn": four objectives, when to fine-tune, what LoRA does, which toolchain, why the frozen container matters.
+3. Closing line on screen: "The container is what you reproduce."
 
 ---
 
@@ -43,7 +43,9 @@ By the end of this module, you'll know when fine-tuning actually beats prompting
 
 ### Narration script
 
-Before you start a fine-tune, there are three questions worth asking, in order. Let's walk through them.
+Picture the problem first. A generalist model with a good prompt is usually right. Sometimes it breaks the format, or misses your dialect. A specialist gets it right every time. That is a behavior gap, not a knowledge gap.
+
+Now, before you start a fine-tune, there are three questions worth asking, in order. Let's walk through them.
 
 The first question is, can you solve this with a better system prompt? If yes, that's your answer, and it's almost always cheaper than training anything. The second question is, does the model need to reason over your own private documents, things it was never trained on? If yes, that's a knowledge problem, and you already know the fix for that, it's RAG, which you covered back in Module 5. And the third question is the interesting one for this module. Does the model need to behave differently, a new style, some domain vocabulary, a consistent output format, in a way that no prompt reliably gets you? If that's a yes, now you're looking at fine-tuning.
 
@@ -53,13 +55,13 @@ One, you have somewhere between fifty and five thousand high-quality examples of
 
 Now here's the important part, and it's easy to get wrong. Fine-tuning does not help when your problem is really a knowledge problem. If the model doesn't know your runbooks, that is a RAG problem, and no amount of fine-tuning fixes it, because you'd be trying to bake fast-changing facts into slow-changing weights. And it won't help with an inference problem either, that is, when the model reasons incorrectly on a task it should already understand. For that, you would improve your prompt, or you would reach for a smarter base model.
 
-So the short version is, prompting first, RAG for a knowledge gap, and fine-tuning only for a genuine behavior gap. Keep that decision tree in mind, because in the next video we look at what fine-tuning actually does to the model to close that gap.
+So the short version is, prompting first, RAG for a knowledge gap, and fine-tuning only for a genuine behavior gap. Keep that decision in mind, because in the next video we look at what fine-tuning actually does to the model to close that gap.
 
 ### Suggested visuals / slide beats
 
-1. Three-question decision flow: prompting → RAG → fine-tuning
-2. Four numbered cards: the four situations where fine-tuning wins
-3. Contrast card: "knowledge gap → RAG" vs "behavior gap → fine-tune"
+1. Slide 4, "The problem: a behaviour gap": a generalist that occasionally breaks format, against a specialist that always emits valid JSON.
+2. Slide 5, "Prompt vs RAG vs fine-tune": three columns, an instruction gap, a knowledge gap, a behaviour gap.
+3. Slide 6, "Four cases where fine-tuning fits": 50 to 5000 examples, reliable structure, a smaller specialist, a domain dialect, with the "does not fix" strip for knowledge gaps and reasoning errors.
 
 ---
 
@@ -83,10 +85,10 @@ In the next video, we'll look at the toolchain you'd actually use to run this, o
 
 ### Suggested visuals / slide beats
 
-1. Analogy diagram: textbook + sticky notes, peel-off framing
-2. Mechanism diagram: frozen base weights + LoRA matrix A + LoRA matrix B → merge → serving layer (mirrors the lesson's Mermaid diagram)
-3. Stat callout: adapter size 1–3% of base model, under 100 MB
-4. QLoRA callout: 4-bit frozen base, halved memory footprint
+1. Slide 7, divider: "2 · LoRA — sticky notes on a textbook".
+2. Slide 8, "LoRA, sticky notes on a textbook": frozen base weights W, two small matrices A and B, and W + A×B at inference.
+3. Slide 9, "QLoRA, squeeze the base to 4-bit": a 16-bit base too big for one GPU, quantized to 4-bit, with the adapter in higher precision, so a 7B fits in about 24 GB.
+4. The adapter size, one to three percent of the base and under 100 MB, is shown later on slide 17.
 
 ---
 
@@ -114,10 +116,9 @@ So the short version is, Axolotl or Unsloth in a container on NVIDIA, MLX-LM nat
 
 ### Suggested visuals / slide beats
 
-1. Three-card comparison: Axolotl / Unsloth / MLX-LM, with hardware target for each
-2. Diagram: Apple Silicon Mac — MLX native path vs container path (dead end, no CUDA/MPS) — mirrors the lesson's Mermaid diagram
-3. Diagram: NVIDIA Linux — Axolotl container --gpus all → GPU
-4. Callout: "bitsandbytes and CUDA don't exist on macOS"
+1. Slide 11, "The open-source toolchain": two panels. NVIDIA (containerized) lists Axolotl, Unsloth and the pinned Axolotl image. Apple Silicon (native) lists MLX-LM and unified memory.
+2. Slide 13, "The same GPU reality, again": the Mac with MLX-LM native and a container that is CPU only, against NVIDIA with the Axolotl container and `--gpus all`.
+3. Same slide, callout: "bitsandbytes and CUDA won't install on macOS."
 
 ---
 
@@ -133,16 +134,15 @@ Let's say your fine-tuning run finishes, and the adapter you get out of it is ge
 
 An OCI image doesn't rot the same way. The winglian slash axolotl image, at a specific version tag, has every one of those dependencies pinned down, permanently. So the workflow looks like this. You run the training, you tag the git commit for your YAML config, and you tag the Docker image you trained inside, and you push both to your registry. Now you have an immutable experiment record, that is, a record that can't quietly change under you, ever. And that is exactly why we said earlier that the container is what you reproduce, not the script.
 
-Now, what do you actually get out of a LoRA fine-tune? You get a small adapter directory, typically fifty to two hundred megabytes, with two files inside it, adapter underscore model dot safetensors, and adapter underscore config dot json. From there, you have three options. You could merge it directly into the base model weights, using mlx underscore lm dot fuse or peft merge, and that gives you one single portable file. Or you could load it hot, straight into Ollama with ollama create, or into vLLM with the dash dash lora-modules flag, and that keeps the base model shared in memory, and only swaps the small adapter per request. Or, and this is where the course connects forward, you could package it as a ModelKit artifact, with the base model reference and the adapter bundled together, and that's exactly what you'll do in Module 4, where a single modelkit push ships both at once.
+Now, what do you actually get out of a LoRA fine-tune? You get a small adapter directory, typically tens of megabytes, well under one hundred, with two files inside it, adapter underscore model dot safetensors, and adapter underscore config dot json. From there, you have three options. You could merge it directly into the base model weights, using mlx underscore lm dot fuse or peft merge, and that gives you one single portable file. Or you could load it hot, straight into Ollama with ollama create, or into vLLM with the dash dash lora-modules flag, and that keeps the base model shared in memory, and only swaps the small adapter per request. Or, and this is where the course connects forward, you could package it as a ModelKit artifact, with the base model reference and the adapter bundled together, and that's exactly what you'll do in Module 4, where a single modelkit push ships both at once.
 
 So the full pipeline, end to end, looks like this. Fine-tune, produces an adapter. Adapter, gets served, either hot-swapped or merged. Then it gets packaged. Then it ships. In the next video, we'll bring this whole module together before you head into the lab.
 
 ### Suggested visuals / slide beats
 
-1. Diagram: training run → git tag + image tag → push to GHCR → adapter artifact
-2. Adapter contents card: adapter_model.safetensors + adapter_config.json, 50–200 MB
-3. Three-branch diagram: merge / hot-load (Ollama, vLLM) / package (ModelKit → Module 4)
-4. Pipeline strip: fine-tune → adapter → serve → package → ship
+1. Slide 15, "The frozen container is the experiment": a bare script whose dependencies drift, frozen into a pinned image plus YAML, with config in git and the tag in GHCR.
+2. Slide 17, "What you produce: a tiny adapter": two files, adapter_model.safetensors and adapter_config.json, under 100 MB, and three destinations, merge, hot-load and package.
+3. Slide 18, "The pipeline, end to end": fine-tune, adapter, serve, package, ship.
 
 ---
 
@@ -160,9 +160,9 @@ Now it's your turn to run one yourself. In the lab, you have two tracks. If you'
 
 ### Suggested visuals / slide beats
 
-1. Recap card: the four things this module covered, one line each
-2. Fork card: Track A (MLX-LM, Apple Silicon) vs Track B (Axolotl, NVIDIA), same destination
-3. Closing card: "→ Lab: Fine-tune Your First Adapter"
+1. Slide 18, the pipeline, as the recap: fine-tune, adapter, serve, package, ship.
+2. Slide 19, "Two tracks, one destination": Track A (MLX-LM, Apple Silicon) and Track B (Axolotl, NVIDIA), both ending in a working LoRA adapter.
+3. Closing line on screen: "→ Lab: Fine-tune Your First Adapter".
 
 ---
 
@@ -172,7 +172,7 @@ Now it's your turn to run one yourself. In the lab, you have two tracks. If you'
 |-------------|-------|-----------|
 | When to fine-tune vs prompt vs RAG (§1) | Video 2 | Explained |
 | Four cases where fine-tuning wins (§1) | Video 2 | Explained |
-| Fine-tuning does NOT fix a knowledge or inference gap (§1) | Video 2 | Explained |
+| Fine-tuning does NOT fix a knowledge or inference gap (§1) | Video 2 | Explained (slide 6) |
 | LoRA mechanism + sticky-notes analogy (§2) | Video 3 | Explained |
 | QLoRA 4-bit quantization (§2) | Video 3 | Explained |
 | Adapter size (1–3% of base) (§2) | Video 3 | Explained |
@@ -186,10 +186,11 @@ Now it's your turn to run one yourself. In the lab, you have two tracks. If you'
 | Adapter contents (safetensors + config json) (§6) | Video 5 | Explained |
 | Merge / hot-load / package options (§6) | Video 5 | Explained |
 | Pipeline: fine-tune → adapter → serve → package → ship (§6) | Video 5 | Explained |
-| Summary table (all rows) | Video 6 | Recapped |
+| Summary table (all rows) | Video 6 | Recapped (narration-only, no summary slide) |
+| Module objectives (slide 2) | Video 1 | Explained |
 | Track A / Track B lab bridge | Video 6 | Explained |
 
 ## Verification flags
 
-- Adapter size range ("50–200 MB") and speed/memory claims for Unsloth ("twice the speed and 60% less VRAM") are cited from the lesson as-is — these are version-dependent and should be reverified against current Unsloth benchmarks before publishing.
+- Adapter size is stated as under 100 MB (lab: typically 20 to 80 MB) in the deck and narration. Lesson section 6 still says 50 to 200 MB, so the lesson needs the same fix. Speed/memory claims for Unsloth ("twice the speed and 60% less VRAM") are cited from the lesson as-is — these are version-dependent and should be reverified against current Unsloth benchmarks before publishing.
 - "16–32 GB of RAM" for 3B/7B MLX-LM fine-tuning is hardware-dependent and worth reconfirming against the current MLX-LM docs.
