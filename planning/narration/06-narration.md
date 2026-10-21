@@ -5,9 +5,9 @@
 | # | Video title | Format | Estimated duration | Central idea |
 |---|-------------|--------|--------------------|--------------|
 | 1 | Module 6 Introduction — From a Pipeline to an Agent | Talking head | 2 min | Why Module 5's always-retrieve pipeline needs a routing brain |
-| 2 | Naive RAG vs Agentic RAG — Why Aria Decides Before She Retrieves | Slides + voiceover | 6 min | The routing step and why it beats always-retrieve |
-| 3 | Writing an Agent in Markdown — SOUL.md, AGENTS.md, and Skills | Slides + voiceover | 6 min | The onboarding-packet analogy and the three files that define Aria |
-| 4 | MCP and ToolHive — Giving Aria a Real Tool Without the Risk | Slides + voiceover | 5 min | MCP as a standard tool interface, ToolHive as an isolated gateway |
+| 2 | Writing an Agent in Markdown — SOUL.md, AGENTS.md, and Skills | Slides + voiceover | 6 min | The onboarding-packet analogy and the three files that define Aria |
+| 3 | Naive RAG vs Agentic RAG — Why Aria Decides Before She Retrieves | Slides + voiceover | 6 min | The routing step and why it beats always-retrieve |
+| 4 | MCP and ToolHive — Giving Aria a Real Tool Without the Risk | Slides + voiceover | 7 min | MCP as a standard tool interface, ToolHive as an isolated gateway, stateless MCP in 2026 |
 | 5 | Guardrails and Memory — The Safety Net and the Knowledge Base | Slides + voiceover | 5 min | Application-layer guardrails and ChromaDB as long-term memory |
 | 6 | Declarative Agent or Framework — When Markdown Is Enough | Slides + voiceover | 4 min | The three conditions where declarative works, and where it breaks |
 | 7 | Module 6 Summary and Lab Bridge | Slides + voiceover | 2 min | Recap and what the lab proves |
@@ -30,40 +30,13 @@ You'll build this agent the way you'd onboard a new engineer, not by writing a g
 
 ### Suggested visuals / slide beats
 
-1. Title slide — Module 6, Declarative Agent: Agentic RAG.
-2. Divider or analogy visual — a pipeline that fires on every input vs. one with a routing gate.
-3. Closing beat — "Aria" name card, teeing up the next video.
+1. Title slide: Module 6, The Declarative Agent, with Aria assembled from Markdown files and tools inside a container.
+2. What you'll learn: five numbered objectives.
+3. Divider 1, then "Naive RAG is passive, it always retrieves": an ops question and a 2+2 question forced down the same embed, retrieve, generate road.
 
 ---
 
-## Video 2: Naive RAG vs Agentic RAG — Why Aria Decides Before She Retrieves
-
-**Format:** Slides + voiceover
-**Estimated duration:** 6 minutes
-**Learning objective:** By the end, learners can explain the routing decision that separates agentic RAG from naive RAG, and why making that decision at temperature zero matters.
-
-### Narration script
-
-Let's start by being honest about what Module 5 actually built. It was a pipeline, and a pipeline, by definition, doesn't think. Every question goes through the same three steps: embed the question, search the vector store, hand the results to the model. It doesn't matter if the question is "how do I restart the payments service", which genuinely needs the runbooks, or "what is two plus two", which needs nothing at all. Both questions walk the exact same path. And that's the core limitation we're fixing in this module: naive RAG has no judgment about when to retrieve.
-
-Module 6 adds exactly one new step in front of that pipeline, and it's a routing decision. The agent reads the question first, and it asks itself: does answering this actually require Acme's internal runbooks, or can I answer this from what I already know? If the answer is yes, it retrieves, and then it grounds its answer in what it found. If the answer is no, it just answers directly, and it skips retrieval altogether. That decide-first, then-act step is the entire difference between a pipeline and an agent.
-
-Now here's the important part: this routing decision has to be reliable, and the way you get reliability out of a small model is by asking it a very narrow question, and asking it at temperature zero. Temperature zero means the model isn't being creative here, it's not sampling multiple possible answers, it's giving you the single most likely answer every single time. So the same input always produces the same output. That's what makes routing dependable, even on a laptop-sized model like qwen3.5, 2B parameters.
-
-Let's look at how that plays out with a few real examples. "How do I restart the payments service" routes yes, retrieve, because that's an Acme-specific operational fact sitting in the runbooks. "Where are database backups stored" also routes yes, for the same reason. But "what is two plus two" routes no, answer directly, because that's general knowledge, not something in Acme's documentation. And "what's the weather in Paris today" also routes no, even though the agent can't actually answer it well, because the point isn't whether it knows the answer, it's whether the runbooks would help.
-
-So why does this actually matter in practice? Well, every retrieval you skip is an embedding call you didn't make, and a search you didn't run, and more importantly, it's context you didn't waste on evidence the model didn't need. And there's a second, quieter benefit here too: when you retrieve for a question the runbooks can't actually help with, you risk pulling back something irrelevant and having the model generate an answer grounded in the wrong evidence. That's hallucination by bad match, and skipping retrieval when it isn't needed avoids that failure mode entirely. Generation itself, the more open-ended part where the model actually writes the answer, still runs at a higher temperature, because that part benefits from some flexibility. It's only the routing decision that needs to be locked down cold.
-
-### Suggested visuals / slide beats
-
-1. Side-by-side comparison: naive RAG's fixed embed-retrieve-generate path vs. agentic RAG's routing gate.
-2. The routing flowchart (guardrail, route, retrieve-or-direct, ground, respond).
-3. The four-row routing table (restart service / backup location / 2+2 / weather in Paris) with YES/NO badges.
-4. Closing takeaway card: "Decide first, then act."
-
----
-
-## Video 3: Writing an Agent in Markdown — SOUL.md, AGENTS.md, and Skills
+## Video 2: Writing an Agent in Markdown — SOUL.md, AGENTS.md, and Skills
 
 **Format:** Slides + voiceover
 **Estimated duration:** 6 minutes
@@ -77,24 +50,51 @@ A declarative agent works exactly the same way, and that's not a loose compariso
 
 So let's walk through the three files that actually make up Aria. The first is SOUL.md, and this is her identity and her values, who she is, her communication style, calm and precise, no guessing, and her core commitments. The second is AGENTS.md, and this is her operating instructions, how to handle an incoming question, which skills and tools she's allowed to reach for, and the hard guardrail rules she must never break. And the third is a skill file, `skills/agentic-rag/SKILL.md`, which is the actual procedure for agentic RAG: route yes or no, retrieve if needed, then ground the answer in what was retrieved.
 
+When you look at the anatomy slide, you will count five parts, not three. The three files are there, and next to them are the MCP tools that AGENTS.md declares and the hard guardrail rules. One thin script, agent.py, joins all five, and that is what runs as Aria.
+
 All three of these get pulled together by `agent.py`, and I want you to notice something about this file: it's about a hundred and thirty lines, using nothing but the Python standard library. There's no framework here, there's no class hierarchy, there's no decorator soup sitting between you and what's actually happening. It just reads the three Markdown files at startup, joins them together into one system prompt, and runs a simple route, retrieve, ground loop using plain `urllib.request` calls to Ollama and to ChromaDB.
 
 And here's why that matters so much in practice. The alternative, the way most people would first think to build this, is to hand-code the behaviour directly in Python: an if-tree of conditions, system prompts baked into string literals, explicit tool-call chains wired together by hand. That works, but it's fragile, and it's hard to read, and worse, you can't change it without touching the application code itself. With the declarative approach, changing Aria's tone, or adding a new guardrail, or extending what skills she has, is just a Markdown edit. You're not touching Python at all. The model is Aria. The Markdown is her brain. And that's what makes her genuinely easy to evolve.
 
 ### Suggested visuals / slide beats
 
-1. Onboarding-packet analogy visual: job description + operating procedures + skill guide, stacked.
-2. Three-file anatomy diagram: SOUL.md, AGENTS.md, skills/agentic-rag/SKILL.md → agent.py joining them into one system prompt.
-3. Contrast slide: hand-coded if-tree (fragile, code change needed) vs. declarative Markdown (just an edit).
-4. Closing takeaway: "The Markdown is her brain."
+1. Divider 2 (onboarding handoff illustration), then "Onboard an engineer, don't script a robot": job description, rulebook and skill guides mapped to SOUL.md, AGENTS.md and SKILL.md.
+2. "Declarative Markdown vs a hand-coded robot": the if-tree column against the Markdown column.
+3. Divider 3, then "The anatomy of a 2026 agent": five parts feeding the agent.py glue, then Aria runs.
+
+---
+
+## Video 3: Naive RAG vs Agentic RAG — Why Aria Decides Before She Retrieves
+
+**Format:** Slides + voiceover
+**Estimated duration:** 6 minutes
+**Learning objective:** By the end, learners can explain the routing decision that separates agentic RAG from naive RAG, and why making that decision at temperature zero matters.
+
+### Narration script
+
+Let's go back to what Module 5 actually built. It was a pipeline, and a pipeline, by definition, doesn't think. Every question goes through the same three steps: embed the question, search the vector store, hand the results to the model. It doesn't matter if the question is "how do I restart the payments service", which genuinely needs the runbooks, or "what is two plus two", which needs nothing at all. Both questions walk the exact same path. And that's the core limitation we're fixing in this module: naive RAG has no judgment about when to retrieve.
+
+Module 6 adds exactly one new step in front of that pipeline, and it's a routing decision. The agent reads the question first, and it asks itself: does answering this actually require Acme's internal runbooks, or can I answer this from what I already know? If the answer is yes, it retrieves, and then it grounds its answer in what it found. If the answer is no, it just answers directly, and it skips retrieval altogether. That decide-first, then-act step is the entire difference between a pipeline and an agent.
+
+Now here's the important part: this routing decision has to be reliable, and the way you get reliability out of a small model is by asking it a very narrow question, and asking it at temperature zero. Temperature zero means the model isn't being creative here, it's not sampling multiple possible answers, it's giving you the single most likely answer every single time. So the same input always produces the same output. That's what makes routing dependable, even on a laptop-sized model like qwen3.5, 2B parameters.
+
+Let's look at how that plays out with a few real examples. "How do I restart the payments service" routes yes, retrieve, because that's an Acme-specific operational fact sitting in the runbooks. "Where are database backups stored" also routes yes, for the same reason. But "what is two plus two" routes no, answer directly, because that's general knowledge, not something in Acme's documentation. And "what's the weather in Paris today" also routes no, even though the agent can't actually answer it well, because the point isn't whether it knows the answer, it's whether the runbooks would help.
+
+So why does this actually matter in practice? Well, every retrieval you skip is an embedding call you didn't make, and a search you didn't run, and more importantly, it's context you didn't waste on evidence the model didn't need. And there's a second, quieter benefit here too: when you retrieve for a question the runbooks can't actually help with, you risk pulling back something irrelevant and having the model generate an answer grounded in the wrong evidence. That's hallucination by bad match, and skipping retrieval when it isn't needed avoids that failure mode entirely. Generation itself, the more open-ended part where the model actually writes the answer, still runs at a higher temperature, because that part benefits from some flexibility. It's only the routing decision that needs to be locked down cold.
+
+### Suggested visuals / slide beats
+
+1. Divider 4 (fork-in-the-road illustration).
+2. "Agentic RAG, decide first, then act": question, guardrail check, route YES to retrieve and ground, route NO to answer directly.
+3. "A 2B model can route reliably": the four-row routing table (restart payments, database backups, 2+2, weather in Paris) with YES/NO routes.
 
 ---
 
 ## Video 4: MCP and ToolHive — Giving Aria a Real Tool Without the Risk
 
 **Format:** Slides + voiceover
-**Estimated duration:** 5 minutes
-**Learning objective:** By the end, learners can explain what MCP standardizes, what ToolHive isolates, and the two ways to connect an MCP server into a workflow.
+**Estimated duration:** 7 minutes
+**Learning objective:** By the end, learners can explain what MCP standardizes, what ToolHive isolates, the two ways to connect an MCP server into a workflow, and why the stateless 2026 version of MCP makes tool servers easy to scale.
 
 ### Narration script
 
@@ -106,12 +106,17 @@ Now, exposing a tool server is one thing, but running it safely is a separate pr
 
 There are two ways you'd actually connect an MCP server into your workflow. The first is IDE mode, where you configure the ToolHive endpoint inside something like VS Code's MCP settings, and that's what you'd use for interactive development, testing a tool right there in your editor. The second is stack mode, where the containerized agent's AGENTS.md points directly at the ToolHive endpoint, and that's what you'd use for production runs, or CI, or any headless compose stack. Either way, you never install the MCP tool server directly on your laptop. ToolHive is the one thing standing between Aria and the open internet, and that's exactly where you want that isolation to live.
 
+One more thing changed in 2026, and this time it is the protocol itself. Before, an MCP client opened with a handshake called initialize. The server answered with a session ID, in a header called Mcp-Session-Id, and the client sent that header back on every call after that. So the server had to remember you, and a gateway in front of several copies of that server had to send you to the same copy every time. The 2026-07-28 revision of MCP removes all of that. The Streamable HTTP transport is now stateless, so there is no handshake and no session ID. Instead, every request carries the protocol version and the client's capabilities in a field called _meta. That means any replica can answer any request, and there is nothing to pin. For ToolHive, a tool server now scales like any stateless microservice: several replicas behind a plain load balancer, with no sticky sessions.
+
+Here is an easy way to picture it. Think of a counter where you keep a running tab. Only the clerk who opened your tab knows what you ordered, so you have to wait for that one clerk. Now think of a ticket counter instead. Every person brings a complete ticket that says who they are, what they want, and which version of the form they used. So any free clerk can serve the next person in the line. That ticket is the _meta on every MCP request, and the clerks are the replicas behind ToolHive. The same revision also moved tasks out of the core into an extension, deprecated sampling and roots, and put the standard under the Agentic AI Foundation.
+
 ### Suggested visuals / slide beats
 
-1. Before/after: M5 agent with no external tools vs. M6's `web.fetch` capability.
-2. MCP mechanism diagram: agent asks "what tools are available?" → tool server responds → agent calls by name.
-3. ToolHive isolation diagram: fetch server + ingress proxy + egress proxy + DNS container, network boundary drawn explicitly.
-4. Two-mode comparison table: IDE mode vs. Stack mode.
+1. Divider 5 (tool in a glass case illustration).
+2. "Real tools through an MCP gateway": ToolHive hub with web.fetch, GitHub, filesystem, HTTP and database on the spokes. The MCP mechanism is spoken over this slide.
+3. "Each tool server in its own sandbox": fetch server with ingress, egress and DNS containers, public internet reachable, host not. The IDE vs Stack modes are spoken over this slide.
+4. "Stateless MCP: every request stands alone": before, initialize then Mcp-Session-Id on every call; now, every call carries _meta and any of three replicas answers.
+5. "Analogy — a ticket counter, not a tab": one clerk with a running tab against three clerks serving customers who each hold a complete ticket.
 
 ---
 
@@ -133,10 +138,10 @@ This setup is intentionally small: one collection, one document, five chunks. Re
 
 ### Suggested visuals / slide beats
 
-1. Guardrail flow: incoming query → regex scan → match found → hard refusal, model never called.
-2. Contrast: soft system-prompt refusal (bypassable) vs. application-layer regex (not bypassable).
-3. Memory diagram: Acme runbook Markdown → ingestion (idempotent) → `acme_runbooks` collection → 5 chunks.
-4. "Scales without changes" closing card.
+1. Divider 6 (guard at a turnstile illustration).
+2. "Guardrails refuse before the model runs": an unsafe and a safe query hit the regex guardrail; one is refused with the LLM never called, the other goes to the model. The soft-prompt contrast is spoken, not drawn.
+3. Divider 7 (librarian illustration).
+4. "Memory, a librarian who shelves by meaning": query, embed, the acme_runbooks shelves in ChromaDB, grounded answer. Ingestion and scaling are spoken over this slide.
 
 ---
 
@@ -144,21 +149,23 @@ This setup is intentionally small: one collection, one document, five chunks. Re
 
 **Format:** Slides + voiceover
 **Estimated duration:** 4 minutes
-**Learning objective:** By the end, learners can state the three conditions where a declarative agent is sufficient, and recognize the point where a framework becomes necessary.
+**Learning objective:** By the end, learners can state the three conditions where a declarative agent is sufficient, recognize the point where a framework becomes necessary, and explain how the whole agent ships as one container image.
 
 ### Narration script
 
-So after building Aria, the obvious question is: when is this declarative approach actually enough, and when does it stop being enough? Let's look at three conditions that tell you Markdown plus a skill plus a little glue code is the right tool for the job.
+So after building Aria, the obvious question is: when is this declarative approach actually enough, and when does it stop being enough? Look at the slide. On the left, there are three conditions. If all three hold, Markdown plus a skill plus a little glue code is the right tool for the job.
 
-The first condition is that one agent handles one use case, and the routing rules for that use case are simple enough that you could genuinely list them out. Aria fits this perfectly, she has exactly one job, and exactly one routing decision. The second condition is that the skills involved are single-step procedures, not multiple agents coordinating with each other. And the third is that your tools come from standard MCP servers, without complex, stateful coordination happening between them. If all three of those hold, you don't need a framework at all.
+The first condition is that one agent handles one use case, and the routing rules for that use case are simple enough that you could list them out. Aria fits this well. She has exactly one job and exactly one routing decision. The second condition is that the skills are single-step procedures, not several agents coordinating with each other. And the third is that your tools come from standard MCP servers, without complex, stateful chains between them. Aria passes all three, so she needs no framework at all.
 
-But the moment any one of those breaks down, you're in different territory. If you need multiple specialised agents working together, or shared state that has to persist across those agents, or complex tool chains, or retry logic that spans agent boundaries, a framework is what coordinates all of that for you, and trying to hand-roll it yourself in plain Markdown would get painful fast. And that's exactly where the next module picks up. Module 7 introduces CrewAI, which is a crew of declarative agents, each one built the same way you just built Aria, coordinated by a framework that manages how they talk to each other. Understanding this minimal declarative approach first is the prerequisite, because once you've built one agent by hand, you'll see exactly which piece of complexity is the one that actually forces the upgrade from Markdown to a framework.
+Now look at the right side of the slide. The moment any one of those conditions breaks, you are in different territory. If you need multiple specialised agents, or shared state that has to live across those agents, or complex tool chains, or retry logic that spans agent boundaries, you want a framework to coordinate all of that. Trying to hand-roll it in plain Markdown would get painful fast. And that is where the next module picks up. In Module 7, you grow Aria into a crew of four agents. The default stays declarative: four Markdown profiles and one small Python pipeline. CrewAI comes in as the framework alternative, for when the crew needs dynamic task assignment. Because you built one agent by hand first, you will see exactly which piece of complexity forces the move from Markdown to a framework.
+
+Whichever way you go, the agent ships the same way. Everything that defines Aria, SOUL.md, AGENTS.md, the skill file, the MCP config and the agent.py glue, goes into one container image. The model stays native on the host, and the container reaches it at host.docker.internal on port 11434, next to ChromaDB and ToolHive. Build that image once, and the same agent runs on any laptop, in CI, or in a headless compose stack.
 
 ### Suggested visuals / slide beats
 
-1. Three-condition checklist: one use case / single-step skills / simple MCP tools → declarative is enough.
-2. "When it breaks" list: multiple agents, shared state, complex tool chains, cross-agent retries.
-3. Bridge visual: Aria (single declarative agent) → a crew of agents coordinated by a framework, teeing up Module 7.
+1. Divider 8, "Declarative versus framework".
+2. "When a declarative agent is enough": three conditions in the green box, four framework triggers in the orange box, with "Module 7: grow Aria into a crew of four" underneath.
+3. "The whole agent ships in a container": SOUL.md, AGENTS.md, SKILL.md, MCP config and agent.py glue inside the container, wired to native Ollama, ChromaDB and ToolHive.
 
 ---
 
@@ -170,15 +177,13 @@ But the moment any one of those breaks down, you're in different territory. If y
 
 ### Narration script
 
-To summarize, in this module you learned that a declarative agent is just behaviour defined in Markdown, a persona, a set of instructions, and a skill, all read and run by a small glue script. You saw the three files that make that real: SOUL.md for identity, AGENTS.md for operating instructions, and a SKILL.md for the actual agentic-RAG procedure. You learned what makes agentic RAG different from Module 5's naive pipeline, deciding first, at temperature zero, and only retrieving when the decision says yes. You saw how MCP and ToolHive give Aria a real tool, isolated in its own container, without ever putting credentials on your host. And you saw both halves of what keeps her safe and useful: a hard, application-layer guardrail that runs before the model is ever called, and ChromaDB as her long-term memory, reused directly from Module 5.
+To summarize, in this module you learned that a declarative agent is just behaviour defined in Markdown, a persona, a set of instructions, and a skill, all read and run by a small glue script. You saw the three files that make that real: SOUL.md for identity, AGENTS.md for operating instructions, and a SKILL.md for the actual agentic-RAG procedure. You learned what makes agentic RAG different from Module 5's naive pipeline, deciding first, at temperature zero, and only retrieving when the decision says yes. You saw how MCP and ToolHive give Aria a real tool, isolated in its own container, without ever putting credentials on your host. You saw that the 2026 version of MCP is stateless, so any replica behind ToolHive can answer any request. You saw both halves of what keeps her safe and useful: a hard, application-layer guardrail that runs before the model is ever called, and ChromaDB as her long-term memory, reused directly from Module 5. And you saw the whole agent, Markdown, skill, MCP config and glue, packaged as one container image.
 
 In the lab, you're going to read the three Markdown files that are Aria, start ChromaDB and the agent container, and watch her route three different queries live: retrieving for the operational question, answering the math question directly, and refusing a credential request outright. Then you'll wire in a live MCP tool through ToolHive yourself. I'll see you in the lab.
 
 ### Suggested visuals / slide beats
 
-1. Recap card: the three files (SOUL.md / AGENTS.md / SKILL.md) with one-line roles.
-2. Recap card: agentic RAG's routing decision vs. M5's always-retrieve.
-3. Lab-bridge closing slide: "Open Module 6 · Lab."
+1. Closing slide: "The agent IS Markdown + skills + tools", with three Markdown files feeding Aria and three routed outcomes (retrieve, answer, refuse).
 
 ---
 
@@ -186,21 +191,23 @@ In the lab, you're going to read the three Markdown files that are Aria, start C
 
 | Source idea | Video | Treatment |
 |-------------|-------|-----------|
-| M5's pipeline always retrieves, no judgment | 1, 2 | Explained |
+| M5's pipeline always retrieves, no judgment | 1, 3 | Explained |
 | Aria reuses M5's model, ChromaDB, network pattern | 1 (implied), 5 | Explained |
-| Routing decision: decide first, then act | 1, 2 | Explained |
-| Agentic RAG vs naive RAG definition | 2 | Explained |
-| Temperature zero for deterministic routing | 2 | Explained |
-| Routing table (4 example queries) | 2 | Explained |
-| Hallucination-by-bad-match avoidance | 2 | Explained |
-| Onboarding/job-description analogy | 3 | Explained |
-| Declarative vs hand-coded Python if-tree | 3 | Explained |
-| SOUL.md, AGENTS.md, SKILL.md roles | 3 | Explained |
-| agent.py — ~130 lines, stdlib only, route/retrieve/ground loop | 3 | Explained |
+| Routing decision: decide first, then act | 1, 3 | Explained |
+| Agentic RAG vs naive RAG definition | 3 | Explained |
+| Temperature zero for deterministic routing | 3 | Explained |
+| Routing table (4 example queries) | 3 | Explained |
+| Hallucination-by-bad-match avoidance | 3 | Explained |
+| Onboarding/job-description analogy | 2 | Explained |
+| Declarative vs hand-coded Python if-tree | 2 | Explained |
+| SOUL.md, AGENTS.md, SKILL.md roles, five-part anatomy | 2 | Explained |
+| agent.py — ~130 lines, stdlib only, route/retrieve/ground loop | 2 | Explained |
 | MCP definition and mechanism | 4 | Explained |
 | ToolHive isolation (ingress/egress/DNS containers) | 4 | Explained |
 | No credentials stored on host | 4 | Explained |
 | IDE mode vs Stack mode | 4 | Explained |
+| MCP 2026-07-28: stateless Streamable HTTP, `_meta`, no session pinning, ticket-counter analogy | 4 | Explained |
+| Tasks as an extension, sampling and roots deprecated, Agentic AI Foundation governance | 4 | Mentioned |
 | Guardrail regex, application-layer, before model call | 5 | Explained |
 | Why a soft system-prompt refusal is bypassable | 5 | Explained |
 | Layered guardrails in production (mentioned) | 5 | Explained |
@@ -208,7 +215,8 @@ In the lab, you're going to read the three Markdown files that are Aria, start C
 | 5 chunks, one collection, scales without API changes | 5 | Explained |
 | Three conditions where declarative is enough | 6 | Explained |
 | When a framework becomes necessary | 6 | Explained |
-| Bridge to Module 7 (CrewAI) | 6, 7 | Explained |
+| Bridge to Module 7 (a crew of four, declarative by default, CrewAI as the alternative) | 6 | Explained |
+| The whole agent ships as one container image | 6, 7 | Explained |
 | Lab: three routed queries + live MCP tool wiring | 7 | Explained (preview only, not demonstrated) |
 
 ## Verification flags
