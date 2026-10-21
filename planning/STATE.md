@@ -4,7 +4,7 @@
 > cleared, reading this + `CLAUDE.md` + `planning/ROADMAP.md` fully restores context. Keep it concise
 > and update it after every task/decision.
 
-**Last updated:** 2026-08-05 (voice+divider rollout COMPLETE across all 10 modules, branch `voice-divider-rollout` awaiting PR/merge)
+**Last updated:** 2026-10-21 (released v1.8.0 = voice pass + dividers + narration + illustrations; next: 2026 freshness pass, see planning/plans/)
 **Active phase:** ✅ **COURSE COMPLETE** — M1–M8 + Capstone all live + lab-validated. Working on `main`.
 **Live site:** https://schoolofdevops.github.io/303-containerai/ (every page 200)
 **Execution mode:** subagent-driven, grouped into waves; controller reviews + live validation

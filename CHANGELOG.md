@@ -5,6 +5,32 @@ All notable changes to this course build are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-10-21
+
+### Added
+
+- Voiceover narration scripts (planning/narration/) for every module lesson and the four
+  deep-dives, written in the spoken register with the retell-overlap gate enforced.
+- One title-only divider slide per lesson section in all 10 module decks, so the deck follows
+  the lesson's section order exactly (M1 pilot caught and fixed an out-of-order narrative).
+- 49 hand-drawn pencil-sketch illustrations on title, divider and analogy slides across all
+  15 decks (modules + deep-dives).
+
+### Changed
+
+- Every lesson paragraph passed through the course voice pass (simple English, analogy-first,
+  jargon explained inline) across M1-M8, Capstone and the deep-dives.
+- Deck subtitles tightened to one-line anchoring phrases (max 10 words / 60 chars).
+- Per-deck sequence specs (planning/decks/) updated with narration mapping and illustration logs.
+- Fork staging remote retired; origin is the only remote.
+
+### Fixed
+
+- Course-wide deck SVG "rough" filter bug: axis-aligned lines and rectangles were invisible
+  under the default filter region. All decks now use an explicit user-space filter region.
+- M5 divider heading size made consistent with the other decks.
+- M7 lesson: one wrong "orchestrator" to "coordinator" substitution reverted.
+
 ## [1.7.0] - 2026-07-30
 
 ### Changed
