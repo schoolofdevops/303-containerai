@@ -1,0 +1,92 @@
+# M3 · vLLM on CPU — serves SmolLM2 behind the same OpenAI /v1 contract as M2.
+#
+# Build the patched image (see Dockerfile), then:  docker compose up -d
+# Health:  curl http://localhost:8009/health
+services:
+  vllm-cpu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: vllm-cpu-optimized:latest
+    container_name: vllm-smollm2
+
+    # vLLM's CPU backend migrates memory pages across NUMA nodes at startup.
+    # That needs the SYS_NICE capability AND the migrate_pages syscall, which
+    # the default seccomp profile blocks — without both you get
+    # "numa_migrate_pages failed. errno: 1" (EPERM).
+    cap_add:
+      - SYS_NICE
+    security_opt:
+      - seccomp:unconfined
+
+    # Args passed to the vLLM OpenAI server entrypoint.
+    command:
+      # Default to the 135M model: float32 (required on CPU) doubles memory vs the
+      # model's native bf16, so 135M keeps the whole engine comfortably inside a
+      # ~5 GB container. Bump to 360M/1.7B via .env if you gave the VM more RAM.
+      - --model
+      - /models/SmolLM2-135M-Instruct
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "8000"
+      # Force float32 on CPU: '--dtype auto' picks the model's native bfloat16,
+      # but CPU kernels (esp. on arm64) lack bf16 support and crash inference with
+      # "rms_norm_impl not implemented for 'BFloat16'". float32 is the safe CPU dtype.
+      - --dtype
+      - ${DTYPE:-float32}
+      # Smaller context + fewer concurrent seqs = smaller KV cache = fits in RAM.
+      - --max-model-len
+      - "${MAX_MODEL_LEN:-1024}"
+      - --max-num-seqs
+      - "${MAX_NUM_SEQS:-4}"
+      - --tensor-parallel-size
+      - "1"
+      # CPU swap space for KV-cache offload (GiB). vLLM defaults to 4 GiB, which
+      # is larger than this container's RAM — keep it small so startup succeeds.
+      - --swap-space
+      - "${SWAP_SPACE:-1}"
+      - --disable-log-requests
+      - --trust-remote-code
+
+    ports:
+      # host:container — host 8009 keeps clear of Ollama on 11434.
+      - "${VLLM_PORT:-8009}:8000"
+
+    environment:
+      - VLLM_TARGET_DEVICE=cpu
+      - VLLM_CPU_KVCACHE_SPACE=${KVCACHE_SPACE:-1}
+      # Thread control — the main CPU tuning knob is OMP_NUM_THREADS.
+      - OMP_NUM_THREADS=${OMP_THREADS:-2}
+      - OPENBLAS_NUM_THREADS=1
+      - MKL_NUM_THREADS=1
+      # Cache downloaded weights inside the mounted volume.
+      - HF_HOME=/workspace/.cache/huggingface
+
+    volumes:
+      # Persist model downloads so restarts don't re-fetch multi-GB weights.
+      - hf-cache:/workspace/.cache/huggingface
+      - ~/models/SmolLM2-135M-Instruct:/models/SmolLM2-135M-Instruct
+
+    # Keep the container from eating the whole laptop. These are CAPS, not
+    # requirements — each limit must be <= what your runtime VM has allocated.
+    # This lab assumes your container runtime has >= 4 CPUs and >= 6 GB (see the
+    # lab's setup note). Lower these if you allocated less.
+    deploy:
+      resources:
+        limits:
+          cpus: "${CPU_LIMIT:-4.0}"
+          memory: ${MEMORY_LIMIT:-5G}
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+    restart: unless-stopped
+
+volumes:
+  hf-cache:
+    driver: local

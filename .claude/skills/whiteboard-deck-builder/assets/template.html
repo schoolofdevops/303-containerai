@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title = "<Course Name> — <Module Name>" -->
+<title>COURSE NAME — MODULE NAME</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/white.min.css" id="theme">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap">
+
+<style>
+  /* ============================================================
+     DO NOT MODIFY this style block (except to swap the font).
+     It encodes hard-won fixes — see SKILL.md "Why the CSS is
+     shaped this way" before touching anything here.
+     ============================================================ */
+  :root{
+    --ink:#1e1e1e;
+    --gray:#757575;
+    --paper:#ffffff;
+  }
+  .reveal{ font-family:'Patrick Hand', cursive; color:var(--ink); }
+  .reveal .slides{ text-align:center; }
+  /* Slide-fit fix: reveal.js forces the visible slide to display:block with a
+     high-specificity rule, which silently kills any flex layout on <section>.
+     We pin every section to the slide box (absolute inset:0) and re-assert
+     display:flex on the VISIBLE slide (.present) so the column layout wins. */
+  .reveal .slides section{ position:absolute; inset:0; box-sizing:border-box; flex-direction:column; justify-content:center; padding:20px 48px 42px; overflow:hidden; }
+  .reveal .slides > section.present{ display:flex; }
+
+  .reveal h1,.reveal h2,.reveal h3{
+    font-family:'Patrick Hand', cursive;
+    color:var(--ink);
+    text-transform:none;
+    font-weight:700;
+    letter-spacing:0;
+    margin:0 0 6px 0;
+    line-height:1.15;
+  }
+  .reveal h2.t{ font-size:1.75em; }
+  .reveal p.s{ font-size:0.95em; color:var(--gray); margin:0 0 8px 0; }
+  .reveal p.takeaway{
+    font-size:0.92em; color:var(--gray);
+    margin:10px auto 0; max-width:1050px;
+  }
+  .reveal p.takeaway::before{ content:"\2192  "; color:var(--ink); font-weight:700; }
+  /* flex:1 1 0 (grow from ZERO basis) is what makes the fit deterministic:
+     text rows take the space they need first; the diagram expands into
+     whatever is left. flex:1 1 auto would start from the SVG's natural size
+     and can push the takeaway line off the bottom of the slide. */
+  .reveal svg{ width:100%; flex:1 1 0; min-height:0; max-height:58%; display:block; margin:8px auto 0; }
+  .reveal .kicker{ font-size:.8em; color:var(--gray); letter-spacing:2px; }
+  .reveal .credit{ font-size:.85em; color:var(--gray); margin-top:16px; }
+  .reveal .credit b{ color:var(--ink); font-weight:700; }
+  .reveal .pageno{ position:absolute; bottom:14px; right:22px; font-size:.6em; color:#bdbdbd; }
+  .reveal .slide-number{ font-family:'Patrick Hand',cursive; }
+
+  /* SVG typographic helpers — use these classes on <text>, don't hand-set sizes */
+  text{ font-family:'Patrick Hand', cursive; }
+  .lbl{ fill:var(--ink); font-size:21px; }
+  .lbl-sm{ fill:var(--ink); font-size:17px; }
+  .lbl-g{ fill:var(--gray); font-size:17px; }
+  .lbl-b{ fill:var(--ink); font-size:23px; font-weight:700; }
+  .num{ fill:var(--ink); font-size:24px; font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- Shared SVG defs: the hand-drawn "wobble" filter + arrowheads.
+     Keep exactly one copy of this block per file, before the slides.
+     #rough distorts strokes so crisp geometry reads as hand-sketched.
+     Apply it ONLY to <g> groups of shapes/lines — NEVER to <text>
+     (distorted text is illegible). -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="ah" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="ahg" markerWidth="14" markerHeight="14" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="reveal"><div class="slides">
+
+<!-- ============ SLIDE 1 — TITLE (edit all text; keep structure) ============ -->
+<section data-auto-animate>
+  <p class="kicker">MODULE N · DAY N &nbsp;·&nbsp; COURSE NAME</p>
+  <h2 class="t" style="font-size:2.3em">Module Title Goes Here</h2>
+  <p class="s" style="font-size:1.2em">One-line subtitle of the module.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Describe the visual anchor for accessibility">
+    <!-- A simple, iconic hand-drawn visual anchor for the module (one metaphor object).
+         Shapes go in a filtered group; text stays OUTSIDE it. -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
+      <rect x="440" y="120" width="220" height="140" rx="12"/>
+      <line x1="300" y1="300" x2="800" y2="300"/>
+    </g>
+    <text x="550" y="200" text-anchor="middle" class="lbl-b">ICON</text>
+    <text x="550" y="345" text-anchor="middle" class="lbl-g">one quiet caption under the anchor</text>
+  </svg>
+  <p class="credit"><b>Author Name</b> &nbsp;·&nbsp; Organization &nbsp;·&nbsp; extra title-card facts</p>
+  <div class="pageno">MN·01</div>
+</section>
+
+<!-- ============ SLIDE 2 — CONCEPT SLIDE (the canonical shape) ============ -->
+<section>
+  <h2 class="t">Concept title as a claim, not a noun</h2>
+  <p class="s">One-line subtitle that frames why this matters.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Describe the diagram">
+    <!-- ONE diagram per slide. Pick a pattern from references/svg-patterns.md
+         and adapt it. Shapes in filtered groups, text outside them. -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="120" y="140" width="280" height="100" rx="10"/>
+      <rect x="700" y="140" width="280" height="100" rx="10"/>
+      <path d="M405,190 L695,190" marker-end="url(#ah)"/>
+    </g>
+    <text x="260" y="198" text-anchor="middle" class="lbl">Before</text>
+    <text x="840" y="198" text-anchor="middle" class="lbl">After</text>
+    <text x="550" y="172" text-anchor="middle" class="lbl-g">what changes</text>
+  </svg>
+  <p class="takeaway">One sentence the learner should remember from this slide.</p>
+  <div class="pageno">MN·02</div>
+</section>
+
+<!-- ...more concept slides... -->
+
+<!-- ============ LAST SLIDE — CLOSING BIG IDEA ============ -->
+<section>
+  <p class="kicker">LET'S BUILD</p>
+  <h2 class="t" style="font-size:2.2em">The one-sentence big idea of the module.</h2>
+  <svg viewBox="0 0 1100 320" role="img" aria-label="Sparse closing visual">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="3" stroke-linecap="round">
+      <rect x="420" y="90" width="260" height="140" rx="10"/>
+    </g>
+    <text x="550" y="170" text-anchor="middle" class="lbl-b">Done</text>
+  </svg>
+  <p class="s" style="font-size:1.1em">A short reinforcing line under the visual.</p>
+  <p class="credit">Lead-in to the lab / next module &nbsp;·&nbsp; <b>Author</b> · Organization</p>
+  <div class="pageno">MN·NN</div>
+</section>
+
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280,
+    height: 720,
+    margin: 0.04,
+    minScale: 0.2,
+    maxScale: 2.0,
+    hash: true,
+    center: false,
+    slideNumber: false,
+    transition: 'slide',
+    controlsTutorial: true
+  });
+</script>
+<script>
+  // Autofit: if a slide's content overflows (long titles/takeaways wrapping to
+  // two lines), shrink its diagram until everything fits. Measures the real
+  // rendered heights, so it holds across browsers, fonts, and zoom levels.
+  (function(){
+    function fit(sec){
+      if(!sec) return;
+      var svg = sec.querySelector('svg');
+      if(!svg) return;
+      var mh = 58;
+      svg.style.maxHeight = mh + '%';
+      var guard = 0;
+      while (sec.scrollHeight > sec.clientHeight + 2 && mh > 18 && guard++ < 20){
+        mh -= 3;
+        svg.style.maxHeight = mh + '%';
+      }
+    }
+    Reveal.on('ready', function(e){ fit(e.currentSlide); });
+    Reveal.on('slidechanged', function(e){ fit(e.currentSlide); });
+    window.addEventListener('resize', function(){ fit(Reveal.getCurrentSlide()); });
+  })();
+</script>
+</body>
+</html>

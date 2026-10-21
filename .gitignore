@@ -15,3 +15,4 @@ sandbox/
 # lab secrets and generated deck exports
 labs/**/.env
 planning/decks/exports/
+decks.zip
