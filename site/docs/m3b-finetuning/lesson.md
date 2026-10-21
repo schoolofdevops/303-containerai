@@ -140,7 +140,7 @@ The YAML config goes into git. The image tag sits right alongside it. Anyone wit
 
 ## 6. What you produce — and where it fits
 
-A LoRA fine-tune gives you a **small adapter directory** (typically 50–200 MB) with two files inside: `adapter_model.safetensors` and `adapter_config.json`. From here you can:
+A LoRA fine-tune gives you a **small adapter directory** (typically under 100 MB; the lab's adapter lands at 20–80 MB) with two files inside: `adapter_model.safetensors` and `adapter_config.json`. From here you can:
 
 - **Merge** it into the base model weights, which gives you one single portable file (`mlx_lm.fuse` or `peft merge`).
 - **Load it hot** into Ollama (`ollama create mymodel -f Modelfile`) or vLLM (`--lora-modules`). This keeps the base model shared in memory and only swaps the adapter per request.
