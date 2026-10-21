@@ -59,7 +59,9 @@ Each module folder (`site/docs/mN-*/`) contains `lesson.md`, `lab.md`, `quiz.mdx
 - **Rancher Desktop** running (docker server 29.5.2, dockerd/moby). **`docker` is NOT on the default
   PATH** — it's at `~/.rd/bin/docker`. Shell exports don't persist between separate Bash tool calls,
   so prefix automated docker commands with `PATH="$HOME/.rd/bin:$PATH"`. `nerdctl` is in the same dir.
-- **Ollama** v0.17.4 serving natively on `:11434` (Metal). Model `qwen2.5:1.5b` (986 MB) pulled.
+- **Ollama** v0.40.7 serving natively on `:11434` (Metal; MLX runner for qwen3.5). Model `qwen3.5:2b` (2.7 GB) pulled, plus optional `qwen3:4b` and `nomic-embed-text`.
+- **ToolHive** `thv` v0.55.2 at `/usr/local/bin/thv`.
+- `qwen3.5` thinks by default — every call passes `think:false` (native) or `reasoning_effort:"none"` (`/v1`).
 - **Node v22 / npm 10** present.
 - **On Apple Silicon the model server runs NATIVE, never containerized** — containers reach it at
   `http://host.docker.internal:11434`. This is the course's defining constraint; teach it, don't fight it.
@@ -142,7 +144,7 @@ Each module folder (`site/docs/mN-*/`) contains `lesson.md`, `lab.md`, `quiz.mdx
 
 ## Cross-cutting defaults (confirm per module when reached)
 
-- Dev models: `qwen2.5:1.5b` / `qwen2.5:3b` + `nomic-embed-text`. CPU-vLLM: `SmolLM2` (M3).
+- Dev models: `qwen3.5:2b` (+ optional `qwen3:4b`) + `nomic-embed-text`. CPU-vLLM: `SmolLM2` (M3).
 - Vector DB: **ChromaDB** (fits ≤8 GB). Registry: **GHCR**. MCP gateway: **ToolHive** (M6/M7).
 - Multi-agent: **CrewAI** concrete + **LangGraph** optional (M7). Acme corpus: small synthetic runbooks.
 
