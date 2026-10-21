@@ -176,7 +176,7 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- ============ SLIDE 1b — SCENE: cutting index cards (illustration) ============ -->
 <section>
   <h2 class="t">Every chunking choice is a cut you can't take back</h2>
-  <p class="s">Cut too small, a fact loses its command. Cut too large, four facts blur into one.</p>
+  <p class="s">Too small loses the command. Too large blurs four facts.</p>
   <svg viewBox="0 0 1600 900" role="img" aria-label="A pair of scissors mid-cut through a long strip of paper, with a messy pile of resulting cards in uneven sizes scattered on a desk">
     <image href="../img/decks/05-deepdive/analogy-cutting-index-cards.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
   </svg>
@@ -360,7 +360,7 @@ footer, header, hgroup, main, menu, nav, section {
 <section>
   <h2 class="t">k=3 requested, 2 returned — you're already retrieving everything</h2>
   <p class="s">Only 2 chunks exist here, so k=3 can't filter anything at all</p>
-  <svg viewBox="0 0 1100 400" role="img" aria-label="Two panels compared — k equals 3 requested with 3 slots, the third empty and outlined in red dashed with nothing to give, versus 2 chunks that actually exist filled in blue at distance 0.6956 and 1.0968, only 2 of 3 slots ever filling">
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Two panels compared — k equals 3 requested with 3 slots, the third empty and outlined in red dashed with nothing to give, versus 2 chunks that actually exist filled in blue at distance 0.6956 and 1.0966, only 2 of 3 slots ever filling">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="50" y="50" width="450" height="280" rx="12"/>
     </g>
@@ -382,7 +382,7 @@ footer, header, hgroup, main, menu, nav, section {
       <rect x="650" y="195" width="350" height="50" rx="6" fill="var(--p-blue)"/>
     </g>
     <text x="825" y="162" text-anchor="middle" class="lbl-sm" style="font-size:19px">chunk 1 — dist 0.6956</text>
-    <text x="825" y="227" text-anchor="middle" class="lbl-sm" style="font-size:19px">chunk 2 — dist 1.0968</text>
+    <text x="825" y="227" text-anchor="middle" class="lbl-sm" style="font-size:19px">chunk 2 — dist 1.0966</text>
     <text x="825" y="292" text-anchor="middle" class="lbl-g" style="font-size:18px">no third chunk to return</text>
   </svg>
   <div class="pageno">M5-DD·07</div>
@@ -565,9 +565,9 @@ footer, header, hgroup, main, menu, nav, section {
 
 <!-- ============ SLIDE 14 — STAIRCASE: truncation mechanism ============ -->
 <section>
-  <h2 class="t">Ollama keeps the tail and drops the front, verified live</h2>
-  <p class="s">Verified live: Ollama keeps the tail and drops the front</p>
-  <svg viewBox="0 0 1100 380" role="img" aria-label="A long prompt bar of 30861 tokens with a tiny kept prefix of 4 tokens at the very start labeled keep=4, a large discarded middle section shown hatched and red, and a surviving tail segment labeled limit=2050 in green where the question lives, from a real captured truncating input prompt log line">
+  <h2 class="t">On llama.cpp, Ollama keeps the tail and drops the front</h2>
+  <p class="s">qwen3:4b · llama.cpp runner · limit=2050 prompt=30861</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A long prompt bar of 30861 tokens with a tiny kept prefix of 4 tokens at the very start labeled keep=4, a large discarded middle section shown hatched and red, and a surviving tail segment labeled limit=2050 in green where the question lives, from a real captured truncating input prompt log line of the llama.cpp-served qwen3:4b">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
       <rect x="60" y="120" width="980" height="120" rx="10"/>
     </g>
@@ -580,6 +580,7 @@ footer, header, hgroup, main, menu, nav, section {
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="814" y="120" width="226" height="120" fill="var(--p-green)"/>
     </g>
+    <text x="550" y="40" text-anchor="middle" class="lbl-b" style="font-size:23px">qwen3:4b · llama.cpp runner</text>
     <text x="70" y="85" text-anchor="middle" class="lbl-sm" style="font-size:19px">keep=4</text>
     <text x="440" y="85" text-anchor="middle" class="lbl-g" style="font-size:19px">discarded — prompt=30,861 tokens total</text>
     <text x="925" y="85" text-anchor="middle" class="lbl-sm" style="font-size:19px" fill="#2e7d32">surviving tail — limit=2050</text>
@@ -588,6 +589,28 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="440" y="310" text-anchor="middle" class="lbl-g" style="font-size:18px">prompt_eval_count=2050</text>
   </svg>
   <div class="pageno">M5-DD·14</div>
+</section>
+
+<section>
+  <h2 class="t">On MLX, qwen3.5:2b was not truncated</h2>
+  <p class="s">Same test, MLX runner: no cut, both markers found</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A full prompt bar of 30863 tokens for the MLX-served qwen3.5:2b with nothing discarded. The front marker ZEBRA and the back marker OTTER were both found, no truncation warning appeared in the server log, and the request took about 44 seconds">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="60" y="120" width="980" height="120" rx="10" fill="var(--p-green)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
+      <rect x="60" y="120" width="18" height="120" fill="var(--p-purple)"/>
+      <rect x="1022" y="120" width="18" height="120" fill="var(--p-purple)"/>
+    </g>
+    <text x="550" y="40" text-anchor="middle" class="lbl-b" style="font-size:23px">qwen3.5:2b · MLX runner</text>
+    <text x="70" y="85" text-anchor="start" class="lbl-sm" style="font-size:19px">ZEBRA (front) found</text>
+    <text x="1030" y="85" text-anchor="end" class="lbl-sm" style="font-size:19px">OTTER (back) found</text>
+    <text x="550" y="187" text-anchor="middle" class="lbl-b" style="font-size:22px">prompt_eval_count=30863, nothing discarded</text>
+    <text x="550" y="280" text-anchor="middle" class="lbl-g" style="font-size:19px">no truncation warning in the server log · about 44 s</text>
+    <text x="550" y="320" text-anchor="middle" class="lbl-g" style="font-size:18px">different model and runner than the last slide, so the cause is not proven</text>
+    <text x="550" y="355" text-anchor="middle" class="lbl-b" style="font-size:21px" fill="#2e7d32">still size top-k × chunk_size against num_ctx</text>
+  </svg>
+  <div class="pageno">M5-DD·15</div>
 </section>
 
 <!-- ============ SLIDE 15 — TWO-PANEL: retrieval miss vs generation miss ============ -->
@@ -610,7 +633,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="815" y="210" text-anchor="middle" class="lbl-sm" style="font-size:19px">or hallucinates</text>
     <text x="815" y="270" text-anchor="middle" class="lbl-g" style="font-size:19px">fix: the prompt or the model</text>
   </svg>
-  <div class="pageno">M5-DD·15</div>
+  <div class="pageno">M5-DD·16</div>
 </section>
 
 <!-- ============ SLIDE 16 — PIPELINE with broken re-ranker link ============ -->
@@ -639,14 +662,14 @@ footer, header, hgroup, main, menu, nav, section {
       <path d="M600,198 C750,260 900,260 998,190" marker-end="url(#ah)"/>
     </g>
   </svg>
-  <div class="pageno">M5-DD·16</div>
+  <div class="pageno">M5-DD·17</div>
 </section>
 
 <!-- ============ SLIDE 17 — NUMBERED ROWS: direct-Chroma API ============ -->
 <section>
   <h2 class="t">ChromaDB's own API confirms the metric, not a guess</h2>
   <p class="s">ChromaDB's own API confirms the metric — no override was ever set</p>
-  <svg viewBox="0 0 1100 380" role="img" aria-label="Numbered rows — curl the collections endpoint, read the returned JSON showing hnsw_configuration space equals l2 and dimension equals 768, arrow to confirms the claim not assumed, no override was ever set in app main.py">
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Numbered rows — curl the collections endpoint, read the returned JSON showing configuration_json hnsw space equals l2 and dimension equals 768, arrow to confirms the claim not assumed, no override was ever set in app main.py">
     <g class="lbl-b" text-anchor="middle" fill="#1e1e1e">
       <circle cx="75" cy="60" r="24" fill="var(--p-blue)" stroke="#1e1e1e" stroke-width="2.2"/>
       <text x="75" y="68" class="num" style="font-size:24px">1</text>
@@ -661,14 +684,14 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="125" y="290" text-anchor="start" class="lbl-b" style="font-size:22px" fill="#2e7d32">confirms §3's claim — not inferred, read straight from the API</text>
     <text x="125" y="320" text-anchor="start" class="lbl-g" style="font-size:18px">no override set in app/main.py</text>
   </svg>
-  <div class="pageno">M5-DD·17</div>
+  <div class="pageno">M5-DD·18</div>
 </section>
 
 <!-- ============ SLIDE 18 — NUMBERED ROWS: real distances ============ -->
 <section>
-  <h2 class="t">0.6956 and 1.0968 — the numbers behind "Found 2 relevant chunks"</h2>
+  <h2 class="t">0.6956 and 1.0966 — the numbers behind "Found 2 relevant chunks"</h2>
   <p class="s">The real distances behind "Found 2 relevant chunks"</p>
-  <svg viewBox="0 0 1100 380" role="img" aria-label="Numbered rows — the query how do I restart the payments service, chunk 1 at distance 0.6956 the payments runbook chunk, chunk 2 at distance 1.0968 the checkout 503 chunk, caption noting only 2 print though k=3 was requested because only 2 chunks exist">
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Numbered rows — the query how do I restart the payments service, chunk 1 at distance 0.6956 the payments runbook chunk, chunk 2 at distance 1.0966 the checkout 503 chunk, caption noting only 2 print though k=3 was requested because only 2 chunks exist">
     <g class="lbl-b" text-anchor="middle" fill="#1e1e1e">
       <circle cx="75" cy="60" r="24" fill="var(--p-purple)" stroke="#1e1e1e" stroke-width="2.2"/>
       <text x="75" y="68" class="num" style="font-size:24px">Q</text>
@@ -679,17 +702,17 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="125" y="68" text-anchor="start" class="lbl" style="font-size:21px">"How do I restart the payments service?"</text>
     <text x="125" y="175" text-anchor="start" class="lbl-b" style="font-size:23px">dist 0.6956 — payments runbook chunk</text>
-    <text x="125" y="298" text-anchor="start" class="lbl-b" style="font-size:23px">dist 1.0968 — checkout 503 chunk</text>
+    <text x="125" y="298" text-anchor="start" class="lbl-b" style="font-size:23px">dist 1.0966 — checkout 503 chunk</text>
     <text x="760" y="235" text-anchor="middle" class="lbl-g" style="font-size:19px">only 2 print — k=3 requested, 2 chunks exist</text>
   </svg>
-  <div class="pageno">M5-DD·18</div>
+  <div class="pageno">M5-DD·19</div>
 </section>
 
 <!-- ============ SLIDE 19 — NUMBERED ROWS: measured norm ============ -->
 <section>
   <h2 class="t">Three sentences, three vectors, norm 1.000000 every time</h2>
   <p class="s">Three vectors, norm 1.000000 every time — measured, not assumed</p>
-  <svg viewBox="0 0 1100 380" role="img" aria-label="Numbered rows — three sentence boxes through this app's exact OllamaEmbeddings code path, each arrowing to a result of L2norm equals 1.000000, one flagged 1.000001 as float rounding not a real deviation">
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Numbered rows — three sentence boxes through this app's exact OllamaEmbeddings code path, each arrowing to a result of L2norm equals 1.000000, all three the same with no deviation">
     <g class="lbl-b" text-anchor="middle" fill="#1e1e1e">
       <circle cx="75" cy="65" r="24" fill="var(--p-blue)" stroke="#1e1e1e" stroke-width="2.2"/>
       <text x="75" y="73" class="num" style="font-size:24px">1</text>
@@ -707,7 +730,7 @@ footer, header, hgroup, main, menu, nav, section {
       <rect x="700" y="264" width="340" height="55" rx="8" fill="var(--p-green)"/>
     </g>
     <text x="870" y="73" text-anchor="middle" class="lbl-sm" style="font-size:19px">L2norm=1.000000</text>
-    <text x="870" y="185" text-anchor="middle" class="lbl-sm" style="font-size:19px">L2norm=1.000001 — rounding</text>
+    <text x="870" y="185" text-anchor="middle" class="lbl-sm" style="font-size:19px">L2norm=1.000000</text>
     <text x="870" y="297" text-anchor="middle" class="lbl-sm" style="font-size:19px">L2norm=1.000000</text>
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2.2" stroke-dasharray="4 6">
       <path d="M430,65 L698,65" marker-end="url(#ahg)"/>
@@ -715,14 +738,14 @@ footer, header, hgroup, main, menu, nav, section {
       <path d="M430,295 L698,295" marker-end="url(#ahg)"/>
     </g>
   </svg>
-  <div class="pageno">M5-DD·19</div>
+  <div class="pageno">M5-DD·20</div>
 </section>
 
 <!-- ============ SLIDE 20 — THREE-COLUMN: real 3-variant results ============ -->
 <section>
   <h2 class="t">Same corpus, three chunk sizes, three different stories</h2>
   <p class="s">Same corpus, three chunk sizes, three very different outcomes</p>
-  <svg viewBox="0 0 1100 400" role="img" aria-label="Three columns compared — baseline chunk_size 500 overlap 50 with 2 chunks and distance 0.6956 the middle ground, variant-a chunk_size 150 overlap 0 with 11 chunks and distance 0.5146 marked best because nothing dilutes the vector, variant-b chunk_size 1200 overlap 200 with 1 chunk and distance 0.75 to 1.08 marked worst because every question retrieves the same chunk">
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Three columns compared — baseline chunk_size 500 overlap 50 with 2 chunks and distance 0.6956 the middle ground, variant-a chunk_size 150 overlap 0 with 11 chunks and distance 0.5145 marked best because nothing dilutes the vector, variant-b chunk_size 1200 overlap 200 with 1 chunk and distance 0.75 to 1.08 marked worst because every question retrieves the same chunk">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="30" y="50" width="330" height="300" rx="12" fill="var(--p-blue)"/>
       <rect x="385" y="50" width="330" height="300" rx="12" fill="var(--p-green)"/>
@@ -736,7 +759,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="550" y="100" text-anchor="middle" class="lbl-b" style="font-size:24px">variant-a</text>
     <text x="550" y="135" text-anchor="middle" class="lbl-sm" style="font-size:19px">150 / overlap 0</text>
     <text x="550" y="165" text-anchor="middle" class="lbl-sm" style="font-size:19px">11 chunks</text>
-    <text x="550" y="210" text-anchor="middle" class="lbl-b" style="font-size:23px" fill="#2e7d32">dist 0.5146 — best</text>
+    <text x="550" y="210" text-anchor="middle" class="lbl-b" style="font-size:23px" fill="#2e7d32">dist 0.5145 — best</text>
     <text x="550" y="280" text-anchor="middle" class="lbl-g" style="font-size:18px">nothing dilutes the vector</text>
     <text x="905" y="100" text-anchor="middle" class="lbl-b" style="font-size:24px">variant-b</text>
     <text x="905" y="135" text-anchor="middle" class="lbl-sm" style="font-size:19px">1200 / overlap 200</text>
@@ -744,7 +767,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="905" y="210" text-anchor="middle" class="lbl-b" style="font-size:23px" fill="#c62828">dist 0.75–1.08 — worst</text>
     <text x="905" y="280" text-anchor="middle" class="lbl-g" style="font-size:18px">every question, same chunk</text>
   </svg>
-  <div class="pageno">M5-DD·20</div>
+  <div class="pageno">M5-DD·21</div>
 </section>
 
 <!-- ============ SLIDE 21 — CLOSING: honesty caveat + takeaways ============ -->
@@ -776,7 +799,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
   </svg>
   <p class="credit">Next: apply these levers to a real corpus. &nbsp;·&nbsp; <b>Gourav Shah</b> &nbsp;·&nbsp; School of DevOps &amp; AI</p>
-  <div class="pageno">M5-DD·21</div>
+  <div class="pageno">M5-DD·22</div>
 </section>
 </div></div>
 

@@ -21,7 +21,7 @@ than renumbering all 21 following slides — cosmetic only, not a verify-gate co
 Every `.s` subtitle was cut from a multi-sentence paragraph (125–275 chars) to one line (≤ ~85
 chars) — the sharpest hook for that slide's idea, not a recap of the takeaway. Every SVG `viewBox`
 height was grown toward the 380–420 range (from a compressed 260–380) with internal font sizes and
-shape sizes scaled up proportionally so the diagram fills ~55–65% of slide height, matching
+figure sizes scaled up proportionally so the diagram fills ~55–65% of slide height, matching
 `05-naive-rag.html`'s reference proportions. No facts were dropped: numbers and mechanism details
 that used to live only in subtitle prose were relocated into SVG `<text>` labels or folded into the
 one-line takeaway (see the "Notes" column below and in the coverage table for where each landed).
@@ -60,7 +60,7 @@ page's material is measured evidence the learner needs to reason about directly 
 compressed highlight reel. The visual language follows the CourseSmith whiteboard style contract
 (`templates/deck/whiteboard-style-guide.md`): Patrick Hand cursive, `#1e1e1e` primary / `#757575`
 secondary strokes on white paper with the five semantic pastel fills (§1: green good · red
-bad/full · blue data · orange caution · purple meta), the `#rough` wobble filter on shapes only,
+bad/full · blue data · orange caution · purple meta), the `#rough` wobble filter on boxes and curves only,
 and the shared `#ah`/`#ahg` arrowhead markers. The arc moves — **why chunk size trades context
 completeness against embedding precision (index-card analogy) → why top-k is a context-budget
 decision, not a safety dial → what "similar" actually means under ChromaDB's default L2 metric,
@@ -90,22 +90,23 @@ Page numbers are `M5-DD·NN` to distinguish this deck from the lesson concept de
 | 11 | Two embedding models never share a coordinate system | Why swapping embedding models means a full re-ingest: two different models place the same sentence at different, incomparable coordinates | Two-panel comparison: model A's space (blue vectors, one sentence plotted) vs model B's space (orange vectors, same sentence plotted at an unrelated point) — a crossed-out arrow between the two spaces | Storing embeddings from one model and querying with another doesn't degrade gracefully — it produces meaningless distances, not just worse ones |
 | 12 | Four pieces have to fit inside one 4096-token ceiling | The context-budget anatomy: `num_ctx=4096` caps every prompt this app builds — template scaffolding, retrieved context, the question, and headroom for the answer all compete for it | Big-box anatomy: outer box "4096 tokens" with four labeled inner segments (scaffolding, context, question, answer headroom) stacked to fill it | `num_ctx=4096` is the real ceiling, independent of `qwen3.5:2b`'s larger native training context — the app never gets to use more than this |
 | 13 | At this lab's scale, the prompt uses under 15% of the ceiling | Working the real arithmetic: `chunk_size=500` × `k=3` ≈ 300–390 tokens of context, ~350–450 tokens total prompt, ~3,650+ tokens of headroom | Numbered rows: template (~20 tok) → context (~300–390 tok) → question (~15–30 tok) → **total ~350–450 tok** → headroom ~3,650–3,700 tok (green) | There's no pressure on this corpus — but raise `k` to 10 on `chunk_size=1500` and context alone hits ~3,750 tokens, crowding out the answer |
-| 14 | Ollama keeps the tail and drops the front, verified live | The truncation mechanism: a 30,861-token oversized prompt got cut to `prompt_eval_count=2050` with `keep=4` — a marker at the front was lost, one at the back survived | Staircase: long prompt bar (red) with a "keep=4" tiny sliver at the very start, a large discarded middle section (hatched/crossed-out), and a surviving tail segment (green) labeled "limit=2050" | On this app's prompt shape — context first, question last — an over-budget prompt loses your earliest retrieved chunks first, not the question |
-| 15 | Two answers wrong for two different reasons | The retrieval-miss vs generation-miss split: retrieval miss means the wrong chunk was handed to the model; generation miss means the right chunk was handed over and still misused | Two-panel comparison: "retrieval miss" (red, wrong/no chunk retrieved → correct reasoning on bad input) vs "generation miss" (orange, right chunk retrieved → model still answers wrong) | Confusing the two wastes debugging time — check "View Source Chunks" or query ChromaDB directly before touching the prompt or the model |
-| 16 | Naive RAG never asks "is the 2nd-best chunk actually better?" | Why naive top-k retrieval makes retrieval misses more likely: there's no re-ranking step between the vector search and the LLM | Pipeline with one broken link: query → vector search → (crossed-out re-ranker box, dashed) → straight to LLM | A semantically-adjacent-but-wrong chunk can outrank the truly relevant one, and naive RAG has no second look to catch it — that gap is what M6 adds back |
-| 17 | ChromaDB's own API confirms the metric, not a guess | The direct-Chroma observation: querying `/api/v2/tenants/default_tenant/databases/default_database/collections` shows `hnsw_configuration.space: "l2"` and `dimension: 768` straight from the running collection | Numbered rows: `curl .../collections` → highlighted JSON fields `"space": "l2"` and `"dimension": 768` → arrow to "confirms §3's claim, not assumed" | No override was ever set in `app/main.py` — the collection came up on ChromaDB's default, and the API says so directly, not inferred from docs |
-| 18 | 0.6956 and 1.0968 — the numbers behind "Found 2 relevant chunks" | The raw distances behind the ranking: querying the payments question directly returns two real L2 distances, lower ranked first, and the collection has no third chunk to return | Numbered rows: query "How do I restart the payments service?" → chunk 1 (blue, `dist 0.6956`) → chunk 2 (blue, `dist 1.0968`) → caption "only 2 print — k=3 requested, 2 chunks exist" | The Streamlit UI never shows you this number — only the resulting text — but this is exactly what ChromaDB's index ranks on to decide what the LLM sees |
-| 19 | Three sentences, three vectors, norm 1.000000 every time | Verifying the L2≈cosine claim isn't assumed — three arbitrary sentences through this app's exact `OllamaEmbeddings` code path all measure at L2 norm ≈ 1.000000 | Numbered rows: 3 sentence boxes each arrowing to a "L2norm=1.000000" result (green), one flagged "1.000001 — float rounding, not a real deviation" | This confirms the unit-norm claim through the app's *exact* code path, not a general Ollama guarantee — measured, not assumed |
-| 20 | Same corpus, three chunk sizes, three different stories | The 3-variant experiment's real results: baseline (2 chunks) sits in the middle, variant-a (11 chunks) wins on precision, variant-b (1 chunk) loses on every question | Three-column comparison: baseline (blue, "2 chunks · dist 0.6956") · variant-a (green, "11 chunks · dist 0.5146 — best") · variant-b (red, "1 chunk · dist 0.75–1.08 — worst") | variant-a's tiny chunks isolate the exact restart command with nothing diluting the vector; variant-b collapses the whole corpus into one chunk every question retrieves |
-| 21 | On a corpus this small, even the worst chunking still works (closing) | The honest caveat + hand-off: small-corpus-masks-dilution — all three variants still answered correctly here, but variant-b's failure mode would bite on a larger corpus; five real-work takeaways | numbered rows (circles 1–5) — the course's takeaway idiom | variant-b's one-chunk-fits-all only looks harmless because this corpus is 823 bytes — the same collapse on a real corpus returns topically wrong chunks, not just imprecise ones; credit + hand-off |
+| 14 | On llama.cpp, Ollama keeps the tail and drops the front | The truncation mechanism on the llama.cpp-served `qwen3:4b`: a 30,861-token oversized prompt got cut to `prompt_eval_count=2050` with `keep=4` (`limit=2050 prompt=30861`) — a marker at the front was lost, one at the back survived | Staircase: long prompt bar (red) with a "keep=4" tiny sliver at the very start, a large discarded middle section (hatched/crossed-out), and a surviving tail segment (green) labeled "limit=2050"; the bar is labelled "qwen3:4b · llama.cpp runner" | On this app's prompt layout — context first, question last — an over-budget prompt loses your earliest retrieved chunks first, not the question |
+| 15 | On MLX, qwen3.5:2b was not truncated | The contrast the page teaches: the near-identical prompt (30,863 tokens) sent to the MLX-served `qwen3.5:2b` was not truncated — `prompt_eval_count=30863`, no warning in the log, both markers found, about 44 s. Model and runner differ from slide 14, so the cause is not proven | Single full prompt bar (green) with a purple marker sliver at each end labelled "ZEBRA (front) found" and "OTTER (back) found", caption "prompt_eval_count=30863, nothing discarded" and a green payoff line | Do not read this as permission to overfill: size `top-k × chunk_size` against `num_ctx` anyway |
+| 16 | Two answers wrong for two different reasons | The retrieval-miss vs generation-miss split: retrieval miss means the wrong chunk was handed to the model; generation miss means the right chunk was handed over and still misused | Two-panel comparison: "retrieval miss" (red, wrong/no chunk retrieved → correct reasoning on bad input) vs "generation miss" (orange, right chunk retrieved → model still answers wrong) | Confusing the two wastes debugging time — check "View Source Chunks" or query ChromaDB directly before touching the prompt or the model |
+| 17 | Naive RAG never asks "is the 2nd-best chunk actually better?" | Why naive top-k retrieval makes retrieval misses more likely: there's no re-ranking step between the vector search and the LLM | Pipeline with one broken link: query → vector search → (crossed-out re-ranker box, dashed) → straight to LLM | A semantically-adjacent-but-wrong chunk can outrank the truly relevant one, and naive RAG has no second look to catch it — that gap is what M6 adds back |
+| 18 | ChromaDB's own API confirms the metric, not a guess | The direct-Chroma observation: querying `/api/v2/tenants/default_tenant/databases/default_database/collections` shows `configuration_json.hnsw.space: "l2"` and `dimension: 768` straight from the running collection | Numbered rows: `curl .../collections` → highlighted JSON fields `"space": "l2"` and `"dimension": 768` → arrow to "confirms §3's claim, not assumed" | No override was ever set in `app/main.py` — the collection came up on ChromaDB's default, and the API says so directly, not inferred from docs |
+| 19 | 0.6956 and 1.0966 — the numbers behind "Found 2 relevant chunks" | The raw distances behind the ranking: querying the payments question directly returns two real L2 distances, lower ranked first, and the collection has no third chunk to return | Numbered rows: query "How do I restart the payments service?" → chunk 1 (blue, `dist 0.6956`) → chunk 2 (blue, `dist 1.0966`) → caption "only 2 print — k=3 requested, 2 chunks exist" | The Streamlit UI never shows you this number — only the resulting text — but this is exactly what ChromaDB's index ranks on to decide what the LLM sees |
+| 20 | Three sentences, three vectors, norm 1.000000 every time | Verifying the L2≈cosine claim isn't assumed — three arbitrary sentences through this app's exact `OllamaEmbeddings` code path all measure at L2 norm ≈ 1.000000 | Numbered rows: 3 sentence boxes each arrowing to a "L2norm=1.000000" result (green), all three printing the same value | This confirms the unit-norm claim through the app's *exact* code path, not a general Ollama guarantee — measured, not assumed |
+| 21 | Same corpus, three chunk sizes, three different stories | The 3-variant experiment's real results: baseline (2 chunks) sits in the middle, variant-a (11 chunks) wins on precision, variant-b (1 chunk) loses on every question | Three-column comparison: baseline (blue, "2 chunks · dist 0.6956") · variant-a (green, "11 chunks · dist 0.5145 — best") · variant-b (red, "1 chunk · dist 0.75–1.08 — worst") | variant-a's tiny chunks isolate the exact restart command with nothing diluting the vector; variant-b collapses the whole corpus into one chunk every question retrieves |
+| 22 | On a corpus this small, even the worst chunking still works (closing) | The honest caveat + hand-off: small-corpus-masks-dilution — all three variants still answered correctly here, but variant-b's failure mode would bite on a larger corpus; five real-work takeaways | numbered rows (circles 1–5) — the course's takeaway idiom | variant-b's one-chunk-fits-all only looks harmless because this corpus is 823 bytes — the same collapse on a real corpus returns topically wrong chunks, not just imprecise ones; credit + hand-off |
 
 <!-- Visual pattern vocabulary used: title theme-boxes · scene (2, 3, 8) · pipeline/mapping diagram
-     (4, 10, 16) · numbered rows (5, 13, 17, 18, 19, 21) · fan-out (6) · two-panel comparison
-     (7, 11, 15) · big-box anatomy (9, 12) · staircase (14) · three-column comparison (20). -->
+     (4, 10, 17) · numbered rows (5, 13, 18, 19, 20, 22) · fan-out (6) · two-panel comparison
+     (7, 11, 16) · big-box anatomy (9, 12) · staircase (14) · single full bar (15) · three-column comparison (21). -->
 
 ## Recommended presentation order
 
-Present strictly 1 → 21; the deck is one continuous build from "why chunk size trades completeness
+Present strictly 1 → 22; the deck is one continuous build from "why chunk size trades completeness
 for precision" through "the real experiment's honest caveat." Open on slide 1 to name the four
 themes. **Slides 2–3 are the conceptual hinge for chunking** — the too-small/too-large index-card
 pair has to land before slide 4's overlap mechanism and slide 5's concrete "this corpus made 2
@@ -115,18 +116,20 @@ Slides 6–7 are a fast pair — top-k mechanism, then the saturation case where
 scene is the second hinge — pause on "lower is better," it inverts the intuition of most similarity
 scores students have seen elsewhere. Slide 9 is dense math (`‖a-b‖²=2-2cos`) — read the equation
 once, then move straight to its consequence in slide 10 (embedder defines retrieval) and slide 11
-(no cross-model comparability) without lingering on the algebra itself. Slides 12–14 are the
-context-budget triplet and **slide 14 (the verified truncation mechanism) is the single most
+(no cross-model comparability) without lingering on the algebra itself. Slides 12–15 are the
+context-budget run. **Slide 14 (the truncation mechanism on the llama.cpp runner) is the single most
 load-bearing slide in the deck** — it's real captured evidence (`keep=4`, `limit=2050`,
-`prompt=30861`), not a theoretical claim, and it directly contradicts the intuitive assumption that
-truncation just chops off the end; do not compress it. Slide 15 (retrieval miss vs generation miss)
-is a quick, clean framing pivot. Slide 16 is a short connective beat naming the gap M6 fills — quick,
-then move. Slides 17–19 are the raw-evidence triplet (direct Chroma API, the real distances, the
-measured norm) — these are the page's "confirmed, not assumed" backbone; keep the exact numbers on
-screen, they're the point. Slide 20 is the deck's other must-not-compress slide: the three-column
-real-results comparison is the experiment's payoff and needs its own beat before slide 21's honesty
-caveat lands. Under time pressure, compress 6–7 and 16 into single passes — never compress 2–3, 8,
-14, 17–19, or 20; those carry the deep dive's actual measured evidence.
+`prompt=30861`) from the llama.cpp-served `qwen3:4b`, and it directly contradicts the intuitive
+assumption that truncation just chops off the end; do not compress it. Slide 15 is its contrast:
+the MLX-served `qwen3.5:2b` was not truncated, with the honest caveat that model and runner both
+differ. Slide 16 (retrieval miss vs generation miss) is a quick, clean framing pivot. Slide 17 is a
+short connective beat naming the gap M6 fills — quick, then move. Slides 18–20 are the raw-evidence
+triplet (direct Chroma API, the real distances, the measured norm) — these are the page's
+"confirmed, not assumed" backbone; keep the exact numbers on screen, they're the point. Slide 21 is
+the deck's other must-not-compress slide: the three-column real-results comparison is the
+experiment's payoff and needs its own beat before slide 22's honesty caveat lands. Under time
+pressure, compress 6–7 and 17 into single passes — never compress 2–3, 8, 14–15, 18–20, or 21;
+those carry the deep dive's actual measured evidence.
 
 ## Fragment map
 
@@ -136,7 +139,7 @@ hop-by-hop causal diagrams warrant fragments, and this deep dive has no single-i
 like M3's scheduler slide that benefits from a staged reveal — even slide 14's staircase is a static
 picture of one already-completed truncation event, not a process to walk through step by step).
 
-Static slides (1–21, all): scenes, pipelines, anatomy boxes, comparisons, and numbered rows all show
+Static slides (1–22, all): scenes, pipelines, anatomy boxes, comparisons, and numbered rows all show
 the full picture at once.
 
 ## Coverage check (HARD GATE — §0)
@@ -158,16 +161,17 @@ Every deep-dive.md section maps to at least one slide.
 | §3 — embedding models are not comparable; swapping requires full re-ingest | 11 | Two-panel: two incomparable coordinate spaces |
 | §4 — context-window anatomy: `num_ctx=4096` caps scaffolding + context + question + answer | 12 | Anatomy: four segments filling one 4096-token box |
 | §4 — worked arithmetic for this lab's real numbers (~350–450 tokens used, ~3,650+ headroom) | 13 | Numbered rows with the page's actual token estimates |
-| §4 — verified truncation mechanism: `keep=4`, `limit=2050`, front dropped / tail survives | 14 | Staircase: kept prefix, discarded middle, surviving tail — real captured log line |
-| §5 — retrieval miss vs. generation miss as two structurally different failure causes | 15 | Two-panel: wrong-input-correct-reasoning vs right-input-wrong-reasoning |
-| §5 — naive RAG has no re-ranking step; semantically-adjacent-but-wrong chunks can outrank the real answer | 16 | Pipeline with a crossed-out re-ranker stage, forward-pointer to M6 |
-| §6 — direct-Chroma observation: `/api/v2/tenants/default_tenant/databases/default_database/collections` confirms `space: "l2"`, `dimension: 768` | 17 | Numbered rows: curl → highlighted JSON fields → "confirmed, not assumed" |
-| §6 — raw distances behind the ranking: `0.6956` and `1.0968`, only 2 print because only 2 chunks exist | 18 | Numbered rows with the page's real measured distances |
-| §6 — embedding norm verification: `L2norm=1.000000` across three sentences via the app's exact code path | 19 | Numbered rows with the page's real measured norms |
-| §7 — 3-variant re-ingest experiment: baseline (2 chunks), variant-a (11 chunks), variant-b (1 chunk) | 20 | Three-column comparison with the page's real chunk counts and distances |
-| §7 — real results: variant-a best (0.5146), baseline middle (0.6956), variant-b worst (0.75–1.08) | 20 | Same slide, the three measured distance ranges labeled directly |
-| §7 — honesty: small-corpus-masks-dilution, all three variants still answered correctly here | 21 | Closing slide states the caveat explicitly before the takeaways. 2026-07-25: the caveat row now names the corpus size directly ("this one is 823 bytes") for concreteness |
-| "Where you will use this" — 5 real-work triggers | 21 | Closing numbered rows, one per trigger |
+| §4 — truncation mechanism on the llama.cpp runner: `keep=4`, `limit=2050`, front dropped / tail survives | 14 | Staircase: kept prefix, discarded middle, surviving tail — real captured log line, labelled as the llama.cpp-served `qwen3:4b` |
+| §4 — MLX-served `qwen3.5:2b` not truncated by a near-identical prompt (`prompt_eval_count=30863`, ZEBRA and OTTER both found, about 44 s); not permission to overfill | 15 | Single full bar with both markers found, so the page's runner contrast has a visual |
+| §5 — retrieval miss vs. generation miss as two structurally different failure causes | 16 | Two-panel: wrong-input-correct-reasoning vs right-input-wrong-reasoning |
+| §5 — naive RAG has no re-ranking step; semantically-adjacent-but-wrong chunks can outrank the real answer | 17 | Pipeline with a crossed-out re-ranker stage, forward-pointer to M6 |
+| §6 — direct-Chroma observation: `/api/v2/tenants/default_tenant/databases/default_database/collections` confirms `space: "l2"`, `dimension: 768` | 18 | Numbered rows: curl → highlighted JSON fields → "confirmed, not assumed" |
+| §6 — raw distances behind the ranking: `0.6956` and `1.0966`, only 2 print because only 2 chunks exist | 19 | Numbered rows with the page's real measured distances |
+| §6 — embedding norm verification: `L2norm=1.000000` across three sentences via the app's exact code path | 20 | Numbered rows with the page's real measured norms |
+| §7 — 3-variant re-ingest experiment: baseline (2 chunks), variant-a (11 chunks), variant-b (1 chunk) | 21 | Three-column comparison with the page's real chunk counts and distances |
+| §7 — real results: variant-a best (0.5145), baseline middle (0.6956), variant-b worst (0.75–1.08) | 21 | Same slide, the three measured distance ranges labeled directly |
+| §7 — honesty: small-corpus-masks-dilution, all three variants still answered correctly here | 22 | Closing slide states the caveat explicitly before the takeaways. 2026-07-25: the caveat row now names the corpus size directly ("this one is 823 bytes") for concreteness |
+| "Where you will use this" — 5 real-work triggers | 22 | Closing numbered rows, one per trigger |
 
 **No orphans.** Every deep-dive.md section (§1–§7, the opening framing paragraph, and the closing
 "Where you will use this") has at least one slide anchor. The `:::note` guarded re-ingest snippet in
@@ -175,4 +179,4 @@ Every deep-dive.md section maps to at least one slide.
 are terminal-output/console detail that belongs in the lab prose, not a concept slide (the concept
 deck teaches concepts, never terminal output, per the style guide); the underlying concepts those
 commands demonstrate (direct API inspection, live re-ingest under a new collection name) are still
-covered by slides 17–20.
+covered by slides 18–21.
