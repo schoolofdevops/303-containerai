@@ -309,7 +309,7 @@ docker compose down -v
 
 :::warning[Chroma client/server version skew]
 
-**Symptom:** `genai-app` logs show an error like `ValueError: Could not connect to a Chroma server` or `version mismatch`.
+**Symptom:** The older `0.5.x` client still connects to a 1.x server, and simple calls such as the heartbeat work. Anything that goes through the retired `/api/v1` routes fails with `HTTP 405 Method Not Allowed`, so ingest and retrieval break while the containers look healthy.
 
 **Cause:** The app's `chromadb` client is `1.5.9`. A server from a different major (an old `0.5.x` image, or a future `2.x` that `latest` may point to) speaks a different HTTP API. Chroma 1.0 moved the routes from `/api/v1` to `/api/v2`, and a raw call to a retired route returns `405 Method Not Allowed`.
 

@@ -203,24 +203,34 @@ a corpus with `chunk_size=1500`, and 10 × 1500 chars ≈ 3,750 tokens of contex
 crowds out the answer entirely inside a 4096 window, and Ollama silently truncates the prompt once
 it exceeds `num_ctx`.
 
-**Verified live, not assumed.** A deliberately oversized prompt (~40K raw tokens: a unique marker
-sentence, a large filler block, then the real question) sent to `qwen3.5:2b` with `num_ctx=4096`
-produced `prompt_eval_count: 2050` — Ollama cut the prompt down to roughly half the context
-window, not the full 4096, leaving headroom for the answer. The underlying `llama-server`'s debug
-log shows exactly how:
+**Verified live, not assumed.** A deliberately oversized prompt (~30K tokens: a unique front
+marker sentence, a large filler block, a back marker, then the real question) was sent with
+`num_ctx=4096`. What happens next depends on which engine Ollama runs the model on. Check the
+`RUNNER` column of `ollama ps`.
+
+On the **llama.cpp runner**, tested here with `qwen2.5:1.5b` on Ollama v0.40.7, the prompt is cut
+down. `prompt_eval_count` came back as `2050`, roughly half the context window, which leaves
+headroom for the answer. The Ollama server log (`~/.ollama/logs/server.log` on macOS) shows how:
 
 ```text
-level=WARN msg="truncating input prompt" limit=2050 prompt=33742 keep=4 new=2050
+level=WARN source=llama_server.go:334 msg="truncating input prompt" limit=2050 prompt=30880 keep=4 new=2050
 ```
 
-It keeps a tiny fixed prefix (`n_keep=4` tokens — effectively nothing) and then discards everything
-else *except* the most recent `limit` tokens — the truncation keeps the **tail** of the prompt, not
-the head. This is the behavior on this course's Ollama (v0.17.4); the exact keep/limit split is an
-implementation detail that can change. Sending the model the marker-at-the-front / question-at-the-back
-prompt confirmed this directly: the model answered using the *back* marker, and had lost the *front* marker entirely —
-proof the front of an over-budget prompt is what gets dropped, and the tail survives. On this
+It keeps a tiny fixed prefix (`keep=4` tokens, effectively nothing) and discards everything else
+*except* the most recent `limit` tokens. The truncation keeps the **tail** of the prompt, not the
+head. The model confirmed it: it answered with the *back* marker (`OTTER`) and had lost the *front*
+marker (`ZEBRA`) entirely. The front of an over-budget prompt is what gets dropped.
+
+On the **MLX runner**, which Ollama 0.40.7 uses for `qwen3.5:2b` on this Mac, the same prompt was
+**not** truncated. `prompt_eval_count` was `30863`, no truncation warning appeared in the log, and
+the model found both markers (`ZEBRA, OTTER`), even though `ollama ps` still showed `CONTEXT 4096`.
+Do not read that as permission to overfill the window. It is a property of that runner, it can
+change between Ollama releases, and it costs time and memory (that single request took about 44
+seconds). The exact keep/limit split on the llama.cpp runner is also an implementation detail. So
+size `top-k × chunk_size` against `num_ctx` anyway, and watch for the `"truncating input prompt"`
+warning when your model runs on the llama.cpp runner. With the
 app's prompt shape (`Context:\n{context}\n\nQuestion: {prompt}\n\nAnswer:` — retrieved chunks
-first, the question last), that means an over-budget prompt loses your **earliest retrieved
+first, the question last), truncation on that runner means an over-budget prompt loses your **earliest retrieved
 chunks** first while the question itself, sitting at the very end, is the last thing to go. Sizing
 `top-k × chunk_size` against your actual `num_ctx` before scaling either knob up is the check that
 catches this before it becomes a silent, hard-to-diagnose "the model ignored my context" bug —
