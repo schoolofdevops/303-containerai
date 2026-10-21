@@ -180,26 +180,28 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- ============ SLIDE 2 — WHAT YOU'LL LEARN ============ -->
 <section>
   <h2 class="t">What you'll learn</h2>
-  <p class="s">Five ideas that make model serving portable and boring.</p>
-  <svg viewBox="0 0 1100 400" role="img" aria-label="Five learning objectives listed as numbered rows">
+  <p class="s">Six ideas that make model serving portable and boring.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Six learning objectives listed as numbered rows">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
-      <circle cx="120" cy="70"  r="24"/>
-      <circle cx="120" cy="140" r="24"/>
-      <circle cx="120" cy="210" r="24"/>
-      <circle cx="120" cy="280" r="24"/>
-      <circle cx="120" cy="350" r="24"/>
+      <circle cx="120" cy="45"  r="22"/>
+      <circle cx="120" cy="107" r="22"/>
+      <circle cx="120" cy="169" r="22"/>
+      <circle cx="120" cy="231" r="22"/>
+      <circle cx="120" cy="293" r="22"/>
+      <circle cx="120" cy="355" r="22"/>
     </g>
     <g class="num" text-anchor="middle">
-      <text x="120" y="78">1</text><text x="120" y="148">2</text>
-      <text x="120" y="218">3</text><text x="120" y="288">4</text>
-      <text x="120" y="358">5</text>
+      <text x="120" y="53">1</text><text x="120" y="115">2</text>
+      <text x="120" y="177">3</text><text x="120" y="239">4</text>
+      <text x="120" y="301">5</text><text x="120" y="363">6</text>
     </g>
     <g class="lbl" text-anchor="start">
-      <text x="170" y="78">See Docker Model Runner — then choose runtime-agnostic open engines</text>
-      <text x="170" y="148">Know when Ollama, llama.cpp, or LocalAI is the right engine</text>
-      <text x="170" y="218">Treat the OpenAI-compatible /v1 API as the universal contract</text>
-      <text x="170" y="288">Read GGUF + quantization; size a model to a 16 GB laptop</text>
-      <text x="170" y="358">Wire model-native (Mac) vs model-in-container (GPU host)</text>
+      <text x="170" y="53">See Docker Model Runner — then choose runtime-agnostic open engines</text>
+      <text x="170" y="115">Know when Ollama, llama.cpp, or LocalAI is the right engine</text>
+      <text x="170" y="177">Treat the OpenAI-compatible /v1 API as the universal contract</text>
+      <text x="170" y="239">Read GGUF + quantization; size a model to a 16 GB laptop</text>
+      <text x="170" y="301">Wire model-native (Mac) vs model-in-container (GPU host)</text>
+      <text x="170" y="363">Switch thinking off so the token budget goes to the answer</text>
     </g>
   </svg>
   <div class="pageno">M2·02</div>
@@ -217,14 +219,14 @@ footer, header, hgroup, main, menu, nav, section {
 <!-- ============ SLIDE — DOCKER MODEL RUNNER ============ -->
 <section>
   <h2 class="t">The quick demo: Docker Model Runner</h2>
-  <p class="s">One command, but locked to Docker's toolchain.</p>
-  <svg viewBox="0 0 1100 380" role="img" aria-label="One docker model run command downloads weights and exposes the standard v1 API">
+  <p class="s">Open source, but it needs Docker Desktop or CE.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="One docker model run command downloads weights and exposes the standard v1 API; ai/gpt-oss is a 20B model, too big for a 16 GB laptop">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
       <rect x="70" y="150" width="360" height="80" rx="10"/>
     </g>
     <text x="250" y="130" text-anchor="middle" class="lbl-g">one command</text>
     <text x="250" y="198" text-anchor="middle" class="lbl">docker model run</text>
-    <text x="250" y="222" text-anchor="middle" class="lbl-g">ai/gpt-oss</text>
+    <text x="250" y="222" text-anchor="middle" class="lbl-g">ai/gpt-oss · 20B, too big for 16 GB</text>
 
     <g fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
       <path d="M435,190 L560,190" marker-end="url(#ah)"/>
@@ -265,7 +267,7 @@ footer, header, hgroup, main, menu, nav, section {
       <rect x="70"  y="70" width="250" height="120" rx="10" transform="translate(60 120)"/>
     </g>
     <text x="195" y="100" text-anchor="middle" class="lbl-b">Ollama</text>
-    <text x="195" y="128" text-anchor="middle" class="lbl-g">dev standard, Metal</text>
+    <text x="195" y="128" text-anchor="middle" class="lbl-g">dev standard, MLX on Mac</text>
     <text x="255" y="220" text-anchor="middle" class="lbl-b">llama.cpp</text>
     <text x="255" y="248" text-anchor="middle" class="lbl-g">the lean core</text>
     <text x="285" y="340" text-anchor="middle" class="lbl-b">LocalAI</text>
@@ -293,7 +295,7 @@ footer, header, hgroup, main, menu, nav, section {
 <section>
   <h2 class="t">Which engine, when</h2>
   <p class="s">Match the engine to the job.</p>
-  <svg viewBox="0 0 1100 380" role="img" aria-label="A table matching Ollama, llama.cpp and LocalAI to their best-fit use">
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A table matching Ollama, llama.cpp and LocalAI to their best-fit use; Ollama runs the MLX engine on Apple Silicon from version 0.40">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
       <rect x="60" y="60" width="980" height="290" rx="12"/>
     </g>
@@ -309,7 +311,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <g class="lbl" text-anchor="start">
       <text x="360" y="106">The de-facto dev standard — one-command setup</text>
-      <text x="360" y="132" class="lbl-g" style="fill:var(--gray)">Metal-accelerated natively on Apple Silicon</text>
+      <text x="360" y="132" class="lbl-g" style="fill:var(--gray)">MLX engine on Apple Silicon (Ollama 0.40+)</text>
       <text x="360" y="200">The inference core inside Ollama — minimal footprint</text>
       <text x="360" y="226" class="lbl-g" style="fill:var(--gray)">Run it directly when you want maximum control</text>
       <text x="360" y="295">One container that looks like OpenAI to every caller</text>
@@ -466,7 +468,7 @@ footer, header, hgroup, main, menu, nav, section {
 <section>
   <h2 class="t">GGUF: the JPEG of model weights</h2>
   <p class="s">RAW is huge, JPEG loads instantly.</p>
-  <svg viewBox="0 0 1100 360" role="img" aria-label="A large RAW float16 file compresses down to a small quantized GGUF file that fits laptop RAM">
+  <svg viewBox="0 0 1100 360" role="img" aria-label="A large RAW float16 file compresses down to a small quantized GGUF file that fits laptop RAM; qwen3.5:2b is the exception, an MLX mxfp8 build of 3.1 GB">
     <!-- RAW big file -->
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
       <rect x="80" y="70" width="260" height="230" rx="10"/>
@@ -500,6 +502,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="920" y="190" text-anchor="middle" class="lbl">params × 0.6</text>
     <text x="920" y="220" text-anchor="middle" class="lbl">≈ GB of RAM</text>
     <text x="920" y="252" text-anchor="middle" class="lbl-g">7B ≈ 4 GB at Q4</text>
+    <text x="550" y="345" text-anchor="middle" class="lbl-g">Exception: qwen3.5:2b on a Mac is an MLX mxfp8 build, 3.1 GB, so the rule does not apply</text>
   </svg>
   <div class="pageno">M2·13</div>
 </section>
@@ -508,9 +511,9 @@ footer, header, hgroup, main, menu, nav, section {
 <section>
   <h2 class="t">Picking a model for a 16 GB laptop</h2>
   <p class="s">Small models for the labs, big ones for later.</p>
-  <svg viewBox="0 0 1100 380" role="img" aria-label="A table of laptop-friendly models with approximate Q4 sizes and their role in the course">
+  <svg viewBox="0 0 1100 420" role="img" aria-label="A table of laptop-friendly models with approximate sizes on disk and their role in the course; gpt-oss 20B is too big for 16 GB">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
-      <rect x="60" y="55" width="980" height="300" rx="12"/>
+      <rect x="60" y="55" width="980" height="350" rx="12"/>
     </g>
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="1.6">
       <line x1="60" y1="105" x2="1040" y2="105"/>
@@ -518,8 +521,9 @@ footer, header, hgroup, main, menu, nav, section {
       <line x1="60" y1="205" x2="1040" y2="205"/>
       <line x1="60" y1="255" x2="1040" y2="255"/>
       <line x1="60" y1="305" x2="1040" y2="305"/>
-      <line x1="520" y1="55" x2="520" y2="355"/>
-      <line x1="740" y1="55" x2="740" y2="355"/>
+      <line x1="60" y1="355" x2="1040" y2="355"/>
+      <line x1="520" y1="55" x2="520" y2="405"/>
+      <line x1="740" y1="55" x2="740" y2="405"/>
     </g>
     <g class="lbl-g" text-anchor="start" style="font-size:16px">
       <text x="80" y="87">MODEL</text>
@@ -529,10 +533,14 @@ footer, header, hgroup, main, menu, nav, section {
     <rect x="62" y="107" width="976" height="48" fill="var(--p-green)" opacity="0.5"/>
     <g class="lbl-sm" text-anchor="start">
       <text x="80" y="137">qwen3.5:2b</text>   <text x="540" y="137">~3.1 GB</text>  <text x="760" y="137">Labs (default)</text>
-      <text x="80" y="187">qwen3:4b</text>     <text x="540" y="187">~2.5 GB</text>  <text x="760" y="187">Optional upgrade</text>
+      <text x="80" y="187">qwen3:4b</text>     <text x="540" y="187">~2.5 GB</text>  <text x="760" y="187">Optional, not a drop-in</text>
       <text x="80" y="237">Qwen3 4B–8B</text>    <text x="540" y="237">2–5 GB</text> <text x="760" y="237">Beyond labs</text>
       <text x="80" y="287">Llama 3.2 3B</text>   <text x="540" y="287">~2 GB</text>  <text x="760" y="287">General tasks</text>
       <text x="80" y="337">Mistral 7B</text>     <text x="540" y="337">~4 GB</text>  <text x="760" y="337">Prod baseline</text>
+    </g>
+    <rect x="62" y="357" width="976" height="46" fill="var(--p-red)" opacity="0.5"/>
+    <g class="lbl-sm" text-anchor="start">
+      <text x="80" y="387">gpt-oss 20B</text>    <text x="540" y="387">too big for 16 GB</text>  <text x="760" y="387">Demo only (Section 1)</text>
     </g>
   </svg>
   <div class="pageno">M2·14</div>
@@ -595,6 +603,156 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M2·16</div>
 </section>
 
+<!-- ============ SLIDE — REASONING: THINKING TOKENS (lesson §6) ============ -->
+<section>
+  <h2 class="t">Reasoning models: thinking tokens first</h2>
+  <p class="s">Thinking tokens count against max_tokens.</p>
+  <svg viewBox="0 0 1100 400" role="img" aria-label="The same request to qwen3.5:2b with a 4,096 token budget: with thinking on by default, 4,080 tokens go to thinking and content comes back empty; with reasoning_effort none, the answer comes back in 11 tokens">
+    <!-- request -->
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="40" y="140" width="210" height="110" rx="12"/>
+    </g>
+    <text x="145" y="180" text-anchor="middle" class="lbl-b">Request</text>
+    <text x="145" y="208" text-anchor="middle" class="lbl-sm">qwen3.5:2b</text>
+    <text x="145" y="232" text-anchor="middle" class="lbl-g">max_tokens 4,096</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M255,170 L305,112" marker-end="url(#ahg)"/>
+      <path d="M255,220 L305,282" marker-end="url(#ahg)"/>
+    </g>
+
+    <!-- lane 1: default, thinking on -->
+    <text x="320" y="70" text-anchor="start" class="lbl-g">no switch sent: thinking is ON by default</text>
+    <rect x="322" y="87" width="536" height="52" fill="var(--p-orange)"/>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="320" y="85" width="560" height="56" rx="6"/>
+      <rect x="920" y="85" width="150" height="56" rx="8"/>
+    </g>
+    <text x="590" y="121" text-anchor="middle" class="lbl">thinking: 4,080 tokens</text>
+    <rect x="922" y="87" width="146" height="52" fill="var(--p-red)"/>
+    <text x="995" y="120" text-anchor="middle" class="lbl-sm">content: ""</text>
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+      <path d="M884,113 L912,113" marker-end="url(#ah)"/>
+    </g>
+
+    <!-- lane 2: reasoning_effort none -->
+    <text x="320" y="240" text-anchor="start" class="lbl-g">"reasoning_effort": "none"</text>
+    <rect x="322" y="257" width="44" height="52" fill="var(--p-green)"/>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="320" y="255" width="560" height="56" rx="6"/>
+      <rect x="920" y="255" width="150" height="56" rx="8"/>
+    </g>
+    <text x="385" y="291" text-anchor="start" class="lbl">answer: 11 tokens, budget left over</text>
+    <rect x="922" y="257" width="146" height="52" fill="var(--p-green)"/>
+    <text x="995" y="290" text-anchor="middle" class="lbl-sm">short answer</text>
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="round">
+      <path d="M884,283 L912,283" marker-end="url(#ah)"/>
+    </g>
+
+    <text x="550" y="370" text-anchor="middle" class="lbl-g">same model, same question, same 4,096-token budget</text>
+  </svg>
+  <div class="pageno">M2·17</div>
+</section>
+
+<!-- ============ SLIDE — ANALOGY: SCRATCH PAPER (lesson §6) ============ -->
+<section>
+  <h2 class="t">Analogy — scratch paper never handed in</h2>
+  <p class="s">Fill every line with scratch work, no answer.</p>
+  <svg viewBox="0 0 1100 420" role="img" aria-label="Two exam answer sheets. Left: thinking on, scratch work fills every line and the answer box stays empty. Right: thinking off, the scratch paper stays on the desk and the answer box is filled in">
+    <!-- LEFT: thinking on -->
+    <text x="250" y="32" text-anchor="middle" class="lbl-b">Thinking on</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="90" y="50" width="320" height="300" rx="6"/>
+    </g>
+    <text x="250" y="80" text-anchor="middle" class="lbl-sm">EXAM ANSWER SHEET</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M115,108 q15,-10 30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t20,0"/>
+      <path d="M115,138 q15,-10 30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t20,0"/>
+      <path d="M115,168 q15,-10 30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t20,0"/>
+      <path d="M115,198 q15,-10 30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t20,0"/>
+      <path d="M115,228 q15,-10 30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t20,0"/>
+      <path d="M115,258 q15,-10 30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t20,0"/>
+    </g>
+    <rect x="115" y="283" width="270" height="48" fill="var(--p-red)"/>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="113" y="281" width="274" height="52" rx="4"/>
+    </g>
+    <text x="250" y="314" text-anchor="middle" class="lbl-sm">Answer: (empty)</text>
+    <text x="250" y="380" text-anchor="middle" class="lbl-g">scratch work used every line</text>
+
+    <!-- RIGHT: thinking off -->
+    <text x="790" y="32" text-anchor="middle" class="lbl-b">Thinking off</text>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" transform="rotate(-8 560 240)">
+      <rect x="480" y="150" width="160" height="180" rx="4"/>
+      <path d="M498,190 q12,-8 24,0 t24,0 t24,0 t24,0 t24,0"/>
+      <path d="M498,220 q12,-8 24,0 t24,0 t24,0 t24,0 t24,0"/>
+      <path d="M498,250 q12,-8 24,0 t24,0 t24,0 t24,0"/>
+    </g>
+    <text x="560" y="380" text-anchor="middle" class="lbl-g">scratch paper stays on the desk</text>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
+      <rect x="680" y="50" width="320" height="300" rx="6"/>
+    </g>
+    <text x="840" y="80" text-anchor="middle" class="lbl-sm">EXAM ANSWER SHEET</text>
+    <rect x="705" y="283" width="270" height="48" fill="var(--p-green)"/>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="703" y="281" width="274" height="52" rx="4"/>
+    </g>
+    <text x="840" y="314" text-anchor="middle" class="lbl">Answer: Paris</text>
+    <text x="840" y="380" text-anchor="middle" class="lbl-g">room left for the answer</text>
+
+    <text x="550" y="412" text-anchor="middle" class="lbl-g">lines on the sheet = max_tokens · scratch work = thinking tokens · answer box = content</text>
+  </svg>
+  <div class="pageno">M2·18</div>
+</section>
+
+<!-- ============ SLIDE — THE SWITCH PER API (lesson §6) ============ -->
+<section>
+  <h2 class="t">Switching thinking off, per API</h2>
+  <p class="s">Three switches work; two look right but fail.</p>
+  <svg viewBox="0 0 1100 420" role="img" aria-label="Three working switch-offs: native Ollama API think false, the OpenAI-compatible v1 endpoint reasoning_effort none, langchain-ollama reasoning False. Two that do not work on qwen3.5:2b: a /no_think prompt and a Modelfile PARAMETER think">
+    <rect x="62" y="97" width="976" height="168" fill="var(--p-green)" opacity="0.5"/>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
+      <rect x="60" y="40" width="980" height="227" rx="12"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="1.6">
+      <line x1="60" y1="95" x2="1040" y2="95"/>
+      <line x1="60" y1="152" x2="1040" y2="152"/>
+      <line x1="60" y1="209" x2="1040" y2="209"/>
+      <line x1="560" y1="40" x2="560" y2="267"/>
+    </g>
+    <g class="lbl-g" text-anchor="start" style="font-size:16px">
+      <text x="80" y="74">API LAYER</text>
+      <text x="580" y="74">SWITCH-OFF</text>
+    </g>
+    <g class="lbl" text-anchor="start">
+      <text x="80" y="131">Native: /api/generate, /api/chat</text>
+      <text x="80" y="188">OpenAI-compatible: /v1/chat/completions</text>
+      <text x="80" y="245">langchain-ollama</text>
+    </g>
+    <g class="lbl-b" text-anchor="start">
+      <text x="580" y="131">"think": false</text>
+      <text x="580" y="188">"reasoning_effort": "none"</text>
+      <text x="580" y="245">reasoning=False</text>
+    </g>
+
+    <text x="550" y="302" text-anchor="middle" class="lbl-g">does NOT work on qwen3.5:2b</text>
+    <rect x="62" y="317" width="466" height="76" fill="var(--p-red)"/>
+    <rect x="572" y="317" width="466" height="76" fill="var(--p-red)"/>
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
+      <rect x="60" y="315" width="470" height="80" rx="10"/>
+      <rect x="570" y="315" width="470" height="80" rx="10"/>
+    </g>
+    <text x="295" y="347" text-anchor="middle" class="lbl">/no_think in the prompt</text>
+    <text x="295" y="379" text-anchor="middle" class="lbl-g">still thinks, empty answer</text>
+    <text x="805" y="347" text-anchor="middle" class="lbl">Modelfile PARAMETER think</text>
+    <text x="805" y="379" text-anchor="middle" class="lbl-g">unknown parameter</text>
+    <g fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
+      <path d="M180,341 L410,341"/>
+      <path d="M672,341 L938,341"/>
+    </g>
+  </svg>
+  <div class="pageno">M2·19</div>
+</section>
+
 <!-- ============ SLIDE — CLOSING ============ -->
 <section>
   <p class="kicker">BIG IDEA</p>
@@ -629,7 +787,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="890" y="208" text-anchor="middle" class="lbl-g">never rewired</text>
   </svg>
   <p class="credit">Continue to the <b>Serving lab</b>. &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
-  <div class="pageno">M2·17</div>
+  <div class="pageno">M2·20</div>
 </section>
 </div></div>
 

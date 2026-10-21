@@ -9,7 +9,7 @@
      CourseSmith whiteboard deck skeleton (self-contained).
      Style contract: templates/deck/whiteboard-style-guide.md
      Tokens: Containers for GenAI &amp; Agentic AI 1 Container-Native GenAI
-             Why the open standard &mdash; not Docker &mdash; is the through-line for AI M1 (e.g. M1)
+             Why the open standard &mdash; not Docker &mdash; is the foundation for AI M1 (e.g. M1)
      Zero external requests: reveal.js 5.x runtime + Patrick Hand
      woff2 are inlined below. Keep it that way.
      ============================================================ -->
@@ -426,8 +426,8 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M1·12</div>
 </section><section>
   <h2 class="t">Anatomy of a declarative agent</h2>
-  <p class="s">Identity, skills, tools, guardrails</p>
-  <svg viewBox="0 0 1100 380" role="img" aria-label="A large outlined agent box with four labelled inner sections: identity files, skills, MCP tools and guardrails">
+  <p class="s">Identity, skills, tools, runtime</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A large outlined agent box with four labelled inner sections: identity files, skills, MCP tools and the runtime that executes them">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="120" y="55" width="860" height="285" rx="14"/>
     </g>
@@ -448,8 +448,8 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="340" y="265" class="lbl">MCP tool connections</text>
       <text x="340" y="297" class="lbl-g">what it can reach in the world</text>
 
-      <text x="760" y="265" class="lbl">Guardrails</text>
-      <text x="760" y="297" class="lbl-g">limits on what it may do</text>
+      <text x="760" y="265" class="lbl">Agent runtime</text>
+      <text x="760" y="297" class="lbl-g">reads the files and runs them</text>
     </g>
   </svg>
   <div class="pageno">M1·13</div>
@@ -495,7 +495,7 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M1·15</div>
 </section><section>
   <h2 class="t">The build ladder, one step per module</h2>
-  <p class="s">One module, one rung, one compose.yaml</p>
+  <p class="s">One module, one step, one compose.yaml</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="A staircase of modules rising from M1 a model responding up to the shipped platform capstone">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
       <rect x="50"  y="320" width="118" height="46" rx="7"/>
@@ -519,7 +519,7 @@ footer, header, hgroup, main, menu, nav, section {
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
       <rect x="946" y="75" width="120" height="291" rx="8"/>
     </g>
-    <text x="1006" y="205" text-anchor="middle" class="lbl-b" transform="rotate(-90 1006 205)">M8 &middot; Ship + Capstone</text>
+    <text x="1006" y="205" text-anchor="middle" class="lbl-b" transform="rotate(-90 1006 205)">M8 harden &middot; Capstone</text>
     <text x="330" y="395" text-anchor="middle" class="lbl-g">&larr; DAY 1 &middot; Serve &amp; Package</text>
     <text x="760" y="395" text-anchor="middle" class="lbl-g">DAY 2 &middot; RAG &rarr; Agentic &rarr; Ship &rarr;</text>
   </svg>
@@ -533,7 +533,7 @@ footer, header, hgroup, main, menu, nav, section {
 </section><section>
   <h2 class="t">One universal contract: the OpenAI-compatible endpoint</h2>
   <p class="s">Same socket, swap the engine behind it</p>
-  <svg viewBox="0 0 1100 360" role="img" aria-label="Ollama vLLM and llama.cpp all plug into one OpenAI compatible socket that the app plugs into unchanged">
+  <svg viewBox="0 0 1100 360" role="img" aria-label="Ollama, vLLM, LocalAI and llama.cpp all plug into one OpenAI compatible socket that the app plugs into unchanged; reasoning models such as qwen3.5:2b also send reasoning_effort none">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
       <rect x="60" y="70"  width="200" height="60" rx="8"/>
       <rect x="60" y="150" width="200" height="60" rx="8"/>
@@ -542,7 +542,7 @@ footer, header, hgroup, main, menu, nav, section {
     <g class="lbl" text-anchor="middle">
       <text x="160" y="108">Ollama</text>
       <text x="160" y="188">vLLM</text>
-      <text x="160" y="268">llama.cpp</text>
+      <text x="160" y="268">LocalAI · llama.cpp</text>
     </g>
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
       <path d="M265,100 L460,175" marker-end="url(#ahg)"/>
@@ -562,6 +562,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="917" y="180" text-anchor="middle" class="lbl-b">Your app / agent</text>
     <text x="917" y="210" text-anchor="middle" class="lbl-g">code never changes</text>
+    <text x="550" y="335" text-anchor="middle" class="lbl-g">qwen3.5:2b thinks first, so labs add "reasoning_effort": "none" (M2)</text>
   </svg>
   <div class="pageno">M1·18</div>
 </section><section>

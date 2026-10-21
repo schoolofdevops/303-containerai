@@ -22,25 +22,25 @@
      data (the actual facts — model names, the `/v1` socket, `host.docker.internal:11434`, the
      "≈4–6 GB" figure — already lived in-SVG in the original and still do). Two SVGs also picked
      up one small in-SVG label each to carry a fact that previously lived ONLY in the removed
-     takeaway line (slide 7's M3B-optional-rung note; slide 13's M3B-extends-to-2.5-days note).
+     takeaway line (slide 7's M3B-optional-step note; slide 13's M3B-extends-to-2.5-days note).
      Old pageno numbering (`01`–`15`, no module-prefix — this is the intro deck, not a numbered
      module) is kept as-is per "match precedent." -->
 
 This companion doc maps the 15-slide explainer deck (`site/static/decks/00-introduction.html`) to
 the course introduction page (`site/docs/intro.md`). The deck teaches **concepts**, not commands —
 it turns the intro page's framing (what you'll build, why container-native not Docker-native, the
-GPU constraint, the budget, the program shape) into a hand-drawn whiteboard visual a learner walks
+GPU constraint, the budget, the program layout) into a hand-drawn whiteboard visual a learner walks
 through before opening Module 1. The visual language follows the CourseSmith whiteboard style
 contract (`templates/deck/whiteboard-style-guide.md`): Patrick Hand cursive, `#1e1e1e` primary /
 `#757575` secondary strokes on white paper with the five semantic pastel fills (§1: green good ·
 red bad/full · blue data · orange caution · purple meta — this deck stays mostly neutral ink/gray,
 consistent with the original's black-and-white palette; no pastel fills were introduced since none
-were part of the founder-approved baseline), the `#rough` wobble filter on shapes only, and the
+were part of the founder-approved baseline), the `#rough` wobble filter on drawn outlines only, and the
 shared `#ah`/`#ahg` arrowhead markers. The arc moves — **what you'll build (one growing system, two
 connected use cases) → the one design pivot (container-native, not Docker-native) → what you'll be
 able to do → the intelligence progression and the module-by-module build ladder → the constraints
-that shape every lab (Apple-Silicon GPU wiring, the OpenAI-compatible socket, the 16 GB budget) →
-the open-source tool map → how the labs are authored → the two-day program shape and prerequisites
+behind every lab (Apple-Silicon GPU wiring, the OpenAI-compatible socket, the 16 GB budget) →
+the open-source tool map → how the labs are authored → the two-day program layout and prerequisites
 → a closing call to start.**
 
 Page numbers stay the old deck's own bare `NN` prefix (`01`–`15`) — this is the course-level intro
@@ -52,19 +52,19 @@ deck, not a numbered module deck (those use `M<N>·NN`), so there is no `module.
 |---|-------|---------|--------|----------|
 | 1 | Containers for GenAI & Agentic AI (title) | Course framing: what the course is, who it's for, how long | Title scene: a shipping container labeled AI rolling on wheels, "runs identically on any OCI runtime" | credit line: Gourav Shah · 2 Full Days · Intermediate → Advanced · Hands-on |
 | 2 | One real system — built one step per module | You don't learn tools in isolation; you ship one growing system, one block at a time | Staircase of 7 rising modules (model → serve → package → RAG → agent → crew → Platform) | From a bare model call to a shipped multi-agent platform — nothing thrown away along the way |
-| 3 | Container-native, not Docker-native | Docker Desktop is now paid for larger orgs — the course builds on the open OCI/Compose standard instead | Two-panel comparison: dashed gray "Docker-proprietary (2025)" box vs solid ink "Open-source & universal" box, arrow "swap for" | OCI + the Compose Spec run identically on every runtime. Docker becomes one option, never a requirement |
+| 3 | Container-native, not Docker-native | Docker Desktop is now paid for larger orgs — the course builds on the open OCI/Compose standard instead | Two-panel comparison: dashed gray "Docker-specific (2025)" box vs solid ink "Open-source & universal" box, arrow "swap for" | OCI + the Compose Spec run identically on every runtime. Docker becomes one option, never a requirement |
 | 4 | What you'll be able to do | The five concrete outcomes by the end of two days | Numbered rows (circles 1–5), one outcome per row | Everything containerized, portable, and reproducible — using only open-source tooling |
 | 5 | Two connected use cases | The course builds two systems that connect at the tool boundary, not in isolation | Two-panel: Day 1 "Docs Assistant" box → arrow "used as a tool" → Day 2 "Support Agent → Incident Crew" box | Use Case B *uses* Use Case A as one of its tools — so skills compound instead of forming one giant tangle |
 | 6 | The intelligence progression | AI patterns are introduced the way teams actually adopt them, each earning its keep | Pipeline, 4 stages: Naive RAG → Agentic RAG → Tool-using agent → Multi-agent crew, "simple → complex" caption | You learn not just *how* each pattern works, but *when* it's the right one to reach for |
-| 7 | The build ladder — one step per module | Every module (M1–M8 + capstone) maps to one rung, Day 1 serve/package, Day 2 RAG/agentic/ship | Two-column ladder of 8 module rows + a capstone bar spanning both, "← DAY 1" / "DAY 2 →" captions | M3B (LoRA/QLoRA fine-tuning) is an optional bonus rung for cohorts that want model customization |
-| 8 | The one constraint that shapes every lab | Apple Silicon can't expose its Metal GPU to a container, so the course wires around it instead of fighting it | Big-box anatomy: host boundary containing a native "Model Server" box + a dashed container boundary with 4 inner service boxes, arrow "host.docker.internal:11434" | On Mac: serve the model natively, containerize everything else. On Windows + NVIDIA the server *can* live in a container |
+| 7 | The build ladder — one step per module | Every module (M1–M8 + capstone) maps to one step, Day 1 serve/package, Day 2 RAG/agentic/ship | Two-column ladder of 8 module rows + a capstone bar spanning both, "← DAY 1" / "DAY 2 →" captions | M3B (LoRA/QLoRA fine-tuning) is an optional bonus step for cohorts that want model customization |
+| 8 | The one constraint behind every lab | Apple Silicon can't expose its Metal GPU to a container, so the course wires around it instead of fighting it | Big-box anatomy: host boundary containing a native "Model Server" box + a dashed container boundary with 4 inner service boxes, arrow "host.docker.internal:11434" | On Mac: serve the model natively, containerize everything else. On Windows + NVIDIA the server *can* live in a container |
 | 9 | One contract: the OpenAI-compatible endpoint | The wall-socket analogy — swap the serving engine behind the endpoint and the app code never notices | Fan-out: 3 engines (Ollama, vLLM, llama.cpp) converge into one socket labeled "/v1 (OpenAI API)", arrow to "Your app / agent" | Every serving lab ships behind the same endpoint — so application and agent code stay untouched when the backend swaps |
 | 10 | It all runs on a 16 GB laptop | The memory budget is a non-negotiable design rule, engineered lean on purpose | Budget bar (≈4–6 GB peak marked on a full-width bar) + 3-panel row of the tactics that keep it small | Target per lab: ≈4–6 GB RAM and 2–3 containers. Heavy GPU work stays opt-in with CPU/cloud fallbacks |
 | 11 | The open-source tool map — one tool per job | A tidy stack: for each job, the exact open-source tool used in the labs | Two-column table (8 rows: runtime, serving, packaging, vector store / MCP tools, agents, orchestration, supply chain) | Open standards throughout — swap any tool for its peer and the pattern still holds |
 | 12 | Write the stack — don't paste it | The compose.yaml grows service by service, hand-authored across modules, never pasted whole | Anatomy: a `compose.yaml` box with 5 service blocks stacked inside, gray arrows labeled "one block per module" feeding in | By the end, one file tells the whole story — and you understand every line because you wrote it |
-| 13 | Program at a glance | The two-day shape: Day 1 serve & package, Day 2 RAG → agentic → ship | Two-panel: DAY 1 box (M1–M4) / DAY 2 box (M5–M8 + Capstone) | Optional M3B (LoRA/QLoRA) can extend the program toward 2.5 days for customization-focused cohorts |
-| 14 | What to bring | Prerequisites split into knowledge needed vs. system needed, all free/open source | Two-panel: "Knowledge" box (5 rows) / "System" box (5 rows) | Windows + NVIDIA unlocks the full local vLLM-GPU lab; without it, the CPU track covers the learning |
-| 15 | Build it once. Run it anywhere. (closing) | Closing call to action and hand-off to Setup → Module 1 | Closing scene: a container labeled AI rolling forward on wheels toward a "Shipped" box, captioned with the four open runtimes | Container-native, not Docker-native — the open standard is the through-line. Start with Setup → Prerequisites, then Module 1 |
+| 13 | Program at a glance | The two-day layout: Day 1 serve & package, Day 2 RAG → agentic → ship | Two-panel: DAY 1 box (M1–M4) / DAY 2 box (M5–M8 + Capstone) | Optional M3B (LoRA/QLoRA) can extend the program toward 2.5 days for customization-focused cohorts |
+| 14 | What to bring | Prerequisites split into knowledge needed vs. system needed, all free/open source | Two-panel: "Knowledge" box (5 rows) / "System" box (5 rows) | Windows + NVIDIA enables the full local vLLM-GPU lab; without it, the CPU track covers the learning |
+| 15 | Build it once. Run it anywhere. (closing) | Closing call to action and hand-off to Setup → Module 1 | Closing scene: a container labeled AI rolling forward on wheels toward a "Shipped" box, captioned with the four open runtimes | Container-native, not Docker-native — built on open standards. Start with Setup → Prerequisites, then Module 1 |
 
 <!-- Visual pattern vocabulary (reuse before inventing):
      fan-out · two-panel comparison · big-box anatomy · numbered rows ·
@@ -108,7 +108,7 @@ Every `site/docs/intro.md` section maps to a slide. No slide teaches more than o
 | "What You'll Build" — the intelligence progression (Naive RAG → Agentic RAG → tool agent → crew) | 6 | Pipeline idiom, "simple & predictable → capable & complex" caption |
 | The one design principle: container-native, not Docker-native | 3 | Two-panel crossed-out-old (dashed) → boxed-new (solid) idiom |
 | What you'll be able to do (5 learning objectives) | 4 | Numbered-rows idiom (circles 1–5), matches the lesson's implicit objective list |
-| "The Build Ladder" table (M1–M8, M3B optional, Capstone) | 7 | Ladder idiom across two columns + a capstone bar; M3B called out as the optional bonus rung |
+| "The Build Ladder" table (M1–M8, M3B optional, Capstone) | 7 | Ladder idiom across two columns + a capstone bar; M3B called out as the optional bonus step |
 | The Apple-Silicon / GPU wiring constraint (native model server vs. containerized app) | 8 | Big-box anatomy: host boundary, native Model Server box, dashed container boundary with 4 service boxes |
 | The OpenAI-compatible endpoint (engine-swap wall-socket analogy) | 9 | Fan-out idiom: 3 engines converge on one socket, app plugs in unchanged |
 | "The 16 GB Budget" (peak footprint, the tactics that keep it small) | 10 | Budget-bar + 3-panel tactics idiom |
@@ -154,6 +154,15 @@ files (not base64-inlined), verified by content against their prompts before ins
 balanced, file size 216 KB (well under the 800 KB cap), `#rough` filter fixed, both slides rendered
 headless and confirmed correct.
 
-**Not in scope, flagged for a separate pass:** slide 15's subtitle still uses "through-line", a word
-banned by the current `gourav-voice` skill vocabulary list — this is existing deck prose, not
-narration or illustration work, so it was left untouched here.
+**Closed 2026-10-21 (deck audit pass):** slide 15's subtitle no longer uses the banned word; it now
+reads "Container-native, not Docker-native — built on open standards.
+
+## Update 2026-10-21 — deck audit fixes (g1)
+
+- Slide 3: the left column is now "Docker-specific (2025)", not "Docker-proprietary". Docker Model
+  Runner is open source but runs only on Docker Desktop and Docker CE (M2 §1).
+- Slide 7: subtitle "Each module adds one step to the same growing system."; M3B note "a bonus step".
+- Slide 8: title "The one constraint behind every lab".
+- Slide 10: first card reads "1B–4B, quantized"; the default `qwen3.5:2b` is an MLX mxfp8 build of
+  3.1 GB, not Q4. `site/docs/intro.md` was fixed to match.
+- Narration: Video 3 now carries beats for slides 8, 9, 11 and 12; Video 1 covers slides 2 and 4.

@@ -30,12 +30,15 @@ Well, it never meant only that. Underneath Docker sits an open standard, the OCI
 
 You will also get the one practical lesson that decides whether every single lab in this course runs fast or painfully slow on a Mac, and you will connect your first container to a natively running model and get a real response back, with your own hands.
 
+So this module gives you five ideas that carry the rest of the course. First, container-native beats Docker-native, thanks to OCI and the Compose Spec. Second, what containers buy an AI stack: package, serve, isolate, and ship. Third, the Apple Silicon GPU limit, and the fix, which is to run the model natively. Fourth, the OpenAI-compatible endpoint, one contract with a swappable engine behind it. And fifth, the 2026 map of declarative agents and orchestration, plus the Acme build ladder you will climb.
+
 ### Suggested visuals / slide beats
 
 1. Title card, Module 1: Container-Native GenAI
-2. Docker Desktop pricing headline, crossed out over a "container = Docker" equation
-3. OCI + Compose Spec logo row: Colima, OrbStack, Rancher Desktop, Podman, all running the same compose.yaml
-4. Closing frame: "Next — the standard that makes this possible"
+2. Five ideas as numbered rows (slide 2)
+3. Docker Desktop pricing headline, crossed out over a "container = Docker" equation
+4. OCI + Compose Spec logo row: Colima, OrbStack, Rancher Desktop, Podman, all running the same compose.yaml
+5. Closing frame: "Next — the standard that makes this possible"
 
 ---
 
@@ -47,7 +50,7 @@ You will also get the one practical lesson that decides whether every single lab
 
 ### Narration script
 
-Let's say you packed something valuable into a steel shipping container. Would it matter which truck picks it up, or which ship carries it across the ocean, or which crane lifts it onto the dock? Not really. The box has a standard shape and standard locking points, and as long as the carrier respects that standard, your cargo travels safely, no matter who is driving.
+Let's say you packed something valuable into a steel shipping container. Would it matter which truck picks it up, or which ship carries it across the ocean, or which crane lifts it onto the dock? Not really. The box has a standard size and standard locking points, and as long as the carrier respects that standard, your cargo travels safely, no matter who is driving.
 
 An OCI image works exactly the same way. Your application code, your model server, your embedding pipeline, all of that is the cargo. The OCI image format is the box. And Docker, Colima, OrbStack, and Rancher Desktop are just different carriers moving that same box. The shipper, that is you, does not really care which carrier shows up, as long as the box opens the same way every time.
 
@@ -92,9 +95,9 @@ Here is why this matters for you specifically in this course. Every single modul
 
 ### Suggested visuals / slide beats
 
-1. Sealed-crate diagram: four crates (model server, embedding pipeline, vector DB, agent), each opened identically on any machine
-2. Four-row table: Package, Serve, Isolate, Ship, one plain-language line each
-3. Growing compose.yaml illustration: a stack of blocks growing module by module toward "Capstone"
+1. Divider: four sealed crates stacked in a warehouse, a forklift beside them (slide 6)
+2. Four boxes: Package, Serve, Isolate, Ship, one plain-language line each (slide 7)
+3. The growing `compose.yaml` is spoken only here; the staircase appears later on slide 16
 
 ---
 
@@ -120,10 +123,10 @@ Now, one useful side note. If you are on Windows with WSL2 and an NVIDIA GPU, th
 
 ### Suggested visuals / slide beats
 
-1. Office-building analogy: wired-looking guest rooms with no real power connection to the building's electrical system
-2. Diagram: macOS host with Ollama running natively (Metal-accelerated, port 11434) beside a container runtime box holding the app, agent, and vector DB containers, all pointing to host.docker.internal
-3. Side-by-side comparison: "in a container = CPU fallback, 3-6x slower" vs "native = Metal-accelerated"
-4. Small callout: Windows + WSL2 + NVIDIA is the one exception
+1. Divider: a hotel corridor with unplugged appliances in open guest rooms (slide 8)
+2. Guest rooms with no power outlets: the Metal GPU is not wired into the containers, so they fall back to CPU (slide 9)
+3. Diagram: macOS host with Ollama running natively (Metal-accelerated, port 11434) beside a container runtime box holding the app, agent, and vector DB containers, all pointing to host.docker.internal (slide 10)
+4. The 3-6x slowdown and the Windows + WSL2 + NVIDIA exception are spoken only; no slide carries them
 
 ---
 
@@ -153,10 +156,10 @@ Every module you complete adds exactly one step to this one growing system, star
 
 ### Suggested visuals / slide beats
 
-1. Two-panel comparison: Declarative Agent (AGENTS.md, SOUL.md, SKILL.md, MCP) vs Orchestration Framework (LangGraph, state machine, branching, retries)
-2. Rule callout: "Start declarative. Add orchestration only for hard sequencing."
-3. Acme Engineering scenario card: runbooks and post-mortems piling up, nobody reads them
-4. Build-ladder staircase: M1 through Capstone, one step per module, Docs Assistant and Incident Crew both visible on the staircase
+1. Two-panel comparison: Declarative Agent (AGENTS.md, SOUL.md, SKILL.md, MCP) vs Orchestration Framework (LangGraph, state machine, branching, retries), subtitle "Start declarative, add orchestration when needed" (slide 12)
+2. Anatomy of a declarative agent: AGENTS.md / SOUL.md, SKILL.md, MCP tool connections, and the agent runtime that reads the files and runs them (slide 13)
+3. Acme: runbooks feed the Day 1 Docs Assistant, which the Day 2 Incident Crew uses as a tool (slide 15)
+4. Build-ladder staircase: M1 model to M7 crew, then a tall "M8 harden · Capstone" bar (slide 16)
 
 ---
 
@@ -168,19 +171,20 @@ Every module you complete adds exactly one step to this one growing system, star
 
 ### Narration script
 
-Let's say you travel to a different country, and you carry an appliance with you. Different countries wire their actual power plants very differently behind the wall, but if the socket shape at the wall is a standard one, your appliance still works, no matter which country generated that electricity.
+Let's say you travel to a different country, and you carry an appliance with you. Different countries wire their actual power plants very differently behind the wall, but if the socket at the wall is a standard one, your appliance still works, no matter which country generated that electricity.
 
 The OpenAI API works exactly the same way for your application code. Ollama, vLLM, LocalAI, and llama.cpp are all wired very differently behind the wall, but every one of them exposes the exact same standard socket, the `/v1/chat/completions` interface. So your application code never has to change when you swap out the engine sitting behind it.
 
-Here is what that call actually looks like. You send a POST request to `/v1/chat/completions`, with a model name and a list of messages, and you get a response back. And here is the part that would genuinely surprise you the first time you see it work. That exact same call works, without a single change, against `localhost:11434`, which is Ollama running on your dev laptop, or against a vLLM service running on a production GPU VM, or even against `api.openai.com` itself, if you ever needed to fall back to OpenAI's own hosted models.
+Here is what that call actually looks like. You send a POST request to `/v1/chat/completions`, with a model name and a list of messages, and you get a response back. Our labs also add one field, `reasoning_effort` set to none. That is because `qwen3.5:2b` is a reasoning model, and it thinks before it answers by default. Module 2 explains why that matters. And here is the part that would genuinely surprise you the first time you see it work. That exact same call works, without a single change, against `localhost:11434`, which is Ollama running on your dev laptop, or against a vLLM service running on a production GPU VM, or even against `api.openai.com` itself, if you ever needed to fall back to OpenAI's own hosted models.
 
-This shared contract is what lets you swap from a small one-point-five billion parameter development model, up to a full production-grade engine, without touching a single line of your application code. And every lab you run in this course, from Module 1 all the way to the Capstone, speaks this exact same request format.
+This shared contract is what lets you swap from a small two billion parameter development model, up to a full production-grade engine, without touching a single line of your application code. And every lab you run in this course, from Module 1 all the way to the Capstone, speaks this exact same request format.
 
 ### Suggested visuals / slide beats
 
-1. Wall-socket analogy: one standard socket shape, different power stations behind the wall (Ollama, vLLM, LocalAI, llama.cpp)
-2. POST /v1/chat/completions request block, with model and messages fields highlighted
-3. Three-endpoint diagram: localhost:11434, vllm-service:8000, api.openai.com, all accepting the identical call
+1. Divider: one wall socket with many plugs and cords converging into it (slide 17)
+2. Ollama, vLLM, and LocalAI · llama.cpp plug into one `/v1/chat/completions` socket; the app plugs in once and its code never changes (slide 18)
+3. Footnote on slide 18: `qwen3.5:2b` thinks first, so the labs add `"reasoning_effort": "none"`
+4. The request body and the three base URLs are spoken only; no slide shows them
 
 ---
 
@@ -200,8 +204,7 @@ I'll see you in the lab.
 
 ### Suggested visuals / slide beats
 
-1. Six-row summary table, one line per concept, matching the lesson's summary table
-2. Closing frame: "Next — the lab. Prove the wiring yourself."
+1. Lab bridge: a throwaway container calls `host.docker.internal:11434`, the native Ollama on the Metal GPU sends a real response back (slide 19). The deck has no summary table slide; the recap is spoken.
 
 ---
 
@@ -210,6 +213,7 @@ I'll see you in the lab.
 | Source idea | Video | Treatment |
 |---|---|---|
 | Module goal / why container-native, why now | 1 | Explained |
+| Five ideas that carry the course (deck slide 2) | 1 | Explained |
 | Shipping-container analogy, OCI image format | 2 | Explained |
 | Docker Desktop pricing change, broken assumption | 2 | Explained |
 | Compose Spec, same compose.yaml across 4 runtimes | 2 | Explained |
@@ -225,6 +229,7 @@ I'll see you in the lab.
 | Acme Engineering use case (Docs Assistant, Incident Crew) | 5 | Explained |
 | Module-by-module build ladder table | 5 | Explained (staircase visual, not the full table read aloud) |
 | Wall-socket analogy, /v1/chat/completions | 6 | Explained |
+| Reasoning model note: labs send `reasoning_effort` none (points to M2 §6) | 6 | Explained (brief) |
 | Same call works across Ollama/vLLM/OpenAI | 6 | Explained |
 | Summary table | 7 | Explained |
 | Lab bridge (throwaway container calling native Ollama) | 7 | Explained |
