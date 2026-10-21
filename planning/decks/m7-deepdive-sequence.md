@@ -52,13 +52,9 @@
          past 80): "The reason → call → observe → decide shape this crew deliberately isn't" ->
          "The reason-call-observe-decide loop this crew deliberately isn't" (64 chars, same
          4-step sequence named, no entities).
-     HONESTY GUARD held: slide 16's title ("...launders a fabricated command through two agents")
-     and slide 17's title ("The gate pins the marker — remove it and the marker stops being
-     pinned") are unchanged; slide 17's SVG numbered-row labels ("but OUTCOME itself flips run to
-     run — not stable", "wrong runbook every run") are unchanged (byte-identical SVG, confirmed
-     by diff). The gate-bypass structural failure is still stated as repeatable; the OUTCOME
-     marker is still stated as NOT stable without the gate; no reproducibility claim was
-     introduced or implied by the re-trim. Self-gates a-e all passed (see repo for the exact
+     [2026 freshness pass: slides 17 and 18 now say the wrong runbook was approved 6 of 6 runs; the
+     gate, not temperature, decides. Earlier honesty-guard notes on this point are superseded.]
+     Self-gates a-e all passed (see repo for the exact
      command output at regen time); no slide was split — section count stayed 18, matching this
      spec's 18 rows and the pre-regen deck's 18 sections exactly. -->
 
@@ -79,7 +75,7 @@ retrieval (relay-baton analogy) → where the two real code-level gates sit in t
 a Python string check beats a follow-up prompt → how to observe exactly what an agent received
 with no debug flag, just prints and profile files → the real sequential experiment: Variant A's
 temperature-driven prose instability across 3 repeats, Variant B's guardrail bypass producing a
-fabricated, wrongly-approved command → the honest small-model-variance caveat that governs how to
+wrongly-approved wrong-runbook command → the honest small-model-variance caveat that governs how to
 read all of it.**
 
 Page numbers are `M7-DD·NN` to distinguish this deck from the lesson concept deck's `M7·NN`
@@ -105,8 +101,8 @@ Page numbers are `M7-DD·NN` to distinguish this deck from the lesson concept de
 | 14 | No debug flag — read the profile file and the f-string instead | The observation method: `crew.py` has no `DEBUG`/`--verbose`; the four `[STAGE]` prints show outputs, not the full prompt — reconstruct any agent's exact prompt from its profile file plus `run()`'s f-string | Numbered rows: 1) `docker compose run` prints `[TRIAGE]`/`[INVESTIGATOR]`/`[FIXER]`/`[REVIEWER]`/`OUTCOME:` (outputs only) → 2) `cat crew/profiles/investigator.md` (the system prompt) → 3) profile + f-string = the complete prompt, no hidden step | Between the profile file and `run()`'s f-strings you can reconstruct the exact prompt any agent saw for any run, without a debug flag the code doesn't have |
 | 15 | Same incident, three knob variants, always run one at a time | The experiment's ground rules: sequential only (never parallel — this machine's 2 GB budget and, more importantly, small-model run-to-run noise would make it impossible to tell a knob change from ordinary variance) | Numbered rows: 1) baseline (unmodified) → 2) Variant A (Triage temp 0→0.9, ×3 repeats) → 3) Variant B (relevance gate bypassed) — each row captioned "sequential, never parallel" | Overlapping variants would make it impossible to tell whether a difference in output came from the knob you changed or from ordinary small-model noise |
 | 16 | The outcome held at 0.9 — the prose didn't | Variant A's real 3-repeat result: all three runs land on `OUTCOME: APPROVED`, but Triage's prose drifts from terse (run 1) to a run-on sentence (run 2) to an unrequested multi-section writeup (run 3) | Three-column comparison: run 1 (blue, "terse — on profile") · run 2 (orange, "run-on sentence") · run 3 (red, "unrequested ### sections") — all three share one green banner underneath reading "OUTCOME: APPROVED, all 3" | Raising just the Triage temperature made Triage noisier without making the crew's final decision any less reliable — temperature is a per-role knob, not a per-crew one |
-| 17 | Bypass one gate and the crew launders a fabricated command through two agents | Variant B's real result: with the relevance gate patched to always pass, the Kafka incident retrieves the wrong (payments) runbook, the Fixer invents a command that appears nowhere in `acme-runbooks.md`, and the Reviewer approves it as "backed by a runbook" | **Scene** — a rubber stamp coming down marked "APPROVED" over a torn, mismatched runbook page held together with the wrong staple, red ink bleeding from the stamp; illustration-author scene | Not a destructive command — a fabricated one, laundered through two agents and rubber-stamped APPROVED; this is exactly the unsafe output the gate exists to stop |
-| 18 | The gate pins the marker — remove it and the marker stops being pinned | The comparison table's honest-reading rule, applied across baseline/A/B: `OUTCOME:` and which stages ran are exact reproducible facts *while the gate is intact*; wording is small-model noise; Variant B removes the gate and the marker itself stops being pinned | Numbered rows: baseline (blue, APPROVED, 5 calls) → Variant A (orange, APPROVED ×3, prose drifted) → Variant B (red, gate removed, wrong runbook every run, "but OUTCOME itself flips run to run — not stable") | Variant B is structural AND unstable: wrong runbook every run, but no gate left to pin the verdict — that unpredictability is the finding; the gate, not temperature, was the determinism |
+| 17 | Bypass one gate and the crew approves the wrong runbook's command | Variant B's real result: with the relevance gate patched to always pass, the Kafka incident retrieves the wrong (payments) runbook, the Fixer quotes that runbook's payments restart, and the Reviewer, who sees the runbook, approves it because the command matches it (6 of 6 runs) | **Scene** — a rubber stamp coming down marked "APPROVED" over a torn, mismatched runbook page held together with the wrong staple, red ink bleeding from the stamp; illustration-author scene | The command is faithful to the wrong runbook, so the Reviewer cannot catch it; a reviewer is only as right as the evidence it is handed. This is exactly the unsafe output the gate exists to stop |
+| 18 | The gate decides — remove it and APPROVED certifies a mismatch | The comparison table's honest-reading rule, applied across baseline/A/B: `OUTCOME:` and which stages ran are exact reproducible facts *while the gate is intact*; wording is small-model noise; Variant B removes the gate and the marker stays stable but on the wrong answer (APPROVED, 6 of 6 runs) | Numbered rows: baseline (blue, APPROVED, 5 calls) → Variant A (orange, APPROVED ×3, prose drifted) → Variant B (red, gate removed, wrong runbook every run, "but Reviewer APPROVED it 6 of 6 runs — confidently wrong") | Variant B is structural AND stable, but on the wrong answer: wrong runbook every run, and the Reviewer approves it every run — consistently, confidently wrong; the gate, not temperature, decides |
 | 19 | Pin the gates, bound the loop, check what really crosses each hop (closing) | Takeaways + hand-off: temperature is per-role not per-crew; a bounded pipeline trades self-correction for a predictable SLO; check what a diagram implies is passed vs what the code actually passes; a code-level gate beats a follow-up prompt | numbered rows (circles 1–5, including the honest small-model-variance caveat as row 1) — the course's takeaway idiom | The marker (`OUTCOME:`, which branch ran) is the thing downstream code and humans actually act on — check it before worrying about exact wording |
 
 <!-- Visual pattern vocabulary used: title theme-boxes · scene (2, 5, 8, 16) · numbered rows
@@ -168,10 +164,10 @@ move. Slides 14–17 are the experiment and are the deck's other must-not-compre
 the sequential-only rule (skip only if the audience already ran the lab's own sequential steps),
 15 and 16 are the two variants' real captured results and need their own beat each — 15 for the
 "outcome stable, prose drifts" reading, 16 for "wrong runbook retrieved every run — structural, not
-noise" (in this captured run, laundered through to an APPROVED verdict), and 17 for the fuller
+noise" (approved by the Reviewer in 6 of 6 runs), and 17 for the fuller
 picture: that structural wrong-runbook retrieval is repeatable, but the OUTCOME marker itself is
-NOT — it flips run to run once the gate is gone, because the gate (not temperature) was what pinned
-it. Conflating "structural" with "the marker is stable" is the exact honesty mistake the module's
+stable but wrong — the Reviewer approves the wrong runbook's command 6 of 6 runs once the gate is gone,
+because the gate (not temperature) was what stopped it. Conflating "the marker is stable" with "the marker is right" is the exact honesty mistake the module's
 `:::note` warns against — and 17 closes the loop with the comparison table's judging rule. Under time
 pressure, compress 3–4 and 11–12 into single passes each — never compress 2, 9, 15, or 16; those
 carry the deep dive's analogies and its real measured evidence.
@@ -208,8 +204,8 @@ Every deep-dive.md section maps to at least one slide.
 | §5 — observing agent prompts with no debug flag: stage-marker prints plus reading the profile file directly | 13 | Numbered rows: prints show outputs → profile file shows the system prompt → profile + f-string = complete prompt |
 | §6 — experiment ground rules: sequential only, never parallel, because of both machine budget and small-model noise | 14 | Numbered rows: baseline → Variant A → Variant B, each captioned "sequential, never parallel" |
 | §6 — Variant A: Triage temp 0→0.9, 3 repeats, `OUTCOME: APPROVED` stable, prose drifts terse→run-on→unrequested sections | 15 | Three-column comparison with the page's real 3-run prose descriptions, shared green OUTCOME banner |
-| §6 — Variant B: relevance gate bypassed, wrong runbook retrieved, Fixer fabricates a command, Reviewer approves it | 16 | Scene: rubber stamp APPROVED over a mismatched runbook page, illustration-author scene |
-| §6 — comparison table's judging rule: marker is exact and reproducible only while the gate is intact; prose is shape-only; Variant B's wrong-runbook retrieval is structural but its OUTCOME marker is unstable once the gate is gone | 17 | Numbered rows: baseline/A/B summarized, B flagged "gate removed, wrong runbook every run — but OUTCOME itself flips run to run" |
+| §6 — Variant B: relevance gate bypassed, wrong runbook retrieved, Fixer quotes the wrong runbook's command, Reviewer approves it (6 of 6 runs) | 16 | Scene: rubber stamp APPROVED over a mismatched runbook page, illustration-author scene |
+| §6 — comparison table's judging rule: marker is exact and reproducible only while the gate is intact; prose is shape-only; Variant B's wrong-runbook retrieval is structural but its OUTCOME marker stays stable but certifies the wrong runbook once the gate is gone | 17 | Numbered rows: baseline/A/B summarized, B flagged "gate removed, wrong runbook every run — but Reviewer APPROVED it 6 of 6 runs" |
 | §6 — small-model-variance honest framing (the `:::note` guidance) | 15, 17 | Embedded directly in how 15 and 17 are captioned, not a separate disclaimer slide |
 | "Where you will use this" — 4 real-work triggers | 18 | Closing numbered rows, one per trigger, honest-variance caveat folded in as row 1 |
 

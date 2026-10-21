@@ -117,7 +117,7 @@ The second phase is query, and this one runs every single time a user asks a que
 
 Now here's something worth pointing out about where all of this actually runs. The chunking, the vector storage, the retrieval, and the prompt-building — all of that happens inside Docker containers. But the embedding model and the LLM itself both run natively on the host, on Ollama, so they get Metal acceleration on Apple Silicon. And the containers reach that native Ollama server through `host.docker.internal`. This is the same pattern you set up back in Module 2 — model servers stay native, everything else runs containerized and talks to the host across that bridge.
 
-So why ChromaDB, specifically, for this course? A few reasons. It's zero-config — one Docker service, no cluster to stand up, no configuration files to write. It's Python-native, so `langchain-chroma` wires in with under ten lines of code. It's persistent, meaning a Docker volume keeps your vectors across restarts. And it's memory-efficient — the whole stack runs comfortably within 2 gigabytes, with roughly 768 megabytes for ChromaDB and about a gigabyte for the app. One detail worth remembering: we pin ChromaDB to version 0.5.20 specifically, because `langchain-chroma` ships a client built against the 0.5 HTTP API, and if you ran 0.6 instead, the version handshake between client and server would just fail. Pinning removes that ambiguity entirely.
+So why ChromaDB, specifically, for this course? A few reasons. It's zero-config — one Docker service, no cluster to stand up, no configuration files to write. It's Python-native, so `langchain-chroma` wires in with under ten lines of code. It's persistent, meaning a Docker volume keeps your vectors across restarts. And it's memory-efficient — the whole stack runs comfortably within 2 gigabytes, with roughly 768 megabytes for ChromaDB and about a gigabyte for the app. One detail worth remembering: we pin the ChromaDB server image and the Python client to the same version, 1.5.9. The old version one routes are gone in the 1.x line, so a mismatched pair gets an HTTP 405 or 410 back. Pinning both to 1.5.9 removes that ambiguity entirely.
 
 Now, ChromaDB won't be the right choice forever. Once you outgrow a laptop-sized setup, you'd reach for something like Qdrant if you need multi-tenant search across millions of vectors, or pgvector if you're already running PostgreSQL and don't want a new service at all. The good news is that the API you're learning here — things like `add_documents` and `similarity_search` — stays almost identical across all of these. You'd swap out the `Chroma` constructor, and the rest of your code barely changes.
 
@@ -204,7 +204,7 @@ Let's go build it.
 | Query phase (embed, retrieve, augment, generate) | 4 | Explained |
 | Container boundary / native Ollama + host.docker.internal | 4 | Explained |
 | Why ChromaDB (zero-config, Python-native, persistent, memory-efficient) | 4 | Explained |
-| ChromaDB 0.5.20 pin rationale | 4 | Explained |
+| ChromaDB 1.5.9 pin rationale | 4 | Explained |
 | Scale-up alternatives (Qdrant, pgvector, managed cloud) | 4 | Deferred (mentioned briefly, not detailed — matches lesson's own brevity here) |
 | Learning Mode (4 live steps) | 4 | Explained |
 | Five naive-RAG failure modes | 5 | Explained |
@@ -214,5 +214,5 @@ Let's go build it.
 
 ## Verification flags
 
-- ChromaDB version pin (0.5.20) and the langchain-chroma HTTP API handshake claim are software-version-dependent — re-verify if the lab's compose.yaml pins a different version at recording time.
-- Memory figures (768 MB ChromaDB, ~1 GB app, 2 GB total) depend on the actual container resource limits set in the lab's compose.yaml — re-verify against the current file before recording exact numbers.
+- ChromaDB version pin (1.5.9, server and client together) and the v1-routes-gone claim are software-version-dependent — re-verify if the lab's compose.yaml pins a different version at recording time.
+- Memory figures (ChromaDB, app, and total budget) depend on the actual container resource limits set in the lab's compose.yaml — re-verify against the current file before recording exact numbers.

@@ -9,7 +9,7 @@
 | 3 | Why the Incident Crew Never Loops | Slides + voiceover | 5 min | A fixed, five-call pipeline trades self-correction for predictable cost and latency |
 | 4 | What Actually Crosses Each Hop | Slides + voiceover | 6 min | Delegation between agents is a plain string, not a shared memory, and Triage's own output never reaches the Investigator |
 | 5 | Code-Level Gates: Why a Python Check Beats a Second Prompt | Slides + voiceover | 5 min | Both gates are deterministic string checks, placed after the tool call and at final-answer time |
-| 6 | The Experiment: What Breaks When You Remove the Gate | Slides + voiceover | 6 min | Raising temperature barely moves the outcome; removing the gate makes it flip randomly |
+| 6 | The Experiment: What Breaks When You Remove the Gate | Slides + voiceover | 6 min | Raising temperature barely moves the outcome; removing the gate makes the crew approve the wrong fix every time |
 | 7 | Summary and Lab Bridge | Slides + voiceover | 2 min | What you now know about tuning a small-model crew, and what's next |
 
 ## Video 1: Deep Dive: What's Actually Inside crew.py
@@ -171,11 +171,13 @@ For Variant A, we raise only Triage's temperature, from zero up to 0.9, and run 
 
 Now for Variant B, and this is the one that matters most. We leave every temperature exactly where it was, and instead patch out the relevance gate itself, so it always returns true no matter what the model actually said — simulating a very real production failure mode, where a feature flag gets left in a bypass state, or a refactor accidentally sets a flag to always-true. We run this against the Kafka incident, the one the baseline crew correctly escalates, because no runbook in this course actually covers Kafka.
 
-With the gate bypassed, the Investigator still retrieves whatever ChromaDB's nearest-neighbour search happens to return for a Kafka query, which turns out to be the payments runbook — completely the wrong section — and prints it with total confidence, no hint that anything's off. The Fixer then works from that wrong runbook. Sometimes it quotes the payments command reasonably faithfully. And sometimes, like in the run captured for this deep dive, it invents a command that sounds completely plausible — a Kubernetes rollout restart for a Kafka deployment — that appears nowhere in the actual runbook file. The Reviewer then judges whatever the Fixer handed it, and because the Reviewer only checks whether the proposed command text looks non-destructive, not whether the runbook passage it's supposedly backed by actually supports it, its APPROVED or REJECTED verdict now tracks the Fixer's unpinned phrasing instead of a fixed fact.
+With the gate bypassed, the Investigator still retrieves whatever ChromaDB's nearest-neighbour search happens to return for a Kafka query, which turns out to be the payments runbook — completely the wrong section — and prints it with total confidence, no hint that anything's off. The Fixer then works from that wrong runbook and quotes its payments restart command. The Reviewer is handed the runbook passage along with the fix, so it checks the command against that passage. And the command matches it. So the Reviewer approves.
 
-Run this same command four or five times in a row, same incident, same image, same bypassed gate, and watch the OUTCOME marker itself flip between APPROVED and REJECTED across those runs. Neither answer is the "right" one to expect here — that unpredictability IS the finding. With the gate in place, the Investigator's NO pins the outcome before the Fixer or Reviewer ever get a say. Remove the gate, and the last word belongs to two steps that are never fully certain — a Fixer running at 0.2, and a Reviewer judging whatever that Fixer possibly fabricated. And that's a worse failure mode than a clean, repeatable bug, because a flaky APPROVED or REJECTED is much harder to catch in testing than one that's consistently wrong — some fraction of the runs are always going to look fine.
+We ran this exact image six times against the Kafka incident. Every run retrieved the payments chunk. Every Fixer proposed the payments restart. Every Reviewer answered APPROVED. Only the Fixer's opening sentence changed from run to run. The command never did.
 
-So here's the real finding of this whole experiment. It wasn't the low temperatures that were pinning this crew's outcome steady. It was the gate. Variant A proved that by raising temperature and watching the outcome hold anyway. Variant B proved the other half, by leaving every temperature untouched and removing only the gate — and watching the outcome start flipping.
+So removing the gate did not make the crew flaky. It made the crew consistently, confidently wrong. The Reviewer did its job, and it still approved a payments restart for a Kafka outage, because the thing it compared against was the wrong runbook. A reviewer can only be as right as the evidence it is handed. With the gate in place, the Investigator's NO stops the pipeline before the Fixer or Reviewer get a say. Without it, the APPROVED marker certifies a mismatch.
+
+So here's the real finding of this whole experiment. It wasn't the low temperatures that were pinning this crew's outcome steady. It was the gate. Variant A proved that by raising temperature and watching the outcome hold anyway. Variant B proved the other half, by leaving every temperature untouched and removing only the gate — and watching the crew approve the wrong fix six times out of six.
 
 ### Suggested visuals / slide beats
 
@@ -197,7 +199,7 @@ So here's the real finding of this whole experiment. It wasn't the low temperatu
 
 Let's bring this together. You now know that temperature is a per-agent-role decision, not a per-crew setting — pin your classification and safety-gate calls at zero, and only leave a little room, something like 0.2 to 0.4, on the one or two calls that generate prose around a fact that's already been decided. You know that a sequential, single-pass pipeline like this one trades self-correction for predictable cost and latency, and that's a deliberate choice you'd make whenever you're bounding an agent's SLO — an unbounded ReAct loop needs an explicit iteration cap before it's safe to put in front of that same SLO.
 
-You also know that delegation between agents is only as safe as what actually crosses each hop, and that you have to check that directly in the code, because a diagram can quietly lie to you — this crew's own diagram implied Triage's classification mattered downstream, and it doesn't. And you've seen, with real transcripts, that a code-level gate, not low temperature by itself, is what keeps an outcome marker pinned run after run. Variant A raised Triage's temperature and the outcome held, because the gate was still there. Variant B left every temperature alone and removed only the gate, and the outcome started flipping.
+You also know that delegation between agents is only as safe as what actually crosses each hop, and that you have to check that directly in the code, because a diagram can quietly lie to you — this crew's own diagram implied Triage's classification mattered downstream, and it doesn't. And you've seen, with real transcripts, that a code-level gate, not low temperature by itself, is what decides the outcome. Variant A raised Triage's temperature and the outcome held, because the gate was still there. Variant B left every temperature alone and removed only the gate, and the crew approved the wrong runbook's command six times out of six.
 
 That last point is really the one to carry forward. The next time you're evaluating whether a crew's output is reliable enough to trust, don't give credit to "low temperature" for a stable-looking result until you've actually confirmed there's still a code-level gate sitting between the model's opinion and that marker. A stable-looking pipeline with no gate is just one bad retrieval away from a coin flip.
 
@@ -206,7 +208,7 @@ This deep dive closes out Module 7. From here, the course moves into Module 8, w
 ### Suggested visuals / slide beats
 
 1. Four-line recap, one bullet revealing at a time: temperature per role, fixed pipeline for SLOs, check what really crosses each hop, the gate pins the outcome
-2. Split-screen callback: Variant A (stable) vs Variant B (flipping) outcome markers
+2. Split-screen callback: Variant A (right runbook, APPROVED) vs Variant B (wrong runbook, still APPROVED, six of six)
 3. Closing card: "Next: Module 8 — governance across a fleet of crews"
 
 ---
@@ -231,7 +233,7 @@ This deep dive closes out Module 7. From here, the course moves into Module 8, w
 | §4 Behavior vs. governance distinction, bridge to Module 8 | 5 | Explained |
 | §6 Baseline run | 6 | Explained |
 | §6 Variant A — temperature raised, 3 repeats, outcome stable, prose drifts | 6 | Explained |
-| §6 Variant B — gate bypassed, wrong runbook, outcome flips run to run | 6 | Explained |
+| §6 Variant B — gate bypassed, wrong runbook, APPROVED in six of six runs | 6 | Explained |
 | §6 Comparison table takeaway: the gate, not temperature, pins the outcome | 6 | Explained |
 | Four "Where you will use this" takeaways | 7 | Explained |
 | Exact bash/docker commands, sed/python patch scripts, teardown steps | — | Deferred to the written deep-dive page itself — narration points learners there rather than narrating shell syntax aloud, per skill guidance not to narrate every character of a command |
@@ -239,5 +241,5 @@ This deep dive closes out Module 7. From here, the course moves into Module 8, w
 ## Verification flags
 
 - All temperature values (0, 0.2, 0.9), the five-call cost count, and the Variant A/B outcomes are taken directly from the source deep-dive page's own captured transcripts and code excerpts — no new claims were introduced.
-- Variant B's specific fabricated command (`kubectl rollout restart deployment kafka-event-streaming -n prod`) and the "outcome flips across repeated runs" claim are both stated in the source as an actual observed/captured run — narrated as such, not generalized into "this always happens."
+- Variant B's payments restart command and the "approved in six of six runs" claim are both stated in the source as an actual observed run on this image with `qwen3.5:2b` — narrated as such, not generalized into "this always happens."
 - The source explicitly flags that `qwen3.5:2b`-scale variance is illustrative of the mechanism, not a universal temperature recipe — this caveat is preserved in Video 6 rather than dropped.
