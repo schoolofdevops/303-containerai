@@ -341,9 +341,11 @@ removes that gate**, and §6's Variant B section shows directly what happens to 
 marker once it's gone: it stays stable, but on the wrong answer. Judge the prose — the Triage summary sentence, the
 Reviewer's stated reason — by shape only in every variant: whether it stayed on topic and matched
 the expected disposition, not its exact wording. If you swap in a larger model
-(`qwen3:4b` or bigger) later, expect the *outcome markers* to stay just as stable at low
+later, expect the *outcome markers* to stay just as stable at low
 temperature, but expect the *prose* to vary less at a given temperature than it does here — a
-bigger model needs less determinism-by-temperature to stay on-message.
+bigger model needs less determinism-by-temperature to stay on-message. One caveat: `qwen3:4b`
+on Ollama 0.40.7 ignores `think: false` and prints its reasoning inline, which breaks the
+YES/NO gate (see the lab's Troubleshooting), so pick a model that honours the switch-off.
 
 :::
 
