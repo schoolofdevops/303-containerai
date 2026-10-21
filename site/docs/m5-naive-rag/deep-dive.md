@@ -205,10 +205,10 @@ it exceeds `num_ctx`.
 
 **Verified live, not assumed.** A deliberately oversized prompt (~30K tokens: a unique front
 marker sentence, a large filler block, a back marker, then the real question) was sent with
-`num_ctx=4096`. What happens next depends on which engine Ollama runs the model on. Check the
-`RUNNER` column of `ollama ps`.
+`num_ctx=4096` to two different models. The `RUNNER` column of `ollama ps` shows which engine
+Ollama used for each.
 
-On the **llama.cpp runner**, tested here with `qwen3:4b` on Ollama v0.40.7 (a stand-in, chosen only because Ollama runs it on llama.cpp rather than MLX), the prompt is cut
+For the models tested here, the llama.cpp-served `qwen3:4b` on Ollama v0.40.7 (a stand-in, chosen only because Ollama runs it on llama.cpp rather than MLX) had its prompt cut
 down. `prompt_eval_count` came back as `2050`, roughly half the context window, which leaves
 headroom for the answer. The Ollama server log (`~/.ollama/logs/server.log` on macOS) shows how:
 
@@ -221,11 +221,12 @@ It keeps a tiny fixed prefix (`keep=4` tokens, effectively nothing) and discards
 head. The model confirmed it: its output mentioned the *back* marker (`OTTER`) and never the *front*
 marker (`ZEBRA`), which had been dropped. The front of an over-budget prompt is what gets dropped.
 
-On the **MLX runner**, which Ollama 0.40.7 uses for `qwen3.5:2b` on this Mac, the same prompt was
-**not** truncated. `prompt_eval_count` was `30863`, no truncation warning appeared in the log, and
-the model found both markers (`ZEBRA, OTTER`), even though `ollama ps` still showed `CONTEXT 4096`.
-Do not read that as permission to overfill the window. It is a property of that runner, it can
-change between Ollama releases, and it costs time and memory (that single request took about 44
+The MLX-served `qwen3.5:2b` (the model this lab uses) was **not** truncated by a near-identical prompt
+built the same way (30861 vs 30863 tokens). `prompt_eval_count` was `30863`, no truncation warning appeared in the log, and
+the model found both markers (`ZEBRA, OTTER`).
+The runner is the likely reason, but the two runs used different models, so the cause is not
+proven. To test it, run one model on each runner and compare. Do not read this as permission to
+overfill the window: the behavior can change between Ollama releases, and it costs time and memory (that single request took about 44
 seconds). The exact keep/limit split on the llama.cpp runner is also an implementation detail. So
 size `top-k × chunk_size` against `num_ctx` anyway, and watch for the `"truncating input prompt"`
 warning when your model runs on the llama.cpp runner. With the
