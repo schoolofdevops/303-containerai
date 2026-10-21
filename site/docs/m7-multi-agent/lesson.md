@@ -109,14 +109,15 @@ Let's put a number on the resource budget. On a 16 GB laptop running `qwen3.5:2b
 
 | Component | Resource |
 |---|---|
-| The model | ~1 GB VRAM / GPU memory |
-| ChromaDB | ~200 MB RAM |
-| One crew container (4 agents) | ~50 MB RAM |
-| **Total** | **~1.3 GB** |
+| The model (`qwen3.5:2b`, as `ollama ps` reports it) | ~3.5 GB GPU memory |
+| Embedding model (`nomic-embed-text`) | ~0.3 GB |
+| ChromaDB | ~15 MB RAM |
+| One crew container (4 agents) | ~15 MB RAM |
+| **Total** | **~4 GB** |
 
 Agents are cheap. A "crew" is just four Python functions with four system prompts. The model is the expensive part, and it is shared. Running four separate copies of the model, one per agent, would need four times the memory for no real gain. All four agents call the same Ollama endpoint, one after another. This is the same idea you used in M6. The model serves natively on the host, containers reach it over `host.docker.internal`, and the crew container costs almost nothing to run.
 
-A framework crew (CrewAI) using `gemma3:4B` needs about 4 GB. The declarative 2B crew is the laptop-friendly default. Reach for a bigger model only when the framework's more complex coordination actually demands it.
+A framework crew (CrewAI) using `gemma3:4B` needs a model of about 4 GB, so roughly 4.5 GB in total. The declarative 2B crew is the laptop-friendly default. Reach for a bigger model only when the framework's more complex coordination actually demands it.
 
 ---
 

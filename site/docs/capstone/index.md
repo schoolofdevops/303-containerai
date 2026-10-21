@@ -71,7 +71,7 @@ Before touching any module, run the platform readiness check from `labs/capstone
 Expected output:
 
 ```
-== 1. Container runtime ==
+== 1. Container runtime (OCI: Rancher Desktop / Colima / OrbStack / Podman) ==
   ✔ docker CLI + engine reachable
 == 2. Model serving (native Ollama, OpenAI-compatible) ==
   ✔ Ollama serving on :11434
@@ -82,7 +82,10 @@ Expected output:
 == 4. Packaging + supply chain tooling ==
   ✔ kit (KitOps) installed
   ✔ thv (ToolHive) installed
-  ✔ syft / trivy / grype / cosign installed
+  ✔ syft installed
+  ✔ trivy installed
+  ✔ grype installed
+  ✔ cosign installed
 
 PLATFORM READY — serve → RAG → agent → crew → package → secure → ship.
 ```
@@ -118,9 +121,21 @@ docker compose up -d chromadb genai-app
 Expected output:
 
 ```
+ Image capstone-genai-app Building
+ Image capstone-genai-app Built
+ Network capstone_default Creating
  Network capstone_default Created
+ Volume capstone_chroma_data Creating
  Volume capstone_chroma_data Created
+ Container chromadb Creating
+ Container chromadb Created
+ Container genai-app Creating
+ Container genai-app Created
+ Container chromadb Starting
  Container chromadb Started
+ Container chromadb Waiting
+ Container chromadb Healthy
+ Container genai-app Starting
  Container genai-app Started
 ```
 
@@ -136,14 +151,19 @@ With ChromaDB already running, run the M6 agent as a one-shot against the same s
 docker compose run --rm agent "How do I restart the payments service?"
 ```
 
-Expected output (abbreviated):
+Expected output:
 
 ```
-[agent] Aria ready — ingested 5 runbook chunks. Persona from SOUL.md + AGENTS.md + SKILL.md.
+ Container chromadb Running
+ Container chromadb Waiting
+ Container chromadb Healthy
+ Container capstone-agent-run-2cfbbd95481e Creating
+ Container capstone-agent-run-2cfbbd95481e Created
+[agent] Aria ready — ingested 5 runbook chunks (collection 1d5b6985). Persona from SOUL.md + AGENTS.md + SKILL.md (3503 chars).
+
 USER: How do I restart the payments service?
-  [decision: RETRIEVE (top dist=216.8)]
-ARIA: Run `kubectl rollout restart deploy/payments -n prod`. The payments service depends on the
-      Postgres primary in the `prod` namespace.
+  [decision: RETRIEVE (top dist=216.7)]
+ARIA: Run `kubectl rollout restart deploy/payments -n prod`.
 ```
 
 Aria, the declarative agent from M6, reads the question, decides whether it needs to retrieve from ChromaDB at all, and returns a grounded, guardrailed answer. This is agentic RAG: the agent routes first, then acts.
@@ -170,16 +190,38 @@ Still in `labs/capstone/`, run the incident crew one-shot:
 docker compose run --rm crew "P1: payments service down, pods in CrashLoopBackOff"
 ```
 
-Expected output (abbreviated):
+Expected output:
 
-```
-[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer
+````
+ Container chromadb Running
+ Container chromadb Waiting
+ Container chromadb Healthy
+ Container capstone-crew-run-a2e06aee6cc6 Creating
+ Container capstone-crew-run-a2e06aee6cc6 Created
+[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen3.5:2b)
 
-[TRIAGE]      AREA: payments | SEV: 3 | ...   # numeric severity; exact scale/wording varies by run
-[INVESTIGATOR] kubectl rollout restart deploy/payments -n prod ...
-[FIXER]       kubectl rollout restart deploy/payments -n prod
-[REVIEWER]    APPROVED — ready for a human to apply
+======================================================================
+INCIDENT: P1: payments service down, pods in CrashLoopBackOff
+======================================================================
+
+[TRIAGE]      AREA: payments | SEV: SEV2 | payments pods crashing with CrashLoopBackOff
+
+[INVESTIGATOR] ## Payments service
+To restart the Acme payments service, run:
+`kubectl rollout restart deploy/payments -n prod`.
+The payments service depends on the Postgres primary in the `prod` namespace.
+
+[FIXER]       Restart the Acme payments deployment to resolve the CrashLoopBackOff state.
+
+```bash
+kubectl rollout restart deploy/payments -n prod
 ```
+
+[REVIEWER]    APPROVED: Command is a non-destructive, runbook-backed remediation for restarting a dependent service.
+
+======================================================================
+OUTCOME: APPROVED — ready for a human to apply
+````
 
 Four specialised agents run one after another: Triage classifies the incident, Investigator queries the runbook, Fixer proposes the exact fix command, and Reviewer approves it or escalates it. One native model endpoint serves all four agents.
 

@@ -18,7 +18,7 @@ services:
 
   # ── Shared vector memory ─────────────────────────────────────────────────────
   chromadb:
-    image: chromadb/chroma:0.5.20
+    image: chromadb/chroma:1.5.9
     container_name: chromadb
     ports:
       - "8000:8000"
@@ -33,8 +33,9 @@ services:
           memory: 768M
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python3", "-c",
-             "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/heartbeat')"]
+      # The 1.x image has no python3 or curl, so probe the v2 heartbeat with bash's /dev/tcp.
+      test: ["CMD", "bash", "-c",
+             "exec 3<>/dev/tcp/localhost/8000; printf 'GET /api/v2/heartbeat HTTP/1.0\\r\\n\\r\\n' >&3; read -r l <&3; [[ $$l == *' 200 '* ]]"]
       interval: 10s
       timeout: 5s
       retries: 5

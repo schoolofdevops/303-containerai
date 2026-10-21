@@ -66,7 +66,7 @@ cat labs/m7/crew/profiles/reviewer.md
 ```
 # Reviewer
 
-**Role:** Change reviewer and safety gate. Given the incident and the Fixer's proposed command, decide
+**Role:** Change reviewer and safety gate. Given the incident, the runbook passage and the Fixer's proposed command, decide
 whether it is safe and matches the runbook. Output exactly one of:
 - `APPROVED: <one-line reason>` — if the command is a non-destructive, runbook-backed remediation.
 - `REJECTED: <one-line reason>` — if it is destructive (delete/drop/wipe), not backed by a runbook, or
@@ -114,9 +114,14 @@ docker compose up -d chromadb
 **Expected output:**
 
 ```
-[+] Running 2/2
- ✔ Network m7_default  Created
- ✔ Container chromadb  Started
+ Network m7_default Creating
+ Network m7_default Created
+ Volume m7_chroma_data Creating
+ Volume m7_chroma_data Created
+ Container chromadb Creating
+ Container chromadb Created
+ Container chromadb Starting
+ Container chromadb Started
 ```
 
 :::note[Re-running this lab reuses the old data]
@@ -139,24 +144,34 @@ docker compose run --rm crew "The checkout page is returning HTTP 503 errors for
 
 **Expected output:**
 
-```
+````
+ Container chromadb Running
+ Container m7-crew-run-310a1c8f1358 Creating
+ Container m7-crew-run-310a1c8f1358 Created
 [crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen3.5:2b)
 
 ======================================================================
 INCIDENT: The checkout page is returning HTTP 503 errors for all users.
 ======================================================================
 
-[TRIAGE]      AREA: web/checkout | SEV: SEV3 | Checkout service is down or misconfigured.
+[TRIAGE]      AREA: web/checkout | SEV: SEV1 | Checkout API returning 503 errors.
 
-[INVESTIGATOR] ## Checkout 503 errors  (retrieved the exact runbook via RAG)
+[INVESTIGATOR] ## Checkout 503 errors
+If the checkout page returns HTTP 503, the web tier is saturated. Scale it up:
+`kubectl scale deploy/web --replicas=5 -n prod`. Then check the load balancer
+health in the Acme dashboard.
 
-[FIXER]       kubectl scale deploy/web --replicas=5 -n prod   (quoted from the runbook)
+[FIXER]       Run the scaling command to increase web tier capacity:
 
-[REVIEWER]    APPROVED: non-destructive, runbook-backed remediation ...
+```bash
+kubectl scale deploy/web --replicas=5 -n prod
+```
+
+[REVIEWER]    APPROVED: Command matches runbook and is a non-destructive remediation.
 
 ======================================================================
 OUTCOME: APPROVED — ready for a human to apply
-```
+````
 
 On a small model like `qwen3.5:2b`, exact wording varies run to run — the `AREA:`/`SEV:` labels may
 drop or the retrieved runbook excerpt may run longer than shown above. Judge the run by the stage
@@ -164,10 +179,10 @@ markers and the final `OUTCOME:` line, not the exact prose.
 
 Walk through what happened:
 
-1. **Triage** classified the incident as `web/checkout | SEV3` in one line, at temperature 0.
+1. **Triage** classified the incident as `web/checkout | SEV1` in one line, at temperature 0.
 2. **Investigator** embedded the incident text, queried ChromaDB, and retrieved the checkout runbook chunk. The relevance gate confirmed the passage addresses this incident.
 3. **Fixer** quoted the exact `kubectl scale` command from the runbook. It did not invent anything.
-4. **Reviewer** checked the command: non-destructive (a scale, not a delete), verbatim from the runbook. APPROVED.
+4. **Reviewer** received the incident, the runbook passage and the Fixer's command, and checked the command against that passage: non-destructive (a scale, not a delete), verbatim from the runbook. APPROVED.
 
 The output is a vetted recommendation, not an executed action. A human engineer sees APPROVED and decides whether to run the command.
 
@@ -184,15 +199,18 @@ docker compose run --rm crew "The Kafka event streaming cluster has stopped proc
 **Expected output:**
 
 ```
+ Container chromadb Running
+ Container m7-crew-run-1c5d8e6517fd Creating
+ Container m7-crew-run-1c5d8e6517fd Created
 [crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen3.5:2b)
 
 ======================================================================
 INCIDENT: The Kafka event streaming cluster has stopped processing messages.
 ======================================================================
 
-[TRIAGE]      AREA: Kafka | SEV: 3 | Event streaming cluster stalled.
+[TRIAGE]      AREA: database | SEV: 1 | Kafka event stream processing halted
 
-[INVESTIGATOR] NO RUNBOOK FOUND — the knowledge base has no runbook for this incident. Escalate.
+[INVESTIGATOR] NO RUNBOOK FOUND — the knowledge base has no runbook for this incident. Escalate to a human.
 
 [FIXER]       I cannot propose a fix: no runbook covers this incident.
 
@@ -233,10 +251,34 @@ docker compose run --rm crew "The payments service is throwing connection errors
 
 **Expected output:**
 
+````
+ Container chromadb Running
+ Container m7-crew-run-96cb5345c809 Creating
+ Container m7-crew-run-96cb5345c809 Created
+[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen3.5:2b)
+
+======================================================================
+INCIDENT: The payments service is throwing connection errors.
+======================================================================
+
+[TRIAGE]      AREA: payments | SEV: SEV1 | Connection errors in payment service indicate a critical failure preventing transaction processing.
+
+[INVESTIGATOR] ## Payments service
+To restart the Acme payments service, run:
+`kubectl rollout restart deploy/payments -n prod`.
+The payments service depends on the Postgres primary in the `prod` namespace.
+
+[FIXER]       Restart the Acme payments deployment to resolve connection errors with its dependent Postgres instance.
+
+```bash
+kubectl rollout restart deploy/payments -n prod
 ```
-[TRIAGE] AREA: Payments | SEV: 3 ...  ->  [FIXER] kubectl rollout restart deploy/payments -n prod
-[REVIEWER] APPROVED ...   OUTCOME: APPROVED
-```
+
+[REVIEWER]    APPROVED: Command is a non-destructive, runbook-backed remediation for restarting a service dependent on another.
+
+======================================================================
+OUTCOME: APPROVED — ready for a human to apply
+````
 
 ---
 
@@ -293,7 +335,9 @@ CrewAI's role-based orchestration involves more complex message routing and dele
 
 If Triage or Reviewer outputs vary between runs, set `temperature=0` explicitly for those calls. The declarative crew already does this; if you extend it, keep classification and safety-gate calls at temperature 0. For generation tasks (Fixer, Investigator summary), `temperature=0.2` works well.
 
-If the 2B model produces garbled output for a particular incident, bump to `qwen3:4b` by setting `LLM_MODEL=qwen3:4b` in the compose environment or exporting it before running.
+If the Reviewer REJECTs a fix that quotes the runbook exactly, check what it was shown. A small model cannot judge "matches the runbook" without the runbook in front of it, so `crew.py` passes the retrieved passage to the Reviewer along with the incident and the Fixer's command. Without that passage, `qwen3.5:2b` rejected the correct 503 fix on every run we tried.
+
+If the 2B model still produces garbled output for a particular incident, you can try a bigger model with `LLM_MODEL=qwen3:4b`. Be aware that the `qwen3:4b` build we tested ignores `think: false` and prints its reasoning inline, which breaks the YES/NO relevance gate. Pick a model whose output honours `think: false`, or strip the reasoning block before parsing.
 
 :::
 
@@ -315,10 +359,14 @@ docker compose down
 ```
 
 **Expected output:**
+
 ```
-[+] Running 2/2
- ✔ Container chromadb   Removed
- ✔ Network m7_default   Removed
+ Container chromadb Stopping
+ Container chromadb Stopped
+ Container chromadb Removing
+ Container chromadb Removed
+ Network m7_default Removing
+ Network m7_default Removed
 ```
 
 Your native Ollama keeps running — it's shared by every module. This keeps your 16 GB laptop's

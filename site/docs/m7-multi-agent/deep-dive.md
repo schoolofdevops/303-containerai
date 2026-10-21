@@ -165,7 +165,7 @@ incident (the raw string argument)
                       llm(candidate, incident) -> relevant (bool)
                       candidate or "" -> runbook
   -> Fixer:          llm(incident, runbook) -> fix
-  -> Reviewer:        llm(incident, fix) -> verdict
+  -> Reviewer:        llm(incident, runbook, fix) -> verdict
 ```
 
 The detail worth catching: **`retrieve()` queries ChromaDB with the raw `incident` string, not
@@ -321,9 +321,9 @@ doesn't have.
 ## 6 — Experiment: knob variants, one at a time, sequential
 
 Everything below runs **sequentially, one variant at a time** — never two `docker compose run`
-crew invocations in parallel. This machine budgets one crew container (~50 MB) plus the shared
-ChromaDB container (~200 MB) at a time; running variants back to back keeps the stack at or under
-2 GB total. It also matters for a second reason: on `qwen3.5:2b`, small-model output varies run
+crew invocations in parallel. This machine budgets one crew container (~15 MB) plus the shared
+ChromaDB container (~15 MB) at a time; running variants back to back keeps the stack at or under
+4 GB total, almost all of it the one shared model. It also matters for a second reason: on `qwen3.5:2b`, small-model output varies run
 to run even at the *same* temperature, so overlapping variants would make it impossible to tell
 whether a difference in output came from the knob you changed or from ordinary small-model noise.
 
@@ -338,7 +338,7 @@ the `OUTCOME:` marker and which stages ran or short-circuited are exact, reprodu
 this run — Investigator and Reviewer both stay pinned at `temperature=0`, so the gate's YES/NO
 and the final APPROVED/REJECTED don't move even when Triage's temperature does. **Variant B
 removes that gate**, and §6's Variant B section shows directly what happens to the `OUTCOME:`
-marker once it's gone: it stops being pinned. Judge the prose — the Triage summary sentence, the
+marker once it's gone: it stays stable, but on the wrong answer. Judge the prose — the Triage summary sentence, the
 Reviewer's stated reason — by shape only in every variant: whether it stayed on topic and matched
 the expected disposition, not its exact wording. If you swap in a larger model
 (`qwen3:4b` or bigger) later, expect the *outcome markers* to stay just as stable at low
@@ -360,22 +360,25 @@ docker compose run --rm crew "The checkout page is returning HTTP 503 errors for
 **Expected output**
 
 ```text
+ Container chromadb Running
+ Container m7-crew-run-3d9f87ee9d45 Creating
+ Container m7-crew-run-3d9f87ee9d45 Created
 [crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen3.5:2b)
 
 ======================================================================
 INCIDENT: The checkout page is returning HTTP 503 errors for all users.
 ======================================================================
 
-[TRIAGE]      AREA: web/checkout | SEV: SEV3 | Checkout service is down or misconfigured.
+[TRIAGE]      AREA: web/checkout | SEV: SEV1 | Checkout API returning 503 errors.
 
 [INVESTIGATOR] ## Checkout 503 errors
 If the checkout page returns HTTP 503, the web tier is saturated. Scale it up:
 `kubectl scale deploy/web --replicas=5 -n prod`. Then check the load balancer
 health in the Acme dashboard.
 
-[FIXER]       Scale up the deployment of the web application to 5 replicas: `kubectl scale deploy/web --replicas=5 -n prod`. Then verify the health of the load balancer in the Acme dashboard.
+[FIXER]       Scale up the web tier by running `kubectl scale deploy/web --replicas=5 -n prod`.
 
-[REVIEWER]    APPROVED: The proposed command is a non-destructive, runbook-backed remediation that involves scaling up the deployment and verifying the health of the load balancer. This should resolve the HTTP 503 errors for all users without causing any harm to the system or data.
+[REVIEWER]    APPROVED: Command matches runbook and is a non-destructive scaling action.
 
 ======================================================================
 OUTCOME: APPROVED — ready for a human to apply
@@ -406,7 +409,7 @@ later command in this section can find the tracked source again without you rety
 **Expected output**
 
 ```text
-65c65
+73c73
 <     triage = llm(f"Incident: {incident}", profile("triage"), temperature=0)
 ---
 >     triage = llm(f"Incident: {incident}", profile("triage"), temperature=0.9)
@@ -438,9 +441,9 @@ rm crew/crew.py.deepdive-hot-triage
 **Expected output**
 
 ```text
-#10 naming to docker.io/library/acme-incident-crew:hot-triage done
-#10 unpacking to docker.io/library/acme-incident-crew:hot-triage 0.0s done
-#10 DONE 0.1s
+#10 unpacking to docker.io/library/acme-incident-crew:hot-triage
+#10 unpacking to docker.io/library/acme-incident-crew:hot-triage 0.3s done
+#10 DONE 1.3s
 ```
 
 Run it 3 times against the same incident, sequentially, logging each transcript:
@@ -468,16 +471,20 @@ done
 INCIDENT: The checkout page is returning HTTP 503 errors for all users.
 ======================================================================
 
-[TRIAGE]      AREA: Checkout | SEV: SEV3 | Server overloaded with transactions. Users are seeing intermittent 503s.
+[TRIAGE]      AREA: web/checkout | SEV: SEV2 | Checkout API returning 503 errors
 
 [INVESTIGATOR] ## Checkout 503 errors
 If the checkout page returns HTTP 503, the web tier is saturated. Scale it up:
 `kubectl scale deploy/web --replicas=5 -n prod`. Then check the load balancer
 health in the Acme dashboard.
 
-[FIXER]       Scale up the deployment of the web application to 5 replicas: `kubectl scale deploy/web --replicas=5 -n prod`. Then verify the health of the load balancer in the Acme dashboard.
+[FIXER]       Run the following command to scale up the web tier:
 
-[REVIEWER]    APPROVED: The proposed command is a non-destructive, runbook-backed remediation that involves scaling up the deployment and verifying the health of the load balancer. This should resolve the HTTP 503 errors for all users without causing any harm to the system or data.
+```bash
+kubectl scale deploy/web --replicas=5 -n prod
+```
+
+[REVIEWER]    APPROVED: Command matches runbook and is a non-destructive scaling action.
 
 ======================================================================
 OUTCOME: APPROVED — ready for a human to apply
@@ -489,16 +496,20 @@ OUTCOME: APPROVED — ready for a human to apply
 INCIDENT: The checkout page is returning HTTP 503 errors for all users.
 ======================================================================
 
-[TRIAGE]      AREA: Web/Checkout | SEV: Major | Checkout service experiencing unexpected downtime. All users are encountering intermittent timeouts while accessing the checkout section of the website. Please investigate immediately to prevent further disruptions and ensure the resolution process is fully documented for future reference.
+[TRIAGE]      AREA: web/checkout | SEV: SEV1 | Payment gateway outage impacting all checkout attempts.
 
 [INVESTIGATOR] ## Checkout 503 errors
 If the checkout page returns HTTP 503, the web tier is saturated. Scale it up:
 `kubectl scale deploy/web --replicas=5 -n prod`. Then check the load balancer
 health in the Acme dashboard.
 
-[FIXER]       Scale up the deployment of the web application to 5 replicas: `kubectl scale deploy/web --replicas=5 -n prod`. Then verify the health of the load balancer in the Acme dashboard.
+[FIXER]       Run the following command to scale up the web tier:
 
-[REVIEWER]    APPROVED: The proposed command is a non-destructive, runbook-backed remediation that involves scaling up the deployment and verifying the health of the load balancer. This should resolve the HTTP 503 errors for all users without causing any harm to the system or data.
+```bash
+kubectl scale deploy/web --replicas=5 -n prod
+```
+
+[REVIEWER]    APPROVED: Command matches runbook and is a non-destructive scaling action.
 
 ======================================================================
 OUTCOME: APPROVED — ready for a human to apply
@@ -510,50 +521,37 @@ OUTCOME: APPROVED — ready for a human to apply
 INCIDENT: The checkout page is returning HTTP 503 errors for all users.
 ======================================================================
 
-[TRIAGE]      AREA: Checkout | SEV: SEV2 | Users experience intermittent timeouts on checkout pages, with no consistent pattern of failures.
-
-### Explanation:
-- **CHECKOUT:** The issue primarily affects the checkout functionality.
-- **SEV2:** There are both critical and major aspects to consider due to the temporary nature and impact on users' experiences. The symptoms indicate a possible performance or configuration-related problem, which could be indicative of various issues like network latency, load balancing problems, or caching inconsistencies.
-
-### Investigation and Fix Consideration:
-1. **Network Latency Check:** Investigate if there are any external network latency issues.
-2. **Load Balancing & Configuration Review:** Verify the health of the backend servers and their configurations to ensure they are not overloaded.
-3. **Cache Validation:** Ensure that web caches like Cloudflare or NGINX, used by the checkout page, are not causing errors in responding times.
-
-Given the critical impact on users' experience and the temporary nature of this issue (HTTP 503), it's advisable to prioritize immediate investigation and address accordingly without delay.
+[TRIAGE]      AREA: web/checkout | SEV: SEV2 | Checkouts returning 503 errors
 
 [INVESTIGATOR] ## Checkout 503 errors
 If the checkout page returns HTTP 503, the web tier is saturated. Scale it up:
 `kubectl scale deploy/web --replicas=5 -n prod`. Then check the load balancer
 health in the Acme dashboard.
 
-[FIXER]       Scale up the deployment of the web application to 5 replicas:
+[FIXER]       Run the following command to scale up the web tier:
 
-```sh
+```bash
 kubectl scale deploy/web --replicas=5 -n prod
 ```
 
-Check the load balancer health in the Acme dashboard:
-
-[REVIEWER]    APPROVED: The proposed command is a non-destructive, runbook-backed remediation that scales up the deployment of the web application to 5 replicas. This should resolve the HTTP 503 errors by increasing the availability and capacity of the service.
+[REVIEWER]    APPROVED: Command matches runbook and is a non-destructive scaling action.
 
 ======================================================================
 OUTCOME: APPROVED — ready for a human to apply
 `````
 
 All three runs landed on `OUTCOME: APPROVED` — the structural decision held steady across a
-0 → 0.9 temperature jump. The prose did not hold steady: run 1 stayed within the Triage profile's
-"Be terse" instruction, run 2 drifted into a run-on sentence, and run 3 broke the profile's format
-entirely — it added an unrequested `### Explanation:` / `### Investigation and Fix Consideration:`
-section with a numbered troubleshooting list, none of which the Triage profile asked for. This is
-the small-model-variance note above made concrete: `AREA:`/`SEV:` labels loosely survived (`SEV3`,
-`Major`, `SEV2` — three different severity vocabularies for what should be one consistent scale),
-but the crew's overall behavior — retrieve the checkout runbook, propose the scale command, get it
-APPROVED — never wavered, because Investigator, Fixer, and Reviewer all stayed at their original
-low/zero temperatures. Raising just the Triage temperature made Triage noisier without making the
-crew's final decision any less reliable — evidence for why temperature is a per-role knob, not a
-per-crew one (§1).
+0 → 0.9 temperature jump. The Triage prose did move. On this model the format held (one terse
+`AREA: ... | SEV: ...` line every time, no run-on or multi-section write-up), but the content
+drifted: the severity came back as `SEV2`, `SEV1` and `SEV2` for the same incident, and run 2
+invented a cause the incident never mentioned (`Payment gateway outage`) for what is a checkout
+web-tier problem. That is the small-model-variance note above made concrete: the classification
+label is not a stable fact at high temperature. The crew's overall behavior — retrieve the
+checkout runbook, propose the scale command, get it APPROVED — never wavered, because Triage's
+output is printed but never fed forward (§3), and Investigator, Fixer and Reviewer all stayed at
+their original low/zero temperatures. Raising just the Triage temperature made Triage noisier
+without making the crew's final decision any less reliable — evidence for why temperature is a
+per-role knob, not a per-crew one (§1).
 
 ### Variant B: guardrail-off — bypass the relevance gate
 
@@ -581,7 +579,7 @@ diff "$REPO_ROOT/labs/m7/crew/crew.py" ./crew-no-gate.py
 **Expected output**
 
 ```text
-73c73
+81c81
 <                    profile("investigator"), temperature=0).upper().startswith("YES")
 ---
 >                    profile("investigator"), temperature=0).upper().startswith("YES") or True  # DEEP-DIVE: gate bypassed on purpose
@@ -623,22 +621,20 @@ docker run --rm --network m7_default \
 INCIDENT: The Kafka event streaming cluster has stopped processing messages.
 ======================================================================
 
-[TRIAGE]      Kafka | SEV3 | Cluster shutdown due to network connectivity issues.
+[TRIAGE]      AREA: database | SEV: 1 | Kafka event stream processing halted
 
 [INVESTIGATOR] ## Payments service
 To restart the Acme payments service, run:
 `kubectl rollout restart deploy/payments -n prod`.
 The payments service depends on the Postgres primary in the `prod` namespace.
 
-[FIXER]       One short sentence of intent: "Restart the Kafka event streaming cluster."
+[FIXER]       Restart the payments deployment to resolve the dependency issue.
 
-Command to run:
-
-```sh
-kubectl rollout restart deployment kafka-event-streaming -n prod
+```bash
+kubectl rollout restart deploy/payments -n prod
 ```
 
-[REVIEWER]    APPROVED: This command is non-destructive and can be backed by a runbook, so it matches the requirements. Restarting the deployment should resolve the issue with Kafka event streaming cluster processing messages.
+[REVIEWER]    APPROVED: Command is a non-destructive, runbook-backed remediation for restarting a dependent service.
 
 ======================================================================
 OUTCOME: APPROVED — ready for a human to apply
@@ -650,26 +646,20 @@ with total confidence and no hint that it's the wrong section. The baseline crew
 above, and the lab's own Step 5) correctly says `NO RUNBOOK FOUND` for this exact incident,
 because the relevance gate answers NO when asked whether the payments passage addresses a Kafka
 failure. With the gate always returning `True`, the Fixer treats the mismatched passage as
-confirmed-relevant, and starts from a wrong runbook every time — that part is structural and does
-not change run to run. What the Fixer *does* with that wrong runbook does change: at
-`temperature=0.2`, it sometimes quotes the payments command reasonably faithfully and sometimes,
-as in the run captured above, invents a *plausible-sounding* command
-(`kubectl rollout restart deployment kafka-event-streaming -n prod`) that appears nowhere in
-`acme-runbooks.md`. The Reviewer then judges whatever the Fixer handed it — and because the
-Reviewer only checks whether the *proposed command text* looks non-destructive, not whether the
-referenced runbook passage actually supports it, its APPROVED/REJECTED verdict now tracks the
-Fixer's un-pinned phrasing instead of a fixed fact. Run this exact command four or five times in a
-row and expect the `OUTCOME:` marker itself to flip between APPROVED and REJECTED across those
-runs, on the same incident, same image, same bypassed gate — sometimes the Reviewer calls a
-fabricated command "backed by a runbook" and approves it (the run above), sometimes it correctly
-distrusts an unfamiliar command and rejects it. **Neither answer is the "right" one to expect —
-that unpredictability is the finding.** With the gate in place, the Investigator's NO pins the
-outcome before the Fixer or Reviewer ever get a say. Remove the gate, and the last word belongs to
-two non-zero-certainty steps (a `temperature=0.2` Fixer and a Reviewer judging that Fixer's
-possibly-fabricated text) — so the crew stops being wrong in one consistent, obviously-buggy way
-and starts being wrong (or right) unpredictably, run to run. That's a worse failure mode than a
-clean, repeatable bug: a flaky APPROVED/REJECTED is harder to catch in testing than a
-*consistently* wrong one, because some fraction of runs look fine.
+confirmed-relevant and quotes its payments command. We ran this exact image six times against the
+Kafka incident. Every run retrieved the payments chunk, every Fixer proposed the payments restart,
+and every Reviewer answered APPROVED.
+
+That is the sharper finding, and it differs from what a weaker Reviewer would show. The Reviewer
+here is given the runbook passage along with the fix, so it checks the command against that
+passage — and the command does match it. The Reviewer is doing its job and still approves a
+payments restart for a Kafka outage, because the thing it compares against is the wrong runbook.
+A reviewer can only be as right as the evidence handed to it. Removing the gate does not make the
+crew flaky here; it makes the crew **consistently, confidently wrong**, and the APPROVED marker
+now certifies a mismatch. **The gate, not the Reviewer, is what stopped this. That is the finding.** The Fixer's sentence of intent varied across the six runs (`Restart the payments
+deployment...`, `Run the following command to restart the affected service`), but its command
+did not, so the exact wording is the only thing that moves. This is why you test a guardrail by removing it and watching, not by assuming what the downstream
+agents will do.
 
 The tracked `crew.py` itself was never touched — only the temporary `crew.py.deepdive-*` copies
 inside the build contexts (removed by the `rm crew/crew.py.deepdive-*` line right after each
@@ -690,20 +680,21 @@ git -C "$REPO_ROOT" status --short labs/m7/crew/crew.py
 
 | Variant | Knob changed | Wall time | Tool/model calls | OUTCOME marker | Consistency vs. baseline |
 |---|---|---|---|---|---|
-| Baseline | none (Triage=0, gate=0, Fixer=0.2, Reviewer=0) | ~4.2s | 5 (fixed, per §2) | APPROVED | — |
-| A (×3 repeats) | Triage temperature 0 → 0.9 | ~3.5s per run | 5 per run | APPROVED, all 3 runs | Structural outcome stable; Triage prose drifted from terse (run 1) to a run-on sentence (run 2) to an unrequested multi-section troubleshooting writeup (run 3) — the profile's "Be terse" instruction eroded as temperature-driven variance compounded |
-| B | Relevance gate bypassed (`relevant = True`, always) | ~3.4s | 5 (same count — gate bypass changes the *decision*, not the call count) | **Not stable** — retrieves the wrong (payments) runbook every time, but the final APPROVED/REJECTED marker has been observed to flip between runs on this exact incident, this exact image, gate bypassed both times | This *is* instability, and it's the finding: with Investigator/Reviewer still at `temperature=0` but the gate removed, nothing left in the pipeline pins the final verdict — it now depends on what the `temperature=0.2` Fixer does with a wrong runbook, and on the Reviewer's read of that. The gate, not the agents' temperatures, was what made Baseline and Variant A's outcomes reproducible |
+| Baseline | none (Triage=0, gate=0, Fixer=0.2, Reviewer=0) | ~9.5s | 5 (fixed, per §2) | APPROVED | — |
+| A (×3 repeats) | Triage temperature 0 → 0.9 | ~6.6–8.6s per run | 5 per run | APPROVED, all 3 runs | Structural outcome stable; Triage stayed one terse line but its content drifted: `SEV2`, `SEV1`, `SEV2` for the same incident, and run 2 invented a "payment gateway outage" the report never mentioned |
+| B | Relevance gate bypassed (`relevant = True`, always) | ~4.5s (3.9–9.7s over 6 runs) | 5 (same count — gate bypass changes the *decision*, not the call count) | **APPROVED in 6 of 6 runs — pinned to the wrong answer** | Retrieves the wrong (payments) runbook every time, the Fixer quotes the payments restart, and the Reviewer, comparing it to that same wrong passage, approves it. The gate, not the Reviewer, is what made the Kafka incident escalate in the Baseline |
+
+Wall times are one machine, and the first (Baseline) run also paid for loading the model, so read them as the same order of magnitude, not a benchmark.
 
 Judge the deterministic side of this table strictly, and note what "deterministic" is
 conditional on. In Baseline and Variant A, the relevance gate is intact, so the `OUTCOME:` line
 and which stages ran are exact, reproducible facts about each run (per the small-model-variance
 note above) — the gate pins the verdict regardless of what Triage's temperature does upstream. In
 Variant B, the gate itself is the thing removed, and the table row above documents what breaks:
-the `OUTCOME:` marker is no longer pinned. Judge the Triage/Fixer/Reviewer prose in every variant
+the `OUTCOME:` marker is still stable, but it is stable on the wrong answer. Judge the Triage/Fixer/Reviewer prose in every variant
 by shape — did it stay on-topic, did it reach a defensible disposition — not by exact wording,
 which will vary between the three Variant A repeats even though nothing else changed between
-them, and which drives the Variant B outcome itself once the gate is gone. Wall times above are
-single-machine, single-run measurements on this
+them. Wall times above are single-machine, single-run measurements on this
 laptop, included to show the same order of magnitude across variants (temperature and a gate
 bypass do not change the crew's call count, so wall time stays roughly flat) — not a timing
 benchmark to reproduce exactly.
@@ -719,9 +710,9 @@ PATH="$HOME/.rd/bin:$PATH" docker rmi acme-incident-crew:hot-triage acme-inciden
 
 ```text
 Untagged: acme-incident-crew:hot-triage
-Deleted: sha256:f362088a779db9dce3e9c8422a14eb808adeef8b3341575d2e231f644a620977
+Deleted: sha256:bba6a0cebfdbf3382d0a1ab9f4ce32961430439947705fb62e7f9d2a34a734cf
 Untagged: acme-incident-crew:no-gate
-Deleted: sha256:28af760d5b1695928ca255208675ee59a6cb68ca7024dd6bca708ca542f4528b
+Deleted: sha256:a980d19975f15730511c5dfcff4c9023b14be6a34be44f0592f126bd2f2aea51
 ```
 
 ---

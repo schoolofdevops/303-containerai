@@ -6,7 +6,7 @@
 # Prereqs: ollama pull qwen3.5:2b && ollama pull nomic-embed-text
 services:
   chromadb:
-    image: chromadb/chroma:0.5.20
+    image: chromadb/chroma:1.5.9
     container_name: chromadb
     ports:
       - "8000:8000"
