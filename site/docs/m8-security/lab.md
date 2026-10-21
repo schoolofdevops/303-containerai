@@ -112,11 +112,16 @@ syft $IMAGE -o spdx-json > sbom.spdx.json
 **Expected output:**
 
 ```
- ✔ Loaded image                                                         acme-support-agent:latest
- ✔ Parsed image
- ✔ Cataloged contents
-   -> 96 packages, SPDX-2.3   (Debian debs + Python + binaries)
+ ✔ Loaded image                    acme-support-agent:latest
+ ✔ Parsed image                    sha256:49a5340fa5fd6d0f8b92f25df393468ec0485e3760909594b7094f02d2d4f86e
+ ✔ Cataloged contents              5195dcbc620b738e317b4266cf9dcbd26a78fc0e321f10b40ac3851f27094a16
+   ├── ✔ Packages                        [95 packages]
+   ├── ✔ Executables                     [750 executables]
+   ├── ✔ File metadata                   [2,659 locations]
+   └── ✔ File digests                    [2,659 files]
 ```
+
+The SBOM file lists 96 entries: the 95 packages plus one entry for the image itself.
 
 Inspect the SBOM:
 
@@ -147,18 +152,21 @@ table first, then one `Total:` line **per target** it scanned, e.g. one for the 
 Python packages, and a 7-column table with a `Status` column the block below abbreviates):
 
 ```
-Total: 77 (MEDIUM: 54, HIGH: 19, CRITICAL: 4)     # debian (OS) target
+acme-support-agent:latest (debian 13.7)
+=======================================
+Total: 102 (MEDIUM: 58, HIGH: 44, CRITICAL: 0)
 
-┌──────────────┬────────────────────┬──────────┬────────┬───────────────────┬───────────────────┬──────────────────────────────┐
-│   Library    │   Vulnerability    │ Severity │ Status │ Installed Version │    Fixed Version  │            Title             │
-├──────────────┼────────────────────┼──────────┼────────┼───────────────────┼───────────────────┼──────────────────────────────┤
-│ gzip         │ CVE-2026-41992     │ HIGH     │ fixed  │ 1.12-1            │ 1.12-2            │ gzip: ...                    │
-│ libacl1      │ CVE-2026-54369     │ HIGH     │ fixed  │ 2.3.1-3           │ 2.3.1-4           │ libacl1: ...                 │
-│ ...          │ ...                │          │        │ ...               │ ...               │ ...                          │
-└──────────────┴────────────────────┴──────────┴────────┴───────────────────┴───────────────────┴──────────────────────────────┘
+┌──────────────┬────────────────────┬──────────┬──────────┬───────────────────┬───────────────┬──────────────────────────────┐
+│   Library    │   Vulnerability    │ Severity │  Status  │ Installed Version │ Fixed Version │            Title             │
+├──────────────┼────────────────────┼──────────┼──────────┼───────────────────┼───────────────┼──────────────────────────────┤
+│ bsdutils     │ CVE-2026-76642     │ HIGH     │ affected │ 1:2.41.5-0+deb13u1│               │ util-linux: ...              │
+│ libacl1      │ CVE-2026-54369     │ HIGH     │          │ 2.3.2-2+b1        │               │ acl: ...                     │
+│ ...          │ ...                │          │          │ ...               │               │ ...                          │
+└──────────────┴────────────────────┴──────────┴──────────┴───────────────────┴───────────────┴──────────────────────────────┘
 
-Total: 4 (MEDIUM: 4, HIGH: 0, CRITICAL: 0)        # python-pkg target
-...
+usr/local/lib/python3.12/site-packages/pip-25.0.1.dist-info/METADATA (python-pkg)
+==================================================================================
+Total: 5 (MEDIUM: 5, HIGH: 0, CRITICAL: 0)
 ```
 
 Now run a second opinion with Grype:
@@ -172,21 +180,23 @@ longer prints a "Vulnerabilities by severity" summary footer; judge by the table
 an exact footer line):
 
 ```
- ✔ Vulnerability DB                [no update available]
- ✔ Loaded image
- ✔ Parsed image
- ✔ Cataloged packages              [96 packages]
- ✔ Scanning for vulnerabilities    [151 vulnerability matches]
+ ✔ Loaded image                    acme-support-agent:latest
+ ✔ Parsed image                    sha256:49a5340fa5fd6d0f8b92f25df393468ec0485e3760909594b7094f02d2d4f86e
+ ✔ Cataloged contents              5195dcbc620b738e317b4266cf9dcbd26a78fc0e321f10b40ac3851f27094a16
+   ├── ✔ Packages                        [95 packages]
+ ✔ Scanned for vulnerabilities     [172 vulnerability matches]
 
-NAME       INSTALLED  FIXED IN  TYPE  VULNERABILITY        SEVERITY  EPSS  RISK
+NAME          INSTALLED          FIXED IN      TYPE    VULNERABILITY   SEVERITY  EPSS         RISK
+perl-base     5.40.1-6+deb13u1   (won't fix)   deb     CVE-2026-82560  High      0.6% (49th)  0.5
+libncursesw6  6.5+20250216-2     (won't fix)   deb     CVE-2025-69720  High      0.5% (38th)  0.4
 ...
 ```
 
-The two scanners disagree. Trivy finds 4 Critical/19 High; Grype finds 7 Critical/30 High (exact counts
+The two scanners disagree. Trivy finds 0 Critical/44 High; Grype finds 0 Critical/55 High (exact counts
 vary by database freshness). Both are correct — they use different advisory feeds and matching heuristics. The rule: **run both and triage by fixable + severity**.
 
 **Triage heuristic:**
-- Look at the "Fixed Version" column in Trivy. If a fix exists, rebuild the image on a patched base (`FROM debian:bookworm` → wait for the daily rebuild, or pin the fixed package version).
+- Look at the "Fixed Version" column in Trivy. If a fix exists, rebuild the image on a patched base (`FROM debian:bookworm` → wait for the daily rebuild, or pin the fixed package version). On the scan above most OS findings show `affected` with an empty Fixed Version, which means Debian has no patch yet.
 - If no fix exists, accept the risk explicitly, add it to your tracking backlog, and apply mitigating controls (network policy, sandboxing).
 - Medium and below: log and track; do not block CI.
 
@@ -488,7 +498,7 @@ The `exit-code: '1'` in the Trivy step means the step fails (and blocks the sign
 ==> [1/4] SBOM with syft  (local image — no registry pull)
     wrote sbom.spdx.json
 ==> [2/4] Vulnerability scan with trivy  (CRITICAL/HIGH — local image)
-Total: 23 (HIGH: 19, CRITICAL: 4)
+Total: 44 (HIGH: 44, CRITICAL: 0)
 ==> [3/4] Second opinion with grype  (local image)
 NAME       INSTALLED  FIXED IN  TYPE  VULNERABILITY        SEVERITY  EPSS  RISK
 ...

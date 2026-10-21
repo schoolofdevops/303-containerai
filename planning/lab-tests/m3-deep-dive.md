@@ -14,6 +14,31 @@ inside the container). Ran the entire validation with `export VLLM_PORT=8010` �
 the page reads `${VLLM_PORT:-8009}`, so this is a one-variable, machine-local override, not a
 course default. Documented on-page as a `:::note` immediately after the seed check.
 
+## Re-validation 2026-10-21 (freshness pass): Ollama side re-run on qwen3.5:2b
+
+Native Ollama 0.40.7 (MLX runner), `qwen3.5:2b` called through `/v1/chat/completions` with
+`"reasoning_effort":"none"` (the model thinks by default; without it the 48-token budget is spent on
+reasoning). vLLM-CPU re-run on the same stack (`labs/m3`, port 8009). The host was memory-pressured
+(swap near full) during capture, so several vLLM runs showed 10-100x stalls; the figures pasted into the page
+are from the run where the stack was warm. Absolute times are noisy; the sequential-vs-concurrent shape held.
+
+| Run | vLLM-CPU | Ollama (qwen3.5:2b) |
+|---|---|---|
+| Sequential, 4 prompts | 17.661s (139 tok) | 7.065s (112 tok, first request 4.7s model warm-up) |
+| Concurrent, 3 prompts | 6.037s (75 tok) | 1.664s (73 tok) |
+| Sequential, same 3 prompts | 20.634s | 1.954s |
+| Scaling (seq3 / conc3) | 3.42x | 1.17x |
+
+```
+$ node scripts/run-checks.mjs labs/m3/deep-dive.checks.json
+✅ vllm-up-if-running ... ✅ metrics-endpoint-if-running ... ✅ comparison-results
+✅ comparison-table-in-page ... ✅ pagedattention-section ... ✅ continuous-batching-section
+✅ swap-space-verdict-in-page
+
+7/7 checks · score 7/7
+```
+
+
 ## Step 1 — Probe: bring the lab up, confirm both servers
 
 ```
