@@ -54,7 +54,7 @@ Reach for a crew when the task produces a consequential action, when reviewing t
 
 ## 3. The incident crew's pipeline
 
-The crew runs as a pipeline, one stage after another. Each stage hands its output to the next, and the pipeline stops early if no runbook is found.
+The crew runs as a pipeline, one stage after another. Every stage sees the incident. The Investigator adds the runbook passage, the Fixer works from that passage, and the Reviewer checks the proposed fix against the same passage. Triage's classification is printed for the operator, not fed forward. The pipeline stops early if no runbook is found.
 
 ```mermaid
 flowchart TD
