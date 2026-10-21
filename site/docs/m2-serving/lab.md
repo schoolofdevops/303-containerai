@@ -186,17 +186,17 @@ CMD ["python", "client.py"]
 Build it:
 
 ```bash
-docker build --no-cache --progress=plain -t m2-client labs/m2/
+docker build --progress=plain -t m2-client labs/m2/
 ```
 
-`--no-cache` forces a clean first build and `--progress=plain` prints the full step log, so your output matches the block below. Plain `docker build -t m2-client labs/m2/` works too; it just shows less.
+`--progress=plain` prints the full step log instead of the animated view, so your output matches the block below. Plain `docker build -t m2-client labs/m2/` works too; it just shows less.
 
 **Expected output:**
 ```
 #0 building with "rancher" instance using docker driver
 
 #1 [internal] load build definition from Dockerfile
-#1 transferring dockerfile: 155B 0.0s done
+#1 transferring dockerfile: 155B done
 #1 DONE 0.0s
 
 #2 [internal] load metadata for docker.io/library/python:3.12-slim
@@ -212,36 +212,36 @@ docker build --no-cache --progress=plain -t m2-client labs/m2/
 
 #5 [1/4] FROM docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1
 #5 resolve docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1 0.0s done
-#5 CACHED
+#5 DONE 0.1s
 
 #6 [2/4] RUN pip install --no-cache-dir openai
-#6 3.474 Collecting openai
-#6 3.666   Downloading openai-3.35.1-py3-none-any.whl.metadata (44 kB)
+#6 4.672 Collecting openai
+#6 4.791   Downloading openai-3.35.1-py3-none-any.whl.metadata (44 kB)
 #6 ...
-#6 10.56 Successfully installed annotated-types-0.8.0 anyio-4.15.1 h11-0.16.0 httpcore2-2.16.0 httpx2-2.16.0 idna-3.20 jiter-0.17.0 openai-3.35.1 pydantic-2.14.1 pydantic-core-2.50.1 sniffio-1.3.1 truststore-0.10.5 typing-extensions-4.16.0 typing-inspection-0.4.4
-#6 10.56 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
-#6 10.76 
-#6 10.76 [notice] A new release of pip is available: 25.0.1 -> 26.2.2
-#6 10.76 [notice] To update, run: pip install --upgrade pip
-#6 DONE 11.2s
+#6 11.57 Successfully installed annotated-types-0.8.0 anyio-4.15.1 h11-0.16.0 httpcore2-2.16.0 httpx2-2.16.0 idna-3.20 jiter-0.17.0 openai-3.35.1 pydantic-2.14.1 pydantic-core-2.50.1 sniffio-1.3.1 truststore-0.10.5 typing-extensions-4.16.0 typing-inspection-0.4.4
+#6 11.57 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#6 11.90 
+#6 11.90 [notice] A new release of pip is available: 25.0.1 -> 26.2.2
+#6 11.90 [notice] To update, run: pip install --upgrade pip
+#6 DONE 12.9s
 
 #7 [3/4] WORKDIR /app
-#7 DONE 0.1s
+#7 DONE 0.3s
 
 #8 [4/4] COPY client.py .
 #8 DONE 0.1s
 
 #9 exporting to image
 #9 exporting layers
-#9 exporting layers 2.7s done
-#9 exporting manifest sha256:867f6c5579a9ca675c93a9eab02524bbfbcd88c5cac8a1396bf0f284a3c79c1e 0.0s done
-#9 exporting config sha256:cf6c20796062ada0397456fd23ede9a69bffd3ac6454ecfb7f1fd3ac5503e3e7 0.0s done
-#9 exporting attestation manifest sha256:8fc51bf1d735daba6d5a824245517c2df2d8bad83aa5848f40c5dd5ee725795c 0.0s done
-#9 exporting manifest list sha256:7533a53d655bc318579f367f188f2512e6224bbe80c18cc8d21e256ba92ab1de 0.0s done
+#9 exporting layers 3.3s done
+#9 exporting manifest sha256:9414dbd9d13452903097f63d39295731f6fccfd8781ef86b7506b33f3a4b217f 0.0s done
+#9 exporting config sha256:bab2a71669681149691309bfbe3976e105048bb96d0e852a6a857a5c566f9551 0.0s done
+#9 exporting attestation manifest sha256:4a03d9d017bbf255e446d7a1673cd6552831f35fbc696568ccb757cbe302d334 0.0s done
+#9 exporting manifest list sha256:30a8dc30b915ee6f5cc1c0be6a86856224805ed2aa20a8ef896ed311f5151b9f 0.0s done
 #9 naming to docker.io/library/m2-client:latest done
 #9 unpacking to docker.io/library/m2-client:latest
-#9 unpacking to docker.io/library/m2-client:latest 1.2s done
-#9 DONE 4.0s
+#9 unpacking to docker.io/library/m2-client:latest 1.7s done
+#9 DONE 5.2s
 ```
 
 > Lines marked `...` are whole pip log lines left out for length; everything else is verbatim.
@@ -259,7 +259,7 @@ docker run --rm m2-client
 
 **Expected output:**
 ```
-Containers are lightweight, standardized virtual machine environments that encapsulate an operating system, kernel, shell, and user application into a single reusable unit for efficient deployment and isolation across different systems.
+Containers are lightweight, portable, and modular components that encapsulate application code, runtime environment, and external dependencies to enable independent deployment across different operating systems and infrastructure environments using a standardized binary format.
 ```
 
 The model's exact wording will vary — what matters is that a sentence comes back, not an error.
@@ -309,9 +309,9 @@ docker compose -f labs/m2/compose.yaml run --rm client
 ```
  Network m2_default Creating 
  Network m2_default Created 
- Container m2-client-run-185db55d72e0 Creating 
- Container m2-client-run-185db55d72e0 Created 
-Containers are discrete, lightweight units of storage that allow you to encapsulate software applications and their data in a portable way without needing to know the underlying operating system details.
+ Container m2-client-run-891634bd6348 Creating 
+ Container m2-client-run-891634bd6348 Created 
+Containers are lightweight, isolated software platforms that encapsulate everything needed to run an application while enabling developers to quickly deploy, scale, and recover services with minimal downtime.
 ```
 
 > On first run you will also see Compose's network and container creation lines (shown above) before the model reply — Compose creates the default network. These disappear on subsequent runs.
