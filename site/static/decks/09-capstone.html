@@ -294,9 +294,38 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">CAP·05</div>
 </section>
 
+<!-- ============ SLIDE — STEP 0 · READINESS ============ -->
+<section>
+  <h2 class="t">Step 0: verify readiness</h2>
+  <p class="s">platform-check.sh runs four checks.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="platform-check.sh runs four checks in order: runtime reachable, Ollama serving both models, containers reach the model, tooling installed, then reports platform ready">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="25"  y="115" width="190" height="120" rx="10"/>
+      <rect x="245" y="115" width="190" height="120" rx="10"/>
+      <rect x="465" y="115" width="190" height="120" rx="10"/>
+      <rect x="685" y="115" width="190" height="120" rx="10"/>
+      <rect x="915" y="115" width="160" height="120" rx="12"/>
+      <path d="M217,175 L241,175" marker-end="url(#ah)"/>
+      <path d="M437,175 L461,175" marker-end="url(#ah)"/>
+      <path d="M657,175 L681,175" marker-end="url(#ah)"/>
+      <path d="M877,175 L911,175" marker-end="url(#ah)"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="120" y="160">1 · Runtime</text><text x="120" y="188" class="lbl-g">engine reachable</text>
+      <text x="340" y="160">2 · Ollama</text><text x="340" y="188" class="lbl-g">chat + embeddings</text>
+      <text x="560" y="160">3 · Wiring</text><text x="560" y="188" class="lbl-g">host.docker.internal</text>
+      <text x="780" y="160">4 · Tooling</text><text x="780" y="188" class="lbl-g">kit · thv · syft</text><text x="780" y="210" class="lbl-g">trivy · grype · cosign</text>
+    </g>
+    <text x="995" y="170" text-anchor="middle" class="lbl-b">PLATFORM</text>
+    <text x="995" y="198" text-anchor="middle" class="lbl-b">READY</text>
+    <text x="550" y="310" text-anchor="middle" class="lbl-g">a red ✗ names the layer, and the module to revisit</text>
+  </svg>
+  <div class="pageno">CAP·06</div>
+</section>
+
 <!-- ============ SLIDE 4 — MOVE 1 · SERVE ============ -->
 <section>
-  <h2 class="t">Move 1 serves the model</h2>
+  <h2 class="t">Step 1: serve the model</h2>
   <p class="s">One model, two homes, one shared API.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Ollama native or vLLM in a container both expose the same slash v1 endpoint that every consumer plugs into">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
@@ -306,7 +335,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="190" y="120" text-anchor="middle" class="lbl">Ollama &middot; native</text>
     <text x="190" y="150" text-anchor="middle" class="lbl-g">Metal · unified memory</text>
     <text x="190" y="260" text-anchor="middle" class="lbl">vLLM &middot; container</text>
-    <text x="190" y="290" text-anchor="middle" class="lbl-g">CPU (SmolLM2) or GPU</text>
+    <text x="190" y="290" text-anchor="middle" class="lbl-g">CPU (SmolLM2)</text>
 
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
       <path d="M325,125 L470,185" marker-end="url(#ahg)"/>
@@ -328,12 +357,78 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="935" y="190" text-anchor="middle" class="lbl-b">Every consumer</text>
     <text x="935" y="220" text-anchor="middle" class="lbl-g">app · agent · crew</text>
   </svg>
-  <div class="pageno">CAP·06</div>
+  <div class="pageno">CAP·07</div>
+</section>
+
+<!-- ============ SLIDE — STEP 2 · SHARED CHROMADB ============ -->
+<section>
+  <h2 class="t">Step 2: one shared ChromaDB</h2>
+  <p class="s">One vector store, so no port clash.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="The Docs Assistant, the Support Agent and the Incident Crew all read one shared ChromaDB container whose index lives on a named volume">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="40" y="40" width="240" height="80" rx="10"/>
+      <rect x="40" y="150" width="240" height="80" rx="10"/>
+      <rect x="40" y="260" width="240" height="80" rx="10"/>
+      <rect x="440" y="125" width="230" height="130" rx="12"/>
+      <rect x="840" y="150" width="210" height="80" rx="10"/>
+      <path d="M285,85 L436,170" marker-end="url(#ah)"/>
+      <path d="M285,190 L436,190" marker-end="url(#ah)"/>
+      <path d="M285,300 L436,215" marker-end="url(#ah)"/>
+      <path d="M674,190 L836,190" marker-end="url(#ah)"/>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="160" y="87">Docs Assistant</text>
+      <text x="160" y="197">Support Agent</text>
+      <text x="160" y="307">Incident Crew</text>
+      <text x="945" y="187">chroma_data</text><text x="945" y="212" class="lbl-g">volume keeps the index</text>
+    </g>
+    <text x="555" y="182" text-anchor="middle" class="lbl-b">ChromaDB</text>
+    <text x="555" y="210" text-anchor="middle" class="lbl-g">one container</text>
+    <text x="555" y="234" text-anchor="middle" class="lbl-g">health-checked first</text>
+    <text x="550" y="365" text-anchor="middle" class="lbl-g">per-module composes each bound their own, and clashed</text>
+  </svg>
+  <div class="pageno">CAP·08</div>
+</section>
+
+<!-- ============ SLIDE — STEP 3 · ARIA ROUTES ============ -->
+<section>
+  <h2 class="t">Step 3: Aria decides to retrieve</h2>
+  <p class="s">Agentic RAG: route first, then act.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Aria reads the question and routes it: RETRIEVE leads to a grounded answer from the runbook, ANSWER DIRECTLY leads to an ungrounded guess, so check the decision marker">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="30" y="150" width="170" height="80" rx="10"/>
+      <path d="M340,110 L425,190 L340,270 L255,190 Z"/>
+      <rect x="540" y="45" width="220" height="80" rx="10"/>
+      <rect x="840" y="45" width="220" height="80" rx="10"/>
+      <path d="M204,190 L250,190" marker-end="url(#ah)"/>
+      <path d="M385,150 L536,95" marker-end="url(#ah)"/>
+      <path d="M764,85 L836,85" marker-end="url(#ah)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-dasharray="8 6" stroke-linecap="round">
+      <rect x="540" y="255" width="220" height="80" rx="10"/>
+      <rect x="840" y="255" width="220" height="80" rx="10"/>
+      <path d="M385,230 L536,290" marker-end="url(#ahg)"/>
+      <path d="M764,295 L836,295" marker-end="url(#ahg)"/>
+    </g>
+    <text x="115" y="187" text-anchor="middle" class="lbl-b">Question</text>
+    <text x="115" y="215" text-anchor="middle" class="lbl-g">how do I restart…</text>
+    <text x="340" y="187" text-anchor="middle" class="lbl-sm">Aria</text>
+    <text x="340" y="211" text-anchor="middle" class="lbl-g">retrieve?</text>
+    <text x="650" y="82" text-anchor="middle" class="lbl-sm">decision: RETRIEVE</text>
+    <text x="650" y="107" text-anchor="middle" class="lbl-g">ChromaDB lookup</text>
+    <text x="950" y="82" text-anchor="middle" class="lbl-b">Grounded answer</text>
+    <text x="950" y="107" text-anchor="middle" class="lbl-g">exact runbook command</text>
+    <text x="650" y="292" text-anchor="middle" class="lbl-sm lbl-g">ANSWER DIRECTLY</text>
+    <text x="950" y="292" text-anchor="middle" class="lbl-g">a plausible guess</text>
+    <text x="950" y="317" text-anchor="middle" class="lbl-g">no runbook behind it</text>
+    <text x="800" y="200" text-anchor="middle" class="lbl-g">phrase it like the runbook, read the marker</text>
+  </svg>
+  <div class="pageno">CAP·09</div>
 </section>
 
 <!-- ============ SLIDE 5 — MOVE 2 · RUN THE CREW ============ -->
 <section>
-  <h2 class="t">Move 2 runs the Incident Crew</h2>
+  <h2 class="t">Step 4: run the Incident Crew</h2>
   <p class="s">Four specialists, one shared model and memory.</p>
   <svg viewBox="0 0 1100 400" role="img" aria-label="Triage to Investigate to Fix to Review pipeline all served by one model with ToolHive and ChromaDB below">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
@@ -365,12 +460,12 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="550" y="240" text-anchor="middle" class="lbl-g">one native model serves all four agents</text>
   </svg>
-  <div class="pageno">CAP·07</div>
+  <div class="pageno">CAP·10</div>
 </section>
 
 <!-- ============ SLIDE 6 — MOVE 3 · PACKAGE ============ -->
 <section>
-  <h2 class="t">Move 3 packages the ModelKit</h2>
+  <h2 class="t">Step 5: package the ModelKit</h2>
   <p class="s">Weights, prompt, and config sealed into one artifact.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="Three model inputs packed into a ModelKit box then pushed to a registry">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.2">
@@ -405,12 +500,12 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="940" y="185" text-anchor="middle" class="lbl-b">Registry</text>
     <text x="940" y="215" text-anchor="middle" class="lbl-g">GHCR · versioned</text>
   </svg>
-  <div class="pageno">CAP·08</div>
+  <div class="pageno">CAP·11</div>
 </section>
 
 <!-- ============ SLIDE 7 — MOVE 4 · SECURE ============ -->
 <section>
-  <h2 class="t">Move 4 secures the image</h2>
+  <h2 class="t">Step 6: secure the image</h2>
   <p class="s">Inventory it, scan it, sign it, sandbox every tool.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="An image passes through SBOM then scan gate then signing, with sandboxed tool execution shown below">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
@@ -446,12 +541,12 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="550" y="305" text-anchor="middle" class="lbl">Sandboxed tool execution</text>
     <text x="550" y="333" text-anchor="middle" class="lbl-g">ToolHive isolates every MCP tool call</text>
   </svg>
-  <div class="pageno">CAP·09</div>
+  <div class="pageno">CAP·12</div>
 </section>
 
 <!-- ============ SLIDE 8 — MOVE 5 · SHIP ============ -->
 <section>
-  <h2 class="t">Move 5 ships it through CI</h2>
+  <h2 class="t">Step 7: ship it through CI</h2>
   <p class="s">Push to main, the pipeline builds, scans, and ships.</p>
   <svg viewBox="0 0 1100 380" role="img" aria-label="A CI pipeline from git push through build scan sign to a published signed image in the registry">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
@@ -489,7 +584,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="470" y="330" text-anchor="middle" class="lbl-g">failed scan blocks the push, nothing ships</text>
   </svg>
-  <div class="pageno">CAP·10</div>
+  <div class="pageno">CAP·13</div>
 </section>
 
 <!-- ============ DIVIDER 3 — PORTABILITY PROOF ============ -->
@@ -498,28 +593,31 @@ footer, header, hgroup, main, menu, nav, section {
     <image href="../img/decks/09-capstone/divider3-any-runtime.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
   </svg>
   <h2 class="t" style="font-size:2.2em">3 &middot; Portability Proof</h2>
-  <div class="pageno">CAP·11</div>
+  <div class="pageno">CAP·14</div>
 </section>
 
 <!-- ============ SLIDE 9 — MOVE 6 · PORTABILITY PROOF ============ -->
 <section>
-  <h2 class="t">Move 6 proves it's portable</h2>
+  <h2 class="t">Prove it's portable on any runtime</h2>
   <p class="s">Swap the runtime, the output stays identical.</p>
-  <svg viewBox="0 0 1100 400" role="img" aria-label="Colima Rancher and OrbStack all run the same unchanged platform because OCI Compose and host.docker.internal are shared standards">
+  <svg viewBox="0 0 1100 400" role="img" aria-label="Colima, Rancher Desktop, OrbStack and Podman all run the same unchanged platform because OCI Compose and host.docker.internal are shared standards">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4">
-      <rect x="60"  y="60" width="220" height="70" rx="10"/>
-      <rect x="60"  y="155" width="220" height="70" rx="10"/>
-      <rect x="60"  y="250" width="220" height="70" rx="10"/>
+      <rect x="60"  y="25"  width="220" height="70" rx="10"/>
+      <rect x="60"  y="115" width="220" height="70" rx="10"/>
+      <rect x="60"  y="205" width="220" height="70" rx="10"/>
+      <rect x="60"  y="295" width="220" height="70" rx="10"/>
     </g>
     <g class="lbl" text-anchor="middle">
-      <text x="170" y="103">Colima</text>
-      <text x="170" y="198">Rancher</text>
-      <text x="170" y="293">OrbStack</text>
+      <text x="170" y="68">Colima</text>
+      <text x="170" y="158">Rancher Desktop</text>
+      <text x="170" y="248">OrbStack</text>
+      <text x="170" y="330">Podman</text><text x="170" y="352" class="lbl-g" style="font-size:14px">+ --add-host, once</text>
     </g>
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
-      <path d="M285,95  L470,185" marker-end="url(#ahg)"/>
-      <path d="M285,190 L470,195" marker-end="url(#ahg)"/>
-      <path d="M285,285 L470,205" marker-end="url(#ahg)"/>
+      <path d="M285,60  L470,170" marker-end="url(#ahg)"/>
+      <path d="M285,150 L470,185" marker-end="url(#ahg)"/>
+      <path d="M285,240 L470,205" marker-end="url(#ahg)"/>
+      <path d="M285,330 L470,220" marker-end="url(#ahg)"/>
     </g>
 
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
@@ -539,7 +637,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="1000" y="190" text-anchor="middle" class="lbl">Identical</text>
     <text x="1000" y="218" text-anchor="middle" class="lbl-g" font-size="15px">output</text>
   </svg>
-  <div class="pageno">CAP·12</div>
+  <div class="pageno">CAP·15</div>
 </section>
 
 <!-- ============ DIVIDER 4 — WHAT YOU BUILT AND WHERE TO GO NEXT ============ -->
@@ -548,7 +646,7 @@ footer, header, hgroup, main, menu, nav, section {
     <image href="../img/decks/09-capstone/divider4-top-of-ladder.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
   </svg>
   <h2 class="t" style="font-size:2.2em">4 &middot; What You Built — and Where to Go Next</h2>
-  <div class="pageno">CAP·13</div>
+  <div class="pageno">CAP·16</div>
 </section>
 
 <!-- ============ SLIDE 10 — THE ARC OF INTELLIGENCE ============ -->
@@ -575,7 +673,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="550" y="270" text-anchor="middle" class="lbl-g">simple &amp; predictable  ————————→  capable &amp; auditable</text>
   </svg>
-  <div class="pageno">CAP·14</div>
+  <div class="pageno">CAP·17</div>
 </section>
 
 <!-- ============ SLIDE 11 — CLOSING ============ -->
@@ -600,7 +698,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="967" y="167" text-anchor="middle" class="lbl">Any runtime</text>
   </svg>
   <p class="credit">Now open <b>Capstone · Lab</b>. &nbsp;·&nbsp; <b>Gourav Shah</b> · School of DevOps &amp; AI</p>
-  <div class="pageno">CAP·15</div>
+  <div class="pageno">CAP·18</div>
 </section>
 
 </div></div>

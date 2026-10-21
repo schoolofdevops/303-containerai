@@ -9,13 +9,13 @@
      Slide count: 11 → 15 (4 dividers added, zero content slides added/removed/reordered —
      the original 9 content slides + title + closing were already in lesson order 1→4). -->
 
-This companion doc maps the 15-slide explainer deck (`site/static/decks/09-capstone.html`) to the
+This companion doc maps the 18-slide explainer deck (`site/static/decks/09-capstone.html`) to the
 Capstone page (`site/docs/capstone/index.md`). The deck teaches **concepts**, not commands — it turns
 the capstone's "eight modules snap into one platform" narrative into a hand-drawn whiteboard walk a
 learner takes before opening the lab. Visual language follows the CourseSmith whiteboard style
 contract (`whiteboard-style-guide.md`): Patrick Hand cursive, `#1e1e1e` primary / `#757575` secondary
 strokes on white paper, five semantic pastel fills (green good · red bad · blue data · orange caution ·
-purple meta), the `#rough` wobble filter on shapes only, shared `#ah`/`#ahg` arrowhead markers. The arc:
+purple meta), the `#rough` wobble filter on boxes only, shared `#ah`/`#ahg` arrowhead markers. The arc:
 **eight modules → one wired platform → six shipped moves (serve, run, package, secure, ship, prove
 portable) → the arc of intelligence the course taught (naive RAG → agentic RAG → crew).**
 
@@ -24,20 +24,23 @@ portable) → the arc of intelligence the course taught (naive RAG → agentic R
 | # | Slide | Purpose | Visual | Takeaway |
 |---|-------|---------|--------|----------|
 | 1 | Ship the Acme AI Support Platform (title) | Frame the capstone: every module becomes one deployable product | Title scene: four module-group boxes fanning into one wheeled platform box | credit line: Gourav Shah · School of DevOps & AI · Capstone · Day 2 |
-| 2 | 1 · The Platform at a Glance (divider) | Open §1 — the platform's big-picture shape | — (divider) | n/a |
+| 2 | 1 · The Platform at a Glance (divider) | Open §1 — the platform's big-picture layout | — (divider) | n/a |
 | 3 | You're about to assemble the whole platform | See the three zones before touching a command: native host, containers, supply chain | Big-box anatomy: host boundary (Ollama) + containers boundary (3 apps + ChromaDB + ToolHive) + supply-chain lane (ModelKit, SBOM/sign, CI) | The container boundary is the rule: the model stays native, everything else is a container |
 | 4 | How the modules connect | Each of the eight modules maps to exactly one capability of the shipped platform | Two-column list (M1–M4 left, M5–M8 right) converging into one "Acme AI Support Platform" box | Nothing was thrown away — the capstone is the sum of eight modules, wired together |
 | 5 | 2 · Run It End-to-End (divider) | Open §2 — the seven runnable steps | — (divider) | n/a |
-| 6 | Move 1 serves the model | The model has two interchangeable homes behind one stable API | Two-panel comparison (Ollama native / vLLM container) fanning into a shared `/v1` endpoint box, then into "every consumer" | Swap the engine behind the wall socket — no downstream container changes a single line |
-| 7 | Move 2 runs the Incident Crew | Four specialised agents run in sequence, sharing one model and two shared services | Pipeline (Triage → Investigate → Fix → Review) with ToolHive + ChromaDB feeding in from below | Specialisation with an approval gate — a traceable, auditable incident-response report |
-| 8 | Move 3 packages the ModelKit | Weights, prompt, and config seal into one versioned, pushable artifact | Fan-out: three inputs → ModelKit box → Registry box | One command pulls exactly that version — no shared drives, no stray prompt files |
-| 9 | Move 4 secures the image | Every image is inventoried, scanned, and signed before it ships; every tool call is sandboxed | Pipeline (SBOM → Scan → Sign → Verify) with a reject branch, plus a sandboxed-execution box below | An image that fails the scan never reaches the registry; a passing one is signed and attested |
-| 10 | Move 5 ships it through CI | A push to `main` is the only trigger a release needs | Pipeline (push → build → scan → sign) into a signed GHCR box, with a reject branch back down | A passing build produces a signed, attested image any host can pull and verify |
-| 11 | 3 · Portability Proof (divider) | Open §3 — nothing above depends on the runtime | — (divider) | n/a |
-| 12 | Move 6 proves it's portable | Nothing above depends on which container runtime you run | Fan-out: three runtimes (Colima/Rancher/OrbStack) converging on one "same platform" box → "identical output" | The spec, not the vendor, defines the contract — steps 1–7 run unchanged on every runtime |
-| 13 | 4 · What You Built — and Where to Go Next (divider) | Open §4 — the ladder, the arc, and the next steps | — (divider) | n/a |
-| 14 | The arc you shipped | The three modules (M5/M6/M7) are one progression, not three unrelated demos | Staircase/ladder: Naive RAG → Agentic RAG → Crew, "simple & predictable → capable & auditable" | You learned not just how each pattern works, but when it is the right one to reach for |
-| 15 | You can now ship AI on any runtime (closing) | Send the learner into the lab with the whole arc in one image | Closing scene: sealed "Acme AI" platform box rolling toward "Any runtime" | Now open the Capstone lab. · Gourav Shah · School of DevOps & AI |
+| 6 | Step 0: verify readiness | The four readiness checks that gate the run, before anything starts | four check boxes in a row (runtime, Ollama, wiring, tooling) into a PLATFORM READY box | a red mark names the layer and the module to revisit |
+| 7 | Step 1: serve the model | The model has two interchangeable homes behind one stable API | Two-panel comparison (Ollama native / vLLM container) fanning into a shared `/v1` endpoint box, then into "every consumer" | Swap the engine behind the wall socket — no downstream container changes a single line |
+| 8 | Step 2: one shared ChromaDB | Why the capstone has exactly one vector store | Docs Assistant, Support Agent, Incident Crew all arrowing into one ChromaDB box, with the chroma_data volume | one health-checked ChromaDB, so no per-module port clash |
+| 9 | Step 3: Aria decides to retrieve | Agentic RAG in the run: route first, then act | question → Aria diamond → RETRIEVE branch to a grounded answer, ANSWER DIRECTLY dashed branch to a guess | read the decision marker before trusting the answer |
+| 10 | Step 4: run the Incident Crew | Four specialised agents run in sequence, sharing one model and two shared services | Pipeline (Triage → Investigate → Fix → Review) with ToolHive + ChromaDB feeding in from below | Specialisation with an approval gate — a traceable, auditable incident-response report |
+| 11 | Step 5: package the ModelKit | Weights, prompt, and config seal into one versioned, pushable artifact | Fan-out: three inputs → ModelKit box → Registry box | One command pulls exactly that version — no shared drives, no stray prompt files |
+| 12 | Step 6: secure the image | Every image is inventoried, scanned, and signed before it ships; every tool call is sandboxed | Pipeline (SBOM → Scan → Sign → Verify) with a reject branch, plus a sandboxed-execution box below | An image that fails the scan never reaches the registry; a passing one is signed and attested |
+| 13 | Step 7: ship it through CI | A push to `main` is the only trigger a release needs | Pipeline (push → build → scan → sign) into a signed GHCR box, with a reject branch back down | A passing build produces a signed, attested image any host can pull and verify |
+| 14 | 3 · Portability Proof (divider) | Open §3 — nothing above depends on the runtime | — (divider) | n/a |
+| 15 | Prove it's portable on any runtime | Nothing above depends on which container runtime you run | Fan-out: four runtimes (Colima/Rancher Desktop/OrbStack/Podman) converging on one "same platform" box → "identical output" | The spec, not the vendor, defines the contract — steps 1–7 run unchanged on every runtime |
+| 16 | 4 · What You Built — and Where to Go Next (divider) | Open §4 — the ladder, the arc, and the next steps | — (divider) | n/a |
+| 17 | The arc you shipped | The three modules (M5/M6/M7) are one progression, not three unrelated demos | Staircase/ladder: Naive RAG → Agentic RAG → Crew, "simple & predictable → capable & auditable" | You learned not just how each pattern works, but when it is the right one to reach for |
+| 18 | You can now ship AI on any runtime (closing) | Send the learner into the lab with the whole arc in one image | Closing scene: sealed "Acme AI" platform box rolling toward "Any runtime" | Now open the Capstone lab. · Gourav Shah · School of DevOps & AI |
 
 <!-- Visual pattern vocabulary used above (reuse before inventing):
      fan-out (slides 1, 8, 12) · two-panel comparison (slide 6) · big-box anatomy (slide 3) ·
@@ -46,7 +49,7 @@ portable) → the arc of intelligence the course taught (naive RAG → agentic R
 
 ## Recommended presentation order
 
-Present strictly 1 → 15. Open on slide 1 to set the "everything snaps together" frame, then divider 2
+Present strictly 1 → 18. Open on slide 1 to set the "everything snaps together" frame, then divider 2
 opens §1 and slide 3 is the conceptual hinge — linger here, it is the map the rest of the deck walks.
 After divider 5 (§2), slides 6–10 are one continuous build ("the six moves you actually run") — keep
 momentum, each move is one lab step. Slide 7 is the busiest single diagram (four agents + two shared
@@ -89,7 +92,7 @@ pencil sketch, hand-drawn line art, light cross-hatching, pure white background,
 | 2 · The Platform at a Glance | `site/static/img/decks/09-capstone/divider1-dispatch-desk.jpg` | A dispatch operator at a switchboard desk, several phone lines converging on one headset, filing cabinets and a locked cabinet behind — the module's dispatch-centre analogy from the narration |
 | 5 · Run It End-to-End | `site/static/img/decks/09-capstone/title-shipping-out.jpg` | A fully loaded cargo ship at a busy port, a crane lowering the last container into place — "running the whole platform, start to finish" |
 | 11 · Portability Proof | `site/static/img/decks/09-capstone/divider3-any-runtime.jpg` | One identical shipping box on a crane hook above a ship, a truck, and a train — the same box lands on any of the three, echoing the M1 shipping-container analogy |
-| 13 · What You Built | `site/static/img/decks/09-capstone/divider4-top-of-ladder.jpg` | A person at the top of a tall ladder looking out over a city skyline at sunrise — having climbed all eight rungs |
+| 13 · What You Built | `site/static/img/decks/09-capstone/divider4-top-of-ladder.jpg` | A person at the top of a tall ladder looking out over a city skyline at sunrise — having climbed all eight steps |
 
 Slides 1 (title) and 15 (closing) were left as their existing custom SVG diagrams — both already carry
 module-specific information (the eight-block-to-platform diagram, the sealed-container-rolling-to-any-runtime
@@ -138,8 +141,8 @@ the header note above):
 | Divider # | Slide | Title (verbatim to lesson header) | Inserted before |
 |---|---|---|---|
 | 1 | 2 | `1 · The Platform at a Glance` | Slide 3 (You're about to assemble the whole platform) |
-| 2 | 5 | `2 · Run It End-to-End` | Slide 6 (Move 1 serves the model) |
-| 3 | 11 | `3 · Portability Proof` | Slide 12 (Move 6 proves it's portable) |
+| 2 | 5 | `2 · Run It End-to-End` | Slide 6 (Step 1: serve the model) |
+| 3 | 11 | `3 · Portability Proof` | Slide 12 (Prove it's portable on any runtime) |
 | 4 | 13 | `4 · What You Built — and Where to Go Next` | Slide 14 (The arc you shipped) — **em dash kept verbatim by design**, the one expected exception in this module's em-dash check |
 
 ## Subtitle audit (2026-08-05 regen — all ≤10 words / ≤60 chars, hard fail >80)
@@ -159,3 +162,11 @@ the header note above):
 | 15 | Same architecture, new domain, swap the runbooks. | 49 | 7 |
 
 All pass. No orphan slides (dividers 2/5/11/13 carry no subtitle per §3a).
+
+## 2026-10-21 deck-pass edits
+
+- **New slides (three):** Step 0 readiness (6), Step 2 shared ChromaDB (8), Step 3 Aria routing (9). The deck is now 18 slides, `CAP·01` to `CAP·18`. The tables above keep the pre-pass numbers. Content slides after the new ones moved by +1 to +3.
+- **Step vocabulary:** the deck says "Step N" to match the lab page. The old "Move 1" to "Move 6" titles map to Steps 1, 4, 5, 6 and 7, and the portability slide is titled by its idea, not a step.
+- **Facts:** the serve slide says "CPU (SmolLM2)" only. The portability slide shows four runtimes (Colima, Rancher Desktop, OrbStack, Podman with its one-time `--add-host`).
+- **Accepted, not added:** the LoRA / QLoRA extension stays narration-only in Video 5. The Container X-Ray tip and the teardown tips are operational detail left to the lab page.
+- **Narration map now:** Video 1 slide 1. Video 2 slides 2-4. Video 3 slides 5-13. Video 4 slides 14-15. Video 5 slides 16-18.

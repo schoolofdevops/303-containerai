@@ -184,11 +184,11 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="110" y="323">5</text><text x="110" y="386">6</text>
     </g>
     <g class="lbl" text-anchor="start">
-      <text x="155" y="62">Build a supply chain: SBOM → scan → sign with Syft, Grype, Cosign</text>
+      <text x="155" y="62">Build a supply chain: SBOM → scan → sign with Syft, Trivy, Grype, Cosign</text>
       <text x="155" y="127">Sandbox tool and generated code in ephemeral, isolated containers</text>
       <text x="155" y="192">Harden the agent image: least privilege, read-only, capped, secrets out</text>
       <text x="155" y="257">Add input / output guardrails and human-in-the-loop review</text>
-      <text x="155" y="322">Run lightweight evals and tracing to catch regressions in CI</text>
+      <text x="155" y="322">Run a lightweight eval in CI to catch regressions</text>
       <text x="155" y="385">Govern the agent without a vendor: a policy the pipeline enforces</text>
     </g>
   </svg>
@@ -284,14 +284,6 @@ footer, header, hgroup, main, menu, nav, section {
   <div class="pageno">M8·06</div>
 </section>
 
-<!-- ============ DIVIDER 3 — SECTION 3 (no dedicated slide; the pipeline slide below already
-     draws the SBOM stage as its own labelled box — folded here rather than a redundant slide,
-     same editorial call as the pre-divider baseline spec; see sequence-spec coverage table) ============ -->
-<section class="divider">
-  <h2 class="t" style="font-size:2.2em">3 &middot; The SBOM: ingredients label for your image</h2>
-  <div class="pageno">M8·07</div>
-</section>
-
 <!-- ============ SLIDE — THE SUPPLY-CHAIN PIPELINE (CENTERPIECE, §2 + §3) ============ -->
 <section>
   <h2 class="t">The supply-chain pipeline</h2>
@@ -341,25 +333,67 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="1005" y="135" text-anchor="middle" class="lbl-g" style="font-size:15px">fix &amp;</text>
     <text x="1005" y="155" text-anchor="middle" class="lbl-g" style="font-size:15px">rebuild</text>
   </svg>
+  <div class="pageno">M8·07</div>
+</section>
+
+<!-- ============ DIVIDER 3 — SECTION 3 ============ -->
+<section class="divider">
+  <h2 class="t" style="font-size:2.2em">3 &middot; The SBOM: ingredients label for your image</h2>
   <div class="pageno">M8·08</div>
+</section>
+
+<!-- ============ SLIDE — SBOM (§3) ============ -->
+<section>
+  <h2 class="t">SBOM: Syft lists every package</h2>
+  <p class="s">One SPDX-JSON file: 95 packages.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="An agent image goes through Syft and becomes an SPDX-JSON file of 95 packages, which feeds the scanners and serves as the audit artifact">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="30" y="140" width="190" height="90" rx="10"/>
+      <rect x="290" y="140" width="190" height="90" rx="10"/>
+      <rect x="560" y="95" width="230" height="180" rx="10"/>
+      <rect x="860" y="55" width="210" height="80" rx="10"/>
+      <rect x="860" y="235" width="210" height="80" rx="10"/>
+      <path d="M224,185 L284,185" marker-end="url(#ah)"/>
+      <path d="M484,185 L554,185" marker-end="url(#ah)"/>
+      <path d="M795,150 L855,105" marker-end="url(#ah)"/>
+      <path d="M795,220 L855,265" marker-end="url(#ah)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
+      <path d="M590,205 L760,215"/>
+      <path d="M590,230 L735,240"/>
+      <path d="M590,255 L700,262"/>
+    </g>
+    <text x="125" y="180" text-anchor="middle" class="lbl-b">Agent image</text>
+    <text x="125" y="208" text-anchor="middle" class="lbl-g">acme-support-agent</text>
+    <text x="385" y="180" text-anchor="middle" class="lbl-b">Syft</text>
+    <text x="385" y="208" text-anchor="middle" class="lbl-g">catalogs every package</text>
+    <text x="675" y="135" text-anchor="middle" class="lbl-b">SPDX-JSON</text>
+    <text x="675" y="165" text-anchor="middle" class="lbl">95 packages</text>
+    <text x="675" y="190" text-anchor="middle" class="lbl-g">debs · wheels · binaries</text>
+    <text x="965" y="90" text-anchor="middle" class="lbl-b">Feeds the scanners</text>
+    <text x="965" y="116" text-anchor="middle" class="lbl-g">read it directly</text>
+    <text x="965" y="270" text-anchor="middle" class="lbl-b">Audit artifact</text>
+    <text x="965" y="296" text-anchor="middle" class="lbl-g">what is inside?</text>
+  </svg>
+  <div class="pageno">M8·09</div>
 </section>
 
 <!-- ============ DIVIDER 4 — SECTION 4 (header keeps its em dash verbatim, per lesson) ============ -->
 <section class="divider">
   <h2 class="t" style="font-size:2.2em">4 &middot; Vulnerability scanning: two scanners disagree — that is a feature</h2>
-  <div class="pageno">M8·09</div>
+  <div class="pageno">M8·10</div>
 </section>
 
 <!-- ============ SLIDE — TWO SCANNERS (§4) ============ -->
 <section>
   <h2 class="t">Two scanners disagree, that's the point</h2>
   <p class="s">Different feeds, different CVEs: triage, don't average.</p>
-  <svg viewBox="0 0 1100 380" role="img" aria-label="One image scanned by Trivy and Grype producing different counts, merged and triaged">
+  <svg viewBox="0 0 1100 380" role="img" aria-label="One image scanned by Trivy and Grype producing 44 and 55 High findings and zero Critical, merged and triaged">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.8">
       <rect x="440" y="40" width="220" height="70" rx="12"/>
     </g>
     <text x="550" y="72" text-anchor="middle" class="lbl-b">Agent image</text>
-    <text x="550" y="97" text-anchor="middle" class="lbl-g">96 packages</text>
+    <text x="550" y="97" text-anchor="middle" class="lbl-g">95 packages</text>
 
     <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-linecap="round">
       <path d="M490,112 L300,175" marker-end="url(#ahg)"/>
@@ -370,9 +404,9 @@ footer, header, hgroup, main, menu, nav, section {
       <rect x="690" y="185" width="290" height="90" rx="10"/>
     </g>
     <text x="265" y="222" text-anchor="middle" class="lbl-b">Trivy</text>
-    <text x="265" y="252" text-anchor="middle" class="lbl-g">2 Critical · 9 High</text>
+    <text x="265" y="252" text-anchor="middle" class="lbl-g">0 Critical · 44 High</text>
     <text x="835" y="222" text-anchor="middle" class="lbl-b">Grype</text>
-    <text x="835" y="252" text-anchor="middle" class="lbl-g">5 Critical · 28 High</text>
+    <text x="835" y="252" text-anchor="middle" class="lbl-g">0 Critical · 55 High</text>
 
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
       <rect x="390" y="300" width="320" height="60" rx="12"/>
@@ -381,7 +415,39 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="550" y="338" text-anchor="middle" class="lbl">Triage: fixable + severity</text>
   </svg>
-  <div class="pageno">M8·10</div>
+  <div class="pageno">M8·11</div>
+</section>
+
+<!-- ============ SLIDE — TRIAGE TIERS (§4) ============ -->
+<section>
+  <h2 class="t">Triage: fixable first, then severity</h2>
+  <p class="s">Three tiers decide what blocks the build.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A finding is sorted into three tiers: Critical or High with a fix means rebuild on a patched base, Critical or High with no fix means mitigate and document, Medium and below means log it and do not block CI">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="30" y="140" width="170" height="90" rx="10"/>
+      <rect x="320" y="35" width="320" height="80" rx="10"/>
+      <rect x="320" y="150" width="320" height="80" rx="10"/>
+      <rect x="320" y="265" width="320" height="80" rx="10"/>
+      <rect x="720" y="35" width="350" height="80" rx="10"/>
+      <rect x="720" y="150" width="350" height="80" rx="10"/>
+      <rect x="720" y="265" width="350" height="80" rx="10"/>
+      <path d="M204,170 L314,85" marker-end="url(#ah)"/>
+      <path d="M204,185 L314,190" marker-end="url(#ah)"/>
+      <path d="M204,200 L314,300" marker-end="url(#ah)"/>
+      <path d="M644,75 L714,75" marker-end="url(#ah)"/>
+      <path d="M644,190 L714,190" marker-end="url(#ah)"/>
+      <path d="M644,305 L714,305" marker-end="url(#ah)"/>
+    </g>
+    <text x="115" y="182" text-anchor="middle" class="lbl-b">Finding</text>
+    <text x="115" y="210" text-anchor="middle" class="lbl-g">from either scanner</text>
+    <text x="480" y="82" text-anchor="middle" class="lbl">Critical/High, fix exists</text>
+    <text x="480" y="197" text-anchor="middle" class="lbl">Critical/High, no fix yet</text>
+    <text x="480" y="312" text-anchor="middle" class="lbl">Medium and below</text>
+    <text x="895" y="82" text-anchor="middle" class="lbl-sm">Rebuild on patched base, re-scan</text>
+    <text x="895" y="197" text-anchor="middle" class="lbl-sm">Mitigate and document the risk</text>
+    <text x="895" y="312" text-anchor="middle" class="lbl-sm">Log it, re-scan on schedule, do not block</text>
+  </svg>
+  <div class="pageno">M8·12</div>
 </section>
 
 <!-- ============ DIVIDER 5 — SECTION 5 ============ -->
@@ -390,7 +456,7 @@ footer, header, hgroup, main, menu, nav, section {
     <image href="../img/decks/08-security/signing-wax-seal-crate.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
   </svg>
   <h2 class="t">5 &middot; Signing: the tamper-evident seal</h2>
-  <div class="pageno">M8·11</div>
+  <div class="pageno">M8·13</div>
 </section>
 
 <!-- ============ SLIDE — SIGNING / TAMPER SEAL (§5) ============ -->
@@ -423,7 +489,7 @@ footer, header, hgroup, main, menu, nav, section {
     </g>
     <text x="940" y="345" text-anchor="middle" class="lbl-g">valid seal → run · else refuse</text>
   </svg>
-  <div class="pageno">M8·12</div>
+  <div class="pageno">M8·14</div>
 </section>
 
 <!-- ============ DIVIDER 6 — SECTION 6 ============ -->
@@ -432,7 +498,7 @@ footer, header, hgroup, main, menu, nav, section {
     <image href="../img/decks/08-security/sandbox-locked-crate.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
   </svg>
   <h2 class="t">6 &middot; Sandboxing agent, tool, and generated code</h2>
-  <div class="pageno">M8·13</div>
+  <div class="pageno">M8·15</div>
 </section>
 
 <!-- ============ SLIDE — SANDBOXING / BLAST RADIUS (§6) ============ -->
@@ -470,13 +536,59 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="150" y="300">--pids-limit · --memory · no-new-privileges</text>
     </g>
   </svg>
-  <div class="pageno">M8·14</div>
+  <div class="pageno">M8·16</div>
+</section>
+
+<!-- ============ SLIDE — GVISOR + TOOLHIVE (§6) ============ -->
+<section>
+  <h2 class="t">Deeper isolation: gVisor and ToolHive</h2>
+  <p class="s">Kernel interception, and one box per tool.</p>
+  <svg viewBox="0 0 1100 380" role="img" aria-label="Left: sandboxed code hits gVisor's user-space layer before it can reach the host kernel. Right: the agent calls ToolHive, which runs web search, a code interpreter and the file system each in its own container">
+    <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6" stroke-linecap="round">
+      <rect x="25" y="140" width="130" height="90" rx="10"/>
+      <rect x="200" y="125" width="180" height="120" rx="10"/>
+      <rect x="420" y="140" width="110" height="90" rx="10"/>
+      <path d="M158,185 L196,185" marker-end="url(#ah)"/>
+      <path d="M384,185 L416,185" marker-end="url(#ah)"/>
+      <rect x="600" y="140" width="110" height="90" rx="10"/>
+      <rect x="760" y="140" width="130" height="90" rx="10"/>
+      <rect x="940" y="55" width="140" height="70" rx="10"/>
+      <rect x="940" y="150" width="140" height="70" rx="10"/>
+      <rect x="940" y="245" width="140" height="70" rx="10"/>
+      <path d="M714,185 L756,185" marker-end="url(#ah)"/>
+      <path d="M894,170 L936,100" marker-end="url(#ah)"/>
+      <path d="M894,185 L936,185" marker-end="url(#ah)"/>
+      <path d="M894,200 L936,275" marker-end="url(#ah)"/>
+    </g>
+    <g filter="url(#rough)" fill="none" stroke="#757575" stroke-width="2" stroke-dasharray="4 6">
+      <rect x="935" y="45" width="150" height="90" rx="12"/>
+      <rect x="935" y="140" width="150" height="90" rx="12"/>
+      <rect x="935" y="235" width="150" height="90" rx="12"/>
+    </g>
+    <g class="lbl-g" text-anchor="middle">
+      <text x="280" y="60">Kernel-level</text>
+      <text x="840" y="30">Per-tool</text>
+    </g>
+    <g class="lbl-sm" text-anchor="middle">
+      <text x="90" y="178">Sandboxed</text><text x="90" y="202">code</text>
+      <text x="290" y="170">gVisor</text><text x="290" y="196" class="lbl-g">user-space</text><text x="290" y="218" class="lbl-g">syscall layer</text>
+      <text x="475" y="178">Host</text><text x="475" y="202">kernel</text>
+      <text x="655" y="190">Agent</text>
+      <text x="825" y="190">ToolHive</text>
+      <text x="1010" y="95">Web search</text>
+      <text x="1010" y="190">Code interpreter</text>
+      <text x="1010" y="285">File system</text>
+    </g>
+    <text x="280" y="290" text-anchor="middle" class="lbl-g">an exploit hits gVisor first</text>
+    <text x="840" y="350" text-anchor="middle" class="lbl-g">own network and filesystem policy each</text>
+  </svg>
+  <div class="pageno">M8·17</div>
 </section>
 
 <!-- ============ DIVIDER 7 — SECTION 7 ============ -->
 <section class="divider">
   <h2 class="t" style="font-size:2.2em">7 &middot; Hardening the container image</h2>
-  <div class="pageno">M8·15</div>
+  <div class="pageno">M8·18</div>
 </section>
 
 <!-- ============ SLIDE — HARDENING CHECKLIST (§7) ============ -->
@@ -509,13 +621,13 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="160" y="389">Secrets out of the image · HEALTHCHECK + probes</text>
     </g>
   </svg>
-  <div class="pageno">M8·16</div>
+  <div class="pageno">M8·19</div>
 </section>
 
 <!-- ============ DIVIDER 8 — SECTION 8 ============ -->
 <section class="divider">
   <h2 class="t" style="font-size:2.2em">8 &middot; Guardrails and evaluation</h2>
-  <div class="pageno">M8·17</div>
+  <div class="pageno">M8·20</div>
 </section>
 
 <!-- ============ SLIDE — GUARDRAILS + HUMAN-IN-THE-LOOP (§8) ============ -->
@@ -545,7 +657,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="930" y="252" text-anchor="middle" class="lbl-g" style="font-size:16px">gate on destructive</text>
     <text x="930" y="274" text-anchor="middle" class="lbl-g" style="font-size:16px">commands</text>
   </svg>
-  <div class="pageno">M8·18</div>
+  <div class="pageno">M8·21</div>
 </section>
 
 <!-- ============ SLIDE — EVALS + TRACING (§8, cont.) ============ -->
@@ -578,9 +690,9 @@ footer, header, hgroup, main, menu, nav, section {
       <text x="585" y="228">PASS</text>
       <text x="925" y="228">PASS</text>
     </g>
-    <text x="550" y="315" text-anchor="middle" class="lbl-g">3 cases per dimension · runs in CI on every push · tracing records every step</text>
+    <text x="550" y="315" text-anchor="middle" class="lbl-g">3 cases per dimension · runs in CI on every push · catches regressions</text>
   </svg>
-  <div class="pageno">M8·19</div>
+  <div class="pageno">M8·22</div>
 </section>
 
 <!-- ============ DIVIDER 9 — SECTION 9 ============ -->
@@ -589,7 +701,7 @@ footer, header, hgroup, main, menu, nav, section {
     <image href="../img/decks/08-security/governance-four-locks-ledger.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
   </svg>
   <h2 class="t">9 &middot; Governance without a vendor</h2>
-  <div class="pageno">M8·20</div>
+  <div class="pageno">M8·23</div>
 </section>
 
 <!-- ============ SLIDE — GOVERNANCE AS A POLICY GATE (§9) ============ -->
@@ -630,7 +742,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="1015" y="105" text-anchor="middle" class="lbl">permit</text>
     <text x="1015" y="300" text-anchor="middle" class="lbl-g">deny</text>
   </svg>
-  <div class="pageno">M8·21</div>
+  <div class="pageno">M8·24</div>
 </section>
 
 <!-- ============ SLIDE 22 — CLOSING / LAB LEAD-IN ============ -->
@@ -660,7 +772,7 @@ footer, header, hgroup, main, menu, nav, section {
   </svg>
   <p class="s" style="font-size:1.1em">In the lab: run the tools, prove isolation.</p>
   <p class="credit">Head to <b>Module 8 · Lab</b>. &nbsp;·&nbsp; Gourav Shah · School of DevOps &amp; AI</p>
-  <div class="pageno">M8·22</div>
+  <div class="pageno">M8·25</div>
 </section>
 
 
