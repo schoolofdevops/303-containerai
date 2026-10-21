@@ -4,7 +4,7 @@
 > cleared, reading this + `CLAUDE.md` + `planning/ROADMAP.md` fully restores context. Keep it concise
 > and update it after every task/decision.
 
-**Last updated:** 2026-10-21 (v1.9.0 released 2026-10-21: 2026 freshness pass; next, in order: (1) post-workshop model decision — keep qwen3.5:2b (MLX mxfp8, 3.1 GB) for the 2026-10-22 workshop; then A/B `qwen3.5:2b-q4_K_M` (1.9 GB) / `qwen3.5:0.8b` on think-off, M6 routing gate, RAG answer, tok/s, resident RAM, and switch only if all pass + smoke test green; (2) deck-audit + deck-author pass over all 15 decks (M2 §6, M6 MCP 2026 slides missing; 01/03/03b/08/09 decks not audited in v1.9.0); (3) sandboxing deep-dive + observability plan, see planning/plans/)
+**Last updated:** 2026-10-21 (v1.9.0 released 2026-10-21: 2026 freshness pass; next, in order: (1) post-workshop model decision — keep qwen3.5:2b (MLX mxfp8, 3.1 GB) for the 2026-10-22 workshop; then A/B `qwen3.5:2b-q4_K_M` (1.9 GB) / `qwen3.5:0.8b` on think-off, M6 routing gate, RAG answer, tok/s, resident RAM, and switch only if all pass + smoke test green; (2) DONE 2026-10-21 (PR #6): deck-audit + deck-author pass over all 15 decks, +23 slides, report planning/audits/deck-audit-report.md — open items there: chapter-contract restructure, dividers for the new M2 §6 / M6 MCP chapters, narration → voiceover format, quiz 10–15 rule, banned words in docs; (3) sandboxing deep-dive + observability plan, see planning/plans/)
 **Active phase:** ✅ **COURSE COMPLETE** — M1–M8 + Capstone all live + lab-validated. Working on `main`.
 **Live site:** https://schoolofdevops.github.io/303-containerai/ (every page 200)
 **Execution mode:** subagent-driven, grouped into waves; controller reviews + live validation
