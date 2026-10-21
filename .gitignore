@@ -11,3 +11,7 @@ labs/tools/container-xray/state.json.tmp
 
 # scratch / non-versioned working area
 sandbox/
+
+# lab secrets and generated deck exports
+labs/**/.env
+planning/decks/exports/
