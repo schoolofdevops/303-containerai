@@ -53,13 +53,13 @@ reference-repos/  cloned reuse assets (gitignored)
 
 Each module folder (`site/docs/mN-*/`) contains `lesson.md`, `lab.md`, `quiz.mdx`.
 
-## Environment facts (this machine — verified 2026-07-05)
+## Environment facts (this machine — verified 2026-10-21)
 
 - **arm64, 16 GB RAM** — the course's reference laptop. Nothing in a lab may exceed ~4–6 GB peak.
 - **Rancher Desktop** running (docker server 29.5.2, dockerd/moby). **`docker` is NOT on the default
   PATH** — it's at `~/.rd/bin/docker`. Shell exports don't persist between separate Bash tool calls,
   so prefix automated docker commands with `PATH="$HOME/.rd/bin:$PATH"`. `nerdctl` is in the same dir.
-- **Ollama** v0.40.7 serving natively on `:11434` (Metal; MLX runner for qwen3.5). Model `qwen3.5:2b` (2.7 GB) pulled, plus optional `qwen3:4b` and `nomic-embed-text`.
+- **Ollama** v0.40.7 serving natively on `:11434` (Metal; MLX runner for qwen3.5). Model `qwen3.5:2b` (3.1 GB) pulled, plus optional `qwen3:4b` and `nomic-embed-text`.
 - **ToolHive** `thv` v0.55.2 at `/usr/local/bin/thv`.
 - `qwen3.5` thinks by default — every call passes `think:false` (native) or `reasoning_effort:"none"` (`/v1`).
 - **Node v22 / npm 10** present.

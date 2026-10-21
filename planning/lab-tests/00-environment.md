@@ -4,7 +4,7 @@
 **Date:** 2026-10-21
 **Runtime:** Rancher Desktop — docker client `29.5.3-rd`, server `29.5.2` (dockerd/moby)
 **Model server:** Ollama `0.40.7` (native, Metal; MLX runner for qwen3.5), serving on `:11434`
-**Model:** `qwen3.5:2b` (2.7 GB), optional `qwen3:4b`, embeddings `nomic-embed-text`
+**Model:** `qwen3.5:2b` (3.1 GB), optional `qwen3:4b`, embeddings `nomic-embed-text`
 **MCP gateway:** ToolHive `v0.55.2`
 
 > Note: on this machine `docker` is not on the default PATH; automated checks prefix
@@ -58,7 +58,7 @@ NAME          ID              SIZE      PROCESSOR    CONTEXT    RUNNER    UNTIL
 qwen3.5:2b    dfaf2605162e    3.2 GB    100% GPU     4096       mlx       4 minutes from now
 ```
 
-Model details:
+Model details (abridged: license section omitted):
 
 ```
 $ ollama show qwen3.5:2b
@@ -119,7 +119,7 @@ Generate from inside a container:
 ```
 $ docker run --rm curlimages/curl:latest -s http://host.docker.internal:11434/api/chat \
     -d '{"model":"qwen3.5:2b","stream":false,"think":false,"messages":[{"role":"user","content":"Say hi in 5 words."}]}' | jq -r '"response: "+.message.content, "model: "+.model'
-response: Hello there, I'm ready to help!
+response: Hello there!
 model: qwen3.5:2b
 ```
 
