@@ -208,18 +208,18 @@ marker sentence, a large filler block, a back marker, then the real question) wa
 `num_ctx=4096`. What happens next depends on which engine Ollama runs the model on. Check the
 `RUNNER` column of `ollama ps`.
 
-On the **llama.cpp runner**, tested here with `qwen2.5:1.5b` on Ollama v0.40.7, the prompt is cut
+On the **llama.cpp runner**, tested here with `qwen3:4b` on Ollama v0.40.7 (a stand-in, chosen only because Ollama runs it on llama.cpp rather than MLX), the prompt is cut
 down. `prompt_eval_count` came back as `2050`, roughly half the context window, which leaves
 headroom for the answer. The Ollama server log (`~/.ollama/logs/server.log` on macOS) shows how:
 
 ```text
-level=WARN source=llama_server.go:334 msg="truncating input prompt" limit=2050 prompt=30880 keep=4 new=2050
+level=WARN source=llama_server.go:334 msg="truncating input prompt" limit=2050 prompt=30861 keep=4 new=2050
 ```
 
 It keeps a tiny fixed prefix (`keep=4` tokens, effectively nothing) and discards everything else
 *except* the most recent `limit` tokens. The truncation keeps the **tail** of the prompt, not the
-head. The model confirmed it: it answered with the *back* marker (`OTTER`) and had lost the *front*
-marker (`ZEBRA`) entirely. The front of an over-budget prompt is what gets dropped.
+head. The model confirmed it: its output mentioned the *back* marker (`OTTER`) and never the *front*
+marker (`ZEBRA`), which had been dropped. The front of an over-budget prompt is what gets dropped.
 
 On the **MLX runner**, which Ollama 0.40.7 uses for `qwen3.5:2b` on this Mac, the same prompt was
 **not** truncated. `prompt_eval_count` was `30863`, no truncation warning appeared in the log, and
