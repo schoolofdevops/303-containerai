@@ -19,7 +19,7 @@ Assets for the Module 1 lab: **"Prove the Wiring"**.
   ```
 - Model pulled:
   ```bash
-  ollama pull qwen2.5:1.5b
+  ollama pull qwen3.5:2b
   ollama list    # verify it appears
   ```
 
@@ -35,7 +35,7 @@ chmod +x call-ollama.sh
 ./call-ollama.sh "What is a container registry?"
 
 # Different model
-MODEL=qwen2.5:3b ./call-ollama.sh "Explain RAG in one sentence."
+MODEL=qwen3:4b ./call-ollama.sh "Explain RAG in one sentence."
 ```
 
 Expected output: a JSON object with a `"response"` field containing the model's answer.
@@ -57,4 +57,4 @@ containerised everything else.
 |---------|-----|
 | `curl: (6) Could not resolve host: host.docker.internal` | Check your runtime's network mode; Rancher Desktop supports this by default |
 | `connection refused` on port 11434 | Run `ollama serve` or `brew services start ollama` |
-| Model not found error | Run `ollama pull qwen2.5:1.5b` |
+| Model not found error | Run `ollama pull qwen3.5:2b` |

@@ -1,8 +1,8 @@
 {
   "checks": [
-    { "id": "ollama-v1-models", "describe": "native Ollama OpenAI-compatible /v1/models lists qwen2.5:1.5b",
+    { "id": "ollama-v1-models", "describe": "native Ollama OpenAI-compatible /v1/models lists qwen3.5:2b",
       "run": "curl -s http://localhost:11434/v1/models",
-      "assert": { "contains": "qwen2.5:1.5b" } },
+      "assert": { "contains": "qwen3.5:2b" } },
     { "id": "compose-build", "describe": "m2 compose client image builds",
       "run": "PATH=\"$HOME/.rd/bin:$PATH\" docker compose -f labs/m2/compose.yaml build",
       "assert": { "exit": 0 } },

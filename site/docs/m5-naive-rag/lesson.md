@@ -33,7 +33,7 @@ Every production GenAI application has four parts:
 
 | Component | Role | M5 concrete |
 |---|---|---|
-| **LLM endpoint** | Text generation | `qwen2.5:1.5b` via native Ollama :11434 |
+| **LLM endpoint** | Text generation | `qwen3.5:2b` via native Ollama :11434 |
 | **Embedding model** | Convert text ↔ vectors | `nomic-embed-text` (768-dim) via Ollama |
 | **Vector database** | Store and search by semantic similarity | ChromaDB 0.5.20 in a container |
 | **Application** | Run the pipeline, serve the UI, handle state | Streamlit app in a container |
@@ -89,7 +89,7 @@ flowchart TD
 
     subgraph native["Native Ollama :11434 (host)"]
         EMBED["② ④ nomic-embed-text\n768-dim vectors"]
-        GEN["⑦ qwen2.5:1.5b\ngenerate"]
+        GEN["⑦ qwen3.5:2b\ngenerate"]
     end
 
     DOC --> CHUNK

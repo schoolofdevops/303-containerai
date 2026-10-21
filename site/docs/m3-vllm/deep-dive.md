@@ -29,7 +29,7 @@ cd labs/m3
 bash up.sh
 ```
 
-**Machine budget:** native Ollama (`qwen2.5:1.5b`, ~1 GB resident) and the m3 vLLM container
+**Machine budget:** native Ollama (`qwen3.5:2b`, ~1 GB resident) and the m3 vLLM container
 (SmolLM2-135M, capped at 4 CPU / 5 GB in `compose.yaml`) **coexist on this machine**: Ollama runs
 native on the host, vLLM runs inside the 4 CPU / 6 GB VM this course targets — you do not need to
 stop one to run the other. Confirm both are reachable before the experiment in §6:
@@ -384,7 +384,7 @@ Now the same four prompts against native Ollama, same shape, same `max_tokens`:
 time (while read -r p; do
   curl -s http://localhost:11434/v1/chat/completions \
     -H "Content-Type: application/json" \
-    -d "{\"model\":\"qwen2.5:1.5b\",\"messages\":[{\"role\":\"user\",\"content\":\"$p\"}],\"max_tokens\":48}" \
+    -d "{\"model\":\"qwen3.5:2b\",\"messages\":[{\"role\":\"user\",\"content\":\"$p\"}],\"max_tokens\":48}" \
     -o /dev/null -w "%{http_code} %{time_total}s\n"
 done < prompts.txt)
 ```
@@ -442,7 +442,7 @@ time (
 for p in "Say OK." "In one sentence, what is a container?" "Name two container runtimes."; do
   curl -s http://localhost:11434/v1/chat/completions \
     -H "Content-Type: application/json" \
-    -d "{\"model\":\"qwen2.5:1.5b\",\"messages\":[{\"role\":\"user\",\"content\":\"$p\"}],\"max_tokens\":48}" \
+    -d "{\"model\":\"qwen3.5:2b\",\"messages\":[{\"role\":\"user\",\"content\":\"$p\"}],\"max_tokens\":48}" \
     -o /dev/null -w "%{http_code} %{time_total}s\n" &
 done
 wait
@@ -494,7 +494,7 @@ time (
 for p in "Say OK." "In one sentence, what is a container?" "Name two container runtimes."; do
   curl -s http://localhost:11434/v1/chat/completions \
     -H "Content-Type: application/json" \
-    -d "{\"model\":\"qwen2.5:1.5b\",\"messages\":[{\"role\":\"user\",\"content\":\"$p\"}],\"max_tokens\":48}" \
+    -d "{\"model\":\"qwen3.5:2b\",\"messages\":[{\"role\":\"user\",\"content\":\"$p\"}],\"max_tokens\":48}" \
     -o /dev/null -w "%{http_code} %{time_total}s\n"
 done
 )
@@ -530,7 +530,7 @@ cat > ~/vllm-deepdive-lab/comparison-results.txt << 'EOF'
 vLLM-CPU vs native Ollama — same prompts, m3 deep-dive experiment
 Machine: arm64, Rancher Desktop VM 5 CPU / 8 GB, VLLM_PORT=8010 (machine-local — host 8009 had a stale forward)
 vLLM 0.9.1-oe2403lts (CPU build), model HuggingFaceTB/SmolLM2-135M-Instruct
-Ollama native, model qwen2.5:1.5b
+Ollama native, model qwen3.5:2b
 
 Sequential (4 prompts, one after another):
   vLLM-CPU : 200 8.462310s / 200 1.896633s / 200 5.088494s / 200 4.156934s -> real 19.673s
@@ -554,7 +554,7 @@ Approx tokens/sec (completion_tokens / wall time, aggregate):
   Ollama sequential(4)    : 125 tok / 3.765s  ~= 33.2 tok/s
   Ollama concurrent(3)    : 42 tok / 1.301s   ~= 32.3 tok/s
 
-Headline: Ollama is faster in absolute tokens/sec at this toy CPU scale (qwen2.5:1.5b via a mature
+Headline: Ollama is faster in absolute tokens/sec at this toy CPU scale (qwen3.5:2b via a mature
 optimized runtime vs SmolLM2-135M via vLLM eager-mode float32 CPU path with real per-step overhead).
 But the SHAPE differs exactly as PagedAttention/continuous-batching theory predicts: vLLM-CPUs
 concurrent wall time is ~3.1x better than linear scaling from its own sequential baseline, while

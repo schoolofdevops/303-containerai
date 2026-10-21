@@ -45,7 +45,7 @@ By the end of this deep dive, you'll be able to look at any small multi-agent pi
 
 ### Narration script
 
-The lab treated `qwen2.5:1.5b` as one model wearing four different hats. That's true. But each of those four calls uses a different temperature, and that difference is not an accident — it was chosen on purpose, one agent at a time.
+The lab treated `qwen3.5:2b` as one model wearing four different hats. That's true. But each of those four calls uses a different temperature, and that difference is not an accident — it was chosen on purpose, one agent at a time.
 
 Think of temperature as how much a musician is allowed to improvise around a melody. At low temperature, the musician plays the melody exactly as written, every single time. Reliable, maybe a little boring, but correct. At high temperature, the musician takes liberties — sometimes brilliant, sometimes off-key. Now, in an incident-response crew, where do you want that improvisation? Almost nowhere. This crew is mostly the string section, reading sheet music. A wrong note here is expensive, so most of it should be exact and repeatable.
 
@@ -240,4 +240,4 @@ This deep dive closes out Module 7. From here, the course moves into Module 8, w
 
 - All temperature values (0, 0.2, 0.9), the five-call cost count, and the Variant A/B outcomes are taken directly from the source deep-dive page's own captured transcripts and code excerpts — no new claims were introduced.
 - Variant B's specific fabricated command (`kubectl rollout restart deployment kafka-event-streaming -n prod`) and the "outcome flips across repeated runs" claim are both stated in the source as an actual observed/captured run — narrated as such, not generalized into "this always happens."
-- The source explicitly flags that `qwen2.5:1.5b`-scale variance is illustrative of the mechanism, not a universal temperature recipe — this caveat is preserved in Video 6 rather than dropped.
+- The source explicitly flags that `qwen3.5:2b`-scale variance is illustrative of the mechanism, not a universal temperature recipe — this caveat is preserved in Video 6 rather than dropped.

@@ -9,6 +9,6 @@ client = OpenAI(base_url=os.environ.get("OPENAI_BASE_URL", "http://host.docker.i
 prompt = sys.argv[1] if len(sys.argv) > 1 else "Explain containers in one sentence."
 
 resp = client.chat.completions.create(
-    model=os.environ.get("MODEL", "qwen2.5:1.5b"),
+    model=os.environ.get("MODEL", "qwen3.5:2b"),
     messages=[{"role": "user", "content": prompt}])
 print(resp.choices[0].message.content)

@@ -14,7 +14,7 @@ import urllib.request
 
 OLLAMA = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 CHROMA = f"http://localhost:{os.getenv('CHROMA_PORT', '8000')}"
-LLM = os.getenv("LLM_MODEL", "qwen2.5:1.5b")
+LLM = os.getenv("LLM_MODEL", "qwen3.5:2b")
 EMB = os.getenv("EMBEDDING_MODEL", "nomic-embed-text")
 COLLECTION = "checks-roundtrip"
 DOCS_PATH = os.path.join(os.path.dirname(__file__), "docs", "acme-runbooks.md")

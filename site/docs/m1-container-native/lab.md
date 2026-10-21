@@ -8,7 +8,7 @@ title: 'Lab: Prove the Wiring'
 **Goal:** Confirm that a throwaway container can reach the natively-served Ollama model on your Mac, get a real inference response back, and understand exactly why this wiring exists.
 
 **Time:** ~20 minutes  
-**Prerequisites:** Rancher Desktop (or Colima / OrbStack / Podman) installed and running; Ollama installed natively; `qwen2.5:1.5b` pulled.
+**Prerequisites:** Rancher Desktop (or Colima / OrbStack / Podman) installed and running; Ollama installed natively; `qwen3.5:2b` pulled.
 
 ---
 
@@ -57,13 +57,13 @@ ollama list
 **Expected output:**
 ```
 NAME            ID              SIZE      MODIFIED
-qwen2.5:1.5b    65ec06548149    986 MB    About an hour ago
+qwen3.5:2b    dfaf2605162e    3.1 GB    About an hour ago
 ```
 
-`qwen2.5:1.5b` should appear. If it doesn't, pull it:
+`qwen3.5:2b` should appear. If it doesn't, pull it:
 
 ```bash
-ollama pull qwen2.5:1.5b
+ollama pull qwen3.5:2b
 ```
 
 Also confirm the native API responds:
@@ -74,7 +74,7 @@ curl -s http://localhost:11434/api/tags
 
 **Expected output** (abbreviated):
 ```json
-{"models":[{"name":"qwen2.5:1.5b","model":"qwen2.5:1.5b",...}]}
+{"models":[{"name":"qwen3.5:2b","model":"qwen3.5:2b",...}]}
 ```
 
 :::info[Why native on Mac?]
@@ -91,12 +91,12 @@ This is the heart of the lab. A throwaway `curlimages/curl` container will POST 
 ```bash
 docker run --rm curlimages/curl:latest -s \
   http://host.docker.internal:11434/api/generate \
-  -d '{"model":"qwen2.5:1.5b","prompt":"Say hi in 5 words.","stream":false}'
+  -d '{"model":"qwen3.5:2b","prompt":"Say hi in 5 words.","stream":false}'
 ```
 
 **Expected output:**
 ```json
-{"model":"qwen2.5:1.5b","created_at":"...","response":"Hello there! How can I help you today?","done":true,...}
+{"model":"qwen3.5:2b","created_at":"...","response":"Hello there! How can I help you today?","done":true,...}
 ```
 
 You should see a `"response"` field with a short reply. The exact wording varies — the model is generative. What proves the wiring works is any non-error JSON with a `"response"` key.
@@ -131,7 +131,7 @@ Run it with the default prompt:
 
 **Expected output** (the response wording varies — the model is generative; the JSON *shape* is what matters):
 ```json
-{"model":"qwen2.5:1.5b","created_at":"...","response":"A container is a lightweight virtualization technology that packages an application with its dependencies so it runs the same anywhere.","done":true,...}
+{"model":"qwen3.5:2b","created_at":"...","response":"A container is a lightweight virtualization technology that packages an application with its dependencies so it runs the same anywhere.","done":true,...}
 ```
 
 Run it with a custom prompt:
@@ -142,7 +142,7 @@ Run it with a custom prompt:
 
 **Expected output** (wording will differ):
 ```json
-{"model":"qwen2.5:1.5b","created_at":"...","response":"A container registry is an online repository for storing and managing container images.","done":true,...}
+{"model":"qwen3.5:2b","created_at":"...","response":"A container registry is an online repository for storing and managing container images.","done":true,...}
 ```
 
 The script is a thin wrapper around the `docker run` command from Step 3. Open it and read it — there are no surprises:
@@ -186,11 +186,11 @@ curl http://localhost:11434/api/tags
 ```
 :::
 
-:::warning[`model "qwen2.5:1.5b" not found`]
+:::warning[`model "qwen3.5:2b" not found`]
 Pull the model:
 
 ```bash
-ollama pull qwen2.5:1.5b
+ollama pull qwen3.5:2b
 ```
 :::
 

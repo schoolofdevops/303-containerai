@@ -43,7 +43,7 @@ The three engines you'll encounter in this course:
 | **llama.cpp** | Minimal footprint, CPU or Metal | Yes | The inference core inside Ollama; use directly for maximum control |
 | **LocalAI** | Multi-backend OpenAI hub | Yes | One container routing to multiple backends: llama.cpp, Whisper, Stable Diffusion |
 
-**Ollama** is the engine you already have running from M1. It's serving `qwen2.5:1.5b` on Metal at `:11434`. The lab builds a containerized client that calls it.
+**Ollama** is the engine you already have running from M1. It's serving `qwen3.5:2b` on Metal at `:11434`. The lab builds a containerized client that calls it.
 
 **llama.cpp** is the inference engine *inside* Ollama. It handles GGUF-format models, quantization, and hardware acceleration. You can run llama.cpp in its own container when you need something lighter than the full Ollama stack.
 
@@ -97,7 +97,7 @@ graph LR
 
 *The app talks to the contract. Which engine sits behind it is a deployment decision, not a code decision.*
 
-This is the one idea that makes the rest of the course click. The Acme Docs Assistant (M5), the Support Agent (M6), and the Incident Crew (M7) all speak this same contract. So when the team decides to move from a 1.5B dev model to a 13B production model, the application code does not change at all.
+This is the one idea that makes the rest of the course click. The Acme Docs Assistant (M5), the Support Agent (M6), and the Incident Crew (M7) all speak this same contract. So when the team decides to move from a 2B dev model to a 13B production model, the application code does not change at all.
 
 ---
 
@@ -105,7 +105,7 @@ This is the one idea that makes the rest of the course click. The Acme Docs Assi
 
 **Analogy:** Quantization is like compressing a photo. A camera RAW file is huge, and mathematically it's perfect. A JPEG at 80% quality is a fraction of the size. You can barely tell the difference for most purposes, and it loads instantly. GGUF is the JPEG for LLM weights: a compact, quantized format that llama.cpp (and therefore Ollama) loads and runs well on CPU and Metal, without needing CUDA.
 
-When you run `ollama pull qwen2.5:1.5b`, Ollama fetches a GGUF file at roughly `Q4_K_M` quantization, not the original float16 weights. The `1.5b` part is the parameter count. The quantization level is the compression setting.
+When you run `ollama pull qwen3.5:2b`, Ollama fetches a GGUF file at roughly `Q4_K_M` quantization, not the original float16 weights. The `2b` part is the parameter count. The quantization level is the compression setting.
 
 **Practical sizing rule:** parameter count into 0.6 gives you roughly the RAM usage at Q4 quantization. A 7B model costs roughly 4 GB. On 16 GB unified memory, with 8 GB reserved for the OS and app containers, you have about 4 to 5 GB for the model.
 
@@ -113,14 +113,14 @@ When you run `ollama pull qwen2.5:1.5b`, Ollama fetches a GGUF file at roughly `
 
 | Model | Approx size (Q4) | Strength | Course use |
 |-------|-----------------|----------|-----------|
-| `qwen2.5:1.5b` | ~1 GB | Fast iteration | Labs (already pulled) |
-| `qwen2.5:3b` | ~2 GB | Better reasoning, still fast | Optional upgrade |
+| `qwen3.5:2b` | ~3.1 GB | Fast iteration | Labs (already pulled) |
+| `qwen3:4b` | ~2.5 GB | Better reasoning, still fast | Optional upgrade |
 | **Qwen3** 4B-8B | 2-5 GB | Latest reasoning series, strong tool use | Recommended beyond labs |
 | **Llama 3.2** 3B | ~2 GB | Meta's compact instruction model | Good general tasks |
 | **Mistral 7B** | ~4 GB | Strong instruction following | Popular production baseline |
 | **gpt-oss** 20B | too big for 16 GB | OpenAI's open-weight release; great via Docker Model Runner on bigger machines | Demo only (Section 1) |
 
-Stay with `qwen2.5:1.5b` for all the labs in this course. It keeps iteration fast and the machine responsive. The model-selection decision gets more interesting in M3, when you learn to serve a model with vLLM and need to think about the trade-off between throughput and model size.
+Stay with `qwen3.5:2b` for all the labs in this course. It keeps iteration fast and the machine responsive. The model-selection decision gets more interesting in M3, when you learn to serve a model with vLLM and need to think about the trade-off between throughput and model size.
 
 ---
 
@@ -164,7 +164,7 @@ This portability is the real payoff of that universal contract. The app treats t
 | Open engines | Ollama (dev standard), llama.cpp (core, minimal), LocalAI (multi-backend hub) |
 | The `/v1` contract | Two endpoints, one URL, swap engines by changing an env var, never code |
 | GGUF + quantization | Compressed weights that fit laptop RAM; Q4 ≈ 0.6 × parameter count in GB |
-| Model selection | `qwen2.5:1.5b` for labs; Qwen3, Llama 3.x, Mistral 7B for heavier tasks |
+| Model selection | `qwen3.5:2b` for labs; Qwen3, Llama 3.x, Mistral 7B for heavier tasks |
 | Two wiring patterns | Mac → native model via `host.docker.internal`; Windows/Linux → model container via Compose hostname |
 
 ---

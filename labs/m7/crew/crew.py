@@ -10,7 +10,7 @@ import json, os, re, sys, urllib.request, pathlib
 
 OLLAMA = os.getenv("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
 CHROMA = f"http://{os.getenv('CHROMA_HOST','localhost')}:{os.getenv('CHROMA_PORT','8000')}"
-LLM = os.getenv("LLM_MODEL", "qwen2.5:1.5b")
+LLM = os.getenv("LLM_MODEL", "qwen3.5:2b")
 EMB = os.getenv("EMBEDDING_MODEL", "nomic-embed-text")
 COLLECTION = "acme_runbooks"
 HERE = pathlib.Path(__file__).parent

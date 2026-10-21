@@ -13,7 +13,7 @@
 # Apple-Silicon pattern: Ollama runs NATIVELY on the host; every container
 # reaches it via http://host.docker.internal:11434. Never containerize the model.
 #
-# Prereqs:  ollama pull qwen2.5:1.5b  &&  ollama pull nomic-embed-text
+# Prereqs:  ollama pull qwen3.5:2b  &&  ollama pull nomic-embed-text
 services:
 
   # ── Shared vector memory ─────────────────────────────────────────────────────
@@ -52,7 +52,7 @@ services:
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
-      - LLM_MODEL=qwen2.5:1.5b
+      - LLM_MODEL=qwen3.5:2b
       - EMBEDDING_MODEL=nomic-embed-text
     depends_on:
       chromadb:
@@ -74,7 +74,7 @@ services:
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
-      - LLM_MODEL=qwen2.5:1.5b
+      - LLM_MODEL=qwen3.5:2b
       - EMBEDDING_MODEL=nomic-embed-text
     depends_on:
       chromadb:
@@ -91,7 +91,7 @@ services:
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
-      - LLM_MODEL=qwen2.5:1.5b
+      - LLM_MODEL=qwen3.5:2b
       - EMBEDDING_MODEL=nomic-embed-text
     depends_on:
       chromadb:

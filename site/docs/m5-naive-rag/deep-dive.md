@@ -150,7 +150,7 @@ alongside direction, which cosine similarity ignores entirely. If you ever chang
 models, check whether the new model's vectors are normalized before assuming the ranking behaves
 the same way.
 
-**Why the embedder — not the LLM — defines retrieval quality.** The LLM (`qwen2.5:1.5b`) never
+**Why the embedder — not the LLM — defines retrieval quality.** The LLM (`qwen3.5:2b`) never
 sees your documents until after retrieval hands it a slice of text. Every retrieval decision —
 which chunk counts as "similar" — is made entirely by `nomic-embed-text`'s 768-dimensional
 representation of meaning. If the embedding model doesn't distinguish "restart" from "backup" in
@@ -160,7 +160,7 @@ the same sentence at different, incomparable coordinates — `nomic-embed-text`'
 "restart the payments service" and a hypothetical second model's vector for the same sentence are
 not points in the same space, so comparing across them (or storing embeddings from one and
 querying with the other) produces nonsense distances. `nomic-embed-text` was chosen for this
-course because it is small enough to run natively on Ollama alongside `qwen2.5:1.5b` within the
+course because it is small enough to run natively on Ollama alongside `qwen3.5:2b` within the
 6 GB budget and produces reasonable general-purpose retrieval quality without a GPU. A larger
 domain-tuned embedder (e.g. a code- or legal-specific embedding model) would out-retrieve it on
 that domain — at a proportionally larger memory and latency cost.
@@ -170,7 +170,7 @@ that domain — at a proportionally larger memory and latency cost.
 ## 4 — Context-window budget: what actually has to fit
 
 `init_llm()` sets `num_ctx=4096` on the Ollama LLM — that is the real ceiling every prompt this
-app builds has to fit inside, independent of `qwen2.5:1.5b`'s much larger native training context.
+app builds has to fit inside, independent of `qwen3.5:2b`'s much larger native training context.
 The augmented prompt the app sends to the model (`main.py`, the `augmented_prompt` f-string) has
 four parts, and every one of them eats into that 4096-token budget:
 
@@ -204,7 +204,7 @@ crowds out the answer entirely inside a 4096 window, and Ollama silently truncat
 it exceeds `num_ctx`.
 
 **Verified live, not assumed.** A deliberately oversized prompt (~40K raw tokens: a unique marker
-sentence, a large filler block, then the real question) sent to `qwen2.5:1.5b` with `num_ctx=4096`
+sentence, a large filler block, then the real question) sent to `qwen3.5:2b` with `num_ctx=4096`
 produced `prompt_eval_count: 2050` — Ollama cut the prompt down to roughly half the context
 window, not the full 4096, leaving headroom for the answer. The underlying `llama-server`'s debug
 log shows exactly how:
@@ -494,7 +494,7 @@ VARIANTS = {
 # possible. The live Streamlit app keeps 0.7 for more natural answers — expect its UI answers to
 # vary more, run to run, than what this script prints.
 emb = OllamaEmbeddings(model="nomic-embed-text", base_url=OLLAMA)
-llm = OllamaLLM(model="qwen2.5:1.5b", base_url=OLLAMA, temperature=0, num_ctx=4096)
+llm = OllamaLLM(model="qwen3.5:2b", base_url=OLLAMA, temperature=0, num_ctx=4096)
 client = chromadb.HttpClient(host=CHROMA_HOST, port=CHROMA_PORT)
 
 for name, params in VARIANTS.items():

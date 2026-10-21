@@ -3,11 +3,11 @@
     { "id": "runtime-up", "describe": "container runtime responds",
       "run": "PATH=\"$HOME/.rd/bin:$PATH\" docker version",
       "assert": { "exit": 0 } },
-    { "id": "ollama-native", "describe": "native Ollama serving with qwen2.5:1.5b pulled",
+    { "id": "ollama-native", "describe": "native Ollama serving with qwen3.5:2b pulled",
       "run": "curl -s http://localhost:11434/api/tags",
-      "assert": { "contains": "qwen2.5:1.5b" } },
+      "assert": { "contains": "qwen3.5:2b" } },
     { "id": "container-to-host", "describe": "throwaway container reaches host Ollama and gets an inference response",
-      "run": "PATH=\"$HOME/.rd/bin:$PATH\" docker run --rm curlimages/curl:latest -s http://host.docker.internal:11434/api/generate -d '{\"model\":\"qwen2.5:1.5b\",\"prompt\":\"Say OK\",\"stream\":false}'",
+      "run": "PATH=\"$HOME/.rd/bin:$PATH\" docker run --rm curlimages/curl:latest -s http://host.docker.internal:11434/api/generate -d '{\"model\":\"qwen3.5:2b\",\"prompt\":\"Say OK\",\"stream\":false}'",
       "assert": { "contains": "\"response\"" } }
   ]
 }

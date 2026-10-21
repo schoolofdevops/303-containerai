@@ -26,7 +26,7 @@ The container boundary is the single rule this whole course is built on: **the m
 ```mermaid
 graph TD
     subgraph HOST["Host — native (Metal / CPU)"]
-        OL["Ollama :11434\nqwen2.5:1.5b + nomic-embed-text"]
+        OL["Ollama :11434\nqwen3.5:2b + nomic-embed-text"]
     end
 
     subgraph CONTAINERS["Containers — OCI (any runtime)"]
@@ -75,7 +75,7 @@ Expected output:
   ✔ docker CLI + engine reachable
 == 2. Model serving (native Ollama, OpenAI-compatible) ==
   ✔ Ollama serving on :11434
-  ✔ chat model present (qwen2.5)
+  ✔ chat model present (qwen3.5)
   ✔ embedding model present (nomic-embed-text)
 == 3. Container → native model wiring ==
   ✔ containers reach the model via host.docker.internal
@@ -150,7 +150,7 @@ Aria, the declarative agent from M6, reads the question, decides whether it need
 
 :::note[Phrasing matters for a small model's routing]
 
-`qwen2.5:1.5b`'s routing step is a single yes or no judgment call. Vaguer phrasing (for example, "payments
+`qwen3.5:2b`'s routing step is a single yes or no judgment call. Vaguer phrasing (for example, "payments
 pod keeps restarting, what do I do?") can miss and answer directly instead of retrieving, and the model
 then hallucinates a plausible-looking command instead of giving you the real runbook answer. Ask the same
 way M6's own lab does: a direct "how do I restart X" question that mirrors the runbook's own language, and
@@ -317,4 +317,4 @@ The platform is not tied to IT operations. The same architecture (native Ollama,
 
 ### Extension: fine-tuned models with LoRA / QLoRA (M3B)
 
-This course uses `qwen2.5:1.5b` from the public Ollama library. But if your use case demands a model trained on your own proprietary data, the M3B extension covers LoRA and QLoRA fine-tuning workflows that produce a new GGUF file. That file gets packaged straight into a ModelKit (M4) and secured through the M8 pipeline. The container architecture stays the same, only the model artifact is different. The wall socket stays the same; you just swapped the power station behind it.
+This course uses `qwen3.5:2b` from the public Ollama library. But if your use case demands a model trained on your own proprietary data, the M3B extension covers LoRA and QLoRA fine-tuning workflows that produce a new GGUF file. That file gets packaged straight into a ModelKit (M4) and secured through the M8 pipeline. The container architecture stays the same, only the model artifact is different. The wall socket stays the same; you just swapped the power station behind it.

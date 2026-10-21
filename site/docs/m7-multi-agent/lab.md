@@ -7,10 +7,10 @@ title: 'Lab: Multi-Agent Incident Crew'
 
 > **What you build:** A four-agent crew (Triage → Investigator → Fixer → Reviewer) running in a single container, sharing one Ollama model endpoint and the ChromaDB knowledge base from M6. You will run two incidents — one that gets APPROVED, one that gets REJECTED/escalated — and understand the relevance gate that makes the difference.
 
-**Prerequisites:** `qwen2.5:1.5b` and `nomic-embed-text` pulled in Ollama; the M6 ChromaDB data (or the crew will ingest the runbooks fresh).
+**Prerequisites:** `qwen3.5:2b` and `nomic-embed-text` pulled in Ollama; the M6 ChromaDB data (or the crew will ingest the runbooks fresh).
 
 ```bash
-ollama pull qwen2.5:1.5b
+ollama pull qwen3.5:2b
 ollama pull nomic-embed-text
 ```
 
@@ -86,7 +86,7 @@ The glue script is the whole crew in ~100 lines. Three things to look for:
 cat labs/m7/crew/crew.py
 ```
 
-**Shared model endpoint.** Every `llm()` call goes to the same `OLLAMA_BASE_URL`. There is no per-agent model — all four agents share one `qwen2.5:1.5b` instance.
+**Shared model endpoint.** Every `llm()` call goes to the same `OLLAMA_BASE_URL`. There is no per-agent model — all four agents share one `qwen3.5:2b` instance.
 
 **Sequential pipeline.** `run()` calls Triage, then Investigator (with RAG), then Fixer, then Reviewer. Each function's output is a Python string passed to the next call. No framework, no state machine — just four Python calls in order.
 
@@ -140,7 +140,7 @@ docker compose run --rm crew "The checkout page is returning HTTP 503 errors for
 **Expected output:**
 
 ```
-[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen2.5:1.5b)
+[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen3.5:2b)
 
 ======================================================================
 INCIDENT: The checkout page is returning HTTP 503 errors for all users.
@@ -158,7 +158,7 @@ INCIDENT: The checkout page is returning HTTP 503 errors for all users.
 OUTCOME: APPROVED — ready for a human to apply
 ```
 
-On a small model like `qwen2.5:1.5b`, exact wording varies run to run — the `AREA:`/`SEV:` labels may
+On a small model like `qwen3.5:2b`, exact wording varies run to run — the `AREA:`/`SEV:` labels may
 drop or the retrieved runbook excerpt may run longer than shown above. Judge the run by the stage
 markers and the final `OUTCOME:` line, not the exact prose.
 
@@ -184,7 +184,7 @@ docker compose run --rm crew "The Kafka event streaming cluster has stopped proc
 **Expected output:**
 
 ```
-[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen2.5:1.5b)
+[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen3.5:2b)
 
 ======================================================================
 INCIDENT: The Kafka event streaming cluster has stopped processing messages.
@@ -242,7 +242,7 @@ docker compose run --rm crew "The payments service is throwing connection errors
 
 ## CrewAI framework variant
 
-The declarative crew above is the default: no dependencies, works on a 1.5B model, fits any laptop. When you need role-based orchestration, dynamic task delegation, or the structure that a framework provides, **CrewAI** is the go-to choice.
+The declarative crew above is the default: no dependencies, works on a 2B model, fits any laptop. When you need role-based orchestration, dynamic task delegation, or the structure that a framework provides, **CrewAI** is the go-to choice.
 
 The reference repository [`gouravshah/compose-for-agents`](https://github.com/gouravshah/compose-for-agents) — specifically its `crew-ai/` directory — shows a CrewAI crew defined in `agents.yaml` and `tasks.yaml`. This is optional external reading; nothing in this lab requires cloning it. To run it anywhere — not just on Docker Desktop with Docker Model Runner — two ports are needed.
 
@@ -264,7 +264,7 @@ services:
   agents:
     environment:
       - OPENAI_BASE_URL=http://host.docker.internal:11434/v1
-      - OPENAI_MODEL_NAME=qwen2.5
+      - OPENAI_MODEL_NAME=qwen3.5
 ```
 
 Ollama's `/v1` endpoint is OpenAI-compatible, so CrewAI's `openai` client talks to it without modification.
@@ -281,7 +281,7 @@ ToolHive starts the DuckDuckGo MCP server, wraps it with network isolation, and 
 
 :::note[Why CrewAI wants a bigger model]
 
-CrewAI's role-based orchestration involves more complex message routing and delegation logic than the four-call sequential pipeline above. A 1.5B model can struggle with the internal coordination prompts. The reference repo defaults to `gemma3:4B` (~4 GB). Use the declarative crew for laptop demos; use CrewAI when the structure is worth the larger model requirement.
+CrewAI's role-based orchestration involves more complex message routing and delegation logic than the four-call sequential pipeline above. A 2B model can struggle with the internal coordination prompts. The reference repo defaults to `gemma3:4B` (~4 GB). Use the declarative crew for laptop demos; use CrewAI when the structure is worth the larger model requirement.
 
 :::
 
@@ -293,13 +293,13 @@ CrewAI's role-based orchestration involves more complex message routing and dele
 
 If Triage or Reviewer outputs vary between runs, set `temperature=0` explicitly for those calls. The declarative crew already does this; if you extend it, keep classification and safety-gate calls at temperature 0. For generation tasks (Fixer, Investigator summary), `temperature=0.2` works well.
 
-If the 1.5B model produces garbled output for a particular incident, bump to `qwen2.5:3b` by setting `LLM_MODEL=qwen2.5:3b` in the compose environment or exporting it before running.
+If the 2B model produces garbled output for a particular incident, bump to `qwen3:4b` by setting `LLM_MODEL=qwen3:4b` in the compose environment or exporting it before running.
 
 :::
 
 :::warning[Relevance gate tuning]
 
-The gate prompt — "Does this passage directly address THIS incident? Answer ONLY YES or NO." — is calibrated for `qwen2.5:1.5b`. If you switch models and find the gate is too strict (rejecting valid runbooks) or too loose (passing irrelevant ones), adjust the prompt to be more specific about what "directly addresses" means for your knowledge base.
+The gate prompt — "Does this passage directly address THIS incident? Answer ONLY YES or NO." — is calibrated for `qwen3.5:2b`. If you switch models and find the gate is too strict (rejecting valid runbooks) or too loose (passing irrelevant ones), adjust the prompt to be more specific about what "directly addresses" means for your knowledge base.
 
 :::
 

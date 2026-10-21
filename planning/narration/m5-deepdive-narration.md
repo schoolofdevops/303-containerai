@@ -99,11 +99,11 @@ Now, does this actually matter here? For this particular embedding model, `nomic
 
 But that stops being true the moment you swap in an embedding model that doesn't normalize its output. Then L2 distance starts rewarding vector magnitude as well as direction — something cosine similarity ignores completely. So if you ever change embedding models, the first thing to check is whether the new model's vectors are normalized, before you assume the ranking behaves the same way it did before.
 
-And here's the part worth sitting with: the language model — `qwen2.5:1.5b` in this lab — never even sees your documents until after retrieval has already handed it a slice of text. Every decision about which chunk counts as "similar" is made entirely by the embedding model's numeric picture of meaning. If that embedding model can't tell "restart" from "backup" in its own vector space, no amount of downstream language-model quality is going to fix a bad retrieval.
+And here's the part worth sitting with: the language model — `qwen3.5:2b` in this lab — never even sees your documents until after retrieval has already handed it a slice of text. Every decision about which chunk counts as "similar" is made entirely by the embedding model's numeric picture of meaning. If that embedding model can't tell "restart" from "backup" in its own vector space, no amount of downstream language-model quality is going to fix a bad retrieval.
 
 This is also why you can't just swap embedding models without re-embedding your whole corpus. Two different models place the same sentence at different coordinates that aren't comparable to each other. So storing embeddings from one model and querying with another doesn't just work worse — it produces meaningless distances, because they're not even points in the same space.
 
-Why `nomic-embed-text` specifically, for this course? It's small enough to run natively on Ollama, right alongside `qwen2.5:1.5b`, inside a six gigabyte budget, with no GPU required — and it gives reasonable general-purpose retrieval quality for that cost. A larger, domain-tuned embedding model — something built specifically for code, or for legal text — would out-retrieve it on that domain. But that comes at a proportionally bigger memory and latency cost.
+Why `nomic-embed-text` specifically, for this course? It's small enough to run natively on Ollama, right alongside `qwen3.5:2b`, inside a six gigabyte budget, with no GPU required — and it gives reasonable general-purpose retrieval quality for that cost. A larger, domain-tuned embedding model — something built specifically for code, or for legal text — would out-retrieve it on that domain. But that comes at a proportionally bigger memory and latency cost.
 
 ---
 
@@ -115,7 +115,7 @@ Why `nomic-embed-text` specifically, for this course? It's small enough to run n
 
 ### Script
 
-Now let's talk about the ceiling every single prompt in this app has to fit inside. The lab sets `num_ctx=4096` on the Ollama model — and that's the real limit, independent of how much larger `qwen2.5:1.5b`'s native training context actually is.
+Now let's talk about the ceiling every single prompt in this app has to fit inside. The lab sets `num_ctx=4096` on the Ollama model — and that's the real limit, independent of how much larger `qwen3.5:2b`'s native training context actually is.
 
 Every prompt the app builds has four parts stacked together — some fixed instructions, the retrieved context, the user's question, and then space left over for the answer. Every one of those four eats into that four thousand and ninety-six token budget.
 
@@ -123,7 +123,7 @@ Let's do the actual arithmetic, using this lab's own numbers. As a rough rule of
 
 But watch what happens the moment you scale up either side of that equation. Raise `k` to ten, on a corpus with fifteen-hundred-character chunks, and ten times fifteen hundred is already around three thousand seven hundred and fifty tokens of context alone. That crowds out the answer entirely inside a four thousand and ninety-six window — and here's the important part — Ollama does not warn you and stop. It silently truncates the prompt once it goes over `num_ctx`.
 
-Now, I didn't want to just tell you that and move on — we actually verified this live, not assumed it. We sent a deliberately oversized prompt to `qwen2.5:1.5b`, with `num_ctx` still set to four thousand and ninety-six — a unique marker sentence at the front, a large filler block in the middle, and the real question at the very end, roughly forty thousand raw tokens total. And the model's own log told us exactly what happened: it truncated the input down to about two thousand and fifty tokens, roughly half the window, leaving headroom for the answer.
+Now, I didn't want to just tell you that and move on — we actually verified this live, not assumed it. We sent a deliberately oversized prompt to `qwen3.5:2b`, with `num_ctx` still set to four thousand and ninety-six — a unique marker sentence at the front, a large filler block in the middle, and the real question at the very end, roughly forty thousand raw tokens total. And the model's own log told us exactly what happened: it truncated the input down to about two thousand and fifty tokens, roughly half the window, leaving headroom for the answer.
 
 Here's the detail that matters most, and it surprised us the first time we saw it. The truncation keeps a tiny fixed prefix — basically nothing — and then discards everything except the most recent tokens. So it keeps the tail of your prompt, not the head. We confirmed this directly: the model answered using the marker we'd placed at the back, and it had completely lost the marker we'd placed at the front.
 

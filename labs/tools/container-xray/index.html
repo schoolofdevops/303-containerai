@@ -249,7 +249,7 @@
         '<div class="subLbl">models (' + models.length + ')</div>' +
         '<div class="chipWrap">' + (models.length
           ? models.map(function(m){ return '<span class="chip up"><span class="cdot"></span>' + esc(m) + '</span>'; }).join("")
-          : '<div class="empty">no models pulled — <code>ollama pull qwen2.5:1.5b</code></div>') + '</div>';
+          : '<div class="empty">no models pulled — <code>ollama pull qwen3.5:2b</code></div>') + '</div>';
     } else {
       ob.innerHTML = '<div class="row"><span class="lbl">status</span><span class="val bad">not reachable</span></div>' +
         '<div class="empty">start it with <code>ollama serve</code>, then refresh.</div>';

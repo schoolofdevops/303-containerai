@@ -13,7 +13,7 @@ Test your understanding of the end-to-end Acme AI Support Platform — the archi
   {
     prompt: 'In the Acme AI Support Platform, which component runs NATIVE on the host — outside any container?',
     options: [
-      { text: 'Ollama model server (qwen2.5:1.5b + nomic-embed-text)', correct: true, explanation: 'Ollama runs natively on the host, using Metal on Apple Silicon or the CPU elsewhere. All containers reach it at host.docker.internal:11434 — the model never moves into a container.' },
+      { text: 'Ollama model server (qwen3.5:2b + nomic-embed-text)', correct: true, explanation: 'Ollama runs natively on the host, using Metal on Apple Silicon or the CPU elsewhere. All containers reach it at host.docker.internal:11434 — the model never moves into a container.' },
       { text: 'ChromaDB vector store', correct: false, explanation: 'ChromaDB is containerised — it runs as a service in the compose.yaml alongside the Docs Assistant and Support Agent.' },
       { text: 'ToolHive MCP gateway', correct: false, explanation: 'ToolHive (thv) runs as a container process that brokers MCP tool calls for the Support Agent and Incident Crew.' },
       { text: 'Streamlit Docs Assistant', correct: false, explanation: 'The Streamlit app is a container. It reaches ChromaDB and Ollama through the compose network and host.docker.internal respectively.' },
@@ -43,7 +43,7 @@ Test your understanding of the end-to-end Acme AI Support Platform — the archi
     options: [
       { text: 'Specialisation keeps each agent\'s context small and auditable; the Reviewer can catch errors the other agents make without seeing their full working', correct: true, explanation: 'Each agent has exactly one job and a tight context. The Reviewer is the explicit approval gate — it checks the Fixer\'s proposed command against the runbook and can reject it. A single all-purpose agent cannot audit its own output.' },
       { text: 'Four agents run four times faster because they execute in parallel', correct: false, explanation: 'The Incident Crew runs in sequence (Triage → Investigator → Fixer → Reviewer), not in parallel. Each agent\'s output feeds the next. The benefit is specialisation and auditability, not throughput.' },
-      { text: 'A 1.5B model cannot answer any question in a single prompt', correct: false, explanation: 'The 1.5B model handles each specialised agent\'s narrow task reliably. The crew design is about separation of concerns and auditability, not raw model capability.' },
+      { text: 'A 2B model cannot answer any question in a single prompt', correct: false, explanation: 'The 2B model handles each specialised agent\'s narrow task reliably. The crew design is about separation of concerns and auditability, not raw model capability.' },
       { text: 'Using more agents always produces better results for any task', correct: false, explanation: 'Multi-agent adds coordination overhead. A single well-prompted agent is sufficient for simple Q&A (M6). The crew pattern makes sense for multi-step tasks with approval gates, not as a universal rule.' },
     ],
   },

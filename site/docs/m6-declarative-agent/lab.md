@@ -16,7 +16,7 @@ You will read the three Markdown files that define Aria, start ChromaDB and the 
 Both models must be pulled on the host before the containers start.
 
 ```bash
-ollama pull qwen2.5:1.5b
+ollama pull qwen3.5:2b
 ollama pull nomic-embed-text
 ```
 
@@ -39,7 +39,7 @@ curl -s localhost:11434/api/tags | grep -o '"name":"[^"]*"'
 **Expected output:**
 
 ```
-"name":"qwen2.5:1.5b"
+"name":"qwen3.5:2b"
 "name":"nomic-embed-text:latest"
 ```
 
@@ -230,7 +230,7 @@ The guardrail matched `reveal` and `password` in the query regex *before* any LL
 
 :::note[The routing table for this agent]
 
-The validated routing decisions at temperature 0 on `qwen2.5:1.5b`:
+The validated routing decisions at temperature 0 on `qwen3.5:2b`:
 
 ```
 "How do I restart the payments service?" → YES (retrieve)
@@ -398,13 +398,13 @@ docker compose down -v
 
 **Symptom:** The agent routes YES for a general question and retrieves runbook chunks, or the answer is incoherent.
 
-**Cause:** `qwen2.5:1.5b` can occasionally misfire on the YES/NO routing prompt. Smaller quantisations are more sensitive to phrasing.
+**Cause:** `qwen3.5:2b` can occasionally misfire on the YES/NO routing prompt. Smaller quantisations are more sensitive to phrasing.
 
-**Fix:** Upgrade the model to `qwen2.5:3b`. Pull it first, then restart:
+**Fix:** Upgrade the model to `qwen3:4b`. Pull it first, then restart:
 
 ```bash
-ollama pull qwen2.5:3b
-LLM_MODEL=qwen2.5:3b docker compose run --rm agent "What is 2+2?"
+ollama pull qwen3:4b
+LLM_MODEL=qwen3:4b docker compose run --rm agent "What is 2+2?"
 ```
 
 The 3b model is more reliable at temperature 0 for two-class routing.

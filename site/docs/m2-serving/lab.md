@@ -10,7 +10,7 @@ that speaks the `/v1` contract, wire it to Ollama via a `compose.yaml`, and prov
 the engine behind the contract requires zero code changes.
 
 **Time:** ~30 minutes  
-**Prerequisites:** M1 complete — Rancher Desktop running, Ollama serving `qwen2.5:1.5b` natively
+**Prerequisites:** M1 complete — Rancher Desktop running, Ollama serving `qwen3.5:2b` natively
 at `:11434`. `docker` and `docker compose` on your PATH.
 
 ---
@@ -33,7 +33,7 @@ curl -s http://localhost:11434/v1/models | python3 -m json.tool
     "object": "list",
     "data": [
         {
-            "id": "qwen2.5:1.5b",
+            "id": "qwen3.5:2b",
             "object": "model",
             "created": 1783237329,
             "owned_by": "library"
@@ -42,7 +42,7 @@ curl -s http://localhost:11434/v1/models | python3 -m json.tool
 }
 ```
 
-> The `created` value is an epoch timestamp set when Ollama loaded the model; it will differ on your machine. If you've pulled other models on this machine (from other courses or projects), `data` will list every one of them — only the `qwen2.5:1.5b` entry matters here.
+> The `created` value is an epoch timestamp set when Ollama loaded the model; it will differ on your machine. If you've pulled other models on this machine (from other courses or projects), `data` will list every one of them — only the `qwen3.5:2b` entry matters here.
 
 This is the standard OpenAI `GET /v1/models` response shape. Any tool, SDK, or framework that
 expects OpenAI will accept this.
@@ -53,7 +53,7 @@ expects OpenAI will accept this.
 curl -s http://localhost:11434/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "qwen2.5:1.5b",
+    "model": "qwen3.5:2b",
     "messages": [{"role": "user", "content": "Explain containers in one sentence."}]
   }' | python3 -m json.tool
 ```
@@ -64,7 +64,7 @@ curl -s http://localhost:11434/v1/chat/completions \
     "id": "chatcmpl-184",
     "object": "chat.completion",
     "created": 1783249846,
-    "model": "qwen2.5:1.5b",
+    "model": "qwen3.5:2b",
     "system_fingerprint": "fp_ollama",
     "choices": [
         {
@@ -103,19 +103,19 @@ docker run --rm curlimages/curl:latest -s \
 
 **Expected output:**
 ```json
-{"object":"list","data":[{"id":"qwen2.5:1.5b","object":"model","created":1783237329,"owned_by":"library"}]}
+{"object":"list","data":[{"id":"qwen3.5:2b","object":"model","created":1783237329,"owned_by":"library"}]}
 ```
 
 ```bash
 docker run --rm curlimages/curl:latest -s \
   http://host.docker.internal:11434/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -d '{"model":"qwen2.5:1.5b","messages":[{"role":"user","content":"Say hi in 5 words."}]}'
+  -d '{"model":"qwen3.5:2b","messages":[{"role":"user","content":"Say hi in 5 words."}]}'
 ```
 
 **Expected output:**
 ```json
-{"id":"chatcmpl-460","object":"chat.completion","created":1783249856,"model":"qwen2.5:1.5b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"Hello there! Ready to chat now."},"finish_reason":"stop"}],"usage":{"prompt_tokens":36,"completion_tokens":9,"total_tokens":45}}
+{"id":"chatcmpl-460","object":"chat.completion","created":1783249856,"model":"qwen3.5:2b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"Hello there! Ready to chat now."},"finish_reason":"stop"}],"usage":{"prompt_tokens":36,"completion_tokens":9,"total_tokens":45}}
 ```
 
 > The `id`, `created`, and reply text all vary per request. `system_fingerprint` will always be `"fp_ollama"`.
@@ -141,7 +141,7 @@ client = OpenAI(base_url=os.environ.get("OPENAI_BASE_URL", "http://host.docker.i
 prompt = sys.argv[1] if len(sys.argv) > 1 else "Explain containers in one sentence."
 
 resp = client.chat.completions.create(
-    model=os.environ.get("MODEL", "qwen2.5:1.5b"),
+    model=os.environ.get("MODEL", "qwen3.5:2b"),
     messages=[{"role": "user", "content": prompt}])
 print(resp.choices[0].message.content)
 ```
@@ -244,7 +244,7 @@ services:
     build: .
     environment:
       OPENAI_BASE_URL: http://host.docker.internal:11434/v1
-      MODEL: qwen2.5:1.5b
+      MODEL: qwen3.5:2b
     # extra_hosts not needed on Rancher Desktop/Docker Desktop; note it for plain Linux:
     # extra_hosts: ["host.docker.internal:host-gateway"]
 ```
@@ -360,7 +360,7 @@ services:
     build: .
     environment:
       OPENAI_BASE_URL: http://host.docker.internal:11434/v1
-      MODEL: qwen2.5:1.5b
+      MODEL: qwen3.5:2b
     extra_hosts: ["host.docker.internal:host-gateway"]
 ```
 

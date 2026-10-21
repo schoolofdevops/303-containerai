@@ -16,7 +16,7 @@ You will hand-author a `compose.yaml` service by service, start a ChromaDB vecto
 Ollama must be running and both models must be pulled on the host before the containers start.
 
 ```bash
-ollama pull qwen2.5:1.5b
+ollama pull qwen3.5:2b
 ollama pull nomic-embed-text
 ```
 
@@ -39,7 +39,7 @@ curl -s localhost:11434/api/tags | grep -o '"name":"[^"]*"'
 **Expected output (models present):**
 
 ```
-"name":"qwen2.5:1.5b"
+"name":"qwen3.5:2b"
 "name":"nomic-embed-text:latest"
 ```
 
@@ -68,7 +68,7 @@ Create `compose.yaml` and add the opening comment and the first service:
 # only the vector DB and the app are containerized and reach Ollama via
 # host.docker.internal. On Linux/NVIDIA you could add an `ollama` service instead.
 #
-# Prereqs on the host:  ollama pull qwen2.5:1.5b  &&  ollama pull nomic-embed-text
+# Prereqs on the host:  ollama pull qwen3.5:2b  &&  ollama pull nomic-embed-text
 services:
   # Vector database — pinned to 0.5.x to match the langchain-chroma client version.
   chromadb:
@@ -110,7 +110,7 @@ Now append the application service below the chromadb block:
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
-      - LLM_MODEL=qwen2.5:1.5b
+      - LLM_MODEL=qwen3.5:2b
       - EMBEDDING_MODEL=nomic-embed-text
     depends_on:
       - chromadb
@@ -277,7 +277,7 @@ To restart the payments service, you need to execute the following command:
 kubectl rollout restart deploy/payments -n prod
 ```
 
-This is the validated naive-RAG round-trip: the question's embedding matched the payments runbook chunk by semantic similarity, that chunk was passed to `qwen2.5:1.5b` as context, and the model answered with the correct kubectl command — not a hallucinated one.
+This is the validated naive-RAG round-trip: the question's embedding matched the payments runbook chunk by semantic similarity, that chunk was passed to `qwen3.5:2b` as context, and the model answered with the correct kubectl command — not a hallucinated one.
 
 You can also expand **View Source Chunks** below the answer to see the exact text that was retrieved from ChromaDB.
 

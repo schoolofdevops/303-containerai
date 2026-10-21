@@ -457,7 +457,7 @@ footer, header, hgroup, main, menu, nav, section {
 <section>
   <h2 class="t">The embedder decides what "similar" means — the LLM never gets a vote</h2>
   <p class="s">The LLM never sees the corpus until retrieval hands it a slice</p>
-  <svg viewBox="0 0 1100 380" role="img" aria-label="A pipeline from the corpus through the embedding model nomic-embed-text which defines what is similar, into ChromaDB ranking, into retrieved chunks, into the LLM qwen2.5:1.5b which never sees the rest">
+  <svg viewBox="0 0 1100 380" role="img" aria-label="A pipeline from the corpus through the embedding model nomic-embed-text which defines what is similar, into ChromaDB ranking, into retrieved chunks, into the LLM qwen3.5:2b which never sees the rest">
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.6">
       <rect x="20" y="150" width="170" height="90" rx="10"/>
       <rect x="245" y="130" width="240" height="130" rx="10" fill="var(--p-blue)"/>
@@ -471,7 +471,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="640" y="200" text-anchor="middle" class="lbl-sm" style="font-size:19px">Chroma ranking</text>
     <text x="875" y="192" text-anchor="middle" class="lbl-sm" style="font-size:19px">retrieved</text>
     <text x="875" y="217" text-anchor="middle" class="lbl-sm" style="font-size:19px">chunks</text>
-    <text x="1050" y="188" text-anchor="middle" class="lbl-sm" style="font-size:18px">qwen2.5</text>
+    <text x="1050" y="188" text-anchor="middle" class="lbl-sm" style="font-size:18px">qwen3.5</text>
     <text x="1050" y="212" text-anchor="middle" class="lbl-g" style="font-size:15px" fill="#757575">never sees the rest</text>
     <g filter="url(#rough)" fill="none" stroke="#1e1e1e" stroke-width="2.4" stroke-linecap="round">
       <path d="M190,195 L243,195" marker-end="url(#ah)"/>
@@ -532,7 +532,7 @@ footer, header, hgroup, main, menu, nav, section {
     <text x="217" y="195" text-anchor="middle" class="lbl-sm" style="font-size:17px">context</text>
     <text x="322" y="195" text-anchor="middle" class="lbl-sm" style="font-size:17px">Q</text>
     <text x="685" y="195" text-anchor="middle" class="lbl-b" style="font-size:24px">answer headroom</text>
-    <text x="685" y="345" text-anchor="middle" class="lbl-g" style="font-size:18px">real ceiling, independent of qwen2.5:1.5b's native training context</text>
+    <text x="685" y="345" text-anchor="middle" class="lbl-g" style="font-size:18px">real ceiling, independent of qwen3.5:2b's native training context</text>
   </svg>
   <div class="pageno">M5-DD·12</div>
 </section>

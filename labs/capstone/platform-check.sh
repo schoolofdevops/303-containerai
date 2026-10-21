@@ -12,7 +12,7 @@ docker version >/dev/null 2>&1 && ok "docker CLI + engine reachable" || bad "no 
 
 echo "== 2. Model serving (native Ollama, OpenAI-compatible) =="
 curl -sf http://localhost:11434/api/tags >/dev/null 2>&1 && ok "Ollama serving on :11434" || bad "Ollama not serving"
-curl -sf http://localhost:11434/api/tags 2>/dev/null | grep -q qwen2.5 && ok "chat model present (qwen2.5)" || bad "qwen2.5 not pulled"
+curl -sf http://localhost:11434/api/tags 2>/dev/null | grep -q qwen3.5 && ok "chat model present (qwen3.5)" || bad "qwen3.5 not pulled"
 curl -sf http://localhost:11434/api/tags 2>/dev/null | grep -q nomic-embed && ok "embedding model present (nomic-embed-text)" || bad "nomic-embed-text not pulled"
 
 echo "== 3. Container → native model wiring =="

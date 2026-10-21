@@ -126,14 +126,14 @@ Ollama is running
 ### 3. Pull the course dev model
 
 ```bash
-ollama pull qwen2.5:1.5b
+ollama pull qwen3.5:2b
 ```
 
-Expected output (model is ~986 MB; digest varies per release):
+Expected output (model is ~3.1 GB; digest varies per release):
 
 ```
 pulling manifest
-pulling 183715c43589: 100% ▕██████████████████▏ 986 MB
+pulling 183715c43589: 100% ▕██████████████████▏ 3.1 GB
 pulling 66b9ea09bd5b: 100% ▕██████████████████▏   68 B
 pulling eb4402837c78: 100% ▕██████████████████▏ 1.5 KB
 pulling 832dd9e00a68: 100% ▕██████████████████▏  11 KB
@@ -152,7 +152,7 @@ Run a quick container that calls the natively-running Ollama — this proves the
 ```bash
 docker run --rm curlimages/curl \
   curl -s http://host.docker.internal:11434/api/generate \
-  -d '{"model":"qwen2.5:1.5b","prompt":"Say hello in one sentence.","stream":false}' \
+  -d '{"model":"qwen3.5:2b","prompt":"Say hello in one sentence.","stream":false}' \
   | grep -o '"response":"[^"]*"'
 ```
 

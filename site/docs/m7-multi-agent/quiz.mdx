@@ -13,7 +13,7 @@ import Quiz from '@site/src/components/Quiz';
     multiSelect: true,
     options: [
       {text: 'The task produces a consequential action (a command, a deployment) that needs a separate safety review.', correct: true, explanation: 'A Reviewer agent as a dedicated safety gate is a primary reason to use a crew — separating the action-proposing role (Fixer) from the approval role (Reviewer).'},
-      {text: 'Specialised, narrow roles improve small-model reliability on each individual task.', correct: true, explanation: 'A 1.5B model reliably handles "classify this incident in one line" or "does this passage match — YES/NO?". Asking it to do all four tasks at once overloads context and blurs roles.'},
+      {text: 'Specialised, narrow roles improve small-model reliability on each individual task.', correct: true, explanation: 'A 2B model reliably handles "classify this incident in one line" or "does this passage match — YES/NO?". Asking it to do all four tasks at once overloads context and blurs roles.'},
       {text: 'A multi-agent crew always runs faster than a single agent.', correct: false, explanation: 'A sequential crew makes multiple LLM calls, so it is slower. Speed is not the motivation; specialisation and review loops are.'},
       {text: 'Separation of concerns makes each agent easier to audit and each role easier to change.', correct: true, explanation: "Each agent's Markdown profile is a narrow system prompt — changing the Reviewer's criteria is a one-line edit that doesn't touch the other three."},
     ],
@@ -30,7 +30,7 @@ import Quiz from '@site/src/components/Quiz';
   {
     prompt: 'The four-agent crew runs on a 16 GB laptop at ~1.3 GB total. What makes that possible?',
     options: [
-      {text: 'Each agent uses a different, smaller quantised model.', correct: false, explanation: 'All four agents share one model (qwen2.5:1.5b) — there is only one model instance.'},
+      {text: 'Each agent uses a different, smaller quantised model.', correct: false, explanation: 'All four agents share one model (qwen3.5:2b) — there is only one model instance.'},
       {text: 'All four agents share one native Ollama endpoint; agents are cheap Python functions and the model is the only expensive component.', correct: true, explanation: 'The crew is four functions each making one HTTP call to the same endpoint. The model loads once and serves all four sequentially.'},
       {text: 'The crew container runs the model inside Docker with CPU inference.', correct: false, explanation: 'The model runs natively (Ollama/Metal); containers reach it via host.docker.internal:11434.'},
       {text: 'ChromaDB stores the model weights to avoid loading them into RAM.', correct: false, explanation: 'ChromaDB stores vector embeddings; weights are served by Ollama.'},
@@ -42,7 +42,7 @@ import Quiz from '@site/src/components/Quiz';
       {text: 'The crew is fully autonomous; REJECT means it handles the incident another way.', correct: false, explanation: 'REJECTED means escalate to a human. The crew produces a vetted recommendation or a clear escalation — humans keep final authority.'},
       {text: 'The Reviewer is a human-in-the-loop proxy: it produces a vetted recommendation, but a human decides whether to apply it.', correct: true, explanation: 'The crew never applies fixes. APPROVED = "a human should consider this command"; REJECTED = "a human should investigate." Automation does triage/retrieval/checking, not the final act.'},
       {text: 'The Reviewer rejects any automated action, so the crew is only useful for documentation.', correct: false, explanation: 'The 503 incident produces APPROVED with a concrete kubectl command ready for a human to run.'},
-      {text: 'A conservative REJECT bias means it can never approve anything on a small model.', correct: false, explanation: 'The 503 incident shows APPROVED on qwen2.5:1.5b. The bias means prefer an unnecessary escalation over a wrong approval.'},
+      {text: 'A conservative REJECT bias means it can never approve anything on a small model.', correct: false, explanation: 'The 503 incident shows APPROVED on qwen3.5:2b. The bias means prefer an unnecessary escalation over a wrong approval.'},
     ],
   },
   {
@@ -51,7 +51,7 @@ import Quiz from '@site/src/components/Quiz';
       {text: 'ChromaDB → a cloud vector store, and pin Python to 3.11.', correct: false, explanation: 'ChromaDB runs fine as a container anywhere. The Docker-Desktop-only pieces are DMR and supergateway.'},
       {text: 'The Compose models:/DMR block → native Ollama (point OPENAI_BASE_URL at /v1), and supergateway → a ToolHive-managed MCP server (thv run duckduckgo).', correct: true, explanation: 'DMR is Docker-Desktop-only; supergateway wraps a stdio MCP server with SSE inside Docker. ToolHive is the portable equivalent.'},
       {text: 'Rewrite agents.yaml as Python functions and convert tasks.yaml to Markdown.', correct: false, explanation: 'CrewAI keeps agents.yaml/tasks.yaml — that is the point of the framework. Porting changes only the infrastructure.'},
-      {text: 'Downgrade gemma3:4B to qwen2.5:1.5b and rebuild the Dockerfile.', correct: false, explanation: 'The model change is a trade-off, not a required port. The two required swaps are DMR→Ollama and supergateway→ToolHive.'},
+      {text: 'Downgrade gemma3:4B to qwen3.5:2b and rebuild the Dockerfile.', correct: false, explanation: 'The model change is a trade-off, not a required port. The two required swaps are DMR→Ollama and supergateway→ToolHive.'},
     ],
   },
 ]} />

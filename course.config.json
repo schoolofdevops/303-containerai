@@ -29,7 +29,7 @@
   },
   "stack": {
     "container_runtime": "Rancher Desktop (docker + docker compose); OCI/Compose-Spec standard, also runs on Colima/OrbStack/Podman/Docker Desktop",
-    "models": "Ollama (native host) — qwen2.5:1.5b, qwen2.5:3b, nomic-embed-text; CPU-vLLM — SmolLM2",
+    "models": "Ollama (native host) — qwen3.5:2b, qwen3:4b, nomic-embed-text; CPU-vLLM — SmolLM2",
     "vector_db": "ChromaDB",
     "registry": "GHCR"
   },
@@ -60,7 +60,7 @@
       "path": "labs/<id>",
       "kind": "compose"
     },
-    "setup": "Rancher Desktop (docker + compose) running locally; Ollama installed natively on the host serving qwen2.5:1.5b (and nomic-embed-text for RAG modules) at :11434 — on Apple Silicon the model server always runs native, never containerized, and containers reach it at http://host.docker.internal:11434. Each module ships its own labs/<id>/compose.yaml (spine mode: per-module, not grow-in-place).",
+    "setup": "Rancher Desktop (docker + compose) running locally; Ollama installed natively on the host serving qwen3.5:2b (and nomic-embed-text for RAG modules) at :11434 — on Apple Silicon the model server always runs native, never containerized, and containers reach it at http://host.docker.internal:11434. Each module ships its own labs/<id>/compose.yaml (spine mode: per-module, not grow-in-place).",
     "simulators": false
   },
   "pack": {

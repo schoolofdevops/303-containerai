@@ -47,7 +47,7 @@ m7 ready: chromadb healthy, crew image built.
 
 ## 1 — Temperature, per agent, not per crew
 
-The lab treated `qwen2.5:1.5b` as one model behind four roles. It is — but each role calls that
+The lab treated `qwen3.5:2b` as one model behind four roles. It is — but each role calls that
 model with a different `temperature`, and that difference is deliberate, not incidental.
 
 **Analogy:** think of temperature as how much a musician improvises around a melody. At low
@@ -323,13 +323,13 @@ doesn't have.
 Everything below runs **sequentially, one variant at a time** — never two `docker compose run`
 crew invocations in parallel. This machine budgets one crew container (~50 MB) plus the shared
 ChromaDB container (~200 MB) at a time; running variants back to back keeps the stack at or under
-2 GB total. It also matters for a second reason: on `qwen2.5:1.5b`, small-model output varies run
+2 GB total. It also matters for a second reason: on `qwen3.5:2b`, small-model output varies run
 to run even at the *same* temperature, so overlapping variants would make it impossible to tell
 whether a difference in output came from the knob you changed or from ordinary small-model noise.
 
 :::note[Small-model variance — read before judging the results]
 
-`qwen2.5:1.5b`-class models respond to temperature and prompt changes less predictably than
+`qwen3.5:2b`-class models respond to temperature and prompt changes less predictably than
 larger models. The comparisons below are illustrative of the **mechanism** — what changing a
 knob does to a pipeline's stability — not a universal recipe for what temperature to pick.
 Judge the deterministic side of every result strictly, but note that "deterministic" here is
@@ -341,7 +341,7 @@ removes that gate**, and §6's Variant B section shows directly what happens to 
 marker once it's gone: it stops being pinned. Judge the prose — the Triage summary sentence, the
 Reviewer's stated reason — by shape only in every variant: whether it stayed on topic and matched
 the expected disposition, not its exact wording. If you swap in a larger model
-(`qwen2.5:3b` or bigger) later, expect the *outcome markers* to stay just as stable at low
+(`qwen3:4b` or bigger) later, expect the *outcome markers* to stay just as stable at low
 temperature, but expect the *prose* to vary less at a given temperature than it does here — a
 bigger model needs less determinism-by-temperature to stay on-message.
 
@@ -360,7 +360,7 @@ docker compose run --rm crew "The checkout page is returning HTTP 503 errors for
 **Expected output**
 
 ```text
-[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen2.5:1.5b)
+[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen3.5:2b)
 
 ======================================================================
 INCIDENT: The checkout page is returning HTTP 503 errors for all users.
@@ -451,7 +451,7 @@ for i in 1 2 3; do
   docker run --rm --network m7_default \
     -e OLLAMA_BASE_URL=http://host.docker.internal:11434 \
     -e CHROMA_HOST=chromadb -e CHROMA_PORT=8000 \
-    -e LLM_MODEL=qwen2.5:1.5b -e EMBEDDING_MODEL=nomic-embed-text \
+    -e LLM_MODEL=qwen3.5:2b -e EMBEDDING_MODEL=nomic-embed-text \
     acme-incident-crew:hot-triage \
     "The checkout page is returning HTTP 503 errors for all users." \
     | tee ~/crew-deepdive-lab/variant-a-run${i}.log
@@ -462,7 +462,7 @@ done
 
 `````text
 === run 1 ===
-[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen2.5:1.5b)
+[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen3.5:2b)
 
 ======================================================================
 INCIDENT: The checkout page is returning HTTP 503 errors for all users.
@@ -483,7 +483,7 @@ health in the Acme dashboard.
 OUTCOME: APPROVED — ready for a human to apply
 
 === run 2 ===
-[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen2.5:1.5b)
+[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen3.5:2b)
 
 ======================================================================
 INCIDENT: The checkout page is returning HTTP 503 errors for all users.
@@ -504,7 +504,7 @@ health in the Acme dashboard.
 OUTCOME: APPROVED — ready for a human to apply
 
 === run 3 ===
-[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen2.5:1.5b)
+[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen3.5:2b)
 
 ======================================================================
 INCIDENT: The checkout page is returning HTTP 503 errors for all users.
@@ -608,7 +608,7 @@ rm crew/crew.py.deepdive-no-gate
 docker run --rm --network m7_default \
   -e OLLAMA_BASE_URL=http://host.docker.internal:11434 \
   -e CHROMA_HOST=chromadb -e CHROMA_PORT=8000 \
-  -e LLM_MODEL=qwen2.5:1.5b -e EMBEDDING_MODEL=nomic-embed-text \
+  -e LLM_MODEL=qwen3.5:2b -e EMBEDDING_MODEL=nomic-embed-text \
   acme-incident-crew:no-gate \
   "The Kafka event streaming cluster has stopped processing messages." \
   | tee ~/crew-deepdive-lab/variant-b-kafka-no-gate.log
@@ -617,7 +617,7 @@ docker run --rm --network m7_default \
 **Captured output — one real run**
 
 `````text
-[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen2.5:1.5b)
+[crew] Acme Incident Crew: Triage -> Investigator -> Fixer -> Reviewer (4 profiles, one shared model: qwen3.5:2b)
 
 ======================================================================
 INCIDENT: The Kafka event streaming cluster has stopped processing messages.

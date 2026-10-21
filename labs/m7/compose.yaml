@@ -3,7 +3,7 @@
 # declarative default. See the lab for the CrewAI framework variant (ported off Docker Model
 # Runner to native Ollama, and off supergateway to the ToolHive MCP gateway).
 #
-# Prereqs: ollama pull qwen2.5:1.5b && ollama pull nomic-embed-text
+# Prereqs: ollama pull qwen3.5:2b && ollama pull nomic-embed-text
 services:
   chromadb:
     image: chromadb/chroma:0.5.20
@@ -33,7 +33,7 @@ services:
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
-      - LLM_MODEL=qwen2.5:1.5b
+      - LLM_MODEL=qwen3.5:2b
       - EMBEDDING_MODEL=nomic-embed-text
 
 volumes:

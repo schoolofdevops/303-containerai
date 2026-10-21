@@ -49,7 +49,7 @@ By the end of this module, you will be able to design a multi-agent pipeline wit
 
 Let's now look at three different things a single agent cannot give you, and why each one actually matters.
 
-The first is specialisation. Let's say your triage agent's only job is to read an incident report and classify it. You would set its temperature to zero, which just means it gives you the same, most predictable answer every time, and it outputs a single line. Now compare that to an investigator agent — its only job is to query a vector store and report back exactly what it finds, word for word, no extra commentary. A fixer agent proposes one exact command. A reviewer agent checks that command for safety. Each prompt stays small, so the context stays small, and a 1.5 billion parameter model running on your laptop can handle each of these jobs reliably. Now ask one agent to do all four jobs in a single prompt, and you would overload its context, blur every role together, and make the final output much harder to check.
+The first is specialisation. Let's say your triage agent's only job is to read an incident report and classify it. You would set its temperature to zero, which just means it gives you the same, most predictable answer every time, and it outputs a single line. Now compare that to an investigator agent — its only job is to query a vector store and report back exactly what it finds, word for word, no extra commentary. A fixer agent proposes one exact command. A reviewer agent checks that command for safety. Each prompt stays small, so the context stays small, and a 2 billion parameter model running on your laptop can handle each of these jobs reliably. Now ask one agent to do all four jobs in a single prompt, and you would overload its context, blur every role together, and make the final output much harder to check.
 
 The second reason is separation of concerns — that is, keeping each agent's job separate from every other agent's job. The triage agent never sees the runbook. The fixer never checks safety. That's not just tidier design for its own sake. It directly cuts down the chance of a small model hallucinating — that is, making something up with confidence — across a task boundary it was never actually built for.
 
@@ -142,18 +142,18 @@ In the next video, let's put an actual number on what this crew costs to run, an
 
 ### Narration script
 
-Let's do the math on what this crew actually costs to run, on a 16 gigabyte laptop running qwen2.5:1.5b. The model itself needs about 1 gigabyte of memory. ChromaDB needs around 200 megabytes. And the crew container — all four agents together — needs only about 50 megabytes. That's a total of roughly 1.3 gigabytes.
+Let's do the math on what this crew actually costs to run, on a 16 gigabyte laptop running qwen3.5:2b. The model itself needs about 1 gigabyte of memory. ChromaDB needs around 200 megabytes. And the crew container — all four agents together — needs only about 50 megabytes. That's a total of roughly 1.3 gigabytes.
 
 And here's the interesting part — agents themselves are cheap. A crew is really just four Python functions with four different system prompts. The model is the expensive part, and it's shared across all four. Running four separate copies of the model, one per agent, would need four times the memory for no real gain. So all four agents call the same Ollama endpoint, one after another, exactly the same idea you used back in Module 6.
 
-If you did reach for a framework crew instead — CrewAI running gemma3:4B, say — you'd need closer to 4 gigabytes. The declarative 1.5 billion parameter crew stays the laptop-friendly default, and you'd only reach for a bigger model when the framework's more complex coordination actually demands it.
+If you did reach for a framework crew instead — CrewAI running gemma3:4B, say — you'd need closer to 4 gigabytes. The declarative 2 billion parameter crew stays the laptop-friendly default, and you'd only reach for a bigger model when the framework's more complex coordination actually demands it.
 
 To summarize — you've learned why a crew beats a single agent for consequential actions, how the pipeline runs with a relevance gate protecting the fixer, and the three ways to actually build one. In the lab now, you're going to read all four agent profiles yourself, run the crew against a real 503 incident and watch it get APPROVED, and then run it against a Kafka incident and watch the relevance gate catch a bad match and send it to REJECTED — escalate. I'll see you in the lab.
 
 ### Suggested visuals / slide beats
 
 1. Resource table — model / ChromaDB / crew container / total, laptop-friendly framing
-2. Comparison — declarative 1.5B crew (~1.3 GB) vs CrewAI + gemma3:4B (~4 GB)
+2. Comparison — declarative 2B crew (~1.3 GB) vs CrewAI + gemma3:4B (~4 GB)
 3. Closing/lab-bridge slide — "Now open Module 7 · Lab" with the two lab scenarios (503 → APPROVED, Kafka → REJECTED/escalate) as icons
 
 ---
